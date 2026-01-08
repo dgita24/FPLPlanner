@@ -31,7 +31,7 @@ export async function loadFixtures(gw) {
 
 export async function loadTeamEntry(managerId, gw) {
   try {
-    const res = await fetch(`/api/test-team`);
+    const res = await fetch(`/api/fpl/entry/${managerId}/event/${gw}/picks/`);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     return await res.json();
   } catch (err) {
