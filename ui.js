@@ -1,4 +1,5 @@
 // ui.js - UI interactions
+// ui.js - UI interactions changed
 import { state, loadTeamEntry } from './data.js';
 
 // Sidebar toggle
