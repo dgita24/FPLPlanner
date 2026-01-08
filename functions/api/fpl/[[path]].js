@@ -1,11 +1,10 @@
 export async function onRequest(context) {
   const url = new URL(context.request.url);
-  // Extract path after /api/fpl/
-  let fplPath = url.pathname.replace('/api/fpl', '');
-  if (!fplPath.startsWith('/')) fplPath = '/' + fplPath;
-  const target = `https://fantasy.premierleague.com${fplPath}${url.search}`;
+  // Strip /api/fpl/ prefix
+  let fplPath = url.pathname.replace('/api/fpl/', '/');
+  const target = `https://fantasy.premierleague.com/api${fplPath}${url.search}`;
   
-  console.log(`Proxy: ${url.pathname} -> ${target}`); // Debug
+  console.log(`Proxy: ${url.pathname} -> ${target}`);
   
   try {
     const res = await fetch(target, {
@@ -25,4 +24,5 @@ export async function onRequest(context) {
     });
   }
 }
+
 
