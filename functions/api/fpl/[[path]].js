@@ -1,7 +1,7 @@
 export async function onRequest(context) {
   const url = new URL(context.request.url);
   // Strip /api/fpl/ prefix
-  let fplPath = url.pathname.replace('/api/fpl/', '/');
+  let fplPath = url.pathname.replace('/api/fpl/', '');
   const target = `https://fantasy.premierleague.com/api${fplPath}${url.search}`;
   
   console.log(`Proxy: ${url.pathname} -> ${target}`);
