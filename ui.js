@@ -1,5 +1,4 @@
 // ui.js - UI interactions
-// ui.js - UI interactions changed
 import { state, loadTeamEntry } from './data.js';
 
 // Sidebar toggle
@@ -7,38 +6,46 @@ window.toggleSidebarMenu = function() {
   document.getElementById('sidebar').classList.toggle('open');
 };
 
-// Import team from FPL
+// Import team from FPL (Option A: "latest publicly available")
 window.importTeam = async function() {
   const teamId = document.getElementById('importTeamId').value.trim();
   if (!teamId) {
     showMessage('Enter Team ID', 'error');
     return;
   }
-  
-  showMessage('Loading team...', 'info');
+
+  showMessage(`Loading team (GW${state.currentGW})...`, 'info');
+
   const data = await loadTeamEntry(teamId, state.currentGW);
-  
+
   if (!data || !data.picks) {
-    showMessage('Failed to load team', 'error');
+    showMessage('Failed to load team (no public picks found).', 'error');
     return;
   }
-  
-  console.log(`Imported team ${teamId}: ${data.picks.length} players`);
+
+  const importedGW = data._imported_gw || state.importedGW || state.currentGW;
+
+  console.log(`Imported team ${teamId}: ${data.picks.length} players (GW ${importedGW})`);
   renderPitch(data.picks);
-  showMessage(`Team imported! ${data.picks.length} players`, 'success');
+
+  if (importedGW !== state.currentGW) {
+    showMessage(`Imported from GW${importedGW} (GW${state.currentGW} not publicly available yet).`, 'success');
+  } else {
+    showMessage(`Team imported! ${data.picks.length} players (GW${importedGW})`, 'success');
+  }
 };
 
 // Render pitch from picks
 function renderPitch(picks) {
   const starting = picks.filter(p => p.position <= 11).sort((a,b) => a.position - b.position);
   const bench = picks.filter(p => p.position > 11).sort((a,b) => a.position - b.position);
-  
+
   // Group starting XI by position
   const gk = starting.filter(p => getPlayer(p.element).element_type === 1);
   const def = starting.filter(p => getPlayer(p.element).element_type === 2);
   const mid = starting.filter(p => getPlayer(p.element).element_type === 3);
   const fwd = starting.filter(p => getPlayer(p.element).element_type === 4);
-  
+
   const pitch = document.getElementById('pitch');
   pitch.innerHTML = `
     <div class="formation-line">${fwd.map(p => playerCard(p)).join('')}</div>
@@ -46,7 +53,7 @@ function renderPitch(picks) {
     <div class="formation-line">${def.map(p => playerCard(p)).join('')}</div>
     <div class="formation-line">${gk.map(p => playerCard(p)).join('')}</div>
   `;
-  
+
   const benchSlots = document.getElementById('benchSlots');
   benchSlots.innerHTML = bench.map(p => playerCard(p)).join('');
 }
@@ -60,13 +67,14 @@ function getPlayer(id) {
 function playerCard(pick) {
   const p = getPlayer(pick.element);
   const team = state.teams.find(t => t.id === p.team);
+
   return `
     <div class="player-card">
-      <img src="https://resources.premierleague.com/premierleague/badges/t${team.code}.png" 
+      <img src="https://resources.premierleague.com/premierleague/badges/t${team.code}.png"
            class="badge" alt="${team.short_name}">
       <div class="name">${p.web_name}</div>
       <div class="info">
-        <span>£${(p.now_cost / 10).toFixed(1)}m</span>
+        <span>${(p.now_cost / 10).toFixed(1)}m</span>
         <span>${team.short_name}</span>
       </div>
     </div>
