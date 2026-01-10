@@ -473,7 +473,7 @@ max-width: none;
 
 .fixture-row {
   display: grid;
-  grid-template-columns: minmax(0,1fr) auto minmax(0,1fr);
+  grid-template-columns: minmax(120px, 1fr) 64px minmax(120px, 1fr);
   align-items: center;
   padding: 6px 0;
   border-bottom: 1px solid rgba(255,255,255,0.15);
@@ -485,6 +485,33 @@ display: flex;
 align-items: center;
 gap: 6px;
 }
+
+.fixture-team {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.fixture-team.home {
+  justify-content: flex-end;
+  text-align: right;
+}
+
+.fixture-team.away {
+  justify-content: flex-start;
+  text-align: left;
+}
+
+.fixture-time {
+  text-align: center;
+  font-weight: 600;
+  background: rgba(0,0,0,0.35);
+  border-radius: 4px;
+  padding: 2px 6px;
+  font-size: 12px;
+}
+
 
 /* Home team (flows right → away from centre) */
 .fixture-row .team.home {
