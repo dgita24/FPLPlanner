@@ -26,61 +26,95 @@
 
         .header {
             display: flex;
-            justify-content: space-between;
+            justify-content: flex-start;
             align-items: center;
-            margin-bottom: 20px;
-            padding: 20px;
+            gap: 15px;
+            margin-bottom: 10px;
+            padding: 15px 20px;
             background: rgba(255, 255, 255, 0.1);
             border-radius: 10px;
         }
 
-        .header h1 { font-size: 24px; margin: 0; }
-
         .bank-display {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 18px;
-            font-weight: bold;
+          display: flex;
+          align-items: center;
+          gap: 5px; /* Tighter gap */
+          font-size: 16px; /* Slightly smaller */
+          font-weight: bold;
         }
 
         .bank-display input {
-            width: 80px;
-            padding: 8px;
+            width: 70px;
+            padding: 6px 8px;
             border-radius: 5px;
             border: none;
-            font-size: 16px;
+            font-size: 15px;
             font-weight: bold;
+            background: rgba(255, 255, 255, 0.9);
         }
 
         .price-toggle {
             display: flex;
             align-items: center;
-            gap: 6px;
-            margin-left: 15px;
-            font-size: 14px;
+            gap: 4px;
+            font-size: 13px;
         }
 
         .price-toggle select {
             padding: 4px 6px;
             border-radius: 4px;
             border: none;
-            font-size: 13px;
+            font-size: 12px;
+            background: rgba(255, 255, 255, 0.9);
         }
 
+        /* New header button styles */
+        .header-actions {
+          display: flex;
+          gap: 8px;
+        }
+
+        .header-btn {
+          padding: 8px 12px;
+          border: none;
+          border-radius: 5px;
+          font-weight: bold;
+          font-size: 13px;
+          cursor: pointer;
+          transition: all 0.2s;
+        }
+
+        .save-btn {
+        background: #ff9800;
+        color: white;
+        }
+
+        .save-btn:hover {
+          background: #f57c00;
+        }
+
+        .load-btn {
+        background: #2196f3;
+        color: white;
+        }
+
+        .load-btn:hover {
+        background: #1976d2;
+        }
+
+
         .sidebar-toggle {
-            position: fixed;
-            right: 20px;
-            top: 120px;
-            padding: 10px 20px;
+            padding: 10px 15px; /* Slightly smaller */
             background: var(--primary);
             color: var(--bg);
             border: none;
             border-radius: 5px;
             cursor: pointer;
             font-weight: bold;
-            z-index: 2000;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+            margin-left: auto;
+            font-size: 14px;
+            white-space: nowrap;
+            transition: opacity 0.2s;
         }
 
         .sidebar-toggle:hover { opacity: 0.9; }
@@ -334,7 +368,14 @@
                     <option value="current">Current</option>
                 </select>
             </div>
-        </div>
+            <div class="header-actions">
+              <button onclick="localSave()" class="header-btn save-btn">💾 Save</button>
+              <button onclick="localLoad()" class="header-btn load-btn">📂 Load</button>
+            </div> 
+
+            <!-- Menu button - now fixed in header, not floating -->
+             <button class="sidebar-toggle" onclick="toggleSidebarMenu()">☰ Menu</button>
+    </div>
 
         <button class="sidebar-toggle" onclick="toggleSidebarMenu()">Menu</button>
 
@@ -355,9 +396,6 @@
             <input type="password" id="loadPassword" placeholder="Password" />
             <button onclick="loadTeam()">Load Team</button>
 
-            <h3>Local Save</h3>
-            <button onclick="localSave()" style="background: #ff9800">Save</button>
-            <button onclick="localLoad()" style="background: #2196f3">Load</button>
 
             <div id="sideMsg" style="margin-top: 10px; font-size: 12px"></div>
         </div>
