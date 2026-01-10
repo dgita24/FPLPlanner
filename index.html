@@ -472,12 +472,12 @@ max-width: none;
 /* ===== Fixtures panel (FPL-style rows) ===== */
 
 .fixture-row {
-display: grid;
-grid-template-columns: 1fr auto 1fr;
-align-items: center;
-padding: 6px 0;
-border-bottom: 1px solid rgba(255,255,255,0.15);
-font-size: 13px;
+  display: grid;
+  grid-template-columns: minmax(0,1fr) auto minmax(0,1fr);
+  align-items: center;
+  padding: 6px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.15);
+  font-size: 13px;
 }
 
 .fixture-row .team {
@@ -486,14 +486,22 @@ align-items: center;
 gap: 6px;
 }
 
+/* Home team (flows right → away from centre) */
 .fixture-row .team.home {
-justify-content: flex-end;
-text-align: right;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 6px;
+  text-align: right;
 }
 
+/* Away team (flows left ← away from centre) */
 .fixture-row .team.away {
-justify-content: flex-start;
-text-align: left;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 6px;
+  text-align: left;
 }
 
 .team-name {
@@ -506,14 +514,17 @@ height: 22px;
 object-fit: contain;
 }
 
+/* Kickoff time – dead centre */
 .fixture-row .ko {
-background: rgba(0,0,0,0.5);
-padding: 3px 6px;
-border-radius: 4px;
-font-size: 11px;
-font-weight: bold;
+  justify-self: center;
+  text-align: center;
+  min-width: 42px;
+  background: rgba(0,0,0,0.6);
+  padding: 3px 6px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: bold;
 }
-
 
 #fixturesPanel {
 background: rgba(0,0,0,0.25);
