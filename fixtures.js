@@ -26,7 +26,7 @@ export async function loadFixturesData() {
 }
 
 /**
- * GW navigation for fixtures panel only
+ * GW navigation (fixtures panel only)
  */
 window.changeFixturesGW = function (delta) {
   fixturesGW = Math.max(1, Math.min(38, fixturesGW + delta));
@@ -34,7 +34,7 @@ window.changeFixturesGW = function (delta) {
 };
 
 /**
- * Render fixtures panel
+ * Render fixtures panel (FPL-style)
  */
 export function renderFixtures() {
   const panel = document.getElementById('fixturesPanel');
@@ -42,59 +42,78 @@ export function renderFixtures() {
 
   const fixtures = fixturesByGW.get(fixturesGW) || [];
 
-  panel.innerHTML = `
+  // Group fixtures by calendar date
+  const byDate = new Map();
+
+  for (const f of fixtures) {
+    if (!f.kickoff_time) continue;
+
+    const d = new Date(f.kickoff_time);
+    const dateLabel = d.toLocaleDateString('en-GB', {
+      weekday: 'long',
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric'
+    });
+
+    if (!byDate.has(dateLabel)) {
+      byDate.set(dateLabel, []);
+    }
+
+    byDate.get(dateLabel).push(f);
+  }
+
+  let html = `
     <div class="fixtures-header">
       <button onclick="changeFixturesGW(-1)">←</button>
       <strong>GW ${fixturesGW}</strong>
       <button onclick="changeFixturesGW(1)">→</button>
     </div>
-
-    ${fixtures.map(renderFixtureRow).join('')}
   `;
-}
 
-/**
- * Render one fixture row (FPL-style)
- */
-function renderFixtureRow(f) {
-  const home = getTeam(f.team_h);
-  const away = getTeam(f.team_a);
+  for (const [dateLabel, dayFixtures] of byDate) {
+    html += `<div class="fixture-date">${dateLabel}</div>`;
 
-  const kickoff = f.kickoff_time
-    ? new Date(f.kickoff_time).toLocaleTimeString([], {
+    for (const f of dayFixtures) {
+      const ko = new Date(f.kickoff_time).toLocaleTimeString('en-GB', {
         hour: '2-digit',
         minute: '2-digit'
-      })
-    : '';
+      });
 
-  return `
-    <div class="fixture-row">
-      <div class="team home">
-        <span class="team-name">${home.name}</span>
-        <img class="team-badge" src="${home.badge}" />
-      </div>
+      const home = getTeam(f.team_h);
+      const away = getTeam(f.team_a);
 
-      <div class="ko">${kickoff}</div>
+      html += `
+        <div class="fixture-row">
+          <div class="fixture-team home">
+            <span class="team-name">${home.short}</span>
+            <img class="team-badge" src="${home.badge}" />
+          </div>
 
-      <div class="team away">
-        <img class="team-badge" src="${away.badge}" />
-        <span class="team-name">${away.name}</span>
-      </div>
-    </div>
-  `;
+          <div class="fixture-time">${ko}</div>
+
+          <div class="fixture-team away">
+            <img class="team-badge" src="${away.badge}" />
+            <span class="team-name">${away.short}</span>
+          </div>
+        </div>
+      `;
+    }
+  }
+
+  panel.innerHTML = html;
 }
 
 /**
- * Get team info from state
+ * Get team data from state
  */
 function getTeam(teamId) {
   const t = state.teams.find(team => team.id === teamId);
 
   return {
-    name: t ? t.name : '?',
+    short: t ? t.short_name || t.name : '?',
     badge: t
       ? `https://resources.premierleague.com/premierleague/badges/70/t${t.code}.png`
       : ''
   };
 }
-
