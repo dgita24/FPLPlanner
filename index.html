@@ -446,6 +446,32 @@ background: #d50000;
 .msg-info {
 background: #2962ff;
 }
+
+#plannerMain {
+display: grid;
+grid-template-columns: 260px 1fr;
+gap: 12px;
+}
+
+#fixturesPanel {
+background: rgba(0,0,0,0.25);
+border-radius: 10px;
+padding: 10px;
+color: white;
+}
+
+.fixtures-header {
+display: flex;
+justify-content: space-between;
+margin-bottom: 8px;
+}
+
+.fixture-row {
+padding: 4px 0;
+font-size: 13px;
+border-bottom: 1px solid rgba(255,255,255,0.15);
+}
+
 </style>
 </head>
 
@@ -502,7 +528,10 @@ background: #2962ff;
             <button onclick="changeGW(1)" id="nextGW">GW →</button>
         </div>
 
-        <div id="pitch" class="pitch"></div>
+        <div id=plannerMain">
+          <div id="fixturesPanel"></div>
+          <div id="pitch" class="pitch"></div>
+        </div>
 
         <div class="bench">
             <h3>Bench</h3>

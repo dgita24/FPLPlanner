@@ -2,6 +2,7 @@
 // ui.js - Added to try force git commit
 import { state, loadTeamEntry, calculateSellingPrice, loadFixtures } from './data.js';
 import { renderTable } from './table.js';
+import { renderFixtures } from './fixtures.js';
 
 // Sidebar toggle
 let sidebarJustToggled = false;
@@ -212,6 +213,7 @@ function changeGW(delta) {
   pendingSwap = null;
 
   updateUI();
+  renderFixtures();
 }
 
 function getPlayer(id) {

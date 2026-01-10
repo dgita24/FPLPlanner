@@ -2,6 +2,7 @@
 import { loadBootstrap, state } from './data.js';
 import { renderTable, populateFilters } from './table.js';
 import { initUI } from './ui.js';
+import { loadFixturesData, renderFixtures } from './fixtures.js';
 
 async function init() {
   console.log('FPLPlanner starting...');
@@ -12,6 +13,8 @@ async function init() {
     console.log(`App ready! GW ${state.currentGW}, ${state.elements.length} players`);
 
     initUI();
+    await loadFixturesData();
+    renderFixtures();
     populateFilters();
     renderTable();
   } else {
