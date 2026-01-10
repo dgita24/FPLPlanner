@@ -4,7 +4,7 @@ const fixturesByGW = new Map();
 let fixturesGW = null;
 
 /* -------------------------------
-   Load fixtures from FPL API
+   Load fixtures
 -------------------------------- */
 export async function loadFixturesData() {
   const res = await fetch('/api/fpl/fixtures');
@@ -14,10 +14,7 @@ export async function loadFixturesData() {
 
   for (const f of data) {
     if (!f.event || !f.kickoff_time) continue;
-
-    if (!fixturesByGW.has(f.event)) {
-      fixturesByGW.set(f.event, []);
-    }
+    if (!fixturesByGW.has(f.event)) fixturesByGW.set(f.event, []);
     fixturesByGW.get(f.event).push(f);
   }
 
@@ -41,15 +38,12 @@ export function renderFixtures() {
 
   const fixtures = fixturesByGW.get(fixturesGW) || [];
 
-  // Group by calendar date
-  const grouped = {};
+  const byDate = {};
   for (const f of fixtures) {
-    const dateKey = f.kickoff_time.slice(0, 10);
-    if (!grouped[dateKey]) grouped[dateKey] = [];
-    grouped[dateKey].push(f);
+    const d = f.kickoff_time.slice(0, 10);
+    if (!byDate[d]) byDate[d] = [];
+    byDate[d].push(f);
   }
-
-  const dates = Object.keys(grouped).sort();
 
   panel.innerHTML = `
     <div class="fixtures-header">
@@ -58,16 +52,19 @@ export function renderFixtures() {
       <button onclick="changeFixturesGW(1)">→</button>
     </div>
 
-    ${dates.map(dateKey => renderDateBlock(dateKey, grouped[dateKey])).join('')}
+    ${Object.keys(byDate)
+      .sort()
+      .map(d => renderDateBlock(d, byDate[d]))
+      .join('')}
   `;
 }
 
 /* -------------------------------
-   Render a date block
+   Date block
 -------------------------------- */
 function renderDateBlock(dateKey, fixtures) {
   const date = new Date(dateKey + 'T00:00:00Z');
-  const dateLabel = date.toLocaleDateString('en-GB', {
+  const label = date.toLocaleDateString('en-GB', {
     weekday: 'long',
     day: 'numeric',
     month: 'long',
@@ -75,7 +72,7 @@ function renderDateBlock(dateKey, fixtures) {
   });
 
   return `
-    <div class="fixture-date">${dateLabel}</div>
+    <div class="fixture-date">${label}</div>
     ${fixtures
       .sort((a, b) => a.kickoff_time.localeCompare(b.kickoff_time))
       .map(renderFixtureRow)
@@ -84,7 +81,7 @@ function renderDateBlock(dateKey, fixtures) {
 }
 
 /* -------------------------------
-   Render one fixture row
+   Single fixture row
 -------------------------------- */
 function renderFixtureRow(f) {
   const home = getTeam(f.team_h);
@@ -97,28 +94,22 @@ function renderFixtureRow(f) {
 
   return `
     <div class="fixture-row">
-      <div class="fixture-team home">
-        <span>${home.name}</span>
-        <img src="${home.badge}" alt="${home.name}">
-      </div>
-
-      <div class="fixture-time">${ko}</div>
-
-      <div class="fixture-team away">
-        <img src="${away.badge}" alt="${away.name}">
-        <span>${away.name}</span>
-      </div>
+      <span class="team-name home">${home.name}</span>
+      <img class="team-badge" src="${home.badge}" alt="${home.name}">
+      <span class="fixture-time">${ko}</span>
+      <img class="team-badge" src="${away.badge}" alt="${away.name}">
+      <span class="team-name away">${away.name}</span>
     </div>
   `;
 }
 
 /* -------------------------------
-   Team lookup helper
+   Team lookup
 -------------------------------- */
 function getTeam(id) {
-  const team = state.teams.find(t => t.id === id);
+  const t = state.teams.find(team => team.id === id);
   return {
-    name: team?.name ?? '?',
-    badge: team?.badge ?? '',
+    name: t?.name ?? '?',
+    badge: t?.badge ?? '',
   };
 }
