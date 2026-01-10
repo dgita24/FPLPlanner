@@ -89,10 +89,16 @@ window.importTeam = async function () {
     showMessage(`Team imported for GW${state.currentGW}.`, 'success');
   }
 
+  // Ensure we always show/planning the active currentGW after import
+  state.viewingGW = state.currentGW;
+
   // reset transient UI state
   lastSoldSide = null;
   pendingTransfer = null;
   pendingSwap = null;
+
+  // Close the menu after import
+  document.getElementById('sidebar')?.classList.remove('open');
 
   updateUI();
 };
@@ -541,8 +547,9 @@ function addSelectedToSquad() {
 -------------------------- */
 
 function updateUI() {
+  // Show the GW being viewed/planned (this fixes the post-import display too)
   const gwEl = document.getElementById('currentGWDisplay');
-  if (gwEl) gwEl.textContent = state.currentGW;
+  if (gwEl) gwEl.textContent = state.viewingGW;
 
   const prevBtn = document.getElementById('prevGW');
   const nextBtn = document.getElementById('nextGW');
