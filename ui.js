@@ -7,6 +7,19 @@ window.toggleSidebarMenu = function () {
 };
 
 export function initUI() {
+  // Inject CSS for two-click swap highlight (no index.html change needed)
+  if (!document.getElementById('pendingSwapStyle')) {
+    const style = document.createElement('style');
+    style.id = 'pendingSwapStyle';
+    style.textContent = `
+      .player-card.pending-swap {
+        outline: 3px solid #00ff87;
+        box-shadow: 0 0 0 3px rgba(0, 255, 135, 0.25);
+      }
+    `;
+    document.head.appendChild(style);
+  }
+
   // Bank input should be editable and reflect state.bank
   const bankInput = document.getElementById('bankInput');
   if (bankInput) {
@@ -30,7 +43,7 @@ export function initUI() {
     });
   }
 
-  // Expose nav + actions used by inline onclicks in index.html [file:12]
+  // Expose nav + actions used by inline onclicks in index.html
   window.changeGW = changeGW;
   window.removePlayer = removePlayer;
   window.substitutePlayer = substitutePlayer;
@@ -57,7 +70,10 @@ window.importTeam = async function () {
 
   const importedGW = data._imported_gw || state.importedGW;
   if (importedGW && importedGW !== state.currentGW) {
-    showMessage(`Imported from GW${importedGW} (GW${state.currentGW} not public yet).`, 'success');
+    showMessage(
+      `Imported from GW${importedGW} (GW${state.currentGW} not public yet).`,
+      'success'
+    );
   } else {
     showMessage(`Team imported for GW${state.currentGW}.`, 'success');
   }
@@ -74,26 +90,30 @@ function changeGW(delta) {
   if (next > maxGW) next = maxGW;
 
   state.viewingGW = next;
+
+  // cancel any in-progress swap when changing GW
+  pendingSwap = null;
+
   updateUI();
 }
 
 function getPlayer(id) {
-  return state.elements.find(p => p.id === id);
+  return state.elements.find((p) => p.id === id);
 }
 
 function getTeamShortName(teamId) {
-  const t = state.teams.find(x => x.id === teamId);
+  const t = state.teams.find((x) => x.id === teamId);
   return t ? (t.short_name || t.shortname || t.name) : '';
 }
 
 function getTeamCode(teamId) {
-  const t = state.teams.find(x => x.id === teamId);
+  const t = state.teams.find((x) => x.id === teamId);
   return t ? t.code : null;
 }
 
 function displayPrice(entry) {
   const p = getPlayer(entry.id);
-  const current = p ? (p.now_cost / 10) : 0;
+  const current = p ? p.now_cost / 10 : 0;
 
   if (state.priceMode === 'current') return current;
   if (state.priceMode === 'purchase') return entry.purchasePrice ?? current;
@@ -102,15 +122,55 @@ function displayPrice(entry) {
   return entry.sellingPrice ?? current;
 }
 
+// --- Two-click swap state ---
+let pendingSwap = null; // { id: number, side: 'starting'|'bench' }
+
+function getSide(team, playerId) {
+  if (team.starting.some((e) => e.id === playerId)) return 'starting';
+  if (team.bench.some((e) => e.id === playerId)) return 'bench';
+  return null;
+}
+
+function isGK(playerId) {
+  const p = getPlayer(playerId);
+  return p?.element_type === 1;
+}
+
+function swapWithinTeam(team, aId, bId) {
+  const aStart = team.starting.findIndex((e) => e.id === aId);
+  const aBench = team.bench.findIndex((e) => e.id === aId);
+  const bStart = team.starting.findIndex((e) => e.id === bId);
+  const bBench = team.bench.findIndex((e) => e.id === bId);
+
+  // Must be opposite sides.
+  if (aStart !== -1 && bBench !== -1) {
+    const tmp = team.starting[aStart];
+    team.starting[aStart] = team.bench[bBench];
+    team.bench[bBench] = tmp;
+    return true;
+  }
+
+  if (aBench !== -1 && bStart !== -1) {
+    const tmp = team.bench[aBench];
+    team.bench[aBench] = team.starting[bStart];
+    team.starting[bStart] = tmp;
+    return true;
+  }
+
+  return false;
+}
+
 function removePlayer(playerId, source) {
+  if (pendingSwap && pendingSwap.id === playerId) pendingSwap = null;
+
   const gw = state.viewingGW;
   const team = state.plan[gw];
   if (!team) return;
 
   // Find the entry in the currently viewed GW (sell once)
   const entry =
-    team.starting.find(e => e.id === playerId) ||
-    team.bench.find(e => e.id === playerId);
+    team.starting.find((e) => e.id === playerId) ||
+    team.bench.find((e) => e.id === playerId);
 
   if (!entry) return;
 
@@ -122,41 +182,72 @@ function removePlayer(playerId, source) {
   for (let g = gw; g <= state.currentGW + 7; g++) {
     const t = state.plan[g];
     if (!t) continue;
-    t.starting = t.starting.filter(e => e.id !== playerId);
-    t.bench = t.bench.filter(e => e.id !== playerId);
+    t.starting = t.starting.filter((e) => e.id !== playerId);
+    t.bench = t.bench.filter((e) => e.id !== playerId);
   }
 
   updateUI();
 }
 
+// Two-click substitute swap (starter ↔ bench)
+// IMPORTANT UX CHANGE: if a swap is armed, clicking another player on the SAME side
+// does NOT re-arm. The highlight stays until the swap completes or you cancel.
 function substitutePlayer(playerId) {
   const gw = state.viewingGW;
+  const teamNow = state.plan[gw];
+  if (!teamNow) return;
 
+  const sideNow = getSide(teamNow, playerId);
+  if (!sideNow) return;
+
+  // First click: arm selection.
+  if (!pendingSwap) {
+    pendingSwap = { id: playerId, side: sideNow };
+    updateUI();
+    return;
+  }
+
+  // Click same player again: cancel.
+  if (pendingSwap.id === playerId) {
+    pendingSwap = null;
+    updateUI();
+    return;
+  }
+
+  // Clicking a different player on the same side: keep original armed selection.
+  if (pendingSwap.side === sideNow) {
+    const want = pendingSwap.side === 'starting' ? 'bench' : 'starter';
+    showMessage(`Swap in progress: select a ${want} to complete (or click again to cancel).`, 'info');
+    updateUI();
+    return;
+  }
+
+  // Basic safety: GK must swap with GK.
+  if (isGK(pendingSwap.id) !== isGK(playerId)) {
+    pendingSwap = null;
+    showMessage('Invalid swap: GK must swap with GK.', 'error');
+    updateUI();
+    return;
+  }
+
+  const a = pendingSwap.id;
+  const b = playerId;
+
+  // Apply swap from this GW forward (same propagation model as your other actions).
   for (let g = gw; g <= state.currentGW + 7; g++) {
     const t = state.plan[g];
     if (!t) continue;
-
-    const inStart = t.starting.find(e => e.id === playerId);
-    const inBench = t.bench.find(e => e.id === playerId);
-
-    if (inStart) {
-      if (t.bench.length >= 4) continue;
-      t.starting = t.starting.filter(e => e.id !== playerId);
-      if (!t.bench.find(e => e.id === playerId)) t.bench.push(inStart);
-    } else if (inBench) {
-      if (t.starting.length >= 11) continue;
-      t.bench = t.bench.filter(e => e.id !== playerId);
-      if (!t.starting.find(e => e.id === playerId)) t.starting.push(inBench);
-    }
+    swapWithinTeam(t, a, b);
   }
 
+  pendingSwap = null;
   updateUI();
 }
 
 function updateUI() {
   // Always show the GW we are planning/viewing (starts at currentGW)
   const gwEl = document.getElementById('currentGWDisplay');
-  if (gwEl) gwEl.textContent = state.viewingGW;
+  if (gwEl) gwEl.textContent = state.currentGW;
 
   // Enable/disable GW nav buttons
   const prevBtn = document.getElementById('prevGW');
@@ -176,7 +267,7 @@ function updateUI() {
   renderBench();
 }
 
-// FIX #3: render GK first (top), then DEF, MID, FWD
+// Render GK first (top), then DEF, MID, FWD
 function renderPitch() {
   const pitch = document.getElementById('pitch');
   const team = state.plan[state.viewingGW];
@@ -202,10 +293,10 @@ function renderPitch() {
   }
 
   pitch.innerHTML = `
-    <div class="formation-line">${gk.map(e => playerCard(e, 'starting')).join('')}</div>
-    <div class="formation-line">${def.map(e => playerCard(e, 'starting')).join('')}</div>
-    <div class="formation-line">${mid.map(e => playerCard(e, 'starting')).join('')}</div>
-    <div class="formation-line">${fwd.map(e => playerCard(e, 'starting')).join('')}</div>
+    <div class="formation-line">${gk.map((e) => playerCard(e, 'starting')).join('')}</div>
+    <div class="formation-line">${def.map((e) => playerCard(e, 'starting')).join('')}</div>
+    <div class="formation-line">${mid.map((e) => playerCard(e, 'starting')).join('')}</div>
+    <div class="formation-line">${fwd.map((e) => playerCard(e, 'starting')).join('')}</div>
   `;
 }
 
@@ -217,7 +308,7 @@ function renderBench() {
     return;
   }
 
-  benchSlots.innerHTML = team.bench.map(e => playerCard(e, 'bench')).join('');
+  benchSlots.innerHTML = team.bench.map((e) => playerCard(e, 'bench')).join('');
 }
 
 function playerCard(entry, source) {
@@ -230,18 +321,23 @@ function playerCard(entry, source) {
 
   const price = displayPrice(entry).toFixed(1);
   const label =
-    state.priceMode === 'current' ? 'Cur' :
-    state.priceMode === 'purchase' ? 'Buy' : 'Sell';
+    state.priceMode === 'current'
+      ? 'Cur'
+      : state.priceMode === 'purchase'
+        ? 'Buy'
+        : 'Sell';
 
-  // FIX #4: X (transfer out) + Substitute buttons
-  // Uses existing CSS classes in your index.html (.card-btn/.btn-remove/.btn-swap) [file:12]
   const removeFn = `removePlayer(${entry.id}, '${source}')`;
   const subFn = `substitutePlayer(${entry.id})`;
 
+  const armed = pendingSwap && pendingSwap.id === entry.id;
+  const cardClass = `player-card${armed ? ' pending-swap' : ''}`;
+  const swapTitle = armed ? 'Cancel swap' : 'Swap';
+
   return `
-    <div class="player-card">
+    <div class="${cardClass}">
       <button class="card-btn btn-remove" onclick="${removeFn}" title="Transfer out">×</button>
-      <button class="card-btn btn-swap" onclick="${subFn}" title="Substitute">⇅</button>
+      <button class="card-btn btn-swap" onclick="${subFn}" title="${swapTitle}">⇅</button>
 
       <img src="https://resources.premierleague.com/premierleague/badges/t${teamCode}.png"
            class="badge" alt="${teamShort}">
@@ -260,5 +356,5 @@ function showMessage(text, type = 'info') {
   toast.textContent = text;
   toast.className = `message msg-${type}`;
   toast.style.display = 'block';
-  setTimeout(() => toast.style.display = 'none', 3000);
+  setTimeout(() => (toast.style.display = 'none'), 3000);
 }
