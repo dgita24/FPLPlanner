@@ -39,13 +39,13 @@ export function renderFixtures() {
     </div>
     ${fixtures.map(f => `
       <div class="fixture-row">
-        ${teamShortName(f.team_h)} v ${teamShortName(f.team_a)}
+        ${teamFullName(f.team_h)} v ${teamFullName(f.team_a)}
       </div>
     `).join('')}
   `;
 }
 
-function teamShortName(teamId) {
+function teamFullName(teamId) {
   const team = state.teams.find(t => t.id === teamId);
-  return team ? team.short_name : '?';
+  return team ? team.name : '?';
 }
