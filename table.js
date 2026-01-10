@@ -19,6 +19,15 @@ function kickoffTimeValue(fx) {
   return Number.isFinite(t) ? t : Number.POSITIVE_INFINITY;
 }
 
+function foldForSearch(s) {
+  return (s || '')
+    .toString()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .trim();
+}
+
 function bestFixtureForTeamInGW(teamId, fixtures) {
   if (!Array.isArray(fixtures) || fixtures.length === 0) return null;
   const matches = fixtures.filter((f) => f && (f.team_h === teamId || f.team_a === teamId));
@@ -83,14 +92,14 @@ export function renderTable() {
   const tbody = document.getElementById('tableBody');
   if (!tbody) return;
 
-  const search = (document.getElementById('searchName')?.value || '').toLowerCase();
+  const search = foldForSearch(document.getElementById('searchName')?.value || '');
   const posFilter = document.getElementById('filterPos')?.value || '';
   const teamFilter = document.getElementById('filterTeam')?.value || '';
   const maxPrice = parseFloat(document.getElementById('filterPrice')?.value);
   const max = Number.isFinite(maxPrice) ? maxPrice : Infinity;
 
   const filtered = state.elements.filter((player) => {
-    const matchesSearch = (player.web_name || '').toLowerCase().includes(search);
+    const matchesSearch = foldForSearch(player.web_name || '').includes(search);
     const matchesPos = !posFilter || posNames[player.element_type] === posFilter;
     const matchesTeam = !teamFilter || String(player.team) === String(teamFilter);
     const matchesPrice = (player.now_cost / 10) <= max;
