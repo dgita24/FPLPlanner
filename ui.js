@@ -1,5 +1,6 @@
 // ui.js - UI interactions + planner actions
 import { state, loadTeamEntry, calculateSellingPrice, loadFixtures } from './data.js';
+import { renderTable } from './table.js';
 
 // Sidebar toggle
 window.toggleSidebarMenu = function () {
@@ -745,6 +746,8 @@ function renderBench() {
 
   benchSlots.innerHTML = team.bench.map((e) => playerCard(e, 'bench')).join('');
 }
+
+renderTable();
 
 function playerCard(entry, source) {
   const p = getPlayer(entry.id);
