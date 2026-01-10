@@ -4,8 +4,14 @@ import { state, loadTeamEntry, calculateSellingPrice, loadFixtures } from './dat
 import { renderTable } from './table.js';
 
 // Sidebar toggle
+let sidebarJustToggled = false;
 window.toggleSidebarMenu = function () {
-  document.getElementById('sidebar')?.classList.toggle('open');
+  const sb = document.getElementById('sidebar');
+  if (!sb) return;
+  sb.classList.toggle('open');
+  // Prevent immediate outside-click handler from closing the sidebar right after toggle
+  sidebarJustToggled = true;
+  setTimeout(() => (sidebarJustToggled = false), 300);
 };
 
 // Remember where the last sale came from so the next buy goes there.
@@ -116,6 +122,25 @@ export function initUI() {
   window.substitutePlayer = substitutePlayer;
   window.addSelectedToSquad = addSelectedToSquad;
   window.cancelTransfer = cancelTransfer;
+
+  // Close sidebar when clicking outside it (but avoid immediately closing right after toggle)
+  document.addEventListener('click', (e) => {
+    if (sidebarJustToggled) return;
+    const sb = document.getElementById('sidebar');
+    if (!sb) return;
+    if (!sb.classList.contains('open')) return;
+    // If click is outside the sidebar, close it
+    if (!e.target.closest('#sidebar')) {
+      sb.classList.remove('open');
+    }
+  });
+
+  // Close sidebar on Escape
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      document.getElementById('sidebar')?.classList.remove('open');
+    }
+  });
 
   updateUI();
 }
@@ -881,48 +906,8 @@ window.saveTeam = async function() {
         if (response.ok && result.success) {
             showMessage('Team saved to cloud!', 'success');
             if (sideMsg) sideMsg.textContent = `✓ Saved as: ${teamId}`;
-        } else {
-            throw new Error(result.error || 'Save failed');
-        }
-    } catch (err) {
-        showMessage(`Save error: ${err.message}`, 'error');
-        if (sideMsg) sideMsg.textContent = `Error: ${err.message}`;
-    }
-};
-
-// Cloud Save
-window.saveTeam = async function() {
-    const teamId = document.getElementById('saveTeamId')?.value?.trim();
-    const password = document.getElementById('savePassword')?.value?.trim();
-    const label = document.getElementById('saveLabel')?.value?.trim();
-    
-    if (!teamId || !password) {
-        showMessage('Enter Team ID and Password', 'error');
-        return;
-    }
-    
-    const sideMsg = document.getElementById('sideMsg');
-    if (sideMsg) sideMsg.textContent = 'Saving...';
-    
-    try {
-        const payload = {
-            plan: state.plan,
-            bank: state.bank,
-            viewingGW: state.viewingGW,
-            priceMode: state.priceMode
-        };
-        
-        const response = await fetch('/api/save', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ teamid: teamId, label, password, payload })
-        });
-        
-        const result = await response.json();
-        
-        if (response.ok && result.success) {
-            showMessage('Team saved to cloud!', 'success');
-            if (sideMsg) sideMsg.textContent = `✓ Saved as: ${teamId}`;
+            // Close sidebar after successful save
+            document.getElementById('sidebar')?.classList.remove('open');
         } else {
             throw new Error(result.error || 'Save failed');
         }
@@ -975,3 +960,4 @@ window.loadTeam = async function() {
         if (sideMsg) sideMsg.textContent = `Error: ${err.message}`;
     }
 };
+
