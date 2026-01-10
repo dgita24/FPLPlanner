@@ -1,6 +1,7 @@
 <!-- NOTE: Keep <!DOCTYPE html> exactly as-is (required). -->
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
@@ -13,7 +14,11 @@
             --text: #fff;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
 
         body {
             font-family: "Segoe UI", sans-serif;
@@ -22,7 +27,10 @@
             padding: 20px;
         }
 
-        .container { max-width: 1400px; margin: 0 auto; }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
 
         .header {
             display: flex;
@@ -36,11 +44,13 @@
         }
 
         .bank-display {
-          display: flex;
-          align-items: center;
-          gap: 5px; /* Tighter gap */
-          font-size: 16px; /* Slightly smaller */
-          font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            /* Tighter gap */
+            font-size: 16px;
+            /* Slightly smaller */
+            font-weight: bold;
         }
 
         .bank-display input {
@@ -70,41 +80,42 @@
 
         /* New header button styles */
         .header-actions {
-          display: flex;
-          gap: 8px;
+            display: flex;
+            gap: 8px;
         }
 
         .header-btn {
-          padding: 12px 20px;
-          border: none;
-          border-radius: 5px;
-          font-weight: bold;
-          font-size: 14px;
-          cursor: pointer;
-          transition: all 0.2s;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 5px;
+            font-weight: bold;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
         }
 
         .save-btn {
-        background: #ff9800;
-        color: white;
+            background: #ff9800;
+            color: white;
         }
 
         .save-btn:hover {
-          background: #f57c00;
+            background: #f57c00;
         }
 
         .load-btn {
-        background: #2196f3;
-        color: white;
+            background: #2196f3;
+            color: white;
         }
 
         .load-btn:hover {
-        background: #1976d2;
+            background: #1976d2;
         }
 
 
         .sidebar-toggle {
-            padding: 10px 15px; /* Slightly smaller */
+            padding: 10px 15px;
+            /* Slightly smaller */
             background: var(--primary);
             color: var(--bg);
             border: none;
@@ -117,7 +128,9 @@
             transition: opacity 0.2s;
         }
 
-        .sidebar-toggle:hover { opacity: 0.9; }
+        .sidebar-toggle:hover {
+            opacity: 0.9;
+        }
 
         .sidebar {
             position: fixed;
@@ -134,9 +147,14 @@
             overflow-y: auto;
         }
 
-        .sidebar.open { transform: translateX(0); }
+        .sidebar.open {
+            transform: translateX(0);
+        }
 
-        .sidebar h2 { margin: 20px 0 10px; color: var(--primary); }
+        .sidebar h2 {
+            margin: 20px 0 10px;
+            color: var(--primary);
+        }
 
         .sidebar h3 {
             margin: 20px 0 10px;
@@ -166,9 +184,14 @@
             color: var(--bg);
         }
 
-        .sidebar button:hover { opacity: 0.9; }
+        .sidebar button:hover {
+            opacity: 0.9;
+        }
 
-        #sideMsg { margin-top: 10px; font-size: 12px; }
+        #sideMsg {
+            margin-top: 10px;
+            font-size: 12px;
+        }
 
         .gw-nav {
             display: flex;
@@ -187,7 +210,10 @@
             font-weight: bold;
         }
 
-        .gw-nav button:disabled { background: #666; cursor: not-allowed; }
+        .gw-nav button:disabled {
+            background: #666;
+            cursor: not-allowed;
+        }
 
         .pitch {
             background: linear-gradient(to bottom, #2d5016 0%, #1a3d0a 100%);
@@ -274,10 +300,22 @@
             transition: transform 0.1s;
         }
 
-        .card-btn:hover { transform: scale(1.15); }
+        .card-btn:hover {
+            transform: scale(1.15);
+        }
 
-        .btn-remove { top: -8px; left: -8px; background: #ff4444; }
-        .btn-swap { top: -8px; right: -8px; background: #4444ff; font-size: 11px; }
+        .btn-remove {
+            top: -8px;
+            left: -8px;
+            background: #ff4444;
+        }
+
+        .btn-swap {
+            top: -8px;
+            right: -8px;
+            background: #4444ff;
+            font-size: 11px;
+        }
 
         .bench {
             background: rgba(0, 0, 0, 0.2);
@@ -287,9 +325,18 @@
             margin: 0 auto 30px;
         }
 
-        .bench h3 { text-align: center; color: #fff; margin-bottom: 20px; }
+        .bench h3 {
+            text-align: center;
+            color: #fff;
+            margin-bottom: 20px;
+        }
 
-        .bench-slots { display: flex; justify-content: center; gap: 25px; flex-wrap: wrap; }
+        .bench-slots {
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+            flex-wrap: wrap;
+        }
 
         .transfer-section {
             background: rgba(255, 255, 255, 0.05);
@@ -297,9 +344,15 @@
             border-radius: 10px;
         }
 
-        .filters { display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap; }
+        .filters {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
 
-        .filters input, .filters select {
+        .filters input,
+        .filters select {
             padding: 8px;
             border-radius: 4px;
             border: none;
@@ -316,13 +369,41 @@
             overflow-y: auto;
         }
 
-        table { width: 100%; border-collapse: collapse; font-size: 13px; }
-        th { background: var(--bg); color: #fff; padding: 10px; text-align: left; position: sticky; top: 0; }
-        td { padding: 8px 10px; border-bottom: 1px solid #eee; }
-        tr:hover { background: #f0f0f0; cursor: pointer; }
-        tr.selected { background: #e6fffa; }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
 
-        .add-btn-row { margin-top: 15px; display: flex; gap: 10px; }
+        th {
+            background: var(--bg);
+            color: #fff;
+            padding: 10px;
+            text-align: left;
+            position: sticky;
+            top: 0;
+        }
+
+        td {
+            padding: 8px 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        tr:hover {
+            background: #f0f0f0;
+            cursor: pointer;
+        }
+
+        tr.selected {
+            background: #e6fffa;
+        }
+
+        .add-btn-row {
+            margin-top: 15px;
+            display: flex;
+            gap: 10px;
+        }
+
         .add-btn-row button {
             flex: 1;
             padding: 12px;
@@ -338,7 +419,7 @@
             justify-content: center;
             margin: 25px auto 20px;
             max-width: 500px;
-            border-top: 1px solid rgba(255,255,255,0.1);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
             padding-top: 15px;
         }
 
@@ -356,11 +437,51 @@
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
         }
 
-        .msg-success { background: #00c853; }
-        .msg-error { background: #d50000; }
-        .msg-info { background: #2962ff; }
+        .msg-success {
+            background: #00c853;
+        }
+
+        .msg-error {
+            background: #d50000;
+        }
+
+        .msg-info {
+            background: #2962ff;
+        }
+
+        @media (min-width: 1200px) {
+            .pitch {
+                padding: 30px 20px !important;
+                min-height: 550px !important;
+            }
+
+            .formation-line {
+                min-height: 110px !important;
+                gap: 12px !important;
+                margin-bottom: 12px !important;
+            }
+
+            .player-card {
+                width: 120px !important;
+                padding: 6px !important;
+            }
+
+            .player-card .badge {
+                width: 38px !important;
+                height: 38px !important;
+            }
+
+            .bench {
+                padding: 18px !important;
+            }
+
+            .bench-slots {
+                gap: 18px !important;
+            }
+        }
     </style>
 </head>
+
 <body>
     <div class="container">
         <div class="header">
@@ -379,13 +500,13 @@
                 </select>
             </div>
             <div class="header-actions">
-              <button onclick="localSave()" class="header-btn save-btn">💾 Local Save</button>
-              <button onclick="localLoad()" class="header-btn load-btn">📂 Local Load</button>
-            </div> 
-          
+                <button onclick="localSave()" class="header-btn save-btn">💾 Local Save</button>
+                <button onclick="localLoad()" class="header-btn load-btn">📂 Local Load</button>
+            </div>
+
             <button class="sidebar-toggle" onclick="toggleSidebarMenu()">Menu</button>
 
-    </div>
+        </div>
 
         <div class="sidebar" id="sidebar">
             <h2>Manage Team</h2>
@@ -421,10 +542,11 @@
             <div id="benchSlots" class="bench-slots"></div>
         </div>
 
-            <div class="add-btn-row">
-                <button id="addToSquadBtn" style="background: #00ff87" onclick="addSelectedToSquad()">Add to squad</button>
-                <button id="cancelTransferBtn" style="background: #ff4444; color: #fff" onclick="cancelTransfer()">Cancel transfer</button>
-            </div>
+        <div class="add-btn-row">
+            <button id="addToSquadBtn" style="background: #00ff87" onclick="addSelectedToSquad()">Add to squad</button>
+            <button id="cancelTransferBtn" style="background: #ff4444; color: #fff" onclick="cancelTransfer()">Cancel
+                transfer</button>
+        </div>
 
         <div class="transfer-section">
             <h2>Transfers</h2>
@@ -441,7 +563,8 @@
                 <select id="filterTeam" onchange="renderTable()">
                     <option value="">All Teams</option>
                 </select>
-                <input type="number" id="filterPrice" placeholder="Max Price" value="15.0" step="0.5" onchange="renderTable()" />
+                <input type="number" id="filterPrice" placeholder="Max Price" value="15.0" step="0.5"
+                    onchange="renderTable()" />
             </div>
 
             <div class="player-table">
@@ -460,7 +583,7 @@
                 </table>
             </div>
 
-            
+
         </div>
     </div>
 
@@ -473,4 +596,5 @@
         import './ui.js';
     </script>
 </body>
+
 </html>
