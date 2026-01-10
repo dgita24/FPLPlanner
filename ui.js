@@ -1,4 +1,5 @@
 // ui.js - UI interactions + planner actions
+// ui.js - Added to try force git commit
 import { state, loadTeamEntry, calculateSellingPrice, loadFixtures } from './data.js';
 import { renderTable } from './table.js';
 
@@ -844,5 +845,133 @@ window.localLoad = function() {
         showMessage('Team loaded locally', 'success');
     } catch (e) {
         showMessage('Local load failed', 'error');
+    }
+};
+
+// Cloud Save
+window.saveTeam = async function() {
+    const teamId = document.getElementById('saveTeamId')?.value?.trim();
+    const password = document.getElementById('savePassword')?.value?.trim();
+    const label = document.getElementById('saveLabel')?.value?.trim();
+    
+    if (!teamId || !password) {
+        showMessage('Enter Team ID and Password', 'error');
+        return;
+    }
+    
+    const sideMsg = document.getElementById('sideMsg');
+    if (sideMsg) sideMsg.textContent = 'Saving...';
+    
+    try {
+        const payload = {
+            plan: state.plan,
+            bank: state.bank,
+            viewingGW: state.viewingGW,
+            priceMode: state.priceMode
+        };
+        
+        const response = await fetch('/api/save', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ teamid: teamId, label, password, payload })
+        });
+        
+        const result = await response.json();
+        
+        if (response.ok && result.success) {
+            showMessage('Team saved to cloud!', 'success');
+            if (sideMsg) sideMsg.textContent = `✓ Saved as: ${teamId}`;
+        } else {
+            throw new Error(result.error || 'Save failed');
+        }
+    } catch (err) {
+        showMessage(`Save error: ${err.message}`, 'error');
+        if (sideMsg) sideMsg.textContent = `Error: ${err.message}`;
+    }
+};
+
+// Cloud Save
+window.saveTeam = async function() {
+    const teamId = document.getElementById('saveTeamId')?.value?.trim();
+    const password = document.getElementById('savePassword')?.value?.trim();
+    const label = document.getElementById('saveLabel')?.value?.trim();
+    
+    if (!teamId || !password) {
+        showMessage('Enter Team ID and Password', 'error');
+        return;
+    }
+    
+    const sideMsg = document.getElementById('sideMsg');
+    if (sideMsg) sideMsg.textContent = 'Saving...';
+    
+    try {
+        const payload = {
+            plan: state.plan,
+            bank: state.bank,
+            viewingGW: state.viewingGW,
+            priceMode: state.priceMode
+        };
+        
+        const response = await fetch('/api/save', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ teamid: teamId, label, password, payload })
+        });
+        
+        const result = await response.json();
+        
+        if (response.ok && result.success) {
+            showMessage('Team saved to cloud!', 'success');
+            if (sideMsg) sideMsg.textContent = `✓ Saved as: ${teamId}`;
+        } else {
+            throw new Error(result.error || 'Save failed');
+        }
+    } catch (err) {
+        showMessage(`Save error: ${err.message}`, 'error');
+        if (sideMsg) sideMsg.textContent = `Error: ${err.message}`;
+    }
+};
+
+// Cloud Load
+window.loadTeam = async function() {
+    const teamId = document.getElementById('loadTeamId')?.value?.trim();
+    const password = document.getElementById('loadPassword')?.value?.trim();
+    
+    if (!teamId || !password) {
+        showMessage('Enter Team ID and Password', 'error');
+        return;
+    }
+    
+    const sideMsg = document.getElementById('sideMsg');
+    if (sideMsg) sideMsg.textContent = 'Loading...';
+    
+    try {
+        const response = await fetch('/api/load', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ teamid: teamId, password })
+        });
+        
+        const result = await response.json();
+        
+        if (response.ok && result.success) {
+            const data = result.data;
+            state.plan = data.payload.plan;
+            state.bank = data.payload.bank;
+            state.viewingGW = data.payload.viewingGW;
+            state.priceMode = data.payload.priceMode;
+            
+            updateUI();
+            showMessage('Team loaded from cloud!', 'success');
+            if (sideMsg) sideMsg.textContent = `✓ Loaded: ${data.label || teamId}`;
+            
+            // Close sidebar after load
+            document.getElementById('sidebar')?.classList.remove('open');
+        } else {
+            throw new Error(result.error || 'Load failed');
+        }
+    } catch (err) {
+        showMessage(`Load error: ${err.message}`, 'error');
+        if (sideMsg) sideMsg.textContent = `Error: ${err.message}`;
     }
 };
