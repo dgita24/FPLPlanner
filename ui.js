@@ -1,10 +1,13 @@
 // ui.js - UI interactions + planner actions
-import { state, loadTeamEntry } from './data.js';
+import { state, loadTeamEntry, calculateSellingPrice } from './data.js';
 
 // Sidebar toggle
 window.toggleSidebarMenu = function () {
   document.getElementById('sidebar').classList.toggle('open');
 };
+
+// Remember where the last sale came from so the next buy goes there.
+let lastSoldSide = null; // 'starting' | 'bench'
 
 export function initUI() {
   // Inject CSS for two-click swap highlight (no index.html change needed)
@@ -47,6 +50,7 @@ export function initUI() {
   window.changeGW = changeGW;
   window.removePlayer = removePlayer;
   window.substitutePlayer = substitutePlayer;
+  window.addSelectedToSquad = addSelectedToSquad;
 
   updateUI();
 }
@@ -78,6 +82,9 @@ window.importTeam = async function () {
     showMessage(`Team imported for GW${state.currentGW}.`, 'success');
   }
 
+  // reset transfer intent
+  lastSoldSide = null;
+
   updateUI();
 };
 
@@ -93,6 +100,9 @@ function changeGW(delta) {
 
   // cancel any in-progress swap when changing GW
   pendingSwap = null;
+
+  // also clear transfer intent when changing GW
+  lastSoldSide = null;
 
   updateUI();
 }
@@ -163,6 +173,9 @@ function swapWithinTeam(team, aId, bId) {
 function removePlayer(playerId, source) {
   if (pendingSwap && pendingSwap.id === playerId) pendingSwap = null;
 
+  // record where the sale came from, so the next buy goes there
+  if (source === 'starting' || source === 'bench') lastSoldSide = source;
+
   const gw = state.viewingGW;
   const team = state.plan[gw];
   if (!team) return;
@@ -186,12 +199,14 @@ function removePlayer(playerId, source) {
     t.bench = t.bench.filter((e) => e.id !== playerId);
   }
 
+  showMessage(
+    'Player sold. Now pick a replacement from the table and click Add to squad.',
+    'info'
+  );
   updateUI();
 }
 
 // Two-click substitute swap (starter ↔ bench)
-// IMPORTANT UX CHANGE: if a swap is armed, clicking another player on the SAME side
-// does NOT re-arm. The highlight stays until the swap completes or you cancel.
 function substitutePlayer(playerId) {
   const gw = state.viewingGW;
   const teamNow = state.plan[gw];
@@ -217,7 +232,10 @@ function substitutePlayer(playerId) {
   // Clicking a different player on the same side: keep original armed selection.
   if (pendingSwap.side === sideNow) {
     const want = pendingSwap.side === 'starting' ? 'bench' : 'starter';
-    showMessage(`Swap in progress: select a ${want} to complete (or click again to cancel).`, 'info');
+    showMessage(
+      `Swap in progress: select a ${want} to complete (or click again to cancel).`,
+      'info'
+    );
     updateUI();
     return;
   }
@@ -241,6 +259,91 @@ function substitutePlayer(playerId) {
   }
 
   pendingSwap = null;
+  updateUI();
+}
+
+function addSelectedToSquad() {
+  const gw = state.viewingGW;
+  const team = state.plan[gw];
+  if (!team) return;
+
+  const playerId = window.selectedPlayerId;
+  if (!playerId) {
+    showMessage('Select a player in the table first.', 'error');
+    return;
+  }
+
+  if (!lastSoldSide) {
+    showMessage(
+      "Sell a player (X) first so the app knows whether to add to XI or bench.",
+      'info'
+    );
+    return;
+  }
+
+  // Prevent duplicates
+  const already =
+    team.starting.some((e) => e.id === playerId) ||
+    team.bench.some((e) => e.id === playerId);
+  if (already) {
+    showMessage('That player is already in your squad.', 'error');
+    return;
+  }
+
+  const p = getPlayer(playerId);
+  if (!p) {
+    showMessage('Player data not found.', 'error');
+    return;
+  }
+
+  const buy = p.now_cost / 10;
+  if (state.bank < buy) {
+    showMessage(
+      `Not enough money. Need ${buy.toFixed(1)}m, have ${Number(state.bank).toFixed(1)}m.`,
+      'error'
+    );
+    return;
+  }
+
+  // capacity check on the CURRENT GW team
+  if (lastSoldSide === 'starting' && team.starting.length >= 11) {
+    showMessage('Starting XI is already full.', 'error');
+    return;
+  }
+
+  if (lastSoldSide === 'bench' && team.bench.length >= 4) {
+    showMessage('Bench is already full.', 'error');
+    return;
+  }
+
+  // Spend once
+  state.bank = Number((state.bank - buy).toFixed(1));
+
+  const purchasePrice = buy;
+  const sellingPrice = calculateSellingPrice(purchasePrice, buy);
+  const entry = { id: playerId, purchasePrice, sellingPrice };
+
+  // Add from this GW forward
+  for (let g = gw; g <= state.currentGW + 7; g++) {
+    const t = state.plan[g];
+    if (!t) continue;
+
+    const exists =
+      t.starting.some((e) => e.id === playerId) ||
+      t.bench.some((e) => e.id === playerId);
+    if (exists) continue;
+
+    if (lastSoldSide === 'starting') {
+      if (t.starting.length < 11) t.starting.push({ ...entry });
+    } else {
+      if (t.bench.length < 4) t.bench.push({ ...entry });
+    }
+  }
+
+  // Reset intent so you can't add repeatedly without selling again.
+  lastSoldSide = null;
+
+  showMessage('Player bought and added to squad.', 'success');
   updateUI();
 }
 
