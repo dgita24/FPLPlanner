@@ -3,11 +3,17 @@ import { state, loadTeamEntry, calculateSellingPrice } from './data.js';
 
 // Sidebar toggle
 window.toggleSidebarMenu = function () {
-  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('sidebar')?.classList.toggle('open');
 };
 
 // Remember where the last sale came from so the next buy goes there.
 let lastSoldSide = null; // 'starting' | 'bench'
+
+// Snapshot used to cancel a planned transfer (sale before buy).
+let pendingTransfer = null; // { plan, bank }
+
+// --- Two-click swap state ---
+let pendingSwap = null; // { id: number, side: 'starting'|'bench' }
 
 export function initUI() {
   // Inject CSS for two-click swap highlight (no index.html change needed)
@@ -51,13 +57,14 @@ export function initUI() {
   window.removePlayer = removePlayer;
   window.substitutePlayer = substitutePlayer;
   window.addSelectedToSquad = addSelectedToSquad;
+  window.cancelTransfer = cancelTransfer;
 
   updateUI();
 }
 
-// Import team from FPL (Option A: latest publicly available picks)
+// Import team from FPL
 window.importTeam = async function () {
-  const teamId = document.getElementById('importTeamId').value.trim();
+  const teamId = document.getElementById('importTeamId')?.value?.trim();
   if (!teamId) {
     showMessage('Enter Team ID', 'error');
     return;
@@ -82,14 +89,20 @@ window.importTeam = async function () {
     showMessage(`Team imported for GW${state.currentGW}.`, 'success');
   }
 
-  // reset transfer intent
+  // reset transient UI state
   lastSoldSide = null;
+  pendingTransfer = null;
   pendingSwap = null;
 
   updateUI();
 };
 
 function changeGW(delta) {
+  if (pendingTransfer) {
+    showMessage('Finish the pending transfer (Add) or Cancel it first.', 'info');
+    return;
+  }
+
   const minGW = state.currentGW;
   const maxGW = state.currentGW + 7;
 
@@ -101,9 +114,6 @@ function changeGW(delta) {
 
   // cancel any in-progress swap when changing GW
   pendingSwap = null;
-
-  // clear transfer intent when changing GW
-  lastSoldSide = null;
 
   updateUI();
 }
@@ -147,14 +157,13 @@ function getPlayerTeamId(playerId) {
   return p?.team ?? null;
 }
 
-// Starting XI must be valid per FPL min requirements.
-// (This app enforces: exactly 1 GK, min 3 DEF, min 2 MID, min 1 FWD)
+// Enforced: exactly 1 GK, min 3 DEF, min 2 MID, min 1 FWD.
 function validateStartingXI(team) {
   if (!team || !Array.isArray(team.starting)) {
     return { ok: false, message: 'Internal error: missing starting XI.' };
   }
 
-  // Only validate when XI is complete (swaps always are; transfers temporarily may not be).
+  // Only validate when XI is complete.
   if (team.starting.length !== 11) return { ok: true, message: '' };
 
   let gk = 0, def = 0, mid = 0, fwd = 0;
@@ -167,13 +176,12 @@ function validateStartingXI(team) {
     else if (et === 4) fwd++;
   }
 
-  // Exact/Minimums
   if (gk !== 1) return { ok: false, message: 'Invalid formation: must have exactly 1 GK in the starting XI.' };
   if (def < 3) return { ok: false, message: 'Invalid formation: must have at least 3 defenders in the starting XI.' };
   if (mid < 2) return { ok: false, message: 'Invalid formation: must have at least 2 midfielders in the starting XI.' };
   if (fwd < 1) return { ok: false, message: 'Invalid formation: must have at least 1 forward in the starting XI.' };
 
-  // Upper bounds (so you can’t do 1-6-4-0 etc)
+  // Upper bounds (keeps it in the normal FPL set)
   if (def > 5) return { ok: false, message: 'Invalid formation: max 5 defenders in the starting XI.' };
   if (mid > 5) return { ok: false, message: 'Invalid formation: max 5 midfielders in the starting XI.' };
   if (fwd > 3) return { ok: false, message: 'Invalid formation: max 3 forwards in the starting XI.' };
@@ -181,7 +189,6 @@ function validateStartingXI(team) {
   return { ok: true, message: '' };
 }
 
-// Count total squad (XI + bench) club usage for a given GW team
 function getClubCounts(team) {
   const counts = new Map();
   if (!team) return counts;
@@ -206,20 +213,53 @@ function getOverLimitClubs(team) {
 
 function validateClubLimit(team) {
   const counts = getClubCounts(team);
-  for (const [tid, c] of counts.entries()) {
-    if (c > 3) {
-      return { ok: false, message: 'Invalid squad: max 3 players per club (must be back under the limit to make transfers).' };
-    }
+  for (const [, c] of counts.entries()) {
+    if (c > 3) return { ok: false, message: 'Invalid squad: max 3 players per club.' };
   }
   return { ok: true, message: '' };
 }
 
 /* -------------------------
-   TWO-CLICK SWAP
+   CANCEL TRANSFER (ROBUST)
 -------------------------- */
 
-// --- Two-click swap state ---
-let pendingSwap = null; // { id: number, side: 'starting'|'bench' }
+function deepClone(obj) {
+  if (typeof structuredClone === 'function') return structuredClone(obj);
+  return JSON.parse(JSON.stringify(obj));
+}
+
+function snapshotForCancel() {
+  return {
+    plan: deepClone(state.plan),
+    bank: state.bank,
+  };
+}
+
+function restorePlanInPlace(snapshotPlan) {
+  // Keep the same object reference for state.plan; replace its contents.
+  for (const k of Object.keys(state.plan)) delete state.plan[k];
+  for (const [k, v] of Object.entries(snapshotPlan)) state.plan[k] = v;
+}
+
+function cancelTransfer() {
+  if (!pendingTransfer) {
+    showMessage('No pending transfer to cancel.', 'info');
+    return;
+  }
+
+  restorePlanInPlace(pendingTransfer.plan);
+  state.bank = pendingTransfer.bank;
+
+  pendingTransfer = null;
+  lastSoldSide = null;
+
+  showMessage('Transfer cancelled. Sold player restored.', 'success');
+  updateUI();
+}
+
+/* -------------------------
+   TWO-CLICK SWAP
+-------------------------- */
 
 function getSide(team, playerId) {
   if (team.starting.some((e) => e.id === playerId)) return 'starting';
@@ -237,7 +277,6 @@ function swapWithinTeam(team, aId, bId) {
   const bStart = team.starting.findIndex((e) => e.id === bId);
   const bBench = team.bench.findIndex((e) => e.id === bId);
 
-  // Must be opposite sides.
   if (aStart !== -1 && bBench !== -1) {
     const tmp = team.starting[aStart];
     team.starting[aStart] = team.bench[bBench];
@@ -255,11 +294,15 @@ function swapWithinTeam(team, aId, bId) {
   return false;
 }
 
-// Two-click substitute swap (starter ↔ bench)
 function substitutePlayer(playerId) {
   const gw = state.viewingGW;
   const teamNow = state.plan[gw];
   if (!teamNow) return;
+
+  if (pendingTransfer) {
+    showMessage('Finish the pending transfer (Add) or Cancel it first.', 'info');
+    return;
+  }
 
   const sideNow = getSide(teamNow, playerId);
   if (!sideNow) return;
@@ -300,15 +343,14 @@ function substitutePlayer(playerId) {
   const a = pendingSwap.id;
   const b = playerId;
 
-  // Validate formation for EVERY affected GW before applying
+  // Validate formation for every affected GW before applying
   for (let g = gw; g <= state.currentGW + 7; g++) {
     const t = state.plan[g];
     if (!t) continue;
 
-    // make a light clone for validation
     const temp = {
-      starting: t.starting.map(x => ({ ...x })),
-      bench: t.bench.map(x => ({ ...x })),
+      starting: t.starting.map((x) => ({ ...x })),
+      bench: t.bench.map((x) => ({ ...x })),
     };
 
     swapWithinTeam(temp, a, b);
@@ -337,14 +379,16 @@ function substitutePlayer(playerId) {
 -------------------------- */
 
 function removePlayer(playerId, source) {
-  if (pendingSwap && pendingSwap.id === playerId) pendingSwap = null;
-
   const gw = state.viewingGW;
   const team = state.plan[gw];
   if (!team) return;
 
-  // If currently over the 3-per-club limit (e.g. due to a real-life transfer),
-  // the next transfer out must be from that over-limit club.
+  if (pendingTransfer) {
+    showMessage('Finish the pending transfer (Add) or Cancel it first.', 'info');
+    return;
+  }
+
+  // If currently over the 3-per-club limit, the next transfer out must be from that club.
   const overLimit = getOverLimitClubs(team);
   if (overLimit.size > 0) {
     const playerClub = getPlayerTeamId(playerId);
@@ -354,15 +398,18 @@ function removePlayer(playerId, source) {
     }
   }
 
-  // record where the sale came from, so the next buy goes there
-  if (source === 'starting' || source === 'bench') lastSoldSide = source;
-
   // Find the entry in the currently viewed GW (sell once)
   const entry =
     team.starting.find((e) => e.id === playerId) ||
     team.bench.find((e) => e.id === playerId);
 
   if (!entry) return;
+
+  // Snapshot BEFORE any mutations so we can cancel and restore
+  pendingTransfer = snapshotForCancel();
+
+  // record where the sale came from, so the next buy goes there
+  if (source === 'starting' || source === 'bench') lastSoldSide = source;
 
   // Add selling price to bank once
   const sell = entry.sellingPrice ?? displayPrice(entry);
@@ -376,10 +423,7 @@ function removePlayer(playerId, source) {
     t.bench = t.bench.filter((e) => e.id !== playerId);
   }
 
-  showMessage(
-    'Player sold. Now pick a replacement from the table and click Add to squad.',
-    'info'
-  );
+  showMessage('Player sold. Pick a replacement and click Add to squad (or Cancel transfer).', 'info');
   updateUI();
 }
 
@@ -394,11 +438,8 @@ function addSelectedToSquad() {
     return;
   }
 
-  if (!lastSoldSide) {
-    showMessage(
-      'Sell a player (X) first so the app knows whether to add to XI or bench.',
-      'info'
-    );
+  if (!lastSoldSide || !pendingTransfer) {
+    showMessage('Sell a player first (X), then Add to squad (or Cancel transfer).', 'info');
     return;
   }
 
@@ -408,7 +449,7 @@ function addSelectedToSquad() {
     return;
   }
 
-  // Prevent duplicates (current GW is enough; propagation loop also checks)
+  // Prevent duplicates
   const already =
     team.starting.some((e) => e.id === playerId) ||
     team.bench.some((e) => e.id === playerId);
@@ -437,7 +478,6 @@ function addSelectedToSquad() {
     return;
   }
 
-  // Build the new entry
   const purchasePrice = buy;
   const sellingPrice = calculateSellingPrice(purchasePrice, buy);
   const entry = { id: playerId, purchasePrice, sellingPrice };
@@ -448,22 +488,19 @@ function addSelectedToSquad() {
     if (!t) continue;
 
     const temp = {
-      starting: t.starting.map(x => ({ ...x })),
-      bench: t.bench.map(x => ({ ...x })),
+      starting: t.starting.map((x) => ({ ...x })),
+      bench: t.bench.map((x) => ({ ...x })),
     };
 
-    // apply add to temp
     if (lastSoldSide === 'starting') temp.starting.push({ ...entry });
     else temp.bench.push({ ...entry });
 
-    // enforce club limit on any transfer
     const clubOk = validateClubLimit(temp);
     if (!clubOk.ok) {
-      showMessage('Invalid transfer: max 3 players per club (must be under the limit after your transfer).', 'error');
+      showMessage('Invalid transfer: max 3 players per club (or fix an over-limit club first).', 'error');
       return;
     }
 
-    // enforce formation only once XI is complete
     const v = validateStartingXI(temp);
     if (!v.ok) {
       showMessage(v.message, 'error');
@@ -491,8 +528,9 @@ function addSelectedToSquad() {
     }
   }
 
-  // Reset intent so you can't add repeatedly without selling again.
+  // Clear pending transfer state
   lastSoldSide = null;
+  pendingTransfer = null;
 
   showMessage('Player bought and added to squad.', 'success');
   updateUI();
@@ -503,23 +541,23 @@ function addSelectedToSquad() {
 -------------------------- */
 
 function updateUI() {
-  // Always show the GW we are planning/viewing (starts at currentGW)
   const gwEl = document.getElementById('currentGWDisplay');
   if (gwEl) gwEl.textContent = state.currentGW;
 
-  // Enable/disable GW nav buttons
   const prevBtn = document.getElementById('prevGW');
   const nextBtn = document.getElementById('nextGW');
   if (prevBtn) prevBtn.disabled = state.viewingGW <= state.currentGW;
   if (nextBtn) nextBtn.disabled = state.viewingGW >= state.currentGW + 7;
 
-  // Sync bank input
   const bankInput = document.getElementById('bankInput');
   if (bankInput) bankInput.value = Number(state.bank).toFixed(1);
 
-  // Sync price dropdown
   const pm = document.getElementById('priceModeSelect');
   if (pm && pm.value !== state.priceMode) pm.value = state.priceMode;
+
+  // Enable/disable cancel transfer button (if present)
+  const cancelBtn = document.getElementById('cancelTransferBtn');
+  if (cancelBtn) cancelBtn.disabled = !pendingTransfer;
 
   renderPitch();
   renderBench();
@@ -610,6 +648,7 @@ function playerCard(entry, source) {
 // Toast
 function showMessage(text, type = 'info') {
   const toast = document.getElementById('toast');
+  if (!toast) return;
   toast.textContent = text;
   toast.className = `message msg-${type}`;
   toast.style.display = 'block';
