@@ -1,5 +1,5 @@
 // ui.js - UI interactions + planner actions
-import { state, loadTeamEntry, calculateSellingPrice } from './data.js';
+import { state, loadTeamEntry, calculateSellingPrice, loadFixtures } from './data.js';
 
 // Sidebar toggle
 window.toggleSidebarMenu = function () {
@@ -15,15 +15,67 @@ let pendingTransfer = null; // { plan, bank }
 // --- Two-click swap state ---
 let pendingSwap = null; // { id: number, side: 'starting'|'bench' }
 
+// --- Fixtures cache (per GW) ---
+const fixturesByGW = new Map(); // gw -> fixtures[]
+let fixturesLoadToken = 0;
+
 export function initUI() {
-  // Inject CSS for two-click swap highlight (no index.html change needed)
-  if (!document.getElementById('pendingSwapStyle')) {
+  // Inject CSS for two-click swap highlight + fixture UI (no index.html change needed)
+  if (!document.getElementById('plannerInjectedStyle')) {
     const style = document.createElement('style');
-    style.id = 'pendingSwapStyle';
+    style.id = 'plannerInjectedStyle';
     style.textContent = `
       .player-card.pending-swap {
         outline: 3px solid #00ff87;
         box-shadow: 0 0 0 3px rgba(0, 255, 135, 0.25);
+      }
+
+      .player-card .name-row {
+        display: grid;
+        grid-template-columns: 46px 1fr 46px;
+        gap: 6px;
+        align-items: center;
+        margin: 3px 0;
+      }
+
+      .player-card .player-name {
+        font-size: 14px;
+        font-weight: 800;
+        color: #000;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        background: #eee;
+        padding: 3px 5px;
+        border-radius: 3px;
+        text-align: center;
+      }
+
+      .player-card .fixture {
+        font-size: 11px;
+        color: #6f2dbd; /* purple */
+        text-align: center;
+        white-space: nowrap;
+      }
+
+      .player-card .fixture-next {
+        font-weight: 800;
+      }
+
+      .player-card .future-fixtures {
+        margin-top: 4px;
+        padding: 3px 4px;
+        border-top: 1px solid rgba(0,0,0,0.12);
+        display: flex;
+        justify-content: center;
+        gap: 8px;
+        flex-wrap: nowrap;
+      }
+
+      .player-card .future-fixtures .fixture {
+        font-size: 10px;
+        font-weight: 600;
+        opacity: 0.95;
       }
     `;
     document.head.appendChild(style);
@@ -89,7 +141,7 @@ window.importTeam = async function () {
     showMessage(`Team imported for GW${state.currentGW}.`, 'success');
   }
 
-  // Ensure we always show/planning the active currentGW after import
+  // Always show/planning the active GW after import
   state.viewingGW = state.currentGW;
 
   // reset transient UI state
@@ -150,6 +202,81 @@ function displayPrice(entry) {
 }
 
 /* -------------------------
+   FIXTURE HELPERS
+-------------------------- */
+
+function kickoffTimeValue(fx) {
+  // kickoff_time is ISO string or null; null should sort last.
+  if (!fx?.kickoff_time) return Number.POSITIVE_INFINITY;
+  const t = Date.parse(fx.kickoff_time);
+  return Number.isFinite(t) ? t : Number.POSITIVE_INFINITY;
+}
+
+function bestFixtureForTeamInGW(teamId, fixtures) {
+  if (!Array.isArray(fixtures) || fixtures.length === 0) return null;
+
+  const matches = fixtures.filter(
+    (f) => f && (f.team_h === teamId || f.team_a === teamId)
+  );
+  if (matches.length === 0) return null;
+
+  matches.sort((a, b) => kickoffTimeValue(a) - kickoffTimeValue(b));
+  return matches[0];
+}
+
+function formatOpponent(teamId, fixture) {
+  if (!fixture) return '--';
+
+  const isHome = fixture.team_h === teamId;
+  const oppId = isHome ? fixture.team_a : fixture.team_h;
+  const opp = getTeamShortName(oppId) || '???';
+  return `${opp} (${isHome ? 'H' : 'A'})`;
+}
+
+function getNextFixturesForTeam(teamId, startGW, count = 4) {
+  const out = [];
+  for (let i = 0; i < count; i++) {
+    const gw = startGW + i;
+
+    if (!fixturesByGW.has(gw)) {
+      out.push('--');
+      continue;
+    }
+
+    const list = fixturesByGW.get(gw);
+    const fx = bestFixtureForTeamInGW(teamId, list);
+    out.push(formatOpponent(teamId, fx));
+  }
+  return out;
+}
+
+function ensureFixturesForView() {
+  const token = ++fixturesLoadToken;
+  const start = state.viewingGW;
+  const needed = [start, start + 1, start + 2, start + 3];
+  const missing = needed.filter((gw) => !fixturesByGW.has(gw));
+
+  if (missing.length === 0) return;
+
+  Promise.all(
+    missing.map((gw) =>
+      loadFixtures(gw)
+        .then((fx) => {
+          fixturesByGW.set(gw, Array.isArray(fx) ? fx : []);
+        })
+        .catch(() => {
+          fixturesByGW.set(gw, []);
+        })
+    )
+  ).then(() => {
+    if (token !== fixturesLoadToken) return;
+    // Re-render once fixtures arrive (otherwise you'd see "..." placeholders)
+    renderPitch();
+    renderBench();
+  });
+}
+
+/* -------------------------
    FPL RULE HELPERS
 -------------------------- */
 
@@ -187,7 +314,6 @@ function validateStartingXI(team) {
   if (mid < 2) return { ok: false, message: 'Invalid formation: must have at least 2 midfielders in the starting XI.' };
   if (fwd < 1) return { ok: false, message: 'Invalid formation: must have at least 1 forward in the starting XI.' };
 
-  // Upper bounds (keeps it in the normal FPL set)
   if (def > 5) return { ok: false, message: 'Invalid formation: max 5 defenders in the starting XI.' };
   if (mid > 5) return { ok: false, message: 'Invalid formation: max 5 midfielders in the starting XI.' };
   if (fwd > 3) return { ok: false, message: 'Invalid formation: max 3 forwards in the starting XI.' };
@@ -338,7 +464,7 @@ function substitutePlayer(playerId) {
     return;
   }
 
-  // GK must swap with GK (prevents 2 GK or 0 GK in XI)
+  // GK must swap with GK.
   if (isGK(pendingSwap.id) !== isGK(playerId)) {
     pendingSwap = null;
     showMessage('Invalid swap: GK must swap with GK.', 'error');
@@ -547,7 +673,10 @@ function addSelectedToSquad() {
 -------------------------- */
 
 function updateUI() {
-  // Show the GW being viewed/planned (this fixes the post-import display too)
+  // kick off fixture loads for current viewing window (async)
+  ensureFixturesForView();
+
+  // Show the GW being viewed/planned
   const gwEl = document.getElementById('currentGWDisplay');
   if (gwEl) gwEl.textContent = state.viewingGW;
 
@@ -629,6 +758,12 @@ function playerCard(entry, source) {
         ? 'Buy'
         : 'Sell';
 
+  const fx = getNextFixturesForTeam(teamId, state.viewingGW, 4);
+  const fx1 = fx[0] || '—';
+  const fx2 = fx[1] || '—';
+  const fx3 = fx[2] || '—';
+  const fx4 = fx[3] || '—';
+
   const removeFn = `removePlayer(${entry.id}, '${source}')`;
   const subFn = `substitutePlayer(${entry.id})`;
 
@@ -643,10 +778,22 @@ function playerCard(entry, source) {
 
       <img src="https://resources.premierleague.com/premierleague/badges/t${teamCode}.png"
            class="badge" alt="${teamShort}">
-      <div class="name">${p.web_name}</div>
+
+      <div class="name-row">
+        <span class="fixture fixture-next">${fx1}</span>
+        <span class="player-name">${p.web_name}</span>
+        <span class="fixture fixture-next">${fx1}</span>
+      </div>
+
       <div class="info">
         <span>${teamShort}</span>
         <span>${label} ${price}</span>
+      </div>
+
+      <div class="future-fixtures">
+        <span class="fixture">${fx2}</span>
+        <span class="fixture">${fx3}</span>
+        <span class="fixture">${fx4}</span>
       </div>
     </div>
   `;
