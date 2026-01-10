@@ -3,9 +3,6 @@ import { state } from './data.js';
 const fixturesByGW = new Map();
 let fixturesGW = null;
 
-/**
- * Load all fixtures once and group by GW
- */
 export async function loadFixturesData() {
   const res = await fetch('/api/fpl/fixtures');
   const data = await res.json();
@@ -14,7 +11,6 @@ export async function loadFixturesData() {
 
   for (const f of data) {
     if (!f.event) continue;
-
     if (!fixturesByGW.has(f.event)) {
       fixturesByGW.set(f.event, []);
     }
@@ -25,22 +21,18 @@ export async function loadFixturesData() {
   renderFixtures();
 }
 
-/**
- * GW navigation for fixtures panel only
- */
 window.changeFixturesGW = function (delta) {
   fixturesGW = Math.max(1, Math.min(38, fixturesGW + delta));
   renderFixtures();
 };
 
-/**
- * Render fixtures panel
- */
 export function renderFixtures() {
   const panel = document.getElementById('fixturesPanel');
   if (!panel) return;
 
   const fixtures = fixturesByGW.get(fixturesGW) || [];
+
+  const groups = groupByDate(fixtures);
 
   panel.innerHTML = `
     <div class="fixtures-header">
@@ -49,13 +41,15 @@ export function renderFixtures() {
       <button onclick="changeFixturesGW(1)">→</button>
     </div>
 
-    ${fixtures.map(renderFixtureRow).join('')}
+    ${Object.entries(groups)
+      .map(([date, games]) => `
+        <div class="fixture-date">${date}</div>
+        ${games.map(renderFixtureRow).join('')}
+      `)
+      .join('')}
   `;
 }
 
-/**
- * Render one fixture row (FPL-style)
- */
 function renderFixtureRow(f) {
   const home = getTeam(f.team_h);
   const away = getTeam(f.team_a);
@@ -84,12 +78,27 @@ function renderFixtureRow(f) {
   `;
 }
 
-/**
- * Get team info from state
- */
+function groupByDate(fixtures) {
+  const groups = {};
+  for (const f of fixtures) {
+    if (!f.kickoff_time) continue;
+
+    const d = new Date(f.kickoff_time);
+    const label = d.toLocaleDateString(undefined, {
+      weekday: 'long',
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric'
+    });
+
+    groups[label] ??= [];
+    groups[label].push(f);
+  }
+  return groups;
+}
+
 function getTeam(teamId) {
   const t = state.teams.find(team => team.id === teamId);
-
   return {
     name: t ? t.name : '?',
     badge: t
