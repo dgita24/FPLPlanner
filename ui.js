@@ -14,6 +14,13 @@ window.toggleSidebarMenu = function () {
   setTimeout(() => (sidebarJustToggled = false), 300);
 };
 
+function closeSidebar() {
+  const sb = document.getElementById('sidebar');
+  if (!sb) return;
+  sb.classList.remove('open');
+  sidebarJustToggled = false;
+}
+
 // Remember where the last sale came from so the next buy goes there.
 let lastSoldSide = null; // 'starting' | 'bench'
 
@@ -131,14 +138,14 @@ export function initUI() {
     if (!sb.classList.contains('open')) return;
     // If click is outside the sidebar, close it
     if (!e.target.closest('#sidebar')) {
-      sb.classList.remove('open');
+      closeSidebar();
     }
   });
 
   // Close sidebar on Escape
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
-      document.getElementById('sidebar')?.classList.remove('open');
+      closeSidebar();
     }
   });
 
@@ -181,7 +188,7 @@ window.importTeam = async function () {
   pendingSwap = null;
 
   // Close the menu after import
-  document.getElementById('sidebar')?.classList.remove('open');
+  closeSidebar();
 
   updateUI();
 };
@@ -907,7 +914,7 @@ window.saveTeam = async function() {
             showMessage('Team saved to cloud!', 'success');
             if (sideMsg) sideMsg.textContent = `✓ Saved as: ${teamId}`;
             // Close sidebar after successful save
-            document.getElementById('sidebar')?.classList.remove('open');
+            closeSidebar();
         } else {
             throw new Error(result.error || 'Save failed');
         }
@@ -951,7 +958,7 @@ window.loadTeam = async function() {
             if (sideMsg) sideMsg.textContent = `✓ Loaded: ${data.label || teamId}`;
             
             // Close sidebar after load
-            document.getElementById('sidebar')?.classList.remove('open');
+            closeSidebar();
         } else {
             throw new Error(result.error || 'Load failed');
         }
