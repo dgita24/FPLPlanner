@@ -42,65 +42,15 @@ export function renderFixtures() {
 
   const fixtures = fixturesByGW.get(fixturesGW) || [];
 
-  // Group fixtures by date string
-  const byDate = new Map();
-
-  for (const f of fixtures) {
-    if (!f.kickoff_time) continue;
-
-    const date = new Date(f.kickoff_time);
-    const dateKey = date.toLocaleDateString('en-GB', {
-      weekday: 'long',
-      day: 'numeric',
-      month: 'long',
-      year: 'numeric'
-    });
-
-    if (!byDate.has(dateKey)) {
-      byDate.set(dateKey, []);
-    }
-    byDate.get(dateKey).push(f);
-  }
-
-  let html = `
+  panel.innerHTML = `
     <div class="fixtures-header">
       <button onclick="changeFixturesGW(-1)">←</button>
       <strong>GW ${fixturesGW}</strong>
       <button onclick="changeFixturesGW(1)">→</button>
     </div>
+
+    ${fixtures.map(renderFixtureRow).join('')}
   `;
-
-  for (const [dateLabel, dayFixtures] of byDate) {
-    html += `
-      <div class="fixture-date">${dateLabel}</div>
-    `;
-
-    for (const f of dayFixtures) {
-      const date = new Date(f.kickoff_time);
-      const time = date.toLocaleTimeString('en-GB', {
-        hour: '2-digit',
-        minute: '2-digit'
-      });
-
-      html += `
-        <div class="fixture-row">
-          <div class="fixture-team home">
-            ${teamBadge(f.team_h)}
-            <span>${teamShortName(f.team_h)}</span>
-          </div>
-
-          <div class="fixture-time">${time}</div>
-
-          <div class="fixture-team away">
-            ${teamBadge(f.team_a)}
-            <span>${teamShortName(f.team_a)}</span>
-          </div>
-        </div>
-      `;
-    }
-  }
-
-  panel.innerHTML = html;
 }
 
 /**
@@ -147,4 +97,3 @@ function getTeam(teamId) {
       : ''
   };
 }
-
