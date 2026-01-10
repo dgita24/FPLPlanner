@@ -812,3 +812,37 @@ function showMessage(text, type = 'info') {
   toast.style.display = 'block';
   setTimeout(() => (toast.style.display = 'none'), 3000);
 }
+
+window.localSave = function() {
+    try {
+        const data = {
+            plan: state.plan,
+            bank: state.bank,
+            viewingGW: state.viewingGW,
+            priceMode: state.priceMode
+        };
+        localStorage.setItem('fplplanner-state', JSON.stringify(data));
+        showMessage('Team saved locally', 'success');
+    } catch (e) {
+        showMessage('Local save failed', 'error');
+    }
+};
+
+window.localLoad = function() {
+    try {
+        const saved = localStorage.getItem('fplplanner-state');
+        if (!saved) {
+            showMessage('No local save found', 'info');
+            return;
+        }
+        const data = JSON.parse(saved);
+        state.plan = data.plan;
+        state.bank = data.bank;
+        state.viewingGW = data.viewingGW;
+        state.priceMode = data.priceMode;
+        updateUI();
+        showMessage('Team loaded locally', 'success');
+    } catch (e) {
+        showMessage('Local load failed', 'error');
+    }
+};
