@@ -30,27 +30,7 @@ export function initUI() {
         box-shadow: 0 0 0 3px rgba(0, 255, 135, 0.25);
       }
 
-      .player-card .name-row {
-        display: grid;
-        grid-template-columns: 46px 1fr 46px;
-        gap: 6px;
-        align-items: center;
-        margin: 3px 0;
-      }
-
-      .player-card .player-name {
-        font-size: 14px;
-        font-weight: 800;
-        color: #000;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        background: #eee;
-        padding: 3px 5px;
-        border-radius: 3px;
-        text-align: center;
-      }
-
+      /* Next fixture + fixtures strip */
       .player-card .fixture {
         font-size: 11px;
         color: #6f2dbd; /* purple */
@@ -60,6 +40,30 @@ export function initUI() {
 
       .player-card .fixture-next {
         font-weight: 800;
+      }
+
+      /* Put team | next fixture | price on one centered row */
+      .player-card .info {
+        display: grid;
+        grid-template-columns: 1fr auto 1fr;
+        align-items: center;
+        column-gap: 6px;
+      }
+
+      .player-card .info .team {
+        justify-self: start;
+      }
+
+      .player-card .info .next-fixture {
+        justify-self: center;
+        font-size: 11px;
+        font-weight: 800;
+        color: #6f2dbd; /* purple */
+        white-space: nowrap;
+      }
+
+      .player-card .info .price {
+        justify-self: end;
       }
 
       .player-card .future-fixtures {
@@ -270,7 +274,7 @@ function ensureFixturesForView() {
     )
   ).then(() => {
     if (token !== fixturesLoadToken) return;
-    // Re-render once fixtures arrive (otherwise you'd see "..." placeholders)
+    // Re-render once fixtures arrive
     renderPitch();
     renderBench();
   });
@@ -759,10 +763,10 @@ function playerCard(entry, source) {
         : 'Sell';
 
   const fx = getNextFixturesForTeam(teamId, state.viewingGW, 4);
-  const fx1 = fx[0] || '—';
-  const fx2 = fx[1] || '—';
-  const fx3 = fx[2] || '—';
-  const fx4 = fx[3] || '—';
+  const fx1 = fx[0] || '--';
+  const fx2 = fx[1] || '--';
+  const fx3 = fx[2] || '--';
+  const fx4 = fx[3] || '--';
 
   const removeFn = `removePlayer(${entry.id}, '${source}')`;
   const subFn = `substitutePlayer(${entry.id})`;
@@ -779,15 +783,12 @@ function playerCard(entry, source) {
       <img src="https://resources.premierleague.com/premierleague/badges/t${teamCode}.png"
            class="badge" alt="${teamShort}">
 
-      <div class="name-row">
-        <span class="fixture fixture-next">${fx1}</span>
-        <span class="player-name">${p.web_name}</span>
-        <span class="fixture fixture-next">${fx1}</span>
-      </div>
+      <div class="name">${p.web_name}</div>
 
       <div class="info">
-        <span>${teamShort}</span>
-        <span>${label} ${price}</span>
+        <span class="team">${teamShort}</span>
+        <span class="next-fixture fixture-next">${fx1}</span>
+        <span class="price">${label} ${price}</span>
       </div>
 
       <div class="future-fixtures">
