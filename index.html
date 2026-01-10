@@ -1,8 +1,9 @@
+<!-- NOTE: Keep <!DOCTYPE html> exactly as-is (required). -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
-    <meta content="width=device-width, initial-scale=1" name="viewport" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <title>FPL Team Planner</title>
     <style>
         :root {
@@ -12,11 +13,7 @@
             --text: #fff;
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
             font-family: "Segoe UI", sans-serif;
@@ -25,12 +22,8 @@
             padding: 20px;
         }
 
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-        }
+        .container { max-width: 1400px; margin: 0 auto; }
 
-        /* Header */
         .header {
             display: flex;
             justify-content: space-between;
@@ -41,10 +34,7 @@
             border-radius: 10px;
         }
 
-        .header h1 {
-            font-size: 24px;
-            margin: 0;
-        }
+        .header h1 { font-size: 24px; margin: 0; }
 
         .bank-display {
             display: flex;
@@ -78,7 +68,6 @@
             font-size: 13px;
         }
 
-        /* Sidebar Toggle */
         .sidebar-toggle {
             position: fixed;
             right: 20px;
@@ -94,11 +83,8 @@
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
         }
 
-        .sidebar-toggle:hover {
-            opacity: 0.9;
-        }
+        .sidebar-toggle:hover { opacity: 0.9; }
 
-        /* Sidebar */
         .sidebar {
             position: fixed;
             right: 0;
@@ -114,14 +100,9 @@
             overflow-y: auto;
         }
 
-        .sidebar.open {
-            transform: translateX(0);
-        }
+        .sidebar.open { transform: translateX(0); }
 
-        .sidebar h2 {
-            margin: 20px 0 10px;
-            color: var(--primary);
-        }
+        .sidebar h2 { margin: 20px 0 10px; color: var(--primary); }
 
         .sidebar h3 {
             margin: 20px 0 10px;
@@ -151,16 +132,10 @@
             color: var(--bg);
         }
 
-        .sidebar button:hover {
-            opacity: 0.9;
-        }
+        .sidebar button:hover { opacity: 0.9; }
 
-        #sideMsg {
-            margin-top: 10px;
-            font-size: 12px;
-        }
+        #sideMsg { margin-top: 10px; font-size: 12px; }
 
-        /* GW Nav */
         .gw-nav {
             display: flex;
             justify-content: center;
@@ -178,12 +153,8 @@
             font-weight: bold;
         }
 
-        .gw-nav button:disabled {
-            background: #666;
-            cursor: not-allowed;
-        }
+        .gw-nav button:disabled { background: #666; cursor: not-allowed; }
 
-        /* Pitch */
         .pitch {
             background: linear-gradient(to bottom, #2d5016 0%, #1a3d0a 100%);
             padding: 50px 30px;
@@ -195,7 +166,6 @@
             border: 2px solid rgba(255, 255, 255, 0.1);
         }
 
-        /* Formation Line */
         .formation-line {
             display: flex;
             justify-content: center;
@@ -206,7 +176,6 @@
             flex-wrap: wrap;
         }
 
-        /* Player Card */
         .player-card {
             width: 160px;
             background: rgba(255, 255, 255, 0.95);
@@ -232,22 +201,6 @@
             display: block;
         }
 
-        .player-card .team-fallback {
-            width: 50px;
-            height: 50px;
-            font-size: 16px;
-            font-weight: bold;
-            color: #666;
-            text-align: center;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 4px;
-            background: #f0f0f0;
-            border-radius: 6px;
-            padding: 5px;
-        }
-
         .player-card .name {
             font-size: 14px;
             font-weight: 800;
@@ -271,29 +224,6 @@
             font-weight: 600;
         }
 
-        .player-card .fixtures {
-            font-size: 11px;
-            color: #222;
-            margin-top: 5px;
-            padding: 4px;
-            background: rgba(255, 255, 255, 0.8);
-            border-radius: 4px;
-            font-weight: 600;
-            text-align: center;
-            white-space: nowrap;
-            line-height: 1.4;
-        }
-
-        .player-card .fixtures .fixture {
-            display: inline-block;
-            margin: 0 2px;
-        }
-
-        .player-card .fixtures .fixture.first {
-            font-weight: 800;
-        }
-
-        /* Card Buttons */
         .card-btn {
             position: absolute;
             width: 22px;
@@ -310,24 +240,11 @@
             transition: transform 0.1s;
         }
 
-        .card-btn:hover {
-            transform: scale(1.15);
-        }
+        .card-btn:hover { transform: scale(1.15); }
 
-        .btn-remove {
-            top: -8px;
-            left: -8px;
-            background: #ff4444;
-        }
+        .btn-remove { top: -8px; left: -8px; background: #ff4444; }
+        .btn-swap { top: -8px; right: -8px; background: #4444ff; font-size: 11px; }
 
-        .btn-swap {
-            top: -8px;
-            right: -8px;
-            background: #4444ff;
-            font-size: 11px;
-        }
-
-        /* Bench */
         .bench {
             background: rgba(0, 0, 0, 0.2);
             padding: 25px;
@@ -336,51 +253,19 @@
             margin: 0 auto 30px;
         }
 
-        .bench h3 {
-            text-align: center;
-            color: #fff;
-            margin-bottom: 20px;
-        }
+        .bench h3 { text-align: center; color: #fff; margin-bottom: 20px; }
 
-        .bench-slots {
-            display: flex;
-            justify-content: center;
-            gap: 25px;
-            flex-wrap: wrap;
-        }
+        .bench-slots { display: flex; justify-content: center; gap: 25px; flex-wrap: wrap; }
 
-        .bench-slot {
-            margin-top: 0;
-        }
-
-        .empty-slot {
-            width: 160px;
-            height: 140px;
-            border: 2px dashed rgba(255, 255, 255, 0.2);
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-            color: rgba(255, 255, 255, 0.4);
-        }
-
-        /* Transfer Table */
         .transfer-section {
             background: rgba(255, 255, 255, 0.05);
             padding: 20px;
             border-radius: 10px;
         }
 
-        .filters {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 15px;
-            flex-wrap: wrap;
-        }
+        .filters { display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap; }
 
-        .filters input,
-        .filters select {
+        .filters input, .filters select {
             padding: 8px;
             border-radius: 4px;
             border: none;
@@ -397,41 +282,13 @@
             overflow-y: auto;
         }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 13px;
-        }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        th { background: var(--bg); color: #fff; padding: 10px; text-align: left; position: sticky; top: 0; }
+        td { padding: 8px 10px; border-bottom: 1px solid #eee; }
+        tr:hover { background: #f0f0f0; cursor: pointer; }
+        tr.selected { background: #e6fffa; }
 
-        th {
-            background: var(--bg);
-            color: #fff;
-            padding: 10px;
-            text-align: left;
-            position: sticky;
-            top: 0;
-        }
-
-        td {
-            padding: 8px 10px;
-            border-bottom: 1px solid #eee;
-        }
-
-        tr:hover {
-            background: #f0f0f0;
-            cursor: pointer;
-        }
-
-        tr.selected {
-            background: #e6fffa;
-        }
-
-        .add-btn-row {
-            margin-top: 15px;
-            display: flex;
-            gap: 10px;
-        }
-
+        .add-btn-row { margin-top: 15px; display: flex; gap: 10px; }
         .add-btn-row button {
             flex: 1;
             padding: 12px;
@@ -442,7 +299,6 @@
             color: var(--bg);
         }
 
-        /* Messages */
         .message {
             position: fixed;
             bottom: 20px;
@@ -456,17 +312,9 @@
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
         }
 
-        .msg-success {
-            background: #00c853;
-        }
-
-        .msg-error {
-            background: #d50000;
-        }
-
-        .msg-info {
-            background: #2962ff;
-        }
+        .msg-success { background: #00c853; }
+        .msg-error { background: #d50000; }
+        .msg-info { background: #2962ff; }
     </style>
 </head>
 <body>
@@ -562,7 +410,8 @@
             </div>
 
             <div class="add-btn-row">
-                <button style="background: #00ff87" onclick="addSelectedToSquad()">Add to squad</button>
+                <button id="addToSquadBtn" style="background: #00ff87" onclick="addSelectedToSquad()">Add to squad</button>
+                <button id="cancelTransferBtn" style="background: #ff4444; color: #fff" onclick="cancelTransfer()">Cancel transfer</button>
             </div>
         </div>
     </div>
