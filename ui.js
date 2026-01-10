@@ -3,21 +3,10 @@
 import { state, loadTeamEntry, calculateSellingPrice, loadFixtures } from './data.js';
 import { renderTable } from './table.js';
 
-// Sidebar open state (prevents toggle desync)
-let sidebarOpen = false;
-
-function closeSidebar() {
-  const sidebar = document.getElementById('sidebar');
-  sidebarOpen = false;
-  sidebar?.classList.remove('open');
-}
-
+// Sidebar toggle
 window.toggleSidebarMenu = function () {
-  const sidebar = document.getElementById('sidebar');
-  sidebarOpen = !sidebarOpen;
-  sidebar?.classList.toggle('open', sidebarOpen);
+  document.getElementById('sidebar')?.classList.toggle('open');
 };
-
 
 // Remember where the last sale came from so the next buy goes there.
 let lastSoldSide = null; // 'starting' | 'bench'
@@ -127,25 +116,6 @@ export function initUI() {
   window.substitutePlayer = substitutePlayer;
   window.addSelectedToSquad = addSelectedToSquad;
   window.cancelTransfer = cancelTransfer;
-// Close sidebar if user clicks outside it (so it can't get "stuck" covering the Menu button)
-document.addEventListener('click', (e) => {
-  const sidebar = document.getElementById('sidebar');
-  if (!sidebar?.classList.contains('open')) return;
-
-  // Click inside sidebar => don't close
-  if (sidebar.contains(e.target)) return;
-
-  // Click on the Menu button => let toggleSidebarMenu handle it
-  const menuBtn = document.querySelector('.sidebar-toggle');
-  if (menuBtn && menuBtn.contains(e.target)) return;
-
-  closeSidebar();
-});
-
-// ESC closes sidebar
-document.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape') closeSidebar();
-});
 
   updateUI();
 }
@@ -155,7 +125,6 @@ window.importTeam = async function () {
   const teamId = document.getElementById('importTeamId')?.value?.trim();
   if (!teamId) {
     showMessage('Enter Team ID', 'error');
-    closeSidebar();
     return;
   }
 
@@ -165,7 +134,6 @@ window.importTeam = async function () {
 
   if (!data || !data.picks) {
     showMessage('Failed to load team.', 'error');
-    closeSidebar();
     return;
   }
 
@@ -174,7 +142,6 @@ window.importTeam = async function () {
     showMessage(
       `Imported from GW${importedGW} (GW${state.currentGW} not public yet).`,
       'success'
-      closeSidebar();
     );
   } else {
     showMessage(`Team imported for GW${state.currentGW}.`, 'success');
@@ -882,93 +849,129 @@ window.localLoad = function() {
 };
 
 // Cloud Save
-window.saveTeam = async function () {
-  const teamId = document.getElementById('saveTeamId')?.value?.trim();
-  const password = document.getElementById('savePassword')?.value?.trim();
-  const label = document.getElementById('saveLabel')?.value?.trim(); // optional if you don't have this input
-  const sideMsg = document.getElementById('sideMsg');
-
-  if (!teamId || !password) {
-    showMessage('Enter Team ID and Password', 'error');
-    closeSidebar();
-    return;
-  }
-
-  if (sideMsg) sideMsg.textContent = 'Saving...';
-
-  try {
-    const payload = {
-      plan: state.plan,
-      bank: state.bank,
-      viewingGW: state.viewingGW,
-      priceMode: state.priceMode,
-    };
-
-    const response = await fetch('/api/save', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ teamid: teamId, label, password, payload }),
-    });
-
-    const result = await response.json();
-
-    if (response.ok && result.success) {
-      showMessage('Team saved to cloud!', 'success');
-      if (sideMsg) sideMsg.textContent = `Saved as ${teamId}`;
-      closeSidebar();
-      return;
+window.saveTeam = async function() {
+    const teamId = document.getElementById('saveTeamId')?.value?.trim();
+    const password = document.getElementById('savePassword')?.value?.trim();
+    const label = document.getElementById('saveLabel')?.value?.trim();
+    
+    if (!teamId || !password) {
+        showMessage('Enter Team ID and Password', 'error');
+        return;
     }
+    
+    const sideMsg = document.getElementById('sideMsg');
+    if (sideMsg) sideMsg.textContent = 'Saving...';
+    
+    try {
+        const payload = {
+            plan: state.plan,
+            bank: state.bank,
+            viewingGW: state.viewingGW,
+            priceMode: state.priceMode
+        };
+        
+        const response = await fetch('/api/save', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ teamid: teamId, label, password, payload })
+        });
+        
+        const result = await response.json();
+        
+        if (response.ok && result.success) {
+            showMessage('Team saved to cloud!', 'success');
+            if (sideMsg) sideMsg.textContent = `✓ Saved as: ${teamId}`;
+        } else {
+            throw new Error(result.error || 'Save failed');
+        }
+    } catch (err) {
+        showMessage(`Save error: ${err.message}`, 'error');
+        if (sideMsg) sideMsg.textContent = `Error: ${err.message}`;
+    }
+};
 
-    throw new Error(result.error || 'Save failed');
-  } catch (err) {
-    showMessage(`Save error: ${err.message}`, 'error');
-    if (sideMsg) sideMsg.textContent = `Error: ${err.message}`;
-    closeSidebar();
-  }
+// Cloud Save
+window.saveTeam = async function() {
+    const teamId = document.getElementById('saveTeamId')?.value?.trim();
+    const password = document.getElementById('savePassword')?.value?.trim();
+    const label = document.getElementById('saveLabel')?.value?.trim();
+    
+    if (!teamId || !password) {
+        showMessage('Enter Team ID and Password', 'error');
+        return;
+    }
+    
+    const sideMsg = document.getElementById('sideMsg');
+    if (sideMsg) sideMsg.textContent = 'Saving...';
+    
+    try {
+        const payload = {
+            plan: state.plan,
+            bank: state.bank,
+            viewingGW: state.viewingGW,
+            priceMode: state.priceMode
+        };
+        
+        const response = await fetch('/api/save', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ teamid: teamId, label, password, payload })
+        });
+        
+        const result = await response.json();
+        
+        if (response.ok && result.success) {
+            showMessage('Team saved to cloud!', 'success');
+            if (sideMsg) sideMsg.textContent = `✓ Saved as: ${teamId}`;
+        } else {
+            throw new Error(result.error || 'Save failed');
+        }
+    } catch (err) {
+        showMessage(`Save error: ${err.message}`, 'error');
+        if (sideMsg) sideMsg.textContent = `Error: ${err.message}`;
+    }
 };
 
 // Cloud Load
-window.loadTeam = async function () {
-  const teamId = document.getElementById('loadTeamId')?.value?.trim();
-  const password = document.getElementById('loadPassword')?.value?.trim();
-  const sideMsg = document.getElementById('sideMsg');
-
-  if (!teamId || !password) {
-    showMessage('Enter Team ID and Password', 'error');
-    closeSidebar();
-    return;
-  }
-
-  if (sideMsg) sideMsg.textContent = 'Loading...';
-
-  try {
-    const response = await fetch('/api/load', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ teamid: teamId, password }),
-    });
-
-    const result = await response.json();
-
-    if (response.ok && result.success) {
-      const data = result.data;
-
-      state.plan = data.payload.plan;
-      state.bank = data.payload.bank;
-      state.viewingGW = data.payload.viewingGW;
-      state.priceMode = data.payload.priceMode;
-
-      updateUI();
-      showMessage('Team loaded from cloud!', 'success');
-      if (sideMsg) sideMsg.textContent = `Loaded ${data.label || teamId}`;
-      closeSidebar();
-      return;
+window.loadTeam = async function() {
+    const teamId = document.getElementById('loadTeamId')?.value?.trim();
+    const password = document.getElementById('loadPassword')?.value?.trim();
+    
+    if (!teamId || !password) {
+        showMessage('Enter Team ID and Password', 'error');
+        return;
     }
-
-    throw new Error(result.error || 'Load failed');
-  } catch (err) {
-    showMessage(`Load error: ${err.message}`, 'error');
-    if (sideMsg) sideMsg.textContent = `Error: ${err.message}`;
-    closeSidebar();
-  }
+    
+    const sideMsg = document.getElementById('sideMsg');
+    if (sideMsg) sideMsg.textContent = 'Loading...';
+    
+    try {
+        const response = await fetch('/api/load', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ teamid: teamId, password })
+        });
+        
+        const result = await response.json();
+        
+        if (response.ok && result.success) {
+            const data = result.data;
+            state.plan = data.payload.plan;
+            state.bank = data.payload.bank;
+            state.viewingGW = data.payload.viewingGW;
+            state.priceMode = data.payload.priceMode;
+            
+            updateUI();
+            showMessage('Team loaded from cloud!', 'success');
+            if (sideMsg) sideMsg.textContent = `✓ Loaded: ${data.label || teamId}`;
+            
+            // Close sidebar after load
+            document.getElementById('sidebar')?.classList.remove('open');
+        } else {
+            throw new Error(result.error || 'Load failed');
+        }
+    } catch (err) {
+        showMessage(`Load error: ${err.message}`, 'error');
+        if (sideMsg) sideMsg.textContent = `Error: ${err.message}`;
+    }
 };
