@@ -66,6 +66,8 @@ function initEmptyPlan() {
   }
 }
 
+// data.js - only this function needs updating
+
 export async function loadBootstrap() {
   try {
     const res = await fetch(`${FPL_BASE}/bootstrap-static/`);
@@ -75,10 +77,12 @@ export async function loadBootstrap() {
     state.elements = state.bootstrap.elements || [];
     state.teams = state.bootstrap.teams || [];
 
-    const current = state.bootstrap.events?.find(e => e.is_current)?.id;
-    const next = state.bootstrap.events?.find(e => e.is_next)?.id;
+    const events = state.bootstrap.events || [];
+    const current = events.find(e => e.is_current)?.id;
+    const next = events.find(e => e.is_next)?.id;
 
-    state.currentGW = current || next || 1;
+    // Use the *upcoming* GW as the planner's current GW when available
+    state.currentGW = next || current || 1;
     state.viewingGW = state.currentGW;
 
     initEmptyPlan();
@@ -88,6 +92,7 @@ export async function loadBootstrap() {
     return false;
   }
 }
+
 
 export async function loadFixtures(gw) {
   const res = await fetch(`${FPL_BASE}/fixtures/?event=${gw}`);
