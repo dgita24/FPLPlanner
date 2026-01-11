@@ -149,8 +149,8 @@ export function renderTable() {
           <td>${player.web_name}</td>
           <td>${teamName}</td>
           <td>${posNames[player.element_type]}</td>
-          <td>${player.total_points}</td>
           <td>${(player.now_cost / 10).toFixed(1)}</td>
+          <td>${player.total_points}</td>
           <td style="text-align:center; white-space:nowrap;">${next3Html}</td>
         </tr>
       `;
