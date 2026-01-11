@@ -12,6 +12,26 @@ const posNames = { 1: 'GK', 2: 'DEF', 3: 'MID', 4: 'FWD' };
 // Selected player (shared with ui.js)
 window.selectedPlayerId = window.selectedPlayerId ?? null;
 
+// ---- Multi-select (replaces single selectedPlayerId as the source of truth) ----
+window.selectedPlayerIds = window.selectedPlayerIds ?? new Set();
+
+// Keep selectedPlayerId as “last clicked” for backward compatibility / debugging
+window.togglePlayerSelection = function (playerId, checked) {
+  if (!(window.selectedPlayerIds instanceof Set)) {
+    window.selectedPlayerIds = new Set(window.selectedPlayerIds || []);
+  }
+  if (checked) window.selectedPlayerIds.add(playerId);
+  else window.selectedPlayerIds.delete(playerId);
+
+  window.selectedPlayerId = playerId;
+};
+
+window.clearPlayerSelections = function () {
+  if (window.selectedPlayerIds instanceof Set) window.selectedPlayerIds.clear();
+  else window.selectedPlayerIds = new Set();
+  window.selectedPlayerId = null;
+};
+
 /* ------------------------- FIXTURES (TABLE) -------------------------- */
 // Cache fixtures per GW so typing in filters doesn't spam requests.
 const fixturesByGW = new Map(); // gw -> fixtures[]
@@ -90,6 +110,7 @@ function ensureFixturesForTable() {
 
 /* ------------------------- TABLE RENDER -------------------------- */
 
+// ------------------------- TABLE RENDER --------------------------
 export function renderTable() {
   ensureFixturesForTable();
 
@@ -113,51 +134,48 @@ export function renderTable() {
   // -------- SORTING --------
   if (tableSort.key) {
     const dir = tableSort.dir === 'asc' ? 1 : -1;
-
     filtered = filtered.slice().sort((a, b) => {
-      if (tableSort.key === 'price') {
-        return dir * ((a.now_cost / 10) - (b.now_cost / 10));
-      }
-
-      if (tableSort.key === 'pos') {
-        // GK(1) → DEF(2) → MID(3) → FWD(4)
-        return dir * (a.element_type - b.element_type);
-      }
-
-      if (tableSort.key === 'points') {
-        return dir * (a.total_points - b.total_points);
-      }
-
-
+      if (tableSort.key === 'price') return dir * ((a.now_cost / 10) - (b.now_cost / 10));
+      if (tableSort.key === 'pos') return dir * (a.element_type - b.element_type); // 1..4
+      if (tableSort.key === 'points') return dir * (a.total_points - b.total_points);
       return 0;
     });
+  }
+
+  // Ensure Set
+  if (!(window.selectedPlayerIds instanceof Set)) {
+    window.selectedPlayerIds = new Set(window.selectedPlayerIds || []);
   }
 
   // -------- RENDER --------
   tbody.innerHTML = filtered
     .map((player) => {
-      const teamName =
-        state.teams.find((t) => t.id === player.team)?.short_name || '';
-      const checked = window.selectedPlayerId === player.id ? 'checked' : '';
+      const teamName = state.teams.find((t) => t.id === player.team)?.short_name || '';
+      const selected = window.selectedPlayerIds.has(player.id);
 
       const next3 = getNextFixturesForTeam(player.team, state.viewingGW, 3);
-      const next3Html = next3.map((x) => `<span class="fx">${x}</span>`).join(' ');
+      const next3Html = next3.map((x) => `${x}`).join(' ');
 
       return `
-        <tr onclick="selectPlayer(event, ${player.id})">
-          <td><input type="radio" name="selectedPlayer" value="${player.id}" ${checked}></td>
-          <td>${player.web_name}</td>
+        <tr class="${selected ? 'selected' : ''}">
+          <td>
+            <input
+              type="checkbox"
+              ${selected ? 'checked' : ''}
+              onchange="togglePlayerSelection(${player.id}, this.checked)"
+            />
+          </td>
+          <td>${player.web_name || ''}</td>
           <td>${teamName}</td>
-          <td>${posNames[player.element_type]}</td>
+          <td>${posNames[player.element_type] || ''}</td>
           <td>${(player.now_cost / 10).toFixed(1)}</td>
-          <td>${player.total_points}</td>
-          <td style="text-align:center; white-space:nowrap;">${next3Html}</td>
+          <td>${player.total_points ?? ''}</td>
+          <td style="text-align:center;">${next3Html}</td>
         </tr>
       `;
     })
     .join('');
 }
-
 export function populateFilters() {
   const teamSelect = document.getElementById('filterTeam');
   if (!teamSelect) return;
