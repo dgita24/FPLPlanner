@@ -1,5 +1,10 @@
 // data.js - FPL data via Cloudflare Pages Functions proxy (/api/fpl/*)
 
+export let history = {
+  baseline: null,
+  undoStack: []
+};
+
 export let state = {
   // "Current" GW from bootstrap (e.g. 22)
   currentGW: 1,
@@ -252,6 +257,10 @@ export async function loadTeamEntry(managerId, gwRequested) {
 
       // Always show current GW in the UI after import
       state.viewingGW = state.currentGW;
+
+      // Save baseline state for Reset / Undo
+      history.baseline = JSON.parse(JSON.stringify(state));
+      history.undoStack = [];
 
       return json;
     } catch (e) {

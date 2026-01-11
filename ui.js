@@ -1,8 +1,17 @@
 // ui.js - UI interactions + planner actions
 // ui.js - Added to try force git commit
-import { state, loadTeamEntry, calculateSellingPrice, loadFixtures } from './data.js';
+import { state, history, loadTeamEntry, calculateSellingPrice, loadFixtures } from './data.js';
 import { renderTable } from './table.js';
 import { renderFixtures } from './fixtures.js';
+
+function pushUndoState() {
+  history.undoStack.push(JSON.parse(JSON.stringify(state)));
+
+  // Safety cap to avoid unbounded memory growth
+  if (history.undoStack.length > 50) {
+    history.undoStack.shift();
+  }
+}
 
 // Sidebar toggle
 let sidebarJustToggled = false;
@@ -697,6 +706,7 @@ function addSelectedToSquad() {
   }
 
   // ---------- APPLY TRANSFER ----------
+  pushUndoState();
   state.bank = Number((state.bank - buy).toFixed(1));
 
   for (let g = gw; g <= state.currentGW + 7; g++) {
@@ -1009,4 +1019,38 @@ window.loadTeam = async function() {
         if (sideMsg) sideMsg.textContent = `Error: ${err.message}`;
     }
 };
+
+window.undoLastAction = function () {
+  if (!history.undoStack.length) {
+    showMessage('Nothing to undo.', 'info');
+    return;
+  }
+
+  const prev = history.undoStack.pop();
+
+  // Replace state contents (preserve object reference)
+  Object.keys(state).forEach(k => delete state[k]);
+  Object.assign(state, prev);
+
+  updateUI();
+  showMessage('Last action undone.', 'success');
+};
+
+window.resetToImportedTeam = function () {
+  if (!history.baseline) {
+    showMessage('No imported team to reset to.', 'error');
+    return;
+  }
+
+  // Restore baseline state (preserve object reference)
+  Object.keys(state).forEach(k => delete state[k]);
+  Object.assign(state, JSON.parse(JSON.stringify(history.baseline)));
+
+  // Clear undo history
+  history.undoStack = [];
+
+  updateUI();
+  showMessage('Team reset to imported state.', 'success');
+};
+
 
