@@ -31,46 +31,11 @@ function closeSidebar() {
   sidebarJustToggled = false;
 }
 
-// --- Batch transfer state ---
-let pendingBatch = {
-  // playerId -> { id, side: 'starting'|'bench', sellingPrice: number }
-  outs: new Map(),
-};
+// Remember where the last sale came from so the next buy goes there.
+let lastSoldSide = null; // 'starting' | 'bench'
 
-function getSelectedInIds() {
-  const s = window.selectedPlayerIds;
-  if (!s) return [];
-  if (s instanceof Set) return Array.from(s);
-  if (Array.isArray(s)) return s.slice();
-  return [];
-}
-
-function clearSelectedInIds() {
-  if (window.selectedPlayerIds instanceof Set) window.selectedPlayerIds.clear();
-  else window.selectedPlayerIds = new Set();
-  window.selectedPlayerId = null;
-}
-
-function hasPendingBatch() {
-  return pendingBatch.outs.size > 0 || getSelectedInIds().length > 0;
-}
-
-function clearPendingBatch() {
-  pendingBatch.outs.clear();
-  clearSelectedInIds();
-}
-
-function insertIntoBenchKeepingGKFirst(benchArr, entry) {
-  const isGK = getElementType(entry.id) === 1;
-  if (isGK) {
-    benchArr.unshift(entry);
-    return;
-  }
-  const gkIndex = benchArr.findIndex((e) => getElementType(e.id) === 1);
-  if (gkIndex === -1) benchArr.push(entry);
-  else benchArr.splice(gkIndex + 1, 0, entry);
-}
-
+// Snapshot used to cancel a planned transfer (sale before buy).
+let pendingTransfer = null; // { plan, bank }
 
 // --- Two-click swap state ---
 let pendingSwap = null; // { id: number, side: 'starting'|'bench' }
@@ -239,8 +204,8 @@ window.importTeam = async function () {
 };
 
 function changeGW(delta) {
-  if (hasPendingBatch()) {
-    showMessage('Finish the pending batch transfer (Add) or Cancel it first.', 'info');
+  if (pendingTransfer) {
+    showMessage('Finish the pending transfer (Add) or Cancel it first.', 'info');
     return;
   }
 
@@ -458,16 +423,20 @@ function restorePlanInPlace(snapshotPlan) {
 }
 
 function cancelTransfer() {
-  if (!hasPendingBatch()) {
-    showMessage('No pending batch transfer to cancel.', 'info');
+  if (!pendingTransfer) {
+    showMessage('No pending transfer to cancel.', 'info');
     return;
   }
 
-  clearPendingBatch();
-  showMessage('Pending batch transfer cleared.', 'success');
+  restorePlanInPlace(pendingTransfer.plan);
+  state.bank = pendingTransfer.bank;
+
+  pendingTransfer = null;
+  lastSoldSide = null;
+
+  showMessage('Transfer cancelled. Sold player restored.', 'success');
   updateUI();
 }
-
 
 /* -------------------------
    TWO-CLICK SWAP
@@ -595,49 +564,47 @@ function removePlayer(playerId, source) {
   const team = state.plan[gw];
   if (!team) return;
 
-  if (pendingSwap) {
-    showMessage('Finish the pending swap first.', 'info');
+  if (pendingTransfer) {
+    showMessage('Finish the pending transfer (Add) or Cancel it first.', 'info');
     return;
   }
 
-  // Toggle OFF if already selected
-  if (pendingBatch.outs.has(playerId)) {
-    pendingBatch.outs.delete(playerId);
-    showMessage(`Transfer-out selection updated (${pendingBatch.outs.size} marked).`, 'success');
-    updateUI();
-    return;
-  }
-
-  // Enforce: if currently over the 3-per-club limit, the first transfer out must be from that club.
+  // If currently over the 3-per-club limit, the next transfer out must be from that club.
   const overLimit = getOverLimitClubs(team);
   if (overLimit.size > 0) {
-    const alreadyChoseFromOverLimit = Array.from(pendingBatch.outs.values()).some((o) =>
-      overLimit.has(getPlayerTeamId(o.id))
-    );
     const playerClub = getPlayerTeamId(playerId);
-
-    if (!alreadyChoseFromOverLimit && !overLimit.has(playerClub)) {
-      showMessage(
-        'You have 4 players from a club. Your next transfer out must be from that club.',
-        'error'
-      );
+    if (!overLimit.has(playerClub)) {
+      showMessage('You have 4+ players from a club. Your next transfer out must be from that club.', 'error');
       return;
     }
   }
 
+  // Find the entry in the currently viewed GW (sell once)
   const entry =
-    team.starting.find((e) => e.id === playerId) || team.bench.find((e) => e.id === playerId);
+    team.starting.find((e) => e.id === playerId) ||
+    team.bench.find((e) => e.id === playerId);
+
   if (!entry) return;
 
-  const side = source === 'starting' || source === 'bench' ? source : (getSide(team, playerId) || 'starting');
+  // Snapshot BEFORE any mutations so we can cancel and restore
+  pendingTransfer = snapshotForCancel();
+
+  // record where the sale came from, so the next buy goes there
+  if (source === 'starting' || source === 'bench') lastSoldSide = source;
+
+  // Add selling price to bank once
   const sell = entry.sellingPrice ?? displayPrice(entry);
+  state.bank = Number((state.bank + sell).toFixed(1));
 
-  pendingBatch.outs.set(playerId, { id: playerId, side, sellingPrice: sell });
+  // Remove from this GW and all future planned GWs
+  for (let g = gw; g <= state.currentGW + 7; g++) {
+    const t = state.plan[g];
+    if (!t) continue;
+    t.starting = t.starting.filter((e) => e.id !== playerId);
+    t.bench = t.bench.filter((e) => e.id !== playerId);
+  }
 
-  showMessage(
-    `${pendingBatch.outs.size} player(s) marked out. Select ${pendingBatch.outs.size} replacement(s) in the table, then click Add to squad.`,
-    'info'
-  );
+  showMessage('Player sold. Pick a replacement and click Add to squad (or Cancel transfer).', 'info');
   updateUI();
 }
 
@@ -646,116 +613,59 @@ function addSelectedToSquad() {
   const team = state.plan[gw];
   if (!team) return;
 
-  if (pendingSwap) {
-    showMessage('Finish the pending swap first.', 'info');
+  const playerId = window.selectedPlayerId;
+  if (!playerId) {
+    showMessage('Select a player in the table first.', 'error');
     return;
   }
 
-  const outs = Array.from(pendingBatch.outs.values());
-  const outIds = outs.map((o) => o.id);
-
-  const inIds = getSelectedInIds();
-
-  if (outs.length === 0) {
-    showMessage('Mark at least 1 player to transfer out first.', 'error');
+  if (!lastSoldSide || !pendingTransfer) {
+    showMessage('Sell a player first (X), then Add to squad (or Cancel transfer).', 'info');
     return;
   }
 
-  if (inIds.length !== outs.length) {
-    showMessage(`Select exactly ${outs.length} replacement(s) in the table.`, 'error');
+  const p = getPlayer(playerId);
+  if (!p) {
+    showMessage('Player data not found.', 'error');
     return;
   }
 
-  // Disallow “buying back” a player you’re transferring out in the same batch
-  const outSet = new Set(outIds);
-  if (inIds.some((id) => outSet.has(id))) {
-    showMessage('Replacements cannot include a player marked to transfer out.', 'error');
+  // Prevent duplicates
+  const already =
+    team.starting.some((e) => e.id === playerId) ||
+    team.bench.some((e) => e.id === playerId);
+
+  if (already) {
+    showMessage('That player is already in your squad.', 'error');
     return;
   }
 
-  // Build position counts
-  const countByPos = (ids) => {
-    const m = new Map();
-    for (const id of ids) {
-      const t = getElementType(id);
-      m.set(t, (m.get(t) || 0) + 1);
-    }
-    return m;
-  };
-
-  const outCounts = countByPos(outIds);
-  const inCounts = countByPos(inIds);
-
-  for (const pos of [1, 2, 3, 4]) {
-    const a = outCounts.get(pos) || 0;
-    const b = inCounts.get(pos) || 0;
-    if (a !== b) {
-      showMessage('Transfers must be position-for-position (GK/DEF/MID/FWD counts must match).', 'error');
-      return;
-    }
-  }
-
-  // Prevent duplicates vs remaining squad at the current GW
-  const remaining = new Set([
-    ...team.starting.map((e) => e.id),
-    ...team.bench.map((e) => e.id),
-  ]);
-  for (const id of outIds) remaining.delete(id);
-
-  for (const id of inIds) {
-    if (remaining.has(id)) {
-      showMessage('At least one selected replacement is already in your squad.', 'error');
-      return;
-    }
-  }
-
-  // Budget check (batch)
-  let totalSell = 0;
-  for (const o of outs) totalSell += Number(o.sellingPrice || 0);
-
-  let totalBuy = 0;
-  const buyPriceById = new Map();
-  for (const id of inIds) {
-    const p = getPlayer(id);
-    if (!p) {
-      showMessage('Player data not found for a selected replacement.', 'error');
-      return;
-    }
-    const buy = p.now_cost / 10;
-    buyPriceById.set(id, buy);
-    totalBuy += buy;
-  }
-
-  const bankAfter = Number((state.bank + totalSell - totalBuy).toFixed(1));
-  if (bankAfter < 0) {
-    showMessage(`Not enough money. Bank after batch would be ${bankAfter.toFixed(1)}m.`, 'error');
+  // Budget check
+  const buy = p.now_cost / 10;
+  if (state.bank < buy) {
+    showMessage(
+      `Not enough money. Need ${buy.toFixed(1)}m, have ${Number(state.bank).toFixed(1)}m.`,
+      'error'
+    );
     return;
   }
 
-  // Allocate ins -> sides based on outs (order doesn't matter)
-  const outsByPos = new Map([1, [], 2, [], 3, [], 4, []]);
-  for (const o of outs) outsByPos.get(getElementType(o.id)).push(o);
-
-  const insByPos = new Map([1, [], 2, [], 3, [], 4, []]);
-  for (const id of inIds) insByPos.get(getElementType(id)).push(id);
-
-  const allocations = []; // { id, side }
-  for (const pos of [1, 2, 3, 4]) {
-    const outsThis = outsByPos.get(pos);
-    const insThis = insByPos.get(pos);
-
-    const needStarting = outsThis.filter((o) => o.side === 'starting').length;
-
-    // deterministic (optional): stable order
-    insThis.sort((a, b) => a - b);
-
-    for (let i = 0; i < insThis.length; i++) {
-      allocations.push({
-        id: insThis[i],
-        side: i < needStarting ? 'starting' : 'bench',
-      });
-    }
+  // Capacity check (current GW only)
+  if (lastSoldSide === 'starting' && team.starting.length >= 11) {
+    showMessage('Starting XI is already full.', 'error');
+    return;
   }
+
+  if (lastSoldSide === 'bench' && team.bench.length >= 4) {
+    showMessage('Bench is already full.', 'error');
+    return;
+  }
+
+  const purchasePrice = buy;
+  const sellingPrice = calculateSellingPrice(purchasePrice, buy);
+  const entry = { id: playerId, purchasePrice, sellingPrice };
+
+  const isGK = getElementType(playerId) === 1;
 
   // ---------- VALIDATE ACROSS FUTURE GWs ----------
   for (let g = gw; g <= state.currentGW + 7; g++) {
@@ -763,28 +673,28 @@ function addSelectedToSquad() {
     if (!t) continue;
 
     const temp = {
-      starting: t.starting.filter((e) => !outSet.has(e.id)).map((e) => ({ ...e })),
-      bench: t.bench.filter((e) => !outSet.has(e.id)).map((e) => ({ ...e })),
+      starting: t.starting.map((x) => ({ ...x })),
+      bench: t.bench.map((x) => ({ ...x })),
     };
 
-    for (const a of allocations) {
-      const buy = buyPriceById.get(a.id);
-      const purchasePrice = buy;
-      const sellingPrice = calculateSellingPrice(purchasePrice, buy);
-      const entry = { id: a.id, purchasePrice, sellingPrice };
-
-      if (a.side === 'starting') temp.starting.push(entry);
-      else insertIntoBenchKeepingGKFirst(temp.bench, entry);
-    }
-
-    if (temp.starting.length !== 11 || temp.bench.length !== 4) {
-      showMessage('Invalid squad size after batch (starting must be 11 and bench must be 4).', 'error');
-      return;
+    if (lastSoldSide === 'starting') {
+      temp.starting.push({ ...entry });
+    } else {
+      if (isGK) {
+        temp.bench.unshift({ ...entry });
+      } else {
+        const gkIndex = temp.bench.findIndex((e) => getElementType(e.id) === 1);
+        if (gkIndex === -1) temp.bench.push({ ...entry });
+        else temp.bench.splice(gkIndex + 1, 0, { ...entry });
+      }
     }
 
     const clubOk = validateClubLimit(temp);
     if (!clubOk.ok) {
-      showMessage(clubOk.message || 'Invalid squad: max 3 players per club.', 'error');
+      showMessage(
+        'Invalid transfer: max 3 players per club (or fix an over-limit club first).',
+        'error'
+      );
       return;
     }
 
@@ -794,35 +704,6 @@ function addSelectedToSquad() {
       return;
     }
   }
-
-  // ---------- APPLY (ATOMIC) ----------
-  pushUndoState();
-
-  state.bank = bankAfter;
-
-  for (let g = gw; g <= state.currentGW + 7; g++) {
-    const t = state.plan[g];
-    if (!t) continue;
-
-    t.starting = t.starting.filter((e) => !outSet.has(e.id));
-    t.bench = t.bench.filter((e) => !outSet.has(e.id));
-
-    for (const a of allocations) {
-      const buy = buyPriceById.get(a.id);
-      const purchasePrice = buy;
-      const sellingPrice = calculateSellingPrice(purchasePrice, buy);
-      const entry = { id: a.id, purchasePrice, sellingPrice };
-
-      if (a.side === 'starting') t.starting.push(entry);
-      else insertIntoBenchKeepingGKFirst(t.bench, entry);
-    }
-  }
-
-  clearPendingBatch();
-  showMessage(`Batch transfer applied: ${outs.length} in / ${outs.length} out.`, 'success');
-  updateUI();
-}
-
 
   // ---------- APPLY TRANSFER ----------
   pushUndoState();
@@ -886,22 +767,26 @@ function updateUI() {
   const pm = document.getElementById('priceModeSelect');
   if (pm && pm.value !== state.priceMode) pm.value = state.priceMode;
 
-  // Enable/disable cancel transfer button
+  // Enable/disable cancel transfer button (if present)
   const cancelBtn = document.getElementById('cancelTransferBtn');
-  if (cancelBtn) cancelBtn.disabled = !hasPendingBatch();
+  if (cancelBtn) cancelBtn.disabled = !pendingTransfer;
 
-  // Optional: show progress on Add button
-  const addBtn = document.getElementById('addToSquadBtn');
-  if (addBtn) {
-    const outs = pendingBatch.outs.size;
-    const ins = getSelectedInIds().length;
-    addBtn.textContent = outs > 0 ? `Add to squad (${ins}/${outs})` : 'Add to squad';
+  // ---- TEAM META (FREE TRANSFERS) ----
+  // DISABLED: FT display + logic intentionally removed
+  /*
+  const meta = document.getElementById('teamMeta');
+  if (meta) {
+    if (typeof state.freeTransfers === 'number') {
+      meta.textContent = `FT: ${state.freeTransfers}`;
+    } else {
+      meta.textContent = '';
+    }
   }
+  */
 
   renderPitch();
   renderBench();
 }
-
 
 
 // Render GK first (top), then DEF, MID, FWD
