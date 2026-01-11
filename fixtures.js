@@ -54,12 +54,18 @@ function renderFixtureRow(f) {
   const home = getTeam(f.team_h);
   const away = getTeam(f.team_a);
 
-  const kickoff = f.kickoff_time
-    ? new Date(f.kickoff_time).toLocaleTimeString([], {
-        hour: '2-digit',
-        minute: '2-digit'
-      })
-    : '';
+  let centreDisplay;
+
+  if (f.finished && f.team_h_score !== null && f.team_a_score !== null) {
+    centreDisplay = `${f.team_h_score}–${f.team_a_score}`;
+  } else {
+    centreDisplay = f.kickoff_time
+      ? new Date(f.kickoff_time).toLocaleTimeString([], {
+          hour: '2-digit',
+          minute: '2-digit'
+        })
+      : '';
+  }
 
   return `
     <div class="fixture-row">
@@ -68,7 +74,7 @@ function renderFixtureRow(f) {
         <img class="team-badge" src="${home.badge}" />
       </div>
 
-      <div class="ko">${kickoff}</div>
+      <div class="ko">${centreDisplay}</div>
 
       <div class="team away">
         <img class="team-badge" src="${away.badge}" />
