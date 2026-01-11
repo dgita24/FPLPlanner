@@ -180,10 +180,10 @@ export async function loadTeamEntry(managerId, gwRequested) {
   }
 
   // Derive free transfers (simple + safe)
-  if (entrySummary) {
-    const usedLastGW = entrySummary.last_deadline_total_transfers ?? 0;
-    state.freeTransfers = usedLastGW === 0 ? 2 : 1;
-  }
+  // if (entrySummary) {
+  //   const usedLastGW = entrySummary.last_deadline_total_transfers ?? 0;
+  //   state.freeTransfers = usedLastGW === 0 ? 2 : 1;
+  // }
 
   for (const gw of unique) {
     try {
@@ -206,10 +206,10 @@ export async function loadTeamEntry(managerId, gwRequested) {
       }
       
       // Extract free transfers for this GW
-      const freeTransfers = json.entry_history?.free_transfers;
-      if (typeof freeTransfers === 'number') {
-        state.freeTransfers = freeTransfers;
-      }
+      // const freeTransfers = json.entry_history?.free_transfers;
+      // if (typeof freeTransfers === 'number') {
+      //   state.freeTransfers = freeTransfers;
+      // }
 
       // Build starting/bench entries with purchase & selling prices
       const picks = json.picks || [];

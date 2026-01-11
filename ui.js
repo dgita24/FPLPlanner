@@ -736,6 +736,8 @@ function updateUI() {
   if (cancelBtn) cancelBtn.disabled = !pendingTransfer;
 
   // ---- TEAM META (FREE TRANSFERS) ----
+  // DISABLED: FT display + logic intentionally removed
+  /*
   const meta = document.getElementById('teamMeta');
   if (meta) {
     if (typeof state.freeTransfers === 'number') {
@@ -744,6 +746,7 @@ function updateUI() {
       meta.textContent = '';
     }
   }
+  */
 
   renderPitch();
   renderBench();
