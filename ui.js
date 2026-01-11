@@ -625,6 +625,7 @@ function addSelectedToSquad() {
   const already =
     team.starting.some((e) => e.id === playerId) ||
     team.bench.some((e) => e.id === playerId);
+
   if (already) {
     showMessage('That player is already in your squad.', 'error');
     return;
@@ -640,11 +641,12 @@ function addSelectedToSquad() {
     return;
   }
 
-  // Capacity check on the CURRENT GW team
+  // Capacity check (current GW only)
   if (lastSoldSide === 'starting' && team.starting.length >= 11) {
     showMessage('Starting XI is already full.', 'error');
     return;
   }
+
   if (lastSoldSide === 'bench' && team.bench.length >= 4) {
     showMessage('Bench is already full.', 'error');
     return;
@@ -654,7 +656,9 @@ function addSelectedToSquad() {
   const sellingPrice = calculateSellingPrice(purchasePrice, buy);
   const entry = { id: playerId, purchasePrice, sellingPrice };
 
-  // Validate across all affected GWs BEFORE spending money / applying
+  const isGK = getElementType(playerId) === 1;
+
+  // ---------- VALIDATE ACROSS FUTURE GWs ----------
   for (let g = gw; g <= state.currentGW + 7; g++) {
     const t = state.plan[g];
     if (!t) continue;
@@ -664,12 +668,24 @@ function addSelectedToSquad() {
       bench: t.bench.map((x) => ({ ...x })),
     };
 
-    if (lastSoldSide === 'starting') temp.starting.push({ ...entry });
-    else temp.bench.push({ ...entry });
+    if (lastSoldSide === 'starting') {
+      temp.starting.push({ ...entry });
+    } else {
+      if (isGK) {
+        temp.bench.unshift({ ...entry });
+      } else {
+        const gkIndex = temp.bench.findIndex((e) => getElementType(e.id) === 1);
+        if (gkIndex === -1) temp.bench.push({ ...entry });
+        else temp.bench.splice(gkIndex + 1, 0, { ...entry });
+      }
+    }
 
     const clubOk = validateClubLimit(temp);
     if (!clubOk.ok) {
-      showMessage('Invalid transfer: max 3 players per club (or fix an over-limit club first).', 'error');
+      showMessage(
+        'Invalid transfer: max 3 players per club (or fix an over-limit club first).',
+        'error'
+      );
       return;
     }
 
@@ -680,10 +696,9 @@ function addSelectedToSquad() {
     }
   }
 
-  // Spend once (only after validation passes)
+  // ---------- APPLY TRANSFER ----------
   state.bank = Number((state.bank - buy).toFixed(1));
 
-  // Apply add from this GW forward
   for (let g = gw; g <= state.currentGW + 7; g++) {
     const t = state.plan[g];
     if (!t) continue;
@@ -691,22 +706,33 @@ function addSelectedToSquad() {
     const exists =
       t.starting.some((e) => e.id === playerId) ||
       t.bench.some((e) => e.id === playerId);
+
     if (exists) continue;
 
     if (lastSoldSide === 'starting') {
-      if (t.starting.length < 11) t.starting.push({ ...entry });
+      if (t.starting.length < 11) {
+        t.starting.push({ ...entry });
+      }
     } else {
-      if (t.bench.length < 4) t.bench.push({ ...entry });
+      if (t.bench.length < 4) {
+        if (isGK) {
+          t.bench.unshift({ ...entry });
+        } else {
+          const gkIndex = t.bench.findIndex((e) => getElementType(e.id) === 1);
+          if (gkIndex === -1) t.bench.push({ ...entry });
+          else t.bench.splice(gkIndex + 1, 0, { ...entry });
+        }
+      }
     }
   }
 
-  // Clear pending transfer state
   lastSoldSide = null;
   pendingTransfer = null;
 
   showMessage('Player bought and added to squad.', 'success');
   updateUI();
 }
+
 
 /* -------------------------
    RENDER
