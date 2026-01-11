@@ -124,6 +124,11 @@ export function renderTable() {
         return dir * (a.element_type - b.element_type);
       }
 
+      if (tableSort.key === 'points') {
+        return dir * (a.total_points - b.total_points);
+      }
+
+
       return 0;
     });
   }
@@ -144,6 +149,7 @@ export function renderTable() {
           <td>${player.web_name}</td>
           <td>${teamName}</td>
           <td>${posNames[player.element_type]}</td>
+          <td>${player.total_points}</td>
           <td>${(player.now_cost / 10).toFixed(1)}</td>
           <td style="text-align:center; white-space:nowrap;">${next3Html}</td>
         </tr>
