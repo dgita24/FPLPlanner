@@ -7,12 +7,14 @@ import { loadFixturesData, renderFixtures } from './fixtures.js';
 async function init() {
   console.log('FPLPlanner starting...');
 
+  // CRITICAL: Initialize UI FIRST (binds window.toggleSidebarMenu etc.)
+  initUI();
+
   const success = await loadBootstrap();
 
   if (success) {
     console.log(`App ready! GW ${state.currentGW}, ${state.elements.length} players`);
 
-    initUI();
     await loadFixturesData();
     renderFixtures();
     populateFilters();
@@ -22,4 +24,7 @@ async function init() {
   }
 }
 
-document.addEventListener('DOMContentLoaded', init);
+// DELAY initUI until DOM + window.onload (fixes onclick binding)
+window.addEventListener('load', () => {
+  init();
+});
