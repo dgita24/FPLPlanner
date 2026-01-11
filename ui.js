@@ -339,6 +339,11 @@ function getPlayerTeamId(playerId) {
   return p?.team ?? null;
 }
 
+function getElementType(playerId) {
+  const p = getPlayer(playerId);
+  return p?.element_type ?? null; // 1 GK,2 DEF,3 MID,4 FWD
+}
+
 // Enforced: exactly 1 GK, min 3 DEF, min 2 MID, min 1 FWD.
 function validateStartingXI(team) {
   if (!team || !Array.isArray(team.starting)) {
