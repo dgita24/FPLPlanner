@@ -43,7 +43,7 @@ export function renderFixtures() {
 
     ${Object.entries(groups)
       .map(([date, games]) => `
-        <div class="fixture-date">${date}</div>
+        <div class="fixture-date-banner">${date}</div>
         ${games.map(renderFixtureRow).join('')}
       `)
       .join('')}
