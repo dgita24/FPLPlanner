@@ -204,6 +204,12 @@ export async function loadTeamEntry(managerId, gwRequested) {
       if (typeof bankTenths === 'number') {
         state.bank = bankTenths / 10;
       }
+      
+      // Extract free transfers for this GW
+      const freeTransfers = json.entry_history?.free_transfers;
+      if (typeof freeTransfers === 'number') {
+        state.freeTransfers = freeTransfers;
+      }
 
       // Build starting/bench entries with purchase & selling prices
       const picks = json.picks || [];
