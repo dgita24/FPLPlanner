@@ -21,13 +21,6 @@ export let state = {
   // selling | purchase | current
   priceMode: 'selling',
 
-  // MULTI-TRANSFER STATE (NEW)
-  transfers: {
-    out: [],    // [{id, side, sellingPrice}] - players selected to transfer OUT
-    in: [],     // [{id, purchasePrice}] - players selected to transfer IN
-    pending: null // Snapshot for cancel: {plan, bank}
-  },
-
   // Base FPL datasets
   elements: [],
   teams: [],
@@ -78,68 +71,7 @@ function initEmptyPlan() {
   }
 }
 
-// NEW: Clear multi-transfer state
-export function clearTransfers() {
-  state.transfers = { out: [], in: [], pending: null };
-}
-
-// NEW: Get element position type (1=GK,2=DEF,3=MID,4=FWD)
-export function getElementType(elementId) {
-  const p = state.elements.find(x => x.id === elementId);
-  return p?.element_type ?? null;
-}
-
-// NEW: Validate transfers respect position constraints
-export function validateTransfersPosition() {
-  if (state.transfers.out.length !== state.transfers.in.length) {
-    return { ok: false, message: 'Must select equal number of players to transfer out and in.' };
-  }
-  
-  if (state.transfers.out.length === 0) {
-    return { ok: true };
-  }
-
-  const outTypes = state.transfers.out.map(t => getElementType(t.id));
-  const inTypes = state.transfers.in.map(t => getElementType(t.id));
-  
-  for (let i = 0; i < outTypes.length; i++) {
-    if (outTypes[i] !== inTypes[i]) {
-      return { 
-        ok: false, 
-        message: `Position mismatch: ${outTypes[i]} ↔ ${inTypes[i]}. Transfers must be position-constrained (GK↔GK, DEF↔DEF, etc.).`
-      };
-    }
-  }
-  
-  return { ok: true };
-}
-
-// NEW: Calculate total cost of transfers
-export function calculateTransferCost() {
-  let totalOut = 0;
-  let totalIn = 0;
-  
-  for (const out of state.transfers.out) {
-    totalOut += out.sellingPrice;
-  }
-  
-  for (const playerIn of state.transfers.in) {
-    const p = state.elements.find(x => x.id === playerIn.id);
-    totalIn += p ? (p.now_cost / 10) : 0;
-  }
-  
-  return { in: totalIn, out: totalOut, net: totalIn - totalOut };
-}
-
-// NEW: Check if player is already in transfers.out
-export function isPlayerOut(playerId) {
-  return state.transfers.out.some(t => t.id === playerId);
-}
-
-// NEW: Check if player is already in transfers.in  
-export function isPlayerIn(playerId) {
-  return state.transfers.in.some(t => t.id === playerId);
-}
+// data.js - only this function needs updating
 
 export async function loadBootstrap() {
   try {
@@ -159,13 +91,13 @@ export async function loadBootstrap() {
     state.viewingGW = state.currentGW;
 
     initEmptyPlan();
-    clearTransfers(); // NEW: Initialize clean transfer state
     return true;
   } catch (err) {
     console.error('Bootstrap error:', err);
     return false;
   }
 }
+
 
 export async function loadFixtures(gw) {
   const res = await fetch(`${FPL_BASE}/fixtures/?event=${gw}`);
@@ -329,9 +261,6 @@ export async function loadTeamEntry(managerId, gwRequested) {
       // Save baseline state for Reset / Undo
       history.baseline = JSON.parse(JSON.stringify(state));
       history.undoStack = [];
-
-      // NEW: Clear transfers after import
-      clearTransfers();
 
       return json;
     } catch (e) {

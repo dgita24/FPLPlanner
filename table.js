@@ -46,11 +46,6 @@ function getTeamShortName(teamId) {
   return t ? (t.short_name || t.shortname || t.name) : '';
 }
 
-function getElementType(playerId) {
-  const p = state.elements.find(x => x.id === playerId);
-  return p?.element_type ?? null;
-}
-
 function formatOpponent(teamId, fixture) {
   if (!fixture) return '--';
   const isHome = fixture.team_h === teamId;
