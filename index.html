@@ -206,6 +206,12 @@ background: #666;
 cursor: not-allowed;
 }
 
+.pitch-stack {
+  width: 100%;
+  max-width: 1100px;
+  margin-top: 0;
+}
+
 .pitch {
 background: linear-gradient(to bottom, #2d5016 0%, #1a3d0a 100%);
 padding: 25px 20px;
@@ -455,7 +461,7 @@ gap: 12px;
   justify-content: center;
   align-items: center;
   gap: 20px;
-  margin: 10px auto 20px;
+  margin-bottom: 16px;
 }
 
 
@@ -585,125 +591,142 @@ max-width: none; /* allow grid to control width */
 </head>
 
 <body>
-    <div class="container">
-        <div class="header">
-            <h1 style="font-size: 24px;">FPL Team Planner</h1>
-            <div class="bank-display">
-                <span>Bank</span>
-                <input type="number" id="bankInput" value="100.0" step="0.1" />
-                <span>m</span>
-            </div>
-            <div class="price-toggle">
-                <span>Show</span>
-                <select id="priceModeSelect">
-                    <option value="selling">Selling</option>
-                    <option value="purchase">Purchase</option>
-                    <option value="current">Current</option>
-                </select>
-            </div>
-            <div class="header-actions">
-                <button onclick="localSave()" class="header-btn save-btn">💾 Local Save</button>
-                <button onclick="localLoad()" class="header-btn load-btn">📂 Local Load</button>
-            </div>
+  <div class="container">
+    <div class="header">
+      <h1 style="font-size: 24px;">FPL Team Planner</h1>
 
-            <button class="sidebar-toggle" onclick="toggleSidebarMenu()">Menu</button>
+      <div class="bank-display">
+        <span>Bank</span>
+        <input type="number" id="bankInput" value="100.0" step="0.1" />
+        <span>m</span>
+      </div>
 
-        </div>
+      <div class="price-toggle">
+        <span>Show</span>
+        <select id="priceModeSelect">
+          <option value="selling">Selling</option>
+          <option value="purchase">Purchase</option>
+          <option value="current">Current</option>
+        </select>
+      </div>
 
-        <div class="sidebar" id="sidebar">
-            <h2>Manage Team</h2>
+      <div class="header-actions">
+        <button onclick="localSave()" class="header-btn save-btn">💾 Local Save</button>
+        <button onclick="localLoad()" class="header-btn load-btn">📂 Local Load</button>
+      </div>
 
-            <h3>Import</h3>
-            <input type="text" id="importTeamId" placeholder="FPL Team ID e.g. 123456" />
-            <button onclick="importTeam()">Import from FPL</button>
-
-            <h3>Cloud Save</h3>
-            <input type="text" id="saveTeamId" placeholder="Team ID to save as" />
-            <input type="password" id="savePassword" placeholder="Create Password" />
-            <button onclick="saveTeam()">Save Team</button>
-
-            <h3>Cloud Load</h3>
-            <input type="text" id="loadTeamId" placeholder="Saved Team ID" />
-            <input type="password" id="loadPassword" placeholder="Password" />
-            <button onclick="loadTeam()">Load Team</button>
-
-
-            <div id="sideMsg" style="margin-top: 10px; font-size: 12px"></div>
-        </div>
-
-        <div id="plannerMain">
-          <div id="fixturesPanel"></div>
-
-          <div id="mainColumn">
-
-            <div class="gw-nav">
-              <button onclick="changeGW(-1)" id="prevGW">← GW</button>
-              <h2>Gameweek <span id="currentGWDisplay">1</span></h2>
-              <button onclick="changeGW(1)" id="nextGW">GW →</button>
-            </div>
-
-            <div id="pitch" class="pitch"></div> 
-
-            <div class="bench">
-              <h3>Bench</h3>
-              <div id="benchSlots" class="bench-slots"></div>
-            </div>
-          </div>
-        </div>
-
-        <div class="add-btn-row">
-            <button id="addToSquadBtn" style="background: #00ff87" onclick="addSelectedToSquad()">Add to squad</button>
-            <button id="cancelTransferBtn" style="background: #ff4444; color: #fff" onclick="cancelTransfer()">Cancel
-                transfer</button>
-        </div>
-
-        <div class="transfer-section">
-            <h2>Transfers</h2>
-
-            <div class="filters">
-                <input type="text" id="searchName" placeholder="Name..." onkeyup="renderTable()" />
-                <select id="filterPos" onchange="renderTable()">
-                    <option value="">All Positions</option>
-                    <option value="GK">Goalkeepers</option>
-                    <option value="DEF">Defenders</option>
-                    <option value="MID">Midfielders</option>
-                    <option value="FWD">Forwards</option>
-                </select>
-                <select id="filterTeam" onchange="renderTable()">
-                    <option value="">All Teams</option>
-                </select>
-                <input type="number" id="filterPrice" placeholder="Max Price" value="15.0" step="0.5"
-                    onchange="renderTable()" />
-            </div>
-
-            <div class="player-table">
-                <table id="pTable">
-                    <thead>
-                        <tr>
-                            <th>Select</th>
-                            <th>Name</th>
-                            <th>Team</th>
-                            <th>Pos</th>
-                            <th>£</th>
-                            <th style="text-align:center;">Next 3</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tableBody"></tbody>
-                </table>
-            </div>
-
-
-        </div>
+      <button class="sidebar-toggle" onclick="toggleSidebarMenu()">Menu</button>
     </div>
 
-    <div id="toast" class="message"></div>
+    <div class="sidebar" id="sidebar">
+      <h2>Manage Team</h2>
 
-    <!-- Module Loader -->
-    <script type="module">
-        import './data.js';
-        import './main.js';
-        import './ui.js';
-    </script>
+      <h3>Import</h3>
+      <input type="text" id="importTeamId" placeholder="FPL Team ID e.g. 123456" />
+      <button onclick="importTeam()">Import from FPL</button>
+
+      <h3>Cloud Save</h3>
+      <input type="text" id="saveTeamId" placeholder="Team ID to save as" />
+      <input type="password" id="savePassword" placeholder="Create Password" />
+      <button onclick="saveTeam()">Save Team</button>
+
+      <h3>Cloud Load</h3>
+      <input type="text" id="loadTeamId" placeholder="Saved Team ID" />
+      <input type="password" id="loadPassword" placeholder="Password" />
+      <button onclick="loadTeam()">Load Team</button>
+
+      <div id="sideMsg" style="margin-top: 10px; font-size: 12px"></div>
+    </div>
+
+    <!-- MAIN PLANNER -->
+    <div id="plannerMain">
+      <div id="fixturesPanel"></div>
+
+      <div id="mainColumn">
+
+        <div class="pitch-stack">
+          <div class="gw-nav">
+            <button onclick="changeGW(-1)" id="prevGW">← GW</button>
+            <h2>Gameweek <span id="currentGWDisplay">1</span></h2>
+            <button onclick="changeGW(1)" id="nextGW">GW →</button>
+          </div>
+
+          <div id="pitch" class="pitch"></div>
+        </div>
+
+        <div class="bench">
+          <h3>Bench</h3>
+          <div id="benchSlots" class="bench-slots"></div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="add-btn-row">
+      <button id="addToSquadBtn"
+              style="background: #00ff87"
+              onclick="addSelectedToSquad()">
+        Add to squad
+      </button>
+
+      <button id="cancelTransferBtn"
+              style="background: #ff4444; color: #fff"
+              onclick="cancelTransfer()">
+        Cancel transfer
+      </button>
+    </div>
+
+    <div class="transfer-section">
+      <h2>Transfers</h2>
+
+      <div class="filters">
+        <input type="text" id="searchName" placeholder="Name..." onkeyup="renderTable()" />
+
+        <select id="filterPos" onchange="renderTable()">
+          <option value="">All Positions</option>
+          <option value="GK">Goalkeepers</option>
+          <option value="DEF">Defenders</option>
+          <option value="MID">Midfielders</option>
+          <option value="FWD">Forwards</option>
+        </select>
+
+        <select id="filterTeam" onchange="renderTable()">
+          <option value="">All Teams</option>
+        </select>
+
+        <input type="number"
+               id="filterPrice"
+               placeholder="Max Price"
+               value="15.0"
+               step="0.5"
+               onchange="renderTable()" />
+      </div>
+
+      <div class="player-table">
+        <table id="pTable">
+          <thead>
+            <tr>
+              <th>Select</th>
+              <th>Name</th>
+              <th>Team</th>
+              <th>Pos</th>
+              <th>£</th>
+              <th style="text-align:center;">Next 3</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="message"></div>
+
+  <!-- Module Loader -->
+  <script type="module">
+    import './data.js';
+    import './main.js';
+    import './ui.js';
+  </script>
 </body>
-
 </html>
