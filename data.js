@@ -139,14 +139,22 @@ export async function loadTeamEntry(managerId, gwRequested) {
   if (Number.isFinite(+gwRequested)) candidates.push(+gwRequested);
 
   const finished = events
-    .filter(e => e && typeof e.id === 'number' && e.id <= gwRequested && (e.finished || e.is_previous))
+    .filter(
+      e =>
+        e &&
+        typeof e.id === 'number' &&
+        e.id <= gwRequested &&
+        (e.finished || e.is_previous)
+    )
     .sort((a, b) => b.id - a.id)
     .map(e => e.id);
 
   for (const id of finished) candidates.push(id);
 
   // final safety
-  for (let g = gwRequested - 1; g >= Math.max(1, gwRequested - 6); g--) candidates.push(g);
+  for (let g = gwRequested - 1; g >= Math.max(1, gwRequested - 6); g--) {
+    candidates.push(g);
+  }
 
   const unique = [];
   const seen = new Set();
@@ -160,9 +168,28 @@ export async function loadTeamEntry(managerId, gwRequested) {
   // Purchase-price map from transfers (best-effort)
   const purchaseMap = await loadTransfersPurchaseMap(managerId);
 
+  // Fetch entry summary (for free transfers etc.)
+  let entrySummary = null;
+  try {
+    const entryRes = await fetch(`${FPL_BASE}/entry/${managerId}/`);
+    if (entryRes.ok) {
+      entrySummary = await parseJsonOrThrow(entryRes);
+    }
+  } catch (e) {
+    // non-fatal
+  }
+
+  // Derive free transfers (simple + safe)
+  if (entrySummary) {
+    const usedLastGW = entrySummary.last_deadline_total_transfers ?? 0;
+    state.freeTransfers = usedLastGW === 0 ? 2 : 1;
+  }
+
   for (const gw of unique) {
     try {
-      const res = await fetch(`${FPL_BASE}/entry/${managerId}/event/${gw}/picks/`);
+      const res = await fetch(
+        `${FPL_BASE}/entry/${managerId}/event/${gw}/picks/`
+      );
       if (!res.ok) continue;
 
       const json = await parseJsonOrThrow(res);
@@ -174,7 +201,9 @@ export async function loadTeamEntry(managerId, gwRequested) {
 
       // Extract bank at last deadline (entry_history.bank is in 0.1 units)
       const bankTenths = json.entry_history?.bank;
-      if (typeof bankTenths === 'number') state.bank = bankTenths / 10;
+      if (typeof bankTenths === 'number') {
+        state.bank = bankTenths / 10;
+      }
 
       // Build starting/bench entries with purchase & selling prices
       const picks = json.picks || [];
@@ -185,7 +214,10 @@ export async function loadTeamEntry(managerId, gwRequested) {
         .map(p => {
           const currentPrice = getCurrentPrice(p.element);
           const purchasePrice = purchaseMap[p.element] ?? currentPrice;
-          const sellingPrice = calculateSellingPrice(purchasePrice, currentPrice);
+          const sellingPrice = calculateSellingPrice(
+            purchasePrice,
+            currentPrice
+          );
           return { id: p.element, purchasePrice, sellingPrice };
         });
 
@@ -195,14 +227,19 @@ export async function loadTeamEntry(managerId, gwRequested) {
         .map(p => {
           const currentPrice = getCurrentPrice(p.element);
           const purchasePrice = purchaseMap[p.element] ?? currentPrice;
-          const sellingPrice = calculateSellingPrice(purchasePrice, currentPrice);
+          const sellingPrice = calculateSellingPrice(
+            purchasePrice,
+            currentPrice
+          );
           return { id: p.element, purchasePrice, sellingPrice };
         });
 
-      // Populate planner from currentGW forward (planning "this week" even if importedGW was last deadline)
+      // Populate planner from currentGW forward
       for (let i = 0; i < 8; i++) {
         const g = state.currentGW + i;
-        if (!state.plan[g]) state.plan[g] = { starting: [], bench: [] };
+        if (!state.plan[g]) {
+          state.plan[g] = { starting: [], bench: [] };
+        }
         state.plan[g].starting = deepCopy(starting);
         state.plan[g].bench = deepCopy(bench);
       }

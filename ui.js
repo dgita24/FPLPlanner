@@ -735,9 +735,20 @@ function updateUI() {
   const cancelBtn = document.getElementById('cancelTransferBtn');
   if (cancelBtn) cancelBtn.disabled = !pendingTransfer;
 
+  // ---- TEAM META (FREE TRANSFERS) ----
+  const meta = document.getElementById('teamMeta');
+  if (meta) {
+    if (typeof state.freeTransfers === 'number') {
+      meta.textContent = `FT: ${state.freeTransfers}`;
+    } else {
+      meta.textContent = '';
+    }
+  }
+
   renderPitch();
   renderBench();
 }
+
 
 // Render GK first (top), then DEF, MID, FWD
 function renderPitch() {
