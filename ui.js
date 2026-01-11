@@ -858,7 +858,7 @@ function playerCard(entry, source) {
       <button class="card-btn btn-remove" onclick="${removeFn}" title="Transfer out">×</button>
       <button class="card-btn btn-swap" onclick="${subFn}" title="${swapTitle}">⇅</button>
 
-      <img src="https://resources.premierleague.com/premierleague/badges/t${teamCode}.png"
+      <img src="https://resources.premierleague.com/premierleague/badges/70/t${teamCode}.png"
            class="badge" alt="${teamShort}">
 
       <div class="name">${p.web_name}</div>
