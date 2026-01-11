@@ -2,6 +2,11 @@
 
 import { state, loadFixtures } from './data.js';
 
+let tableSort = {
+  key: null,      // 'price' | 'pos'
+  dir: 'asc'      // 'asc' | 'desc'
+};
+
 const posNames = { 1: 'GK', 2: 'DEF', 3: 'MID', 4: 'FWD' };
 
 // Selected player (shared with ui.js)
@@ -86,7 +91,6 @@ function ensureFixturesForTable() {
 /* ------------------------- TABLE RENDER -------------------------- */
 
 export function renderTable() {
-  // Kick off async fixture loads for the current viewing window.
   ensureFixturesForTable();
 
   const tbody = document.getElementById('tableBody');
@@ -98,7 +102,7 @@ export function renderTable() {
   const maxPrice = parseFloat(document.getElementById('filterPrice')?.value);
   const max = Number.isFinite(maxPrice) ? maxPrice : Infinity;
 
-  const filtered = state.elements.filter((player) => {
+  let filtered = state.elements.filter((player) => {
     const matchesSearch = foldForSearch(player.web_name || '').includes(search);
     const matchesPos = !posFilter || posNames[player.element_type] === posFilter;
     const matchesTeam = !teamFilter || String(player.team) === String(teamFilter);
@@ -106,9 +110,29 @@ export function renderTable() {
     return matchesSearch && matchesPos && matchesTeam && matchesPrice;
   });
 
+  // -------- SORTING --------
+  if (tableSort.key) {
+    const dir = tableSort.dir === 'asc' ? 1 : -1;
+
+    filtered = filtered.slice().sort((a, b) => {
+      if (tableSort.key === 'price') {
+        return dir * ((a.now_cost / 10) - (b.now_cost / 10));
+      }
+
+      if (tableSort.key === 'pos') {
+        // GK(1) → DEF(2) → MID(3) → FWD(4)
+        return dir * (a.element_type - b.element_type);
+      }
+
+      return 0;
+    });
+  }
+
+  // -------- RENDER --------
   tbody.innerHTML = filtered
     .map((player) => {
-      const teamName = state.teams.find((t) => t.id === player.team)?.short_name || '';
+      const teamName =
+        state.teams.find((t) => t.id === player.team)?.short_name || '';
       const checked = window.selectedPlayerId === player.id ? 'checked' : '';
 
       const next3 = getNextFixturesForTeam(player.team, state.viewingGW, 3);
@@ -156,3 +180,16 @@ window.selectPlayer = function (ev, id) {
 // Expose for inline handlers
 window.renderTable = renderTable;
 window.populateFilters = populateFilters;
+
+window.sortTable = function (key) {
+  if (tableSort.key === key) {
+    // Toggle direction
+    tableSort.dir = tableSort.dir === 'asc' ? 'desc' : 'asc';
+  } else {
+    tableSort.key = key;
+    tableSort.dir = 'asc';
+  }
+
+  renderTable();
+};
+
