@@ -225,11 +225,23 @@ function playerCard(entry, source) {
   const cardClass = `player-card${armed ? ' pending-swap' : ''}`;
   const swapTitle = armed ? 'Cancel swap' : 'Swap';
 
+  // Injury/suspension flag
+  // status: 'a' = available, 'd' = doubtful (yellow), 'i' = injured (red), 's' = suspended (red), 'u' = unavailable (red)
+  // news: contains injury details text
+  let statusFlag = '';
+  if (p.status && p.status !== 'a') {
+    const isDoubtful = p.status === 'd';
+    const flagColor = isDoubtful ? '#ffc107' : '#dc3545'; // yellow for doubtful, red for injured/suspended
+    const flagTitle = p.news || (isDoubtful ? 'Doubtful' : 'Unavailable');
+    statusFlag = `<div class="status-flag" style="background-color: ${flagColor};" title="${flagTitle}">!</div>`;
+  }
+
   return `
     <div class="${cardClass}">
       <button class="card-btn btn-remove" onclick="${removeFn}" title="Transfer out">×</button>
       <button class="card-btn btn-swap" onclick="${subFn}" title="${swapTitle}">⇅</button>
 
+      ${statusFlag}
       <img src="https://resources.premierleague.com/premierleague/badges/70/t${teamCode}.png"
            class="badge" alt="${teamShort}">
 

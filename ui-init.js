@@ -307,7 +307,7 @@ export function initUI() {
         position: absolute;
         top: 8px;
         right: 8px;
-        background: rgba(0, 255, 135, 0.9);
+        background: rgba(0, 0, 0, 0.9);
         border: none;
         border-radius: 50%;
         width: 32px;
@@ -324,7 +324,7 @@ export function initUI() {
       }
 
       .reinstate-btn:hover {
-        background: rgba(0, 255, 135, 1);
+        background: rgba(0, 0, 0, 1);
         transform: scale(1.1);
       }
 
@@ -342,6 +342,26 @@ export function initUI() {
         color: #00ff87;
         margin-top: 4px;
         text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+      }
+
+      /* Injury/suspension status flag */
+      .status-flag {
+        position: absolute;
+        top: 6px;
+        left: 6px;
+        width: 0;
+        height: 0;
+        border-left: 18px solid transparent;
+        border-right: 0px solid transparent;
+        border-top: 18px solid;
+        z-index: 10;
+        display: flex;
+        align-items: flex-start;
+        justify-content: flex-start;
+        font-size: 10px;
+        font-weight: 900;
+        color: white;
+        padding: 2px 0 0 2px;
       }
 
       /* Next fixture + fixtures strip */

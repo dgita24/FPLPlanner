@@ -156,6 +156,9 @@ export function renderTable() {
       `;
     })
     .join('');
+
+  // Update sort icons after rendering
+  updateSortIcons();
 }
 
 export function populateFilters() {
@@ -215,19 +218,22 @@ window.sortTable = function (key) {
 };
 
 function updateSortIcons() {
-  // Clear all icons
+  // Clear all icons and show default state
   const posIcon = document.getElementById('sortPosIcon');
   const priceIcon = document.getElementById('sortPriceIcon');
   const pointsIcon = document.getElementById('sortPointsIcon');
 
-  if (posIcon) posIcon.textContent = '';
-  if (priceIcon) priceIcon.textContent = '';
-  if (pointsIcon) pointsIcon.textContent = '';
+  // Default: show neutral arrows for all sortable columns
+  if (posIcon) posIcon.textContent = '⇅';
+  if (priceIcon) priceIcon.textContent = '⇅';
+  if (pointsIcon) pointsIcon.textContent = '⇅';
 
-  // Set active icon
-  const arrow = tableSort.dir === 'asc' ? '▲' : '▼';
-  if (tableSort.key === 'pos' && posIcon) posIcon.textContent = arrow;
-  if (tableSort.key === 'price' && priceIcon) priceIcon.textContent = arrow;
-  if (tableSort.key === 'points' && pointsIcon) pointsIcon.textContent = arrow;
+  // Set active icon for sorted column
+  if (tableSort.key) {
+    const arrow = tableSort.dir === 'asc' ? '▲' : '▼';
+    if (tableSort.key === 'pos' && posIcon) posIcon.textContent = arrow;
+    if (tableSort.key === 'price' && priceIcon) priceIcon.textContent = arrow;
+    if (tableSort.key === 'points' && pointsIcon) pointsIcon.textContent = arrow;
+  }
 }
 
