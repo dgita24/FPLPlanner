@@ -20,10 +20,10 @@ export function resetTransferState() {
   setPendingSwap(null);
 }
 
-// Get the last side from which a player was removed (for compatibility)
-function getLastSoldSide() {
+// Get the first side from which a player was removed (FIFO for batch transfers)
+function getFirstRemovedSide() {
   if (batchTransfers.removedPlayers.length === 0) return null;
-  return batchTransfers.removedPlayers[batchTransfers.removedPlayers.length - 1].side;
+  return batchTransfers.removedPlayers[0].side;
 }
 
 function getPlayer(id) {
@@ -303,20 +303,21 @@ export function addSelectedToSquad(updateUI) {
     return;
   }
 
-  // Determine which side to add to - use the last removed player's side
-  const lastSoldSide = getLastSoldSide();
-  if (!lastSoldSide) {
+  // Determine which side to add to - use the first removed player's side (FIFO)
+  const firstRemoved = batchTransfers.removedPlayers[0];
+  if (!firstRemoved) {
     showMessage('Internal error: No removed player side found.', 'error');
     return;
   }
+  const targetSide = firstRemoved.side;
 
   // Capacity check (current GW only)
-  if (lastSoldSide === 'starting' && team.starting.length >= 11) {
+  if (targetSide === 'starting' && team.starting.length >= 11) {
     showMessage('Starting XI is already full.', 'error');
     return;
   }
 
-  if (lastSoldSide === 'bench' && team.bench.length >= 4) {
+  if (targetSide === 'bench' && team.bench.length >= 4) {
     showMessage('Bench is already full.', 'error');
     return;
   }
@@ -337,7 +338,7 @@ export function addSelectedToSquad(updateUI) {
       bench: t.bench.map((x) => ({ ...x })),
     };
 
-    if (lastSoldSide === 'starting') {
+    if (targetSide === 'starting') {
       temp.starting.push({ ...entry });
     } else {
       if (isGKPlayer) {
@@ -383,7 +384,7 @@ export function addSelectedToSquad(updateUI) {
 
     if (exists) continue;
 
-    if (lastSoldSide === 'starting') {
+    if (targetSide === 'starting') {
       if (t.starting.length < 11) {
         t.starting.push({ ...entry });
       }
@@ -400,8 +401,8 @@ export function addSelectedToSquad(updateUI) {
     }
   }
 
-  // Remove this player's slot from the batch
-  batchTransfers.removedPlayers.pop();
+  // Remove this player's slot from the batch (FIFO - remove first)
+  batchTransfers.removedPlayers.shift();
 
   // Check if all transfers are complete
   const remainingSlots = batchTransfers.removedPlayers.length;
