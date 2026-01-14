@@ -737,6 +737,20 @@ max-width: none; /* allow grid to control width */
       </button>
     </div>
 
+    <div id="batchTransferStatus" style="
+      display: none;
+      padding: 12px 20px;
+      margin-top: 15px;
+      margin-bottom: 15px;
+      background: rgba(255, 153, 0, 0.2);
+      border: 2px solid #ff9800;
+      border-radius: 8px;
+      text-align: center;
+      font-weight: bold;
+      font-size: 15px;
+      color: #fff;
+    "></div>
+
     <div class="transfer-section">
       <h2>Transfers</h2>
 
@@ -768,16 +782,17 @@ max-width: none; /* allow grid to control width */
           <thead>
             <tr>
               <th>Select</th>
+              <th style="text-align:center; width:30px;">Status</th>
               <th>Name</th>
               <th>Team</th>
               <th onclick="sortTable('pos')" style="cursor:pointer">
-                Pos
+                Pos <span id="sortPosIcon"></span>
               </th>
               <th onclick="sortTable('price')" style="cursor:pointer">
-                £
+                £ <span id="sortPriceIcon"></span>
               </th>
               <th onclick="sortTable('points')" style="cursor:pointer">
-                Pts
+                Pts <span id="sortPointsIcon"></span>
               </th>
               <th style="text-align:center;">Next 3</th>
             </tr>

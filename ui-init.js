@@ -4,8 +4,13 @@ import { state, history, loadTeamEntry } from './data.js';
 import { setupSidebarHandlers, closeSidebar } from './ui-sidebar.js';
 import { showMessage, renderPitch, renderBench, ensureFixturesForView } from './ui-render.js';
 import { renderFixtures } from './fixtures.js';
-import { cancelTransfer, substitutePlayer, addSelectedToSquad, removePlayer, resetTransferState, isPendingTransfer } from './team-operations.js';
+import { cancelTransfer, substitutePlayer, addSelectedToSquad, removePlayer, resetTransferState, isPendingTransfer, getBatchTransferInfo, reinstatePlayer } from './team-operations.js';
 import { setPendingSwap } from './ui-render.js';
+
+// Helper function for pluralization
+function pluralize(word, count) {
+  return count === 1 ? word : word + 's';
+}
 
 function updateUI() {
   // kick off fixture loads for current viewing window (async)
@@ -29,6 +34,19 @@ function updateUI() {
   // Enable/disable cancel transfer button (if present)
   const cancelBtn = document.getElementById('cancelTransferBtn');
   if (cancelBtn) cancelBtn.disabled = !isPendingTransfer();
+
+  // Update batch transfer status display
+  const batchInfo = getBatchTransferInfo();
+  const batchStatus = document.getElementById('batchTransferStatus');
+  if (batchStatus) {
+    if (batchInfo.isActive && batchInfo.removedCount > 0) {
+      const count = batchInfo.removedCount;
+      batchStatus.textContent = `${count} ${pluralize('player', count)} removed - add ${pluralize('replacement', count)}`;
+      batchStatus.style.display = 'block';
+    } else {
+      batchStatus.style.display = 'none';
+    }
+  }
 
   renderPitch();
   renderBench();
@@ -252,7 +270,7 @@ function resetToImportedTeam() {
 }
 
 export function initUI() {
-  // Inject CSS for two-click swap highlight + fixture UI (no index.html change needed)
+  // Inject CSS for two-click swap highlight + fixture UI + placeholder cards
   if (!document.getElementById('plannerInjectedStyle')) {
     const style = document.createElement('style');
     style.id = 'plannerInjectedStyle';
@@ -260,6 +278,117 @@ export function initUI() {
       .player-card.pending-swap {
         outline: 3px solid #00ff87;
         box-shadow: 0 0 0 3px rgba(0, 255, 135, 0.25);
+      }
+
+      /* Placeholder card styling for removed players */
+      .player-card.placeholder-card {
+        opacity: 0.5;
+        position: relative;
+        pointer-events: none;
+      }
+
+      .placeholder-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(255, 68, 68, 0.85);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8px;
+        z-index: 5;
+        pointer-events: auto;
+      }
+
+      .reinstate-btn {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        background: rgba(0, 0, 0, 0.9);
+        border: none;
+        border-radius: 50%;
+        width: 32px;
+        height: 32px;
+        font-size: 20px;
+        font-weight: bold;
+        color: white;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+      }
+
+      .reinstate-btn:hover {
+        background: rgba(0, 0, 0, 1);
+        transform: scale(1.1);
+      }
+
+      .placeholder-text {
+        font-size: 16px;
+        font-weight: 900;
+        color: white;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        letter-spacing: 1px;
+      }
+
+      .placeholder-price {
+        font-size: 13px;
+        font-weight: 700;
+        color: #00ff87;
+        margin-top: 4px;
+        text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+      }
+
+      /* Injury/suspension status flag */
+      .status-flag {
+        position: absolute;
+        top: 30px;
+        left: 45px;
+        width: 0;
+        height: 0;
+        border-left: 9px solid transparent;
+        border-right: 9px solid transparent;
+        border-bottom: 15px solid;
+        z-index: 10;
+      }
+      
+      .status-flag::after {
+        content: '!';
+        position: absolute;
+        top: 3px;
+        left: -4px;
+        font-size: 10px;
+        font-weight: 900;
+        color: #000;
+        line-height: 1;
+      }
+
+      /* Status flag in player table */
+      .table-status-flag {
+        display: inline-block;
+        width: 0;
+        height: 0;
+        border-left: 7px solid transparent;
+        border-right: 7px solid transparent;
+        border-bottom: 12px solid;
+        position: relative;
+        cursor: help;
+      }
+      
+      .table-status-flag::after {
+        content: '!';
+        position: absolute;
+        top: 2px;
+        left: -3px;
+        font-size: 8px;
+        font-weight: 900;
+        color: #000;
+        line-height: 1;
       }
 
       /* Next fixture + fixtures strip */
@@ -343,6 +472,7 @@ export function initUI() {
   // Expose nav + actions used by inline onclicks in index.html
   window.changeGW = changeGW;
   window.removePlayer = (playerId, source) => removePlayer(playerId, source, updateUI);
+  window.reinstatePlayer = (playerId) => reinstatePlayer(playerId, updateUI);
   window.substitutePlayer = (playerId) => substitutePlayer(playerId, updateUI);
   window.addSelectedToSquad = () => addSelectedToSquad(updateUI);
   window.cancelTransfer = () => cancelTransfer(updateUI);

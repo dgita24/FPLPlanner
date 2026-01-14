@@ -1,18 +1,22 @@
 // team-operations.js - Team-related operations (transfers, swaps, etc.)
 
 import { state, history, calculateSellingPrice } from './data.js';
-import { validateStartingXI, validateClubLimit, getOverLimitClubs, getElementType, getPlayerTeamId } from './validation.js';
+import { validateStartingXI, validateClubLimit, getOverLimitClubs, getElementType, getPlayerTeamId, validateSquadComposition } from './validation.js';
 import { displayPrice, showMessage, renderPitch, renderBench, setPendingSwap, getPendingSwap } from './ui-render.js';
 
-// Remember where the last sale came from so the next buy goes there.
-let lastSoldSide = null; // 'starting' | 'bench'
-
-// Snapshot used to cancel a planned transfer (sale before buy).
-let pendingTransfer = null; // { plan, bank }
+// Track batch transfers: multiple players can be removed before adding replacements
+let batchTransfers = {
+  snapshot: null, // { plan, bank } - saved before any transfers
+  removedPlayers: [], // Array of { id, side, sellingPrice } for each removed player
+  isActive: false
+};
 
 export function resetTransferState() {
-  lastSoldSide = null;
-  pendingTransfer = null;
+  batchTransfers = {
+    snapshot: null,
+    removedPlayers: [],
+    isActive: false
+  };
   setPendingSwap(null);
 }
 
@@ -52,18 +56,21 @@ function restorePlanInPlace(snapshotPlan) {
 }
 
 export function cancelTransfer(updateUI) {
-  if (!pendingTransfer) {
+  if (!batchTransfers.isActive || !batchTransfers.snapshot) {
     showMessage('No pending transfer to cancel.', 'info');
     return;
   }
 
-  restorePlanInPlace(pendingTransfer.plan);
-  state.bank = pendingTransfer.bank;
+  restorePlanInPlace(batchTransfers.snapshot.plan);
+  state.bank = batchTransfers.snapshot.bank;
 
-  pendingTransfer = null;
-  lastSoldSide = null;
+  batchTransfers = {
+    snapshot: null,
+    removedPlayers: [],
+    isActive: false
+  };
 
-  showMessage('Transfer cancelled. Sold player restored.', 'success');
+  showMessage('All transfers cancelled. Sold players restored.', 'success');
   updateUI();
 }
 
@@ -109,8 +116,8 @@ export function substitutePlayer(playerId, updateUI) {
   const teamNow = state.plan[gw];
   if (!teamNow) return;
 
-  if (pendingTransfer) {
-    showMessage('Finish the pending transfer (Add) or Cancel it first.', 'info');
+  if (batchTransfers.isActive) {
+    showMessage('Finish the pending transfers (Add players) or Cancel first.', 'info');
     return;
   }
 
@@ -195,9 +202,10 @@ export function removePlayer(playerId, source, updateUI) {
   const team = state.plan[gw];
   if (!team) return;
 
-  if (pendingTransfer) {
-    showMessage('Finish the pending transfer (Add) or Cancel it first.', 'info');
-    return;
+  // Snapshot BEFORE the first transfer in a batch
+  if (!batchTransfers.isActive) {
+    batchTransfers.snapshot = snapshotForCancel();
+    batchTransfers.isActive = true;
   }
 
   // If currently over the 3-per-club limit, the next transfer out must be from that club.
@@ -217,14 +225,17 @@ export function removePlayer(playerId, source, updateUI) {
 
   if (!entry) return;
 
-  // Snapshot BEFORE any mutations so we can cancel and restore
-  pendingTransfer = snapshotForCancel();
-
-  // record where the sale came from, so the next buy goes there
-  if (source === 'starting' || source === 'bench') lastSoldSide = source;
-
-  // Add selling price to bank once
+  // Record where the sale came from and add selling price to bank
+  const actualSource = team.starting.some((e) => e.id === playerId) ? 'starting' : 'bench';
   const sell = entry.sellingPrice ?? displayPrice(entry);
+  
+  // Track this removal
+  batchTransfers.removedPlayers.push({
+    id: playerId,
+    side: actualSource,
+    sellingPrice: sell
+  });
+
   state.bank = Number((state.bank + sell).toFixed(1));
 
   // Remove from this GW and all future planned GWs
@@ -235,7 +246,94 @@ export function removePlayer(playerId, source, updateUI) {
     t.bench = t.bench.filter((e) => e.id !== playerId);
   }
 
-  showMessage('Player sold. Pick a replacement and click Add to squad (or Cancel transfer).', 'info');
+  const removedCount = batchTransfers.removedPlayers.length;
+  showMessage(
+    `Player ${removedCount} sold. ${removedCount === 1 ? 'Pick replacement' : 'Continue removing or add replacements'} (or Cancel).`,
+    'info'
+  );
+  updateUI();
+}
+
+// Reinstate a specific removed player (undo individual removal)
+export function reinstatePlayer(playerId, updateUI) {
+  if (!batchTransfers.isActive) {
+    showMessage('No active batch transfer.', 'info');
+    return;
+  }
+
+  // Find the removed player in the batch
+  const removedIndex = batchTransfers.removedPlayers.findIndex(rp => rp.id === playerId);
+  if (removedIndex === -1) {
+    showMessage('Player not found in removed list.', 'error');
+    return;
+  }
+
+  const removed = batchTransfers.removedPlayers[removedIndex];
+  const gw = state.viewingGW;
+
+  // Find the player in the snapshot to restore it
+  const snapshotTeam = batchTransfers.snapshot.plan[gw];
+  if (!snapshotTeam) return;
+
+  const originalEntry = 
+    snapshotTeam.starting.find(e => e.id === playerId) ||
+    snapshotTeam.bench.find(e => e.id === playerId);
+
+  if (!originalEntry) {
+    showMessage('Cannot find original player data.', 'error');
+    return;
+  }
+
+  // Restore the player to all future GWs
+  for (let g = gw; g <= state.currentGW + 7; g++) {
+    const t = state.plan[g];
+    if (!t) continue;
+
+    // Check if player already exists
+    const exists = t.starting.some(e => e.id === playerId) || t.bench.some(e => e.id === playerId);
+    if (exists) continue;
+
+    // Add back to the correct side
+    if (removed.side === 'starting') {
+      if (t.starting.length < 11) {
+        t.starting.push({ ...originalEntry });
+      }
+    } else {
+      if (t.bench.length < 4) {
+        const isGK = getElementType(playerId) === 1;
+        if (isGK) {
+          t.bench.unshift({ ...originalEntry });
+        } else {
+          const gkIndex = t.bench.findIndex(e => getElementType(e.id) === 1);
+          if (gkIndex === -1) t.bench.push({ ...originalEntry });
+          else t.bench.splice(gkIndex + 1, 0, { ...originalEntry });
+        }
+      }
+    }
+  }
+
+  // Deduct the selling price from bank
+  state.bank = Number((state.bank - removed.sellingPrice).toFixed(1));
+
+  // Remove from the batch list
+  batchTransfers.removedPlayers.splice(removedIndex, 1);
+
+  // If no more removals, deactivate batch mode
+  if (batchTransfers.removedPlayers.length === 0) {
+    batchTransfers = {
+      snapshot: null,
+      removedPlayers: [],
+      isActive: false
+    };
+    showMessage('Player reinstated. Batch transfer cancelled.', 'success');
+  } else {
+    const remaining = batchTransfers.removedPlayers.length;
+    showMessage(
+      `Player reinstated. ${remaining} slot${remaining > 1 ? 's' : ''} still need filling.`,
+      'success'
+    );
+  }
+
   updateUI();
 }
 
@@ -244,21 +342,63 @@ export function addSelectedToSquad(updateUI) {
   const team = state.plan[gw];
   if (!team) return;
 
-  const playerId = window.selectedPlayerId;
-  if (!playerId) {
-    showMessage('Select a player in the table first.', 'error');
+  const playerIds = window.selectedPlayerIds || [];
+  if (playerIds.length === 0) {
+    showMessage('Select player(s) in the table first.', 'error');
     return;
   }
 
-  if (!lastSoldSide || !pendingTransfer) {
+  if (!batchTransfers.isActive || batchTransfers.removedPlayers.length === 0) {
     showMessage('Sell a player first (X), then Add to squad (or Cancel transfer).', 'info');
     return;
   }
 
+  // Process each selected player
+  let successCount = 0;
+  let failedPlayers = [];
+
+  for (const playerId of playerIds) {
+    const result = addSinglePlayerToSquad(playerId, team, gw, updateUI);
+    if (result.success) {
+      successCount++;
+    } else {
+      failedPlayers.push({ id: playerId, reason: result.reason });
+    }
+  }
+
+  // Clear selection after processing
+  window.selectedPlayerIds = [];
+
+  // Show summary message
+  if (successCount > 0) {
+    const remaining = batchTransfers.removedPlayers.length;
+    if (remaining === 0) {
+      showMessage('All transfers completed successfully!', 'success');
+    } else {
+      showMessage(
+        `${successCount} player${successCount > 1 ? 's' : ''} added. ${remaining} more slot${remaining === 1 ? '' : 's'} to fill.`,
+        'success'
+      );
+    }
+  }
+
+  if (failedPlayers.length > 0) {
+    const firstFailed = failedPlayers[0];
+    const p = getPlayer(firstFailed.id);
+    showMessage(
+      `${p?.web_name || 'Player'}: ${firstFailed.reason}`,
+      'error'
+    );
+  }
+
+  updateUI();
+}
+
+// Helper function to add a single player
+function addSinglePlayerToSquad(playerId, team, gw, updateUI) {
   const p = getPlayer(playerId);
   if (!p) {
-    showMessage('Player data not found.', 'error');
-    return;
+    return { success: false, reason: 'Player data not found' };
   }
 
   // Prevent duplicates
@@ -267,36 +407,61 @@ export function addSelectedToSquad(updateUI) {
     team.bench.some((e) => e.id === playerId);
 
   if (already) {
-    showMessage('That player is already in your squad.', 'error');
-    return;
+    return { success: false, reason: 'Already in your squad' };
   }
 
   // Budget check
   const buy = p.now_cost / 10;
   if (state.bank < buy) {
-    showMessage(
-      `Not enough money. Need ${buy.toFixed(1)}m, have ${Number(state.bank).toFixed(1)}m.`,
-      'error'
-    );
-    return;
+    return { success: false, reason: `Not enough money. Need £${buy.toFixed(1)}m, have £${Number(state.bank).toFixed(1)}m` };
   }
 
-  // Capacity check (current GW only)
-  if (lastSoldSide === 'starting' && team.starting.length >= 11) {
-    showMessage('Starting XI is already full.', 'error');
+  // Determine which slots are available based on removed players
+  const startingSlotsNeeded = batchTransfers.removedPlayers.filter(p => p.side === 'starting').length;
+  const benchSlotsNeeded = batchTransfers.removedPlayers.filter(p => p.side === 'bench').length;
+  
+  const currentStartingCount = team.starting.length;
+  const currentBenchCount = team.bench.length;
+  
+  // Determine which side to add to based on available slots
+  let targetSide = null;
+  
+  // Check if we can add to starting XI (has room and needs filling)
+  const canAddToStarting = currentStartingCount < 11 && startingSlotsNeeded > 0;
+  // Check if we can add to bench (has room and needs filling)
+  const canAddToBench = currentBenchCount < 4 && benchSlotsNeeded > 0;
+  
+  if (!canAddToStarting && !canAddToBench) {
+    if (startingSlotsNeeded > 0 || benchSlotsNeeded > 0) {
+      return { success: false, reason: 'All available slots are full' };
+    } else {
+      return { success: false, reason: 'No slots to fill' };
+    }
     return;
   }
-
-  if (lastSoldSide === 'bench' && team.bench.length >= 4) {
-    showMessage('Bench is already full.', 'error');
-    return;
+  
+  // Intelligently choose target side based on player type and available slots
+  const isGKPlayer = getElementType(playerId) === 1;
+  
+  if (canAddToStarting && canAddToBench) {
+    // Both available - check if GK should go to bench
+    if (isGKPlayer) {
+      // If adding a GK and starting XI already has a GK, prefer bench
+      const startingHasGK = team.starting.some(e => getElementType(e.id) === 1);
+      targetSide = startingHasGK ? 'bench' : 'starting';
+    } else {
+      // Default to starting XI for outfield players
+      targetSide = 'starting';
+    }
+  } else if (canAddToStarting) {
+    targetSide = 'starting';
+  } else {
+    targetSide = 'bench';
   }
 
   const purchasePrice = buy;
   const sellingPrice = calculateSellingPrice(purchasePrice, buy);
   const entry = { id: playerId, purchasePrice, sellingPrice };
-
-  const isGKPlayer = getElementType(playerId) === 1;
 
   // ---------- VALIDATE ACROSS FUTURE GWs ----------
   for (let g = gw; g <= state.currentGW + 7; g++) {
@@ -308,7 +473,7 @@ export function addSelectedToSquad(updateUI) {
       bench: t.bench.map((x) => ({ ...x })),
     };
 
-    if (lastSoldSide === 'starting') {
+    if (targetSide === 'starting') {
       temp.starting.push({ ...entry });
     } else {
       if (isGKPlayer) {
@@ -322,17 +487,22 @@ export function addSelectedToSquad(updateUI) {
 
     const clubOk = validateClubLimit(temp);
     if (!clubOk.ok) {
-      showMessage(
-        'Invalid transfer: max 3 players per club (or fix an over-limit club first).',
-        'error'
-      );
-      return;
+      return { success: false, reason: 'Max 3 players per club' };
     }
 
-    const v = validateStartingXI(temp);
-    if (!v.ok) {
-      showMessage(v.message, 'error');
-      return;
+    // Validate squad composition (2 GK, 5 DEF, 5 MID, 3 FWD)
+    const squadOk = validateSquadComposition(temp);
+    if (!squadOk.ok) {
+      return { success: false, reason: squadOk.message };
+    }
+
+    // Only validate formation if squad is complete (15 players)
+    const totalPlayers = temp.starting.length + temp.bench.length;
+    if (totalPlayers === 15) {
+      const v = validateStartingXI(temp);
+      if (!v.ok) {
+        return { success: false, reason: v.message };
+      }
     }
   }
 
@@ -350,7 +520,7 @@ export function addSelectedToSquad(updateUI) {
 
     if (exists) continue;
 
-    if (lastSoldSide === 'starting') {
+    if (targetSide === 'starting') {
       if (t.starting.length < 11) {
         t.starting.push({ ...entry });
       }
@@ -367,13 +537,48 @@ export function addSelectedToSquad(updateUI) {
     }
   }
 
-  lastSoldSide = null;
-  pendingTransfer = null;
+  // Remove the filled slot from the batch (find matching side, not FIFO)
+  const slotIndex = batchTransfers.removedPlayers.findIndex(p => p.side === targetSide);
+  if (slotIndex !== -1) {
+    batchTransfers.removedPlayers.splice(slotIndex, 1);
+  }
 
-  showMessage('Player bought and added to squad.', 'success');
+  // Check if all transfers are complete
+  const remainingSlots = batchTransfers.removedPlayers.length;
+  if (remainingSlots === 0) {
+    // All slots filled - validate final squad
+    const finalTeam = state.plan[gw];
+    const totalPlayers = finalTeam.starting.length + finalTeam.bench.length;
+    
+    if (totalPlayers !== 15) {
+      return { success: false, reason: `Squad incomplete: ${totalPlayers}/15 players` };
+    }
+
+    const v = validateStartingXI(finalTeam);
+    if (!v.ok) {
+      return { success: false, reason: v.message };
+    }
+
+    // Clear batch state
+    batchTransfers = {
+      snapshot: null,
+      removedPlayers: [],
+      isActive: false
+    };
+  }
+
+  return { success: true };
   updateUI();
 }
 
 export function isPendingTransfer() {
-  return !!pendingTransfer;
+  return batchTransfers.isActive;
+}
+
+export function getBatchTransferInfo() {
+  return {
+    isActive: batchTransfers.isActive,
+    removedCount: batchTransfers.removedPlayers.length,
+    removedPlayers: batchTransfers.removedPlayers
+  };
 }

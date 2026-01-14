@@ -47,6 +47,33 @@ export function validateStartingXI(team) {
   return { ok: true, message: '' };
 }
 
+// Validate full squad composition: 2 GK, 5 DEF, 5 MID, 3 FWD
+export function validateSquadComposition(team) {
+  if (!team) return { ok: false, message: 'Internal error: missing team.' };
+
+  const all = [...(team.starting || []), ...(team.bench || [])];
+  
+  // Only validate when squad is complete (15 players)
+  if (all.length !== 15) return { ok: true, message: '' };
+
+  let gk = 0, def = 0, mid = 0, fwd = 0;
+
+  for (const e of all) {
+    const et = getElementType(e.id);
+    if (et === 1) gk++;
+    else if (et === 2) def++;
+    else if (et === 3) mid++;
+    else if (et === 4) fwd++;
+  }
+
+  if (gk !== 2) return { ok: false, message: 'Invalid squad: must have exactly 2 goalkeepers.' };
+  if (def !== 5) return { ok: false, message: 'Invalid squad: must have exactly 5 defenders.' };
+  if (mid !== 5) return { ok: false, message: 'Invalid squad: must have exactly 5 midfielders.' };
+  if (fwd !== 3) return { ok: false, message: 'Invalid squad: must have exactly 3 forwards.' };
+
+  return { ok: true, message: '' };
+}
+
 export function getClubCounts(team) {
   const counts = new Map();
   if (!team) return counts;
