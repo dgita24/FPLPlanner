@@ -347,22 +347,25 @@ export function initUI() {
       /* Injury/suspension status flag */
       .status-flag {
         position: absolute;
-        top: 36px;
-        left: 10px;
+        top: 30px;
+        left: 45px;
         width: 0;
         height: 0;
-        border-left: 10px solid transparent;
-        border-right: 10px solid transparent;
-        border-bottom: 17px solid;
+        border-left: 9px solid transparent;
+        border-right: 9px solid transparent;
+        border-bottom: 15px solid;
         z-index: 10;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 11px;
+      }
+      
+      .status-flag::after {
+        content: '!';
+        position: absolute;
+        top: 3px;
+        left: -4px;
+        font-size: 10px;
         font-weight: 900;
         color: #000;
         line-height: 1;
-        padding-top: 5px;
       }
 
       /* Next fixture + fixtures strip */

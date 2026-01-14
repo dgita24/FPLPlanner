@@ -233,7 +233,7 @@ function playerCard(entry, source) {
     const isDoubtful = p.status === 'd';
     const flagColor = isDoubtful ? '#ffeb3b' : '#f44336'; // bright yellow for doubtful, bright red for injured/suspended
     const flagTitle = p.news || (isDoubtful ? 'Doubtful' : 'Unavailable');
-    statusFlag = `<div class="status-flag" style="border-bottom-color: ${flagColor};" title="${flagTitle}">!</div>`;
+    statusFlag = `<div class="status-flag" style="border-bottom-color: ${flagColor};" title="${flagTitle}"></div>`;
   }
 
   return `
