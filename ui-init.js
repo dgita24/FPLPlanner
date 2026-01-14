@@ -347,8 +347,8 @@ export function initUI() {
       /* Injury/suspension status flag */
       .status-flag {
         position: absolute;
-        top: 15px;
-        left: 20px;
+        top: 25px;
+        left: 30px;
         width: 0;
         height: 0;
         border-left: 13.5px solid transparent;
