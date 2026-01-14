@@ -231,7 +231,7 @@ export function removePlayer(playerId, source, updateUI) {
 
   if (!entry) return;
 
-  // Record where the sale came from and the selling price
+  // Record where the sale came from and add selling price to bank
   const actualSource = team.starting.some((e) => e.id === playerId) ? 'starting' : 'bench';
   const sell = entry.sellingPrice ?? displayPrice(entry);
   
@@ -242,7 +242,6 @@ export function removePlayer(playerId, source, updateUI) {
     sellingPrice: sell
   });
 
-  // Add selling price to bank once
   state.bank = Number((state.bank + sell).toFixed(1));
 
   // Remove from this GW and all future planned GWs
@@ -255,7 +254,7 @@ export function removePlayer(playerId, source, updateUI) {
 
   const removedCount = batchTransfers.removedPlayers.length;
   showMessage(
-    `Player ${removedCount} sold. ${removedCount === 1 ? 'Pick replacements' : 'Continue removing or add replacements'} (or Cancel).`,
+    `Player ${removedCount} sold. ${removedCount === 1 ? 'Pick replacement' : 'Continue removing or add replacements'} (or Cancel).`,
     'info'
   );
   updateUI();
@@ -431,8 +430,9 @@ export function addSelectedToSquad(updateUI) {
 
     showMessage('All transfers completed successfully!', 'success');
   } else {
+    const remaining = remainingSlots;
     showMessage(
-      `Player added. ${remainingSlots} more slot${remainingSlots > 1 ? 's' : ''} to fill.`,
+      `Player added. ${remaining} more ${remaining === 1 ? 'slot' : 'slots'} to fill.`,
       'success'
     );
   }

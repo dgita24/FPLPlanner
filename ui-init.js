@@ -7,6 +7,11 @@ import { renderFixtures } from './fixtures.js';
 import { cancelTransfer, substitutePlayer, addSelectedToSquad, removePlayer, resetTransferState, isPendingTransfer, getBatchTransferInfo } from './team-operations.js';
 import { setPendingSwap } from './ui-render.js';
 
+// Helper function for pluralization
+function pluralize(word, count) {
+  return count === 1 ? word : word + 's';
+}
+
 function updateUI() {
   // kick off fixture loads for current viewing window (async)
   ensureFixturesForView();
@@ -35,7 +40,8 @@ function updateUI() {
   const batchStatus = document.getElementById('batchTransferStatus');
   if (batchStatus) {
     if (batchInfo.isActive && batchInfo.removedCount > 0) {
-      batchStatus.textContent = `${batchInfo.removedCount} player${batchInfo.removedCount > 1 ? 's' : ''} removed - add replacement${batchInfo.removedCount > 1 ? 's' : ''}`;
+      const count = batchInfo.removedCount;
+      batchStatus.textContent = `${count} ${pluralize('player', count)} removed - add ${pluralize('replacement', count)}`;
       batchStatus.style.display = 'block';
     } else {
       batchStatus.style.display = 'none';
