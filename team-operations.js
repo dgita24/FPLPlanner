@@ -326,8 +326,8 @@ export function addSelectedToSquad(updateUI) {
   
   if (canAddToStarting && canAddToBench) {
     // Both available - check if GK should go to bench
-    if (isGKPlayer && currentStartingCount >= 1) {
-      // Already have a GK in starting, prefer bench
+    if (isGKPlayer) {
+      // If adding a GK and starting XI already has a GK, prefer bench
       const startingHasGK = team.starting.some(e => getElementType(e.id) === 1);
       targetSide = startingHasGK ? 'bench' : 'starting';
     } else {
