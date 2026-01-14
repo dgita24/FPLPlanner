@@ -4,7 +4,7 @@ import { state, history, loadTeamEntry } from './data.js';
 import { setupSidebarHandlers, closeSidebar } from './ui-sidebar.js';
 import { showMessage, renderPitch, renderBench, ensureFixturesForView } from './ui-render.js';
 import { renderFixtures } from './fixtures.js';
-import { cancelTransfer, substitutePlayer, addSelectedToSquad, removePlayer, resetTransferState, isPendingTransfer } from './team-operations.js';
+import { cancelTransfer, substitutePlayer, addSelectedToSquad, removePlayer, resetTransferState, isPendingTransfer, getBatchTransferInfo } from './team-operations.js';
 import { setPendingSwap } from './ui-render.js';
 
 function updateUI() {
@@ -29,6 +29,18 @@ function updateUI() {
   // Enable/disable cancel transfer button (if present)
   const cancelBtn = document.getElementById('cancelTransferBtn');
   if (cancelBtn) cancelBtn.disabled = !isPendingTransfer();
+
+  // Update batch transfer status display
+  const batchInfo = getBatchTransferInfo();
+  const batchStatus = document.getElementById('batchTransferStatus');
+  if (batchStatus) {
+    if (batchInfo.isActive && batchInfo.removedCount > 0) {
+      batchStatus.textContent = `${batchInfo.removedCount} player${batchInfo.removedCount > 1 ? 's' : ''} removed - add replacement${batchInfo.removedCount > 1 ? 's' : ''}`;
+      batchStatus.style.display = 'block';
+    } else {
+      batchStatus.style.display = 'none';
+    }
+  }
 
   renderPitch();
   renderBench();
