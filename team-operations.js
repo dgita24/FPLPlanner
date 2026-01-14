@@ -259,9 +259,9 @@ export function addSelectedToSquad(updateUI) {
   const team = state.plan[gw];
   if (!team) return;
 
-  const playerId = window.selectedPlayerId;
-  if (!playerId) {
-    showMessage('Select a player in the table first.', 'error');
+  const playerIds = window.selectedPlayerIds || [];
+  if (playerIds.length === 0) {
+    showMessage('Select player(s) in the table first.', 'error');
     return;
   }
 
@@ -270,10 +270,52 @@ export function addSelectedToSquad(updateUI) {
     return;
   }
 
+  // Process each selected player
+  let successCount = 0;
+  let failedPlayers = [];
+
+  for (const playerId of playerIds) {
+    const result = addSinglePlayerToSquad(playerId, team, gw, updateUI);
+    if (result.success) {
+      successCount++;
+    } else {
+      failedPlayers.push({ id: playerId, reason: result.reason });
+    }
+  }
+
+  // Clear selection after processing
+  window.selectedPlayerIds = [];
+
+  // Show summary message
+  if (successCount > 0) {
+    const remaining = batchTransfers.removedPlayers.length;
+    if (remaining === 0) {
+      showMessage('All transfers completed successfully!', 'success');
+    } else {
+      showMessage(
+        `${successCount} player${successCount > 1 ? 's' : ''} added. ${remaining} more slot${remaining === 1 ? '' : 's'} to fill.`,
+        'success'
+      );
+    }
+  }
+
+  if (failedPlayers.length > 0) {
+    const firstFailed = failedPlayers[0];
+    const p = getPlayer(firstFailed.id);
+    showMessage(
+      `${p?.web_name || 'Player'}: ${firstFailed.reason}`,
+      'error'
+    );
+  }
+
+  updateUI();
+}
+
+// Helper function to add a single player
+function addSinglePlayerToSquad(playerId, team, gw, updateUI) {
   const p = getPlayer(playerId);
   if (!p) {
-    showMessage('Player data not found.', 'error');
-    return;
+    return { success: false, reason: 'Player data not found' };
   }
 
   // Prevent duplicates
@@ -282,18 +324,13 @@ export function addSelectedToSquad(updateUI) {
     team.bench.some((e) => e.id === playerId);
 
   if (already) {
-    showMessage('That player is already in your squad.', 'error');
-    return;
+    return { success: false, reason: 'Already in your squad' };
   }
 
   // Budget check
   const buy = p.now_cost / 10;
   if (state.bank < buy) {
-    showMessage(
-      `Not enough money. Need ${buy.toFixed(1)}m, have ${Number(state.bank).toFixed(1)}m.`,
-      'error'
-    );
-    return;
+    return { success: false, reason: `Not enough money. Need £${buy.toFixed(1)}m, have £${Number(state.bank).toFixed(1)}m` };
   }
 
   // Determine which slots are available based on removed players
@@ -313,9 +350,9 @@ export function addSelectedToSquad(updateUI) {
   
   if (!canAddToStarting && !canAddToBench) {
     if (startingSlotsNeeded > 0 || benchSlotsNeeded > 0) {
-      showMessage('All available slots are full. Cannot add more players.', 'error');
+      return { success: false, reason: 'All available slots are full' };
     } else {
-      showMessage('No slots to fill. All transfers complete.', 'info');
+      return { success: false, reason: 'No slots to fill' };
     }
     return;
   }
@@ -367,11 +404,7 @@ export function addSelectedToSquad(updateUI) {
 
     const clubOk = validateClubLimit(temp);
     if (!clubOk.ok) {
-      showMessage(
-        'Invalid transfer: max 3 players per club (or fix an over-limit club first).',
-        'error'
-      );
-      return;
+      return { success: false, reason: 'Max 3 players per club' };
     }
 
     // Only validate formation if squad is complete (15 players)
@@ -379,8 +412,7 @@ export function addSelectedToSquad(updateUI) {
     if (totalPlayers === 15) {
       const v = validateStartingXI(temp);
       if (!v.ok) {
-        showMessage(v.message, 'error');
-        return;
+        return { success: false, reason: v.message };
       }
     }
   }
@@ -430,14 +462,12 @@ export function addSelectedToSquad(updateUI) {
     const totalPlayers = finalTeam.starting.length + finalTeam.bench.length;
     
     if (totalPlayers !== 15) {
-      showMessage(`Squad incomplete: ${totalPlayers}/15 players.`, 'error');
-      return;
+      return { success: false, reason: `Squad incomplete: ${totalPlayers}/15 players` };
     }
 
     const v = validateStartingXI(finalTeam);
     if (!v.ok) {
-      showMessage(v.message, 'error');
-      return;
+      return { success: false, reason: v.message };
     }
 
     // Clear batch state
@@ -446,16 +476,9 @@ export function addSelectedToSquad(updateUI) {
       removedPlayers: [],
       isActive: false
     };
-
-    showMessage('All transfers completed successfully!', 'success');
-  } else {
-    const remaining = remainingSlots;
-    showMessage(
-      `Player added. ${remaining} more ${remaining === 1 ? 'slot' : 'slots'} to fill.`,
-      'success'
-    );
   }
 
+  return { success: true };
   updateUI();
 }
 

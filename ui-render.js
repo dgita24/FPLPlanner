@@ -2,6 +2,7 @@
 
 import { state, loadFixtures } from './data.js';
 import { getElementType } from './validation.js';
+import { getBatchTransferInfo } from './team-operations.js';
 
 // --- Fixtures cache (per GW) ---
 const fixturesByGW = new Map(); // gw -> fixtures[]
@@ -132,6 +133,7 @@ export function renderPitch() {
   }
 
   const starting = team.starting;
+  const batchInfo = getBatchTransferInfo();
 
   const gk = [];
   const def = [];
@@ -146,11 +148,28 @@ export function renderPitch() {
     else if (et === 4) fwd.push(e);
   }
 
+  // Add placeholders for removed starting XI players
+  if (batchInfo.isActive) {
+    const removedStarters = batchInfo.removedPlayers.filter(rp => rp.side === 'starting');
+    for (const removed of removedStarters) {
+      const p = getPlayer(removed.id);
+      if (!p) continue;
+      const et = getElementType(removed.id);
+      const placeholder = { ...removed, isPlaceholder: true };
+      if (et === 1) gk.push(placeholder);
+      else if (et === 2) def.push(placeholder);
+      else if (et === 3) mid.push(placeholder);
+      else if (et === 4) fwd.push(placeholder);
+    }
+  }
+
+  const renderCard = (e) => e.isPlaceholder ? placeholderCard(e, 'starting') : playerCard(e, 'starting');
+
   pitch.innerHTML = `
-    <div class="formation-line">${gk.map((e) => playerCard(e, 'starting')).join('')}</div>
-    <div class="formation-line">${def.map((e) => playerCard(e, 'starting')).join('')}</div>
-    <div class="formation-line">${mid.map((e) => playerCard(e, 'starting')).join('')}</div>
-    <div class="formation-line">${fwd.map((e) => playerCard(e, 'starting')).join('')}</div>
+    <div class="formation-line">${gk.map(renderCard).join('')}</div>
+    <div class="formation-line">${def.map(renderCard).join('')}</div>
+    <div class="formation-line">${mid.map(renderCard).join('')}</div>
+    <div class="formation-line">${fwd.map(renderCard).join('')}</div>
   `;
 }
 
@@ -162,7 +181,19 @@ export function renderBench() {
     return;
   }
 
-  benchSlots.innerHTML = team.bench.map((e) => playerCard(e, 'bench')).join('');
+  const batchInfo = getBatchTransferInfo();
+  let benchPlayers = [...team.bench];
+
+  // Add placeholders for removed bench players
+  if (batchInfo.isActive) {
+    const removedBench = batchInfo.removedPlayers.filter(rp => rp.side === 'bench');
+    for (const removed of removedBench) {
+      benchPlayers.push({ ...removed, isPlaceholder: true });
+    }
+  }
+
+  const renderCard = (e) => e.isPlaceholder ? placeholderCard(e, 'bench') : playerCard(e, 'bench');
+  benchSlots.innerHTML = benchPlayers.map(renderCard).join('');
 }
 
 function playerCard(entry, source) {
@@ -214,6 +245,44 @@ function playerCard(entry, source) {
         <span class="fixture">${fx2}</span>
         <span class="fixture">${fx3}</span>
         <span class="fixture">${fx4}</span>
+      </div>
+    </div>
+  `;
+}
+
+// Placeholder card for removed players during batch transfers
+function placeholderCard(removedPlayer, source) {
+  const p = getPlayer(removedPlayer.id);
+  if (!p) return '';
+
+  const teamId = p.team;
+  const teamCode = getTeamCode(teamId);
+  const teamShort = getTeamShortName(teamId);
+
+  const price = removedPlayer.sellingPrice.toFixed(1);
+
+  return `
+    <div class="player-card placeholder-card">
+      <div class="placeholder-overlay">
+        <span class="placeholder-text">SOLD</span>
+        <span class="placeholder-price">+£${price}m</span>
+      </div>
+
+      <img src="https://resources.premierleague.com/premierleague/badges/70/t${teamCode}.png"
+           class="badge" alt="${teamShort}">
+
+      <div class="name">${p.web_name}</div>
+
+      <div class="info">
+        <span class="team">${teamShort}</span>
+        <span class="next-fixture fixture-next">--</span>
+        <span class="price">Sell ${price}</span>
+      </div>
+
+      <div class="future-fixtures">
+        <span class="fixture">--</span>
+        <span class="fixture">--</span>
+        <span class="fixture">--</span>
       </div>
     </div>
   `;

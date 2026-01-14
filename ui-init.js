@@ -270,7 +270,7 @@ function resetToImportedTeam() {
 }
 
 export function initUI() {
-  // Inject CSS for two-click swap highlight + fixture UI (no index.html change needed)
+  // Inject CSS for two-click swap highlight + fixture UI + placeholder cards
   if (!document.getElementById('plannerInjectedStyle')) {
     const style = document.createElement('style');
     style.id = 'plannerInjectedStyle';
@@ -278,6 +278,44 @@ export function initUI() {
       .player-card.pending-swap {
         outline: 3px solid #00ff87;
         box-shadow: 0 0 0 3px rgba(0, 255, 135, 0.25);
+      }
+
+      /* Placeholder card styling for removed players */
+      .player-card.placeholder-card {
+        opacity: 0.5;
+        position: relative;
+        pointer-events: none;
+      }
+
+      .placeholder-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(255, 68, 68, 0.85);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8px;
+        z-index: 5;
+      }
+
+      .placeholder-text {
+        font-size: 16px;
+        font-weight: 900;
+        color: white;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        letter-spacing: 1px;
+      }
+
+      .placeholder-price {
+        font-size: 13px;
+        font-weight: 700;
+        color: #00ff87;
+        margin-top: 4px;
+        text-shadow: 0 1px 2px rgba(0,0,0,0.5);
       }
 
       /* Next fixture + fixtures strip */

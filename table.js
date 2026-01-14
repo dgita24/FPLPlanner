@@ -9,8 +9,8 @@ let tableSort = {
 
 const posNames = { 1: 'GK', 2: 'DEF', 3: 'MID', 4: 'FWD' };
 
-// Selected player (shared with ui.js)
-window.selectedPlayerId = window.selectedPlayerId ?? null;
+// Selected players (changed from single to multi-select)
+window.selectedPlayerIds = window.selectedPlayerIds ?? [];
 
 /* ------------------------- FIXTURES (TABLE) -------------------------- */
 // Cache fixtures per GW so typing in filters doesn't spam requests.
@@ -138,14 +138,14 @@ export function renderTable() {
     .map((player) => {
       const teamName =
         state.teams.find((t) => t.id === player.team)?.short_name || '';
-      const checked = window.selectedPlayerId === player.id ? 'checked' : '';
+      const checked = window.selectedPlayerIds.includes(player.id) ? 'checked' : '';
 
       const next3 = getNextFixturesForTeam(player.team, state.viewingGW, 3);
       const next3Html = next3.map((x) => `<span class="fx">${x}</span>`).join(' ');
 
       return `
-        <tr onclick="selectPlayer(event, ${player.id})">
-          <td><input type="radio" name="selectedPlayer" value="${player.id}" ${checked}></td>
+        <tr onclick="selectPlayer(event, ${player.id})" class="${checked ? 'selected' : ''}">
+          <td><input type="checkbox" name="selectedPlayer" value="${player.id}" ${checked}></td>
           <td>${player.web_name}</td>
           <td>${teamName}</td>
           <td>${posNames[player.element_type]}</td>
@@ -171,16 +171,30 @@ export function populateFilters() {
 
 window.selectPlayer = function (ev, id) {
   if (ev) ev.stopPropagation();
-  window.selectedPlayerId = id;
+  
+  // Toggle selection
+  const index = window.selectedPlayerIds.indexOf(id);
+  if (index > -1) {
+    window.selectedPlayerIds.splice(index, 1);
+  } else {
+    window.selectedPlayerIds.push(id);
+  }
 
-  document.querySelectorAll('#tableBody tr').forEach((tr) => tr.classList.remove('selected'));
-
+  // Update row styling
   const row = ev?.target?.closest('tr');
-  if (row) row.classList.add('selected');
+  if (row) {
+    if (window.selectedPlayerIds.includes(id)) {
+      row.classList.add('selected');
+    } else {
+      row.classList.remove('selected');
+    }
+  }
 
-  // Keep radio UI in sync
-  const input = row?.querySelector('input[type="radio"]');
-  if (input) input.checked = true;
+  // Update checkbox
+  const checkbox = row?.querySelector('input[type="checkbox"]');
+  if (checkbox) {
+    checkbox.checked = window.selectedPlayerIds.includes(id);
+  }
 };
 
 // Expose for inline handlers
