@@ -368,6 +368,29 @@ export function initUI() {
         line-height: 1;
       }
 
+      /* Status flag in player table */
+      .table-status-flag {
+        display: inline-block;
+        width: 0;
+        height: 0;
+        border-left: 7px solid transparent;
+        border-right: 7px solid transparent;
+        border-bottom: 12px solid;
+        position: relative;
+        cursor: help;
+      }
+      
+      .table-status-flag::after {
+        content: '!';
+        position: absolute;
+        top: 2px;
+        left: -3px;
+        font-size: 8px;
+        font-weight: 900;
+        color: #000;
+        line-height: 1;
+      }
+
       /* Next fixture + fixtures strip */
       .player-card .fixture {
         font-size: 11px;

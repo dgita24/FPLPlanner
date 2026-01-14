@@ -143,9 +143,19 @@ export function renderTable() {
       const next3 = getNextFixturesForTeam(player.team, state.viewingGW, 3);
       const next3Html = next3.map((x) => `<span class="fx">${x}</span>`).join(' ');
 
+      // Status flag for table
+      let statusFlagHtml = '';
+      if (player.status && player.status !== 'a') {
+        const isDoubtful = player.status === 'd';
+        const flagColor = isDoubtful ? '#ffeb3b' : '#f44336';
+        const flagTitle = player.news || (isDoubtful ? 'Doubtful' : 'Unavailable');
+        statusFlagHtml = `<div class="table-status-flag" style="border-bottom-color: ${flagColor};" title="${flagTitle}"></div>`;
+      }
+
       return `
         <tr onclick="selectPlayer(event, ${player.id})" class="${checked ? 'selected' : ''}">
           <td><input type="checkbox" name="selectedPlayer" value="${player.id}" ${checked}></td>
+          <td style="text-align:center; position:relative;">${statusFlagHtml}</td>
           <td>${player.web_name}</td>
           <td>${teamName}</td>
           <td>${posNames[player.element_type]}</td>
