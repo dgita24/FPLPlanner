@@ -320,8 +320,7 @@ export function addSelectedToSquad(updateUI) {
     return;
   }
   
-  // Prefer starting XI if both are available (user can choose by what they select)
-  // For now, intelligently choose based on player position
+  // Intelligently choose target side based on player type and available slots
   const isGKPlayer = getElementType(playerId) === 1;
   
   if (canAddToStarting && canAddToBench) {
