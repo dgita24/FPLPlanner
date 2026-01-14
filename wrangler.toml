@@ -5,17 +5,10 @@ compatibility_date = "2026-01-13"
 [assets]
 directory = "."  # This is your static assets folder
 
-
-name = "fplplanner"
-account_id = "9ab10d79683a9467ca3cb500d90e5bb7"
-compatibility_date = "2026-01-13"
-
 # Default environment—used for preview
-[assets]
-directory = "."  # This is your static assets folder
-
 [env.preview]
 route = "fplplanner.davidnash.workers.dev/*"
 
+# Production environment
 [env.production]
 route = "planfplteam.com/*"  # Or the domain where your live site is hosted

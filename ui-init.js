@@ -347,21 +347,21 @@ export function initUI() {
       /* Injury/suspension status flag */
       .status-flag {
         position: absolute;
-        top: 30px;
-        left: 45px;
+        top: 8px;
+        left: 8px;
         width: 0;
         height: 0;
-        border-left: 9px solid transparent;
-        border-right: 9px solid transparent;
-        border-bottom: 15px solid;
+        border-left: 13.5px solid transparent;
+        border-right: 13.5px solid transparent;
+        border-bottom: 22.5px solid;
         z-index: 10;
       }
       
       .status-flag::after {
         content: '!';
         position: absolute;
-        top: 3px;
-        left: -4px;
+        top: 6px;
+        left: -3px;
         font-size: 10px;
         font-weight: 900;
         color: #000;
