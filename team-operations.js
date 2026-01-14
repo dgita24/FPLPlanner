@@ -20,12 +20,6 @@ export function resetTransferState() {
   setPendingSwap(null);
 }
 
-// Get the first side from which a player was removed (FIFO for batch transfers)
-function getFirstRemovedSide() {
-  if (batchTransfers.removedPlayers.length === 0) return null;
-  return batchTransfers.removedPlayers[0].side;
-}
-
 function getPlayer(id) {
   return state.elements.find((p) => p.id === id);
 }
@@ -302,30 +296,53 @@ export function addSelectedToSquad(updateUI) {
     return;
   }
 
-  // Determine which side to add to - use the first removed player's side (FIFO)
-  const firstRemoved = batchTransfers.removedPlayers[0];
-  if (!firstRemoved) {
-    showMessage('Internal error: No removed player side found.', 'error');
+  // Determine which slots are available based on removed players
+  const startingSlotsNeeded = batchTransfers.removedPlayers.filter(p => p.side === 'starting').length;
+  const benchSlotsNeeded = batchTransfers.removedPlayers.filter(p => p.side === 'bench').length;
+  
+  const currentStartingCount = team.starting.length;
+  const currentBenchCount = team.bench.length;
+  
+  // Determine which side to add to based on available slots
+  let targetSide = null;
+  
+  // Check if we can add to starting XI (has room and needs filling)
+  const canAddToStarting = currentStartingCount < 11 && startingSlotsNeeded > 0;
+  // Check if we can add to bench (has room and needs filling)
+  const canAddToBench = currentBenchCount < 4 && benchSlotsNeeded > 0;
+  
+  if (!canAddToStarting && !canAddToBench) {
+    if (startingSlotsNeeded > 0 || benchSlotsNeeded > 0) {
+      showMessage('All available slots are full. Cannot add more players.', 'error');
+    } else {
+      showMessage('No slots to fill. All transfers complete.', 'info');
+    }
     return;
   }
-  const targetSide = firstRemoved.side;
-
-  // Capacity check (current GW only)
-  if (targetSide === 'starting' && team.starting.length >= 11) {
-    showMessage('Starting XI is already full.', 'error');
-    return;
-  }
-
-  if (targetSide === 'bench' && team.bench.length >= 4) {
-    showMessage('Bench is already full.', 'error');
-    return;
+  
+  // Prefer starting XI if both are available (user can choose by what they select)
+  // For now, intelligently choose based on player position
+  const isGKPlayer = getElementType(playerId) === 1;
+  
+  if (canAddToStarting && canAddToBench) {
+    // Both available - check if GK should go to bench
+    if (isGKPlayer && currentStartingCount >= 1) {
+      // Already have a GK in starting, prefer bench
+      const startingHasGK = team.starting.some(e => getElementType(e.id) === 1);
+      targetSide = startingHasGK ? 'bench' : 'starting';
+    } else {
+      // Default to starting XI for outfield players
+      targetSide = 'starting';
+    }
+  } else if (canAddToStarting) {
+    targetSide = 'starting';
+  } else {
+    targetSide = 'bench';
   }
 
   const purchasePrice = buy;
   const sellingPrice = calculateSellingPrice(purchasePrice, buy);
   const entry = { id: playerId, purchasePrice, sellingPrice };
-
-  const isGKPlayer = getElementType(playerId) === 1;
 
   // ---------- VALIDATE ACROSS FUTURE GWs ----------
   for (let g = gw; g <= state.currentGW + 7; g++) {
@@ -400,8 +417,11 @@ export function addSelectedToSquad(updateUI) {
     }
   }
 
-  // Remove this player's slot from the batch (FIFO - remove first)
-  batchTransfers.removedPlayers.shift();
+  // Remove the filled slot from the batch (find matching side, not FIFO)
+  const slotIndex = batchTransfers.removedPlayers.findIndex(p => p.side === targetSide);
+  if (slotIndex !== -1) {
+    batchTransfers.removedPlayers.splice(slotIndex, 1);
+  }
 
   // Check if all transfers are complete
   const remainingSlots = batchTransfers.removedPlayers.length;

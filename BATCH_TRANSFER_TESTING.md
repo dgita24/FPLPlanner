@@ -7,7 +7,8 @@ This document provides comprehensive testing scenarios for the new batch/multi-p
 The batch transfer feature allows users to:
 - Remove multiple players (N players) from their squad before adding replacements
 - Track all removed players and the bank balance throughout the process
-- Add replacement players one by one until all slots are filled
+- Add replacement players in any order (flexible ordering - not restricted to FIFO)
+- System intelligently assigns players to starting XI or bench based on available slots
 - Cancel all transfers at once, restoring the original squad
 - Maintain FPL rules compliance throughout (formation, club limits, budget)
 
@@ -90,21 +91,21 @@ The batch transfer feature allows users to:
 
 ---
 
-### Scenario 4: Batch Transfer - Mixed Starting XI and Bench
-**Purpose**: Test removing players from both starting XI and bench
+### Scenario 4: Batch Transfer - Mixed Starting XI and Bench (Flexible Order)
+**Purpose**: Test removing players from both starting XI and bench with flexible replacement order
 
 **Steps**:
 1. Import an FPL team
 2. Remove 2 players from starting XI
 3. Remove 1 player from bench
 4. Verify status shows "3 players removed"
-5. Add replacement 1 (should fill first starting XI slot)
-6. Add replacement 2 (should fill second starting XI slot)
-7. Add replacement 3 (should fill bench slot)
-8. Verify each player goes to the correct location
+5. Add replacement 1 (system assigns to available slot intelligently)
+6. Add replacement 2 (system assigns to available slot)
+7. Add replacement 3 (system fills remaining slot)
+8. Verify each player goes to an appropriate location
 9. Verify squad is complete (11 starters + 4 bench)
 
-**Expected Result**: ✅ Players added to correct positions (FIFO order)
+**Expected Result**: ✅ Players added intelligently to available slots (flexible order)
 
 ---
 
@@ -188,7 +189,26 @@ The batch transfer feature allows users to:
 
 ---
 
-### Scenario 10: Batch Transfer with GW Navigation Blocked
+### Scenario 9A: Flexible Replacement Order
+**Purpose**: Test that replacements can be made in any order (not restricted to removal order)
+
+**Steps**:
+1. Import an FPL team
+2. Remove 3 starting XI players (note which ones: A, B, C)
+3. Verify status shows "3 players removed"
+4. Add a replacement X (system assigns to an available starting XI slot)
+5. Verify X is added to starting XI
+6. Add a replacement Y (system assigns to another starting XI slot)
+7. Verify Y is added to starting XI
+8. Add a replacement Z (system assigns to the remaining starting XI slot)
+9. Verify all 3 replacements are in starting XI
+10. Verify you weren't forced to add them in order A→X, B→Y, C→Z
+
+**Expected Result**: ✅ Players can be added in any order, system handles slot assignment intelligently
+
+---
+
+### Scenario 11: Batch Transfer with GW Navigation Blocked
 **Purpose**: Test that GW navigation is blocked during batch transfers
 
 **Steps**:
@@ -205,7 +225,7 @@ The batch transfer feature allows users to:
 
 ---
 
-### Scenario 11: Batch Transfer with Swap Blocked
+### Scenario 12: Batch Transfer with Swap Blocked
 **Purpose**: Test that swaps are blocked during batch transfers
 
 **Steps**:
@@ -220,7 +240,7 @@ The batch transfer feature allows users to:
 
 ---
 
-### Scenario 12: Incomplete Squad During Batch
+### Scenario 13: Incomplete Squad During Batch
 **Purpose**: Test that validation allows incomplete squad during batch but enforces at completion
 
 **Steps**:
@@ -236,7 +256,7 @@ The batch transfer feature allows users to:
 
 ---
 
-### Scenario 13: Undo After Batch Transfer
+### Scenario 14: Undo After Batch Transfer
 **Purpose**: Test undo functionality after batch transfers
 
 **Steps**:
@@ -250,7 +270,7 @@ The batch transfer feature allows users to:
 
 ---
 
-### Scenario 14: Reset After Batch Transfer
+### Scenario 15: Reset After Batch Transfer
 **Purpose**: Test reset to imported team after batch transfers
 
 **Steps**:
@@ -264,7 +284,7 @@ The batch transfer feature allows users to:
 
 ---
 
-### Scenario 15: Batch Transfer Across Multiple GWs
+### Scenario 16: Batch Transfer Across Multiple GWs
 **Purpose**: Test that batch transfers propagate to future GWs
 
 **Steps**:
@@ -352,19 +372,17 @@ Verify that existing functionality still works:
 
 ## Known Limitations
 
-1. **FIFO Order**: Players must be added back in FIFO order (first removed = first replaced)
-   - This is by design to maintain consistent slot assignment
+1. **Intelligent Slot Assignment**: System automatically determines whether players go to starting XI or bench
+   - Based on available slots and player type (e.g., GKs intelligently placed)
+   - Users cannot manually choose starting XI vs bench during batch
    
-2. **Same Side Assignment**: Removed starting XI players must be replaced with starting XI players
-   - This prevents accidental formation changes
-   
-3. **No Partial Cancel**: Cannot cancel individual removals, must cancel all or none
+2. **No Partial Cancel**: Cannot cancel individual removals, must cancel all or none
    - This is by design to maintain state consistency
 
 ## Success Criteria
 
 For this feature to be considered complete:
-- ✅ All 15 main test scenarios pass
+- ✅ All 16 main test scenarios pass
 - ✅ All edge cases handled gracefully
 - ✅ No console errors during operation
 - ✅ All existing functionality still works (regression testing passes)

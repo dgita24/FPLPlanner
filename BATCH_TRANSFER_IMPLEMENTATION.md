@@ -14,7 +14,7 @@ Successfully implemented batch/multi-player transfer functionality for the FPL T
 - Replaced single transfer state (`pendingTransfer`, `lastSoldSide`) with batch transfer tracking
 - New `batchTransfers` object with:
   - `snapshot`: Saves original state before any transfers
-  - `removedPlayers`: FIFO queue of removed players with side and selling price
+  - `removedPlayers`: Array of removed players with side and selling price (flexible order)
   - `isActive`: Boolean flag for batch mode
 
 **Modified Functions**:
@@ -22,20 +22,19 @@ Successfully implemented batch/multi-player transfer functionality for the FPL T
 - `cancelTransfer()`: Restores snapshot for all removals
 - `substitutePlayer()`: Blocks swaps during batch mode
 - `removePlayer()`: Allows multiple removals, tracks each one
-- `addSelectedToSquad()`: FIFO replacement with progressive validation
+- `addSelectedToSquad()`: Flexible replacement order with intelligent slot assignment
 
 **New Functions**:
-- `getFirstRemovedSide()`: Helper for FIFO ordering
 - `getBatchTransferInfo()`: Export batch state for UI
 
 **Logic Flow**:
 ```
-Remove Player 1 → Bank +4.5m → Status: "1 player removed"
-Remove Player 2 → Bank +5.0m → Status: "2 players removed"  
-Remove Player 3 → Bank +6.0m → Status: "3 players removed"
-Add Player 1 → Bank -7.0m → Status: "2 more slots to fill"
-Add Player 2 → Bank -5.5m → Status: "1 more slot to fill"
-Add Player 3 → Bank -8.0m → Status: "All transfers completed!"
+Remove Player 1 (Starter) → Bank +4.5m → Status: "1 player removed"
+Remove Player 2 (Starter) → Bank +5.0m → Status: "2 players removed"  
+Remove Player 3 (Bench) → Bank +6.0m → Status: "3 players removed"
+Add Player X → Fills any starting slot → Status: "2 more slots to fill"
+Add Player Y → Fills any available slot → Status: "1 more slot to fill"
+Add Player Z → Fills remaining slot → Status: "All transfers completed!"
 ```
 
 #### 2. **ui-init.js** (Minor changes)
@@ -133,13 +132,14 @@ let batchTransfers = {
 - ✅ Must respect all club limits
 - ✅ Starting XI must have exactly 11 players
 
-### FIFO Ordering
-Players are replaced in the order they were removed:
-- First removed → First replacement slot
-- Second removed → Second replacement slot
-- Etc.
+### Flexible Replacement Order
+Players can be replaced in any order - you're not restricted to replacing in the order they were removed:
+- Remove 2 starters + 1 bench → Add to starting XI or bench as needed
+- Intelligent slot assignment based on available slots and player type
+- System prefers starting XI for outfield players, intelligently assigns GKs
+- You can fill any available slot, in any order
 
-This maintains consistent slot assignment and prevents confusion.
+This provides maximum flexibility for transfer strategy.
 
 ## FPL Rules Enforcement
 
@@ -240,30 +240,26 @@ To be tested on:
 
 ## Known Limitations
 
-1. **FIFO Replacement Order**: Players must be added in the order they were removed
-   - This is by design for consistency
-   - Alternative (flexible order) would require more complex UI
-
-2. **Same Side Assignment**: Removed starting XI players must be replaced with starting XI players
-   - This prevents accidental formation changes
-   - Users can swap players after batch completes if needed
-
-3. **No Partial Cancel**: Cannot cancel individual removals
+1. **No Partial Cancel**: Cannot cancel individual removals
    - Must cancel all or none
    - This maintains state consistency
 
-4. **No Undo During Batch**: Undo works after batch completes, not during
+2. **No Undo During Batch**: Undo works after batch completes, not during
    - This is consistent with existing undo behavior
    - Cancel serves the same purpose during batch
 
+3. **Intelligent Slot Assignment**: System automatically determines whether players go to starting XI or bench
+   - Based on available slots and player type (e.g., GKs intelligently placed)
+   - Users can swap players after batch completes if needed
+
 ## Future Enhancements (Out of Scope)
 
-- [ ] Allow flexible replacement order (not FIFO)
 - [ ] Show preview of batch transfers before completing
 - [ ] Support drag-and-drop for batch transfers
 - [ ] Add "Complete Batch" button (currently auto-completes)
 - [ ] Show transfer cost (hits for exceeding free transfers)
 - [ ] Batch transfer history/summary
+- [ ] Manual slot selection (let user choose starting/bench explicitly)
 
 ## Deployment Checklist
 
