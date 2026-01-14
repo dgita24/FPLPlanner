@@ -4,7 +4,7 @@ import { state, history, loadTeamEntry } from './data.js';
 import { setupSidebarHandlers, closeSidebar } from './ui-sidebar.js';
 import { showMessage, renderPitch, renderBench, ensureFixturesForView } from './ui-render.js';
 import { renderFixtures } from './fixtures.js';
-import { cancelTransfer, substitutePlayer, addSelectedToSquad, removePlayer, resetTransferState, isPendingTransfer, getBatchTransferInfo } from './team-operations.js';
+import { cancelTransfer, substitutePlayer, addSelectedToSquad, removePlayer, resetTransferState, isPendingTransfer, getBatchTransferInfo, reinstatePlayer } from './team-operations.js';
 import { setPendingSwap } from './ui-render.js';
 
 // Helper function for pluralization
@@ -300,6 +300,32 @@ export function initUI() {
         justify-content: center;
         border-radius: 8px;
         z-index: 5;
+        pointer-events: auto;
+      }
+
+      .reinstate-btn {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        background: rgba(0, 255, 135, 0.9);
+        border: none;
+        border-radius: 50%;
+        width: 32px;
+        height: 32px;
+        font-size: 20px;
+        font-weight: bold;
+        color: white;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+      }
+
+      .reinstate-btn:hover {
+        background: rgba(0, 255, 135, 1);
+        transform: scale(1.1);
       }
 
       .placeholder-text {
@@ -399,6 +425,7 @@ export function initUI() {
   // Expose nav + actions used by inline onclicks in index.html
   window.changeGW = changeGW;
   window.removePlayer = (playerId, source) => removePlayer(playerId, source, updateUI);
+  window.reinstatePlayer = (playerId) => reinstatePlayer(playerId, updateUI);
   window.substitutePlayer = (playerId) => substitutePlayer(playerId, updateUI);
   window.addSelectedToSquad = () => addSelectedToSquad(updateUI);
   window.cancelTransfer = () => cancelTransfer(updateUI);

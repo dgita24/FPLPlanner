@@ -740,6 +740,7 @@ max-width: none; /* allow grid to control width */
     <div id="batchTransferStatus" style="
       display: none;
       padding: 12px 20px;
+      margin-top: 15px;
       margin-bottom: 15px;
       background: rgba(255, 153, 0, 0.2);
       border: 2px solid #ff9800;
@@ -784,13 +785,13 @@ max-width: none; /* allow grid to control width */
               <th>Name</th>
               <th>Team</th>
               <th onclick="sortTable('pos')" style="cursor:pointer">
-                Pos
+                Pos <span id="sortPosIcon"></span>
               </th>
               <th onclick="sortTable('price')" style="cursor:pointer">
-                £
+                £ <span id="sortPriceIcon"></span>
               </th>
               <th onclick="sortTable('points')" style="cursor:pointer">
-                Pts
+                Pts <span id="sortPointsIcon"></span>
               </th>
               <th style="text-align:center;">Next 3</th>
             </tr>

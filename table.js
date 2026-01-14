@@ -210,6 +210,24 @@ window.sortTable = function (key) {
     tableSort.dir = 'asc';
   }
 
+  updateSortIcons();
   renderTable();
 };
+
+function updateSortIcons() {
+  // Clear all icons
+  const posIcon = document.getElementById('sortPosIcon');
+  const priceIcon = document.getElementById('sortPriceIcon');
+  const pointsIcon = document.getElementById('sortPointsIcon');
+
+  if (posIcon) posIcon.textContent = '';
+  if (priceIcon) priceIcon.textContent = '';
+  if (pointsIcon) pointsIcon.textContent = '';
+
+  // Set active icon
+  const arrow = tableSort.dir === 'asc' ? '▲' : '▼';
+  if (tableSort.key === 'pos' && posIcon) posIcon.textContent = arrow;
+  if (tableSort.key === 'price' && priceIcon) priceIcon.textContent = arrow;
+  if (tableSort.key === 'points' && pointsIcon) pointsIcon.textContent = arrow;
+}
 
