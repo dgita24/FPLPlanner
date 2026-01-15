@@ -137,8 +137,13 @@ export function renderTable() {
       if (tableSort.key === 'stat') {
         // Sort by the currently selected stat
         const selectedStat = getSelectedStat();
-        const aVal = a[selectedStat] != null ? parseFloat(a[selectedStat]) : 0;
-        const bVal = b[selectedStat] != null ? parseFloat(b[selectedStat]) : 0;
+        const parseStatValue = (val) => {
+          if (val == null) return 0;
+          const num = parseFloat(val);
+          return isNaN(num) ? 0 : num;
+        };
+        const aVal = parseStatValue(a[selectedStat]);
+        const bVal = parseStatValue(b[selectedStat]);
         return dir * (aVal - bVal);
       }
 
