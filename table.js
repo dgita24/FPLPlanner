@@ -9,6 +9,9 @@ let tableSort = {
 
 const posNames = { 1: 'GK', 2: 'DEF', 3: 'MID', 4: 'FWD' };
 
+// Stat column keys
+const STAT_KEYS = ['goals_scored', 'assists', 'clean_sheets', 'bonus', 'transfers_in_event', 'transfers_out_event', 'selected_by_percent'];
+
 // Selected players (changed from single to multi-select)
 window.selectedPlayerIds = window.selectedPlayerIds ?? [];
 
@@ -22,6 +25,26 @@ function formatStatValue(value, statKey) {
     return isNaN(numVal) ? '-' : numVal.toFixed(1) + '%';
   }
   return String(value);
+}
+
+// Cache sort icons for performance
+let sortIcons = null;
+function getSortIcons() {
+  if (!sortIcons) {
+    sortIcons = {
+      pos: document.getElementById('sortPosIcon'),
+      price: document.getElementById('sortPriceIcon'),
+      points: document.getElementById('sortPointsIcon'),
+      goals_scored: document.getElementById('sortGoalsIcon'),
+      assists: document.getElementById('sortAssistsIcon'),
+      clean_sheets: document.getElementById('sortCleanSheetsIcon'),
+      bonus: document.getElementById('sortBonusIcon'),
+      transfers_in_event: document.getElementById('sortTransfersInIcon'),
+      transfers_out_event: document.getElementById('sortTransfersOutIcon'),
+      selected_by_percent: document.getElementById('sortSelectedByIcon')
+    };
+  }
+  return sortIcons;
 }
 
 /* ------------------------- FIXTURES (TABLE) -------------------------- */
@@ -141,8 +164,7 @@ export function renderTable() {
       }
 
       // Handle all stat columns
-      const statKeys = ['goals_scored', 'assists', 'clean_sheets', 'bonus', 'transfers_in_event', 'transfers_out_event', 'selected_by_percent'];
-      if (statKeys.includes(tableSort.key)) {
+      if (STAT_KEYS.includes(tableSort.key)) {
         const parseStatValue = (val) => {
           if (val == null) return 0;
           const num = parseFloat(val);
@@ -259,19 +281,7 @@ window.sortTable = function (key) {
 };
 
 function updateSortIcons() {
-  // Clear all icons and show default state
-  const icons = {
-    pos: document.getElementById('sortPosIcon'),
-    price: document.getElementById('sortPriceIcon'),
-    points: document.getElementById('sortPointsIcon'),
-    goals_scored: document.getElementById('sortGoalsIcon'),
-    assists: document.getElementById('sortAssistsIcon'),
-    clean_sheets: document.getElementById('sortCleanSheetsIcon'),
-    bonus: document.getElementById('sortBonusIcon'),
-    transfers_in_event: document.getElementById('sortTransfersInIcon'),
-    transfers_out_event: document.getElementById('sortTransfersOutIcon'),
-    selected_by_percent: document.getElementById('sortSelectedByIcon')
-  };
+  const icons = getSortIcons();
 
   // Default: show neutral arrows for all sortable columns
   Object.values(icons).forEach(icon => {
