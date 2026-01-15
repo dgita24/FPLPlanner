@@ -132,8 +132,8 @@ export function renderTable() {
         // Sort by the currently selected stat
         const statSelector = document.getElementById('statSelector');
         const selectedStat = statSelector ? statSelector.value : 'goals_scored';
-        const aVal = parseFloat(a[selectedStat]) || 0;
-        const bVal = parseFloat(b[selectedStat]) || 0;
+        const aVal = a[selectedStat] != null ? parseFloat(a[selectedStat]) : 0;
+        const bVal = b[selectedStat] != null ? parseFloat(b[selectedStat]) : 0;
         return dir * (aVal - bVal);
       }
 
@@ -169,7 +169,8 @@ export function renderTable() {
       if (statValue === null || statValue === undefined) {
         statValue = '-';
       } else if (selectedStat === 'selected_by_percent') {
-        statValue = parseFloat(statValue).toFixed(1) + '%';
+        const numVal = parseFloat(statValue);
+        statValue = isNaN(numVal) ? '-' : numVal.toFixed(1) + '%';
       } else {
         statValue = String(statValue);
       }
