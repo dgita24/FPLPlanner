@@ -233,7 +233,7 @@ function playerCard(entry, source) {
   if (p.status && p.status !== 'a') {
     const isDoubtful = p.status === 'd';
     const bgColor = isDoubtful ? '#ffd700' : '#f44336'; // gold for doubtful, red for injured/suspended
-    const textColor = isDoubtful ? '#000' : '#fff'; // black text on yellow, white on red
+    const textColor = '#000'; // black text on both gold and red for consistency
     nameStyle = `background: ${bgColor}; color: ${textColor};`;
     nameTitle = p.news || (isDoubtful ? 'Doubtful' : 'Unavailable');
   }
