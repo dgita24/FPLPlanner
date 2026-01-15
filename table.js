@@ -3,7 +3,7 @@
 import { state, loadFixtures } from './data.js';
 
 let tableSort = {
-  key: null,      // 'price' | 'pos' | 'points' | 'goals_scored' | 'assists' | etc.
+  key: null,      // 'price' | 'points' | 'goals_scored' | 'assists' | 'clean_sheets' | 'bonus' | 'transfers_in_event' | 'transfers_out_event' | 'selected_by_percent'
   dir: 'asc'      // 'asc' | 'desc'
 };
 
