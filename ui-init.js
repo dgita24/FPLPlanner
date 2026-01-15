@@ -344,50 +344,11 @@ export function initUI() {
         text-shadow: 0 1px 2px rgba(0,0,0,0.5);
       }
 
-      /* Injury/suspension status flag */
-      .status-flag {
-        position: absolute;
-        top: 25px;
-        left: 30px;
-        width: 0;
-        height: 0;
-        border-left: 13.5px solid transparent;
-        border-right: 13.5px solid transparent;
-        border-bottom: 22.5px solid;
-        z-index: 10;
-      }
-      
-      .status-flag::after {
-        content: '!';
-        position: absolute;
-        top: 6px;
-        left: -3px;
-        font-size: 10px;
-        font-weight: 900;
-        color: #000;
-        line-height: 1;
-      }
-
-      /* Status flag in player table */
+      /* Status flag in player table - using emoji flags */
       .table-status-flag {
-        display: inline-block;
-        width: 0;
-        height: 0;
-        border-left: 7px solid transparent;
-        border-right: 7px solid transparent;
-        border-bottom: 12px solid;
-        position: relative;
+        font-size: 16px;
         cursor: help;
-      }
-      
-      .table-status-flag::after {
-        content: '!';
-        position: absolute;
-        top: 2px;
-        left: -3px;
-        font-size: 8px;
-        font-weight: 900;
-        color: #000;
+        display: inline-block;
         line-height: 1;
       }
 
