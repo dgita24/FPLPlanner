@@ -10,7 +10,7 @@ let tableSort = {
 const posNames = { 1: 'GK', 2: 'DEF', 3: 'MID', 4: 'FWD' };
 
 // Stat column keys
-const STAT_KEYS = ['goals_scored', 'assists', 'clean_sheets', 'bonus', 'transfers_in_event', 'transfers_out_event', 'selected_by_percent'];
+const STAT_KEYS = ['goals_scored', 'assists', 'clean_sheets', 'saves', 'bonus', 'transfers_in_event', 'transfers_out_event', 'selected_by_percent'];
 
 // Selected players (changed from single to multi-select)
 window.selectedPlayerIds = window.selectedPlayerIds ?? [];
@@ -37,6 +37,7 @@ function getSortIcons() {
       goals_scored: document.getElementById('sortGoalsIcon'),
       assists: document.getElementById('sortAssistsIcon'),
       clean_sheets: document.getElementById('sortCleanSheetsIcon'),
+      saves: document.getElementById('sortSavesIcon'),
       bonus: document.getElementById('sortBonusIcon'),
       transfers_in_event: document.getElementById('sortTransfersInIcon'),
       transfers_out_event: document.getElementById('sortTransfersOutIcon'),
@@ -204,6 +205,7 @@ export function renderTable() {
           <td class="stat-col-cell">${formatStatValue(player.goals_scored, 'goals_scored')}</td>
           <td class="stat-col-cell">${formatStatValue(player.assists, 'assists')}</td>
           <td class="stat-col-cell">${formatStatValue(player.clean_sheets, 'clean_sheets')}</td>
+          <td class="stat-col-cell">${formatStatValue(player.saves, 'saves')}</td>
           <td class="stat-col-cell">${formatStatValue(player.bonus, 'bonus')}</td>
           <td class="stat-col-cell">${formatStatValue(player.transfers_in_event, 'transfers_in_event')}</td>
           <td class="stat-col-cell">${formatStatValue(player.transfers_out_event, 'transfers_out_event')}</td>
