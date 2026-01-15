@@ -3,14 +3,48 @@
 import { state, loadFixtures } from './data.js';
 
 let tableSort = {
-  key: null,      // 'price' | 'pos'
+  key: null,      // 'price' | 'points' | 'goals_scored' | 'assists' | 'clean_sheets' | 'bonus' | 'transfers_in_event' | 'transfers_out_event' | 'selected_by_percent'
   dir: 'asc'      // 'asc' | 'desc'
 };
 
 const posNames = { 1: 'GK', 2: 'DEF', 3: 'MID', 4: 'FWD' };
 
+// Stat column keys
+const STAT_KEYS = ['goals_scored', 'assists', 'clean_sheets', 'bonus', 'transfers_in_event', 'transfers_out_event', 'selected_by_percent'];
+
 // Selected players (changed from single to multi-select)
 window.selectedPlayerIds = window.selectedPlayerIds ?? [];
+
+// Helper function to format stat values
+function formatStatValue(value, statKey) {
+  if (value === null || value === undefined) {
+    return '-';
+  }
+  if (statKey === 'selected_by_percent') {
+    const numVal = parseFloat(value);
+    return isNaN(numVal) ? '-' : numVal.toFixed(1) + '%';
+  }
+  return String(value);
+}
+
+// Cache sort icons for performance
+let sortIcons = null;
+function getSortIcons() {
+  if (!sortIcons) {
+    sortIcons = {
+      price: document.getElementById('sortPriceIcon'),
+      points: document.getElementById('sortPointsIcon'),
+      goals_scored: document.getElementById('sortGoalsIcon'),
+      assists: document.getElementById('sortAssistsIcon'),
+      clean_sheets: document.getElementById('sortCleanSheetsIcon'),
+      bonus: document.getElementById('sortBonusIcon'),
+      transfers_in_event: document.getElementById('sortTransfersInIcon'),
+      transfers_out_event: document.getElementById('sortTransfersOutIcon'),
+      selected_by_percent: document.getElementById('sortSelectedByIcon')
+    };
+  }
+  return sortIcons;
+}
 
 /* ------------------------- FIXTURES (TABLE) -------------------------- */
 // Cache fixtures per GW so typing in filters doesn't spam requests.
@@ -54,7 +88,7 @@ function formatOpponent(teamId, fixture) {
   return `${opp} (${isHome ? 'H' : 'A'})`;
 }
 
-function getNextFixturesForTeam(teamId, startGW, count = 3) {
+function getNextFixturesForTeam(teamId, startGW, count = 4) {
   const out = [];
   for (let i = 0; i < count; i++) {
     const gw = startGW + i;
@@ -72,7 +106,7 @@ function getNextFixturesForTeam(teamId, startGW, count = 3) {
 function ensureFixturesForTable() {
   const token = ++fixturesLoadToken;
   const start = state.viewingGW;
-  const needed = [start, start + 1, start + 2]; // Next 3
+  const needed = [start, start + 1, start + 2, start + 3]; // Next 4
   const missing = needed.filter((gw) => !fixturesByGW.has(gw));
   if (missing.length === 0) return;
 
@@ -119,15 +153,21 @@ export function renderTable() {
         return dir * ((a.now_cost / 10) - (b.now_cost / 10));
       }
 
-      if (tableSort.key === 'pos') {
-        // GK(1) → DEF(2) → MID(3) → FWD(4)
-        return dir * (a.element_type - b.element_type);
-      }
-
       if (tableSort.key === 'points') {
         return dir * (a.total_points - b.total_points);
       }
 
+      // Handle all stat columns
+      if (STAT_KEYS.includes(tableSort.key)) {
+        const parseStatValue = (val) => {
+          if (val == null) return 0;
+          const num = parseFloat(val);
+          return isNaN(num) ? 0 : num;
+        };
+        const aVal = parseStatValue(a[tableSort.key]);
+        const bVal = parseStatValue(b[tableSort.key]);
+        return dir * (aVal - bVal);
+      }
 
       return 0;
     });
@@ -140,8 +180,8 @@ export function renderTable() {
         state.teams.find((t) => t.id === player.team)?.short_name || '';
       const checked = window.selectedPlayerIds.includes(player.id) ? 'checked' : '';
 
-      const next3 = getNextFixturesForTeam(player.team, state.viewingGW, 3);
-      const next3Html = next3.map((x) => `<span class="fx">${x}</span>`).join(' ');
+      const next4 = getNextFixturesForTeam(player.team, state.viewingGW, 4);
+      const next4Html = next4.map((x) => `<span class="fx">${x}</span>`).join(' ');
 
       // Status flag for table - using flag emoji
       let statusFlagHtml = '';
@@ -155,13 +195,20 @@ export function renderTable() {
       return `
         <tr onclick="selectPlayer(event, ${player.id})" class="${checked ? 'selected' : ''}">
           <td><input type="checkbox" name="selectedPlayer" value="${player.id}" ${checked}></td>
-          <td style="text-align:center; width:30px; vertical-align:middle;">${statusFlagHtml}</td>
-          <td>${player.web_name}</td>
+          <td class="status-cell">${statusFlagHtml}</td>
+          <td class="name-cell">${player.web_name}</td>
           <td>${teamName}</td>
           <td>${posNames[player.element_type]}</td>
           <td>${(player.now_cost / 10).toFixed(1)}</td>
           <td>${player.total_points}</td>
-          <td style="text-align:center; white-space:nowrap;">${next3Html}</td>
+          <td class="stat-col-cell">${formatStatValue(player.goals_scored, 'goals_scored')}</td>
+          <td class="stat-col-cell">${formatStatValue(player.assists, 'assists')}</td>
+          <td class="stat-col-cell">${formatStatValue(player.clean_sheets, 'clean_sheets')}</td>
+          <td class="stat-col-cell">${formatStatValue(player.bonus, 'bonus')}</td>
+          <td class="stat-col-cell">${formatStatValue(player.transfers_in_event, 'transfers_in_event')}</td>
+          <td class="stat-col-cell">${formatStatValue(player.transfers_out_event, 'transfers_out_event')}</td>
+          <td class="stat-col-cell">${formatStatValue(player.selected_by_percent, 'selected_by_percent')}</td>
+          <td class="fixtures-cell">${next4Html}</td>
         </tr>
       `;
     })
@@ -228,22 +275,17 @@ window.sortTable = function (key) {
 };
 
 function updateSortIcons() {
-  // Clear all icons and show default state
-  const posIcon = document.getElementById('sortPosIcon');
-  const priceIcon = document.getElementById('sortPriceIcon');
-  const pointsIcon = document.getElementById('sortPointsIcon');
+  const icons = getSortIcons();
 
   // Default: show neutral arrows for all sortable columns
-  if (posIcon) posIcon.textContent = '⇅';
-  if (priceIcon) priceIcon.textContent = '⇅';
-  if (pointsIcon) pointsIcon.textContent = '⇅';
+  Object.values(icons).forEach(icon => {
+    if (icon) icon.textContent = '⇅';
+  });
 
   // Set active icon for sorted column
-  if (tableSort.key) {
+  if (tableSort.key && icons[tableSort.key]) {
     const arrow = tableSort.dir === 'asc' ? '▲' : '▼';
-    if (tableSort.key === 'pos' && posIcon) posIcon.textContent = arrow;
-    if (tableSort.key === 'price' && priceIcon) priceIcon.textContent = arrow;
-    if (tableSort.key === 'points' && pointsIcon) pointsIcon.textContent = arrow;
+    icons[tableSort.key].textContent = arrow;
   }
 }
 
