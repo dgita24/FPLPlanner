@@ -88,7 +88,7 @@ function formatOpponent(teamId, fixture) {
   return `${opp} (${isHome ? 'H' : 'A'})`;
 }
 
-function getNextFixturesForTeam(teamId, startGW, count = 3) {
+function getNextFixturesForTeam(teamId, startGW, count = 4) {
   const out = [];
   for (let i = 0; i < count; i++) {
     const gw = startGW + i;
@@ -106,7 +106,7 @@ function getNextFixturesForTeam(teamId, startGW, count = 3) {
 function ensureFixturesForTable() {
   const token = ++fixturesLoadToken;
   const start = state.viewingGW;
-  const needed = [start, start + 1, start + 2]; // Next 3
+  const needed = [start, start + 1, start + 2, start + 3]; // Next 4
   const missing = needed.filter((gw) => !fixturesByGW.has(gw));
   if (missing.length === 0) return;
 
@@ -180,8 +180,8 @@ export function renderTable() {
         state.teams.find((t) => t.id === player.team)?.short_name || '';
       const checked = window.selectedPlayerIds.includes(player.id) ? 'checked' : '';
 
-      const next3 = getNextFixturesForTeam(player.team, state.viewingGW, 3);
-      const next3Html = next3.map((x) => `<span class="fx">${x}</span>`).join(' ');
+      const next4 = getNextFixturesForTeam(player.team, state.viewingGW, 4);
+      const next4Html = next4.map((x) => `<span class="fx">${x}</span>`).join(' ');
 
       // Status flag for table - using flag emoji
       let statusFlagHtml = '';
@@ -196,7 +196,7 @@ export function renderTable() {
         <tr onclick="selectPlayer(event, ${player.id})" class="${checked ? 'selected' : ''}">
           <td><input type="checkbox" name="selectedPlayer" value="${player.id}" ${checked}></td>
           <td class="status-cell">${statusFlagHtml}</td>
-          <td>${player.web_name}</td>
+          <td class="name-cell">${player.web_name}</td>
           <td>${teamName}</td>
           <td>${posNames[player.element_type]}</td>
           <td>${(player.now_cost / 10).toFixed(1)}</td>
@@ -208,7 +208,7 @@ export function renderTable() {
           <td class="stat-col-cell">${formatStatValue(player.transfers_in_event, 'transfers_in_event')}</td>
           <td class="stat-col-cell">${formatStatValue(player.transfers_out_event, 'transfers_out_event')}</td>
           <td class="stat-col-cell">${formatStatValue(player.selected_by_percent, 'selected_by_percent')}</td>
-          <td class="fixtures-cell">${next3Html}</td>
+          <td class="fixtures-cell">${next4Html}</td>
         </tr>
       `;
     })
