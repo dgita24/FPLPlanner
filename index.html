@@ -790,18 +790,32 @@ max-width: none; /* allow grid to control width */
         <table id="pTable">
           <thead>
             <tr>
-              <th>Select</th>
+              <th style="width:45px;">Select</th>
               <th style="text-align:center; width:30px; vertical-align:middle;">Status</th>
-              <th>Name</th>
-              <th>Team</th>
-              <th onclick="sortTable('pos')" style="cursor:pointer">
+              <th style="width:140px;">Name</th>
+              <th style="width:50px;">Team</th>
+              <th onclick="sortTable('pos')" style="cursor:pointer; width:45px;">
                 Pos <span id="sortPosIcon"></span>
               </th>
-              <th onclick="sortTable('price')" style="cursor:pointer">
+              <th onclick="sortTable('price')" style="cursor:pointer; width:45px;">
                 £ <span id="sortPriceIcon"></span>
               </th>
-              <th onclick="sortTable('points')" style="cursor:pointer">
+              <th onclick="sortTable('points')" style="cursor:pointer; width:50px;">
                 Pts <span id="sortPointsIcon"></span>
+              </th>
+              <th onclick="sortTable('stat')" style="cursor:pointer; text-align:center; width:110px;">
+                <div style="display:flex; align-items:center; justify-content:space-between;">
+                  <select id="statSelector" onchange="renderTable()" onclick="event.stopPropagation()" style="flex:1; padding:4px; border-radius:3px; border:1px solid #ddd; background:#fff; font-size:11px; font-weight:600;">
+                    <option value="goals_scored">Goals</option>
+                    <option value="assists">Assists</option>
+                    <option value="clean_sheets">Clean Sheets</option>
+                    <option value="bonus">Bonus</option>
+                    <option value="transfers_in_event">Transfers In (GW)</option>
+                    <option value="transfers_out_event">Transfers Out (GW)</option>
+                    <option value="selected_by_percent">Selected By %</option>
+                  </select>
+                  <span id="sortStatIcon" style="margin-left:4px; font-size:10px;"></span>
+                </div>
               </th>
               <th style="text-align:center;">Next 3</th>
             </tr>

@@ -128,6 +128,14 @@ export function renderTable() {
         return dir * (a.total_points - b.total_points);
       }
 
+      if (tableSort.key === 'stat') {
+        // Sort by the currently selected stat
+        const statSelector = document.getElementById('statSelector');
+        const selectedStat = statSelector ? statSelector.value : 'goals_scored';
+        const aVal = parseFloat(a[selectedStat]) || 0;
+        const bVal = parseFloat(b[selectedStat]) || 0;
+        return dir * (aVal - bVal);
+      }
 
       return 0;
     });
@@ -152,6 +160,20 @@ export function renderTable() {
         statusFlagHtml = `<span class="table-status-flag" title="${flagTitle}">${flagEmoji}</span>`;
       }
 
+      // Get selected stat value
+      const statSelector = document.getElementById('statSelector');
+      const selectedStat = statSelector ? statSelector.value : 'goals_scored';
+      let statValue = player[selectedStat];
+      
+      // Format the stat value
+      if (statValue === null || statValue === undefined) {
+        statValue = '-';
+      } else if (selectedStat === 'selected_by_percent') {
+        statValue = parseFloat(statValue).toFixed(1) + '%';
+      } else {
+        statValue = String(statValue);
+      }
+
       return `
         <tr onclick="selectPlayer(event, ${player.id})" class="${checked ? 'selected' : ''}">
           <td><input type="checkbox" name="selectedPlayer" value="${player.id}" ${checked}></td>
@@ -161,6 +183,7 @@ export function renderTable() {
           <td>${posNames[player.element_type]}</td>
           <td>${(player.now_cost / 10).toFixed(1)}</td>
           <td>${player.total_points}</td>
+          <td style="text-align:center;">${statValue}</td>
           <td style="text-align:center; white-space:nowrap;">${next3Html}</td>
         </tr>
       `;
@@ -232,11 +255,13 @@ function updateSortIcons() {
   const posIcon = document.getElementById('sortPosIcon');
   const priceIcon = document.getElementById('sortPriceIcon');
   const pointsIcon = document.getElementById('sortPointsIcon');
+  const statIcon = document.getElementById('sortStatIcon');
 
   // Default: show neutral arrows for all sortable columns
   if (posIcon) posIcon.textContent = '⇅';
   if (priceIcon) priceIcon.textContent = '⇅';
   if (pointsIcon) pointsIcon.textContent = '⇅';
+  if (statIcon) statIcon.textContent = '⇅';
 
   // Set active icon for sorted column
   if (tableSort.key) {
@@ -244,6 +269,7 @@ function updateSortIcons() {
     if (tableSort.key === 'pos' && posIcon) posIcon.textContent = arrow;
     if (tableSort.key === 'price' && priceIcon) priceIcon.textContent = arrow;
     if (tableSort.key === 'points' && pointsIcon) pointsIcon.textContent = arrow;
+    if (tableSort.key === 'stat' && statIcon) statIcon.textContent = arrow;
   }
 }
 
