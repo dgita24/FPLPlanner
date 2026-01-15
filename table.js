@@ -178,14 +178,14 @@ export function renderTable() {
       return `
         <tr onclick="selectPlayer(event, ${player.id})" class="${checked ? 'selected' : ''}">
           <td><input type="checkbox" name="selectedPlayer" value="${player.id}" ${checked}></td>
-          <td style="text-align:center; width:30px; vertical-align:middle;">${statusFlagHtml}</td>
+          <td class="status-cell">${statusFlagHtml}</td>
           <td>${player.web_name}</td>
           <td>${teamName}</td>
           <td>${posNames[player.element_type]}</td>
           <td>${(player.now_cost / 10).toFixed(1)}</td>
           <td>${player.total_points}</td>
-          <td style="text-align:center;">${statValue}</td>
-          <td style="text-align:center; white-space:nowrap;">${next3Html}</td>
+          <td class="stat-value-cell">${statValue}</td>
+          <td class="fixtures-cell">${next3Html}</td>
         </tr>
       `;
     })

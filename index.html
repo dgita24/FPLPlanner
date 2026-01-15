@@ -670,6 +670,69 @@ font-size: 11px;
 font-weight: 600;
 }
 
+td.status-cell {
+text-align: center;
+width: 30px;
+vertical-align: middle;
+}
+
+td.stat-value-cell {
+text-align: center;
+}
+
+td.fixtures-cell {
+text-align: center;
+white-space: nowrap;
+}
+
+th.th-select {
+width: 45px;
+}
+
+th.th-status {
+text-align: center;
+width: 30px;
+vertical-align: middle;
+}
+
+th.th-name {
+width: 140px;
+}
+
+th.th-team {
+width: 50px;
+}
+
+th.th-sortable {
+cursor: pointer;
+}
+
+th.th-pos {
+width: 45px;
+}
+
+th.th-price {
+width: 45px;
+}
+
+th.th-points {
+width: 50px;
+}
+
+th.th-stat {
+text-align: center;
+width: 110px;
+}
+
+th.th-fixtures {
+text-align: center;
+}
+
+.sort-icon {
+margin-left: 4px;
+font-size: 10px;
+}
+
 </style>
 </head>
 
@@ -806,20 +869,20 @@ font-weight: 600;
         <table id="pTable">
           <thead>
             <tr>
-              <th style="width:45px;">Select</th>
-              <th style="text-align:center; width:30px; vertical-align:middle;">Status</th>
-              <th style="width:140px;">Name</th>
-              <th style="width:50px;">Team</th>
-              <th onclick="sortTable('pos')" style="cursor:pointer; width:45px;">
+              <th class="th-select">Select</th>
+              <th class="th-status">Status</th>
+              <th class="th-name">Name</th>
+              <th class="th-team">Team</th>
+              <th onclick="sortTable('pos')" class="th-sortable th-pos">
                 Pos <span id="sortPosIcon"></span>
               </th>
-              <th onclick="sortTable('price')" style="cursor:pointer; width:45px;">
+              <th onclick="sortTable('price')" class="th-sortable th-price">
                 £ <span id="sortPriceIcon"></span>
               </th>
-              <th onclick="sortTable('points')" style="cursor:pointer; width:50px;">
+              <th onclick="sortTable('points')" class="th-sortable th-points">
                 Pts <span id="sortPointsIcon"></span>
               </th>
-              <th onclick="sortTable('stat')" style="cursor:pointer; text-align:center; width:110px;">
+              <th onclick="sortTable('stat')" class="th-sortable th-stat">
                 <div class="stat-selector-wrapper">
                   <select id="statSelector" class="stat-selector" onchange="renderTable()" onclick="event.stopPropagation()">
                     <option value="goals_scored">Goals</option>
@@ -830,10 +893,10 @@ font-weight: 600;
                     <option value="transfers_out_event">Transfers Out (GW)</option>
                     <option value="selected_by_percent">Selected By %</option>
                   </select>
-                  <span id="sortStatIcon" style="margin-left:4px; font-size:10px;"></span>
+                  <span id="sortStatIcon" class="sort-icon"></span>
                 </div>
               </th>
-              <th style="text-align:center;">Next 3</th>
+              <th class="th-fixtures">Next 3</th>
             </tr>
           </thead>
           <tbody id="tableBody"></tbody>
