@@ -32,7 +32,6 @@ let sortIcons = null;
 function getSortIcons() {
   if (!sortIcons) {
     sortIcons = {
-      pos: document.getElementById('sortPosIcon'),
       price: document.getElementById('sortPriceIcon'),
       points: document.getElementById('sortPointsIcon'),
       goals_scored: document.getElementById('sortGoalsIcon'),
@@ -152,11 +151,6 @@ export function renderTable() {
     filtered = filtered.slice().sort((a, b) => {
       if (tableSort.key === 'price') {
         return dir * ((a.now_cost / 10) - (b.now_cost / 10));
-      }
-
-      if (tableSort.key === 'pos') {
-        // GK(1) → DEF(2) → MID(3) → FWD(4)
-        return dir * (a.element_type - b.element_type);
       }
 
       if (tableSort.key === 'points') {

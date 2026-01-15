@@ -391,6 +391,7 @@ border-radius: 4px;
 border: none;
 flex: 1;
 min-width: 150px;
+text-align: center;
 }
 
 .player-table {
@@ -415,6 +416,11 @@ padding: 10px;
 text-align: left;
 position: sticky;
 top: 0;
+border-right: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+th:last-child {
+border-right: none;
 }
 
 th[style*="text-align:center"] {
@@ -424,6 +430,11 @@ padding: 10px 0;
 td {
 padding: 8px 10px;
 border-bottom: 1px solid #eee;
+border-right: 1px solid #ddd;
+}
+
+td:last-child {
+border-right: none;
 }
 
 td[style*="text-align:center"][style*="width:30px"] {
@@ -656,8 +667,9 @@ max-width: none; /* allow grid to control width */
 
 td.status-cell {
 text-align: center;
-width: 30px;
+width: 40px;
 vertical-align: middle;
+padding: 8px 0;
 }
 
 td.stat-value-cell {
@@ -870,8 +882,8 @@ font-size: 9px;
               <th class="th-status">Status</th>
               <th class="th-name">Name</th>
               <th class="th-team">Team</th>
-              <th onclick="sortTable('pos')" class="th-sortable th-pos">
-                Pos <span id="sortPosIcon"></span>
+              <th class="th-pos">
+                Pos
               </th>
               <th onclick="sortTable('price')" class="th-sortable th-price">
                 £ <span id="sortPriceIcon"></span>
