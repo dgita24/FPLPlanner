@@ -654,22 +654,6 @@ margin: 0;       /* cancel auto-centering */
 max-width: none; /* allow grid to control width */
 }
 
-.stat-selector-wrapper {
-display: flex;
-align-items: center;
-justify-content: space-between;
-}
-
-.stat-selector {
-flex: 1;
-padding: 4px;
-border-radius: 3px;
-border: 1px solid #ddd;
-background: #fff;
-font-size: 11px;
-font-weight: 600;
-}
-
 td.status-cell {
 text-align: center;
 width: 30px;
@@ -719,18 +703,30 @@ th.th-points {
 width: 50px;
 }
 
-th.th-stat {
+th.th-stat-col {
+width: 40px;
+font-size: 11px;
 text-align: center;
-width: 110px;
+padding: 8px 4px;
 }
 
 th.th-fixtures {
 text-align: center;
 }
 
+td.stat-col-cell {
+text-align: center;
+font-size: 12px;
+padding: 6px 4px;
+}
+
+td.fixtures-cell {
+font-size: 11px;
+}
+
 .sort-icon {
-margin-left: 4px;
-font-size: 10px;
+margin-left: 2px;
+font-size: 9px;
 }
 
 </style>
@@ -882,19 +878,26 @@ font-size: 10px;
               <th onclick="sortTable('points')" class="th-sortable th-points">
                 Pts <span id="sortPointsIcon"></span>
               </th>
-              <th onclick="sortTable('stat')" class="th-sortable th-stat">
-                <div class="stat-selector-wrapper">
-                  <select id="statSelector" class="stat-selector" onchange="renderTable()" onclick="event.stopPropagation()">
-                    <option value="goals_scored">Goals</option>
-                    <option value="assists">Assists</option>
-                    <option value="clean_sheets">Clean Sheets</option>
-                    <option value="bonus">Bonus</option>
-                    <option value="transfers_in_event">Transfers In (GW)</option>
-                    <option value="transfers_out_event">Transfers Out (GW)</option>
-                    <option value="selected_by_percent">Selected By %</option>
-                  </select>
-                  <span id="sortStatIcon" class="sort-icon"></span>
-                </div>
+              <th onclick="sortTable('goals_scored')" class="th-sortable th-stat-col">
+                G <span id="sortGoalsIcon"></span>
+              </th>
+              <th onclick="sortTable('assists')" class="th-sortable th-stat-col">
+                A <span id="sortAssistsIcon"></span>
+              </th>
+              <th onclick="sortTable('clean_sheets')" class="th-sortable th-stat-col">
+                CS <span id="sortCleanSheetsIcon"></span>
+              </th>
+              <th onclick="sortTable('bonus')" class="th-sortable th-stat-col">
+                Bns <span id="sortBonusIcon"></span>
+              </th>
+              <th onclick="sortTable('transfers_in_event')" class="th-sortable th-stat-col">
+                TI <span id="sortTransfersInIcon"></span>
+              </th>
+              <th onclick="sortTable('transfers_out_event')" class="th-sortable th-stat-col">
+                TO <span id="sortTransfersOutIcon"></span>
+              </th>
+              <th onclick="sortTable('selected_by_percent')" class="th-sortable th-stat-col">
+                TSB% <span id="sortSelectedByIcon"></span>
               </th>
               <th class="th-fixtures">Next 3</th>
             </tr>

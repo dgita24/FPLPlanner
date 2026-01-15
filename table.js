@@ -3,7 +3,7 @@
 import { state, loadFixtures } from './data.js';
 
 let tableSort = {
-  key: null,      // 'price' | 'pos'
+  key: null,      // 'price' | 'pos' | 'points' | 'goals_scored' | 'assists' | etc.
   dir: 'asc'      // 'asc' | 'desc'
 };
 
@@ -12,10 +12,16 @@ const posNames = { 1: 'GK', 2: 'DEF', 3: 'MID', 4: 'FWD' };
 // Selected players (changed from single to multi-select)
 window.selectedPlayerIds = window.selectedPlayerIds ?? [];
 
-// Helper function to get the currently selected stat from the dropdown
-function getSelectedStat() {
-  const statSelector = document.getElementById('statSelector');
-  return statSelector?.value || 'goals_scored';
+// Helper function to format stat values
+function formatStatValue(value, statKey) {
+  if (value === null || value === undefined) {
+    return '-';
+  }
+  if (statKey === 'selected_by_percent') {
+    const numVal = parseFloat(value);
+    return isNaN(numVal) ? '-' : numVal.toFixed(1) + '%';
+  }
+  return String(value);
 }
 
 /* ------------------------- FIXTURES (TABLE) -------------------------- */
@@ -134,16 +140,16 @@ export function renderTable() {
         return dir * (a.total_points - b.total_points);
       }
 
-      if (tableSort.key === 'stat') {
-        // Sort by the currently selected stat
-        const selectedStat = getSelectedStat();
+      // Handle all stat columns
+      const statKeys = ['goals_scored', 'assists', 'clean_sheets', 'bonus', 'transfers_in_event', 'transfers_out_event', 'selected_by_percent'];
+      if (statKeys.includes(tableSort.key)) {
         const parseStatValue = (val) => {
           if (val == null) return 0;
           const num = parseFloat(val);
           return isNaN(num) ? 0 : num;
         };
-        const aVal = parseStatValue(a[selectedStat]);
-        const bVal = parseStatValue(b[selectedStat]);
+        const aVal = parseStatValue(a[tableSort.key]);
+        const bVal = parseStatValue(b[tableSort.key]);
         return dir * (aVal - bVal);
       }
 
@@ -170,20 +176,6 @@ export function renderTable() {
         statusFlagHtml = `<span class="table-status-flag" title="${flagTitle}">${flagEmoji}</span>`;
       }
 
-      // Get selected stat value
-      const selectedStat = getSelectedStat();
-      let statValue = player[selectedStat];
-      
-      // Format the stat value
-      if (statValue === null || statValue === undefined) {
-        statValue = '-';
-      } else if (selectedStat === 'selected_by_percent') {
-        const numVal = parseFloat(statValue);
-        statValue = isNaN(numVal) ? '-' : numVal.toFixed(1) + '%';
-      } else {
-        statValue = String(statValue);
-      }
-
       return `
         <tr onclick="selectPlayer(event, ${player.id})" class="${checked ? 'selected' : ''}">
           <td><input type="checkbox" name="selectedPlayer" value="${player.id}" ${checked}></td>
@@ -193,7 +185,13 @@ export function renderTable() {
           <td>${posNames[player.element_type]}</td>
           <td>${(player.now_cost / 10).toFixed(1)}</td>
           <td>${player.total_points}</td>
-          <td class="stat-value-cell">${statValue}</td>
+          <td class="stat-col-cell">${formatStatValue(player.goals_scored, 'goals_scored')}</td>
+          <td class="stat-col-cell">${formatStatValue(player.assists, 'assists')}</td>
+          <td class="stat-col-cell">${formatStatValue(player.clean_sheets, 'clean_sheets')}</td>
+          <td class="stat-col-cell">${formatStatValue(player.bonus, 'bonus')}</td>
+          <td class="stat-col-cell">${formatStatValue(player.transfers_in_event, 'transfers_in_event')}</td>
+          <td class="stat-col-cell">${formatStatValue(player.transfers_out_event, 'transfers_out_event')}</td>
+          <td class="stat-col-cell">${formatStatValue(player.selected_by_percent, 'selected_by_percent')}</td>
           <td class="fixtures-cell">${next3Html}</td>
         </tr>
       `;
@@ -262,24 +260,28 @@ window.sortTable = function (key) {
 
 function updateSortIcons() {
   // Clear all icons and show default state
-  const posIcon = document.getElementById('sortPosIcon');
-  const priceIcon = document.getElementById('sortPriceIcon');
-  const pointsIcon = document.getElementById('sortPointsIcon');
-  const statIcon = document.getElementById('sortStatIcon');
+  const icons = {
+    pos: document.getElementById('sortPosIcon'),
+    price: document.getElementById('sortPriceIcon'),
+    points: document.getElementById('sortPointsIcon'),
+    goals_scored: document.getElementById('sortGoalsIcon'),
+    assists: document.getElementById('sortAssistsIcon'),
+    clean_sheets: document.getElementById('sortCleanSheetsIcon'),
+    bonus: document.getElementById('sortBonusIcon'),
+    transfers_in_event: document.getElementById('sortTransfersInIcon'),
+    transfers_out_event: document.getElementById('sortTransfersOutIcon'),
+    selected_by_percent: document.getElementById('sortSelectedByIcon')
+  };
 
   // Default: show neutral arrows for all sortable columns
-  if (posIcon) posIcon.textContent = '⇅';
-  if (priceIcon) priceIcon.textContent = '⇅';
-  if (pointsIcon) pointsIcon.textContent = '⇅';
-  if (statIcon) statIcon.textContent = '⇅';
+  Object.values(icons).forEach(icon => {
+    if (icon) icon.textContent = '⇅';
+  });
 
   // Set active icon for sorted column
-  if (tableSort.key) {
+  if (tableSort.key && icons[tableSort.key]) {
     const arrow = tableSort.dir === 'asc' ? '▲' : '▼';
-    if (tableSort.key === 'pos' && posIcon) posIcon.textContent = arrow;
-    if (tableSort.key === 'price' && priceIcon) priceIcon.textContent = arrow;
-    if (tableSort.key === 'points' && pointsIcon) pointsIcon.textContent = arrow;
-    if (tableSort.key === 'stat' && statIcon) statIcon.textContent = arrow;
+    icons[tableSort.key].textContent = arrow;
   }
 }
 
