@@ -225,15 +225,17 @@ function playerCard(entry, source) {
   const cardClass = `player-card${armed ? ' pending-swap' : ''}`;
   const swapTitle = armed ? 'Cancel swap' : 'Swap';
 
-  // Injury/suspension flag
+  // Injury/suspension status - change name band color instead of showing triangle
   // status: 'a' = available, 'd' = doubtful (yellow), 'i' = injured (red), 's' = suspended (red), 'u' = unavailable (red)
   // news: contains injury details text
-  let statusFlag = '';
+  let nameStyle = '';
+  let nameTitle = '';
   if (p.status && p.status !== 'a') {
     const isDoubtful = p.status === 'd';
-    const flagColor = isDoubtful ? '#ffeb3b' : '#f44336'; // bright yellow for doubtful, bright red for injured/suspended
-    const flagTitle = p.news || (isDoubtful ? 'Doubtful' : 'Unavailable');
-    statusFlag = `<div class="status-flag" style="border-bottom-color: ${flagColor};" title="${flagTitle}"></div>`;
+    const bgColor = isDoubtful ? '#ffd700' : '#f44336'; // gold for doubtful, red for injured/suspended
+    const textColor = '#000'; // black text on both gold and red for consistency
+    nameStyle = `background: ${bgColor}; color: ${textColor};`;
+    nameTitle = p.news || (isDoubtful ? 'Doubtful' : 'Unavailable');
   }
 
   return `
@@ -241,11 +243,10 @@ function playerCard(entry, source) {
       <button class="card-btn btn-remove" onclick="${removeFn}" title="Transfer out">×</button>
       <button class="card-btn btn-swap" onclick="${subFn}" title="${swapTitle}">⇅</button>
 
-      ${statusFlag}
       <img src="https://resources.premierleague.com/premierleague/badges/70/t${teamCode}.png"
            class="badge" alt="${teamShort}">
 
-      <div class="name">${p.web_name}</div>
+      <div class="name" style="${nameStyle}" title="${nameTitle}">${p.web_name}</div>
 
       <div class="info">
         <span class="team">${teamShort}</span>
