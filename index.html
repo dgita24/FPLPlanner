@@ -290,7 +290,7 @@ display: block;
 
 .player-card .name {
 font-size: 12px;
-font-weight: 800;
+font-weight: 700;
 color: #000;
 white-space: nowrap;
 overflow: hidden;
@@ -300,6 +300,7 @@ padding: 2px 4px;
 border-radius: 3px;
 margin: 2px 0;
 text-align: center;
+letter-spacing: 0.2px;
 }
 
 .player-card .info {
@@ -416,9 +417,17 @@ position: sticky;
 top: 0;
 }
 
+th[style*="text-align:center"] {
+padding: 10px 0;
+}
+
 td {
 padding: 8px 10px;
 border-bottom: 1px solid #eee;
+}
+
+td[style*="text-align:center"][style*="width:30px"] {
+padding: 8px 0;
 }
 
 tr:hover {
