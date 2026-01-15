@@ -12,6 +12,12 @@ const posNames = { 1: 'GK', 2: 'DEF', 3: 'MID', 4: 'FWD' };
 // Selected players (changed from single to multi-select)
 window.selectedPlayerIds = window.selectedPlayerIds ?? [];
 
+// Helper function to get the currently selected stat from the dropdown
+function getSelectedStat() {
+  const statSelector = document.getElementById('statSelector');
+  return statSelector?.value || 'goals_scored';
+}
+
 /* ------------------------- FIXTURES (TABLE) -------------------------- */
 // Cache fixtures per GW so typing in filters doesn't spam requests.
 const fixturesByGW = new Map(); // gw -> fixtures[]
@@ -130,8 +136,7 @@ export function renderTable() {
 
       if (tableSort.key === 'stat') {
         // Sort by the currently selected stat
-        const statSelector = document.getElementById('statSelector');
-        const selectedStat = statSelector ? statSelector.value : 'goals_scored';
+        const selectedStat = getSelectedStat();
         const aVal = a[selectedStat] != null ? parseFloat(a[selectedStat]) : 0;
         const bVal = b[selectedStat] != null ? parseFloat(b[selectedStat]) : 0;
         return dir * (aVal - bVal);
@@ -161,8 +166,7 @@ export function renderTable() {
       }
 
       // Get selected stat value
-      const statSelector = document.getElementById('statSelector');
-      const selectedStat = statSelector ? statSelector.value : 'goals_scored';
+      const selectedStat = getSelectedStat();
       let statValue = player[selectedStat];
       
       // Format the stat value
