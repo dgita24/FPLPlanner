@@ -155,7 +155,7 @@ export function renderTable() {
       return `
         <tr onclick="selectPlayer(event, ${player.id})" class="${checked ? 'selected' : ''}">
           <td><input type="checkbox" name="selectedPlayer" value="${player.id}" ${checked}></td>
-          <td style="text-align:center;">${statusFlagHtml}</td>
+          <td style="text-align:center; width:30px; vertical-align:middle;">${statusFlagHtml}</td>
           <td>${player.web_name}</td>
           <td>${teamName}</td>
           <td>${posNames[player.element_type]}</td>
