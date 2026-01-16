@@ -352,6 +352,85 @@ background: #4444ff;
 font-size: 11px;
 }
 
+/* ===== Waving Status Flags ===== */
+
+.badge-container {
+position: relative;
+width: 40px;
+height: 40px;
+margin: 0 auto 3px;
+display: flex;
+align-items: center;
+justify-content: center;
+}
+
+.badge-container .badge {
+width: 40px;
+height: 40px;
+object-fit: contain;
+display: block;
+margin: 0;
+}
+
+.status-flag {
+position: absolute;
+width: 0;
+height: 0;
+border-style: solid;
+transform-origin: left center;
+animation: wave 2s ease-in-out infinite;
+}
+
+.status-flag.left {
+left: -8px;
+top: 50%;
+transform: translateY(-50%);
+border-width: 5px 0 5px 10px;
+}
+
+.status-flag.right {
+right: -8px;
+top: 50%;
+transform: translateY(-50%) scaleX(-1);
+border-width: 5px 0 5px 10px;
+}
+
+.status-flag.red {
+border-color: transparent transparent transparent #f44336;
+}
+
+.status-flag.yellow {
+border-color: transparent transparent transparent #ffd700;
+}
+
+@keyframes wave {
+0%, 100% {
+transform: translateY(-50%) rotate(0deg);
+}
+25% {
+transform: translateY(-50%) rotate(-5deg);
+}
+75% {
+transform: translateY(-50%) rotate(5deg);
+}
+}
+
+.status-flag.right {
+animation: wave-right 2s ease-in-out infinite;
+}
+
+@keyframes wave-right {
+0%, 100% {
+transform: translateY(-50%) scaleX(-1) rotate(0deg);
+}
+25% {
+transform: translateY(-50%) scaleX(-1) rotate(-5deg);
+}
+75% {
+transform: translateY(-50%) scaleX(-1) rotate(5deg);
+}
+}
+
 .bench {
 background: rgba(0, 0, 0, 0.2);
 padding: 15px;
@@ -981,6 +1060,26 @@ body {
   height: 32px;
 }
 
+.badge-container {
+  width: 32px;
+  height: 32px;
+}
+
+.badge-container .badge {
+  width: 32px;
+  height: 32px;
+}
+
+.status-flag.left {
+  left: -6px;
+  border-width: 4px 0 4px 8px;
+}
+
+.status-flag.right {
+  right: -6px;
+  border-width: 4px 0 4px 8px;
+}
+
 .player-card .name {
   font-size: 10px;
 }
@@ -1070,6 +1169,26 @@ th, td {
 .player-card .badge {
   width: 28px;
   height: 28px;
+}
+
+.badge-container {
+  width: 28px;
+  height: 28px;
+}
+
+.badge-container .badge {
+  width: 28px;
+  height: 28px;
+}
+
+.status-flag.left {
+  left: -5px;
+  border-width: 3px 0 3px 6px;
+}
+
+.status-flag.right {
+  right: -5px;
+  border-width: 3px 0 3px 6px;
 }
 
 .player-card .name {
