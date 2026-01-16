@@ -281,10 +281,11 @@ function setCaptain(playerId) {
     return;
   }
 
-  // If this player is currently vice-captain, swap roles
-  if (team.viceCaptain === playerId) {
-    team.viceCaptain = team.captain;
+  // If this player is currently vice-captain, swap roles (only if captain exists)
+  if (team.viceCaptain === playerId && team.captain !== null && team.captain !== playerId) {
+    const oldCaptain = team.captain;
     team.captain = playerId;
+    team.viceCaptain = oldCaptain;
     showMessage('Captain and Vice-Captain swapped.', 'success');
   } else {
     team.captain = playerId;
@@ -305,10 +306,11 @@ function setViceCaptain(playerId) {
     return;
   }
 
-  // If this player is currently captain, swap roles
-  if (team.captain === playerId) {
-    team.captain = team.viceCaptain;
+  // If this player is currently captain, swap roles (only if vice-captain exists)
+  if (team.captain === playerId && team.viceCaptain !== null && team.viceCaptain !== playerId) {
+    const oldViceCaptain = team.viceCaptain;
     team.viceCaptain = playerId;
+    team.captain = oldViceCaptain;
     showMessage('Captain and Vice-Captain swapped.', 'success');
   } else {
     team.viceCaptain = playerId;
