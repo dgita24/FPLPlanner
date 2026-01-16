@@ -486,6 +486,48 @@ export function initUI() {
         border-color: #e65100;
       }
 
+      /* Chip buttons row - container for multiple chip buttons */
+      .chip-buttons-row {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+
+      /* Smaller chip buttons for multiple chips */
+      .chip-btn-small {
+        padding: 6px 10px;
+        background: #00ff87;
+        color: #37003c;
+        border: 2px solid #00ff87;
+        border-radius: 5px;
+        font-weight: bold;
+        font-size: 11px;
+        cursor: pointer;
+        transition: all 0.2s;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        white-space: nowrap;
+        min-width: 80px;
+        text-align: center;
+      }
+
+      .chip-btn-small:hover {
+        background: #00e676;
+        border-color: #00e676;
+        transform: translateY(-1px);
+        box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+      }
+
+      .chip-btn-small.chip-btn-active {
+        background: #ff9800;
+        border-color: #f57c00;
+        color: white;
+      }
+
+      .chip-btn-small.chip-btn-active:hover {
+        background: #f57c00;
+        border-color: #e65100;
+      }
+
       /* Mobile adjustments for chip UI */
       @media (max-width: 768px) {
         .chip-container {
@@ -505,6 +547,16 @@ export function initUI() {
         .chip-btn {
           padding: 8px 12px;
           font-size: 12px;
+        }
+
+        .chip-btn-small {
+          padding: 5px 8px;
+          font-size: 10px;
+          min-width: 70px;
+        }
+
+        .chip-buttons-row {
+          gap: 3px;
         }
       }
     `;

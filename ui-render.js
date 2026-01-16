@@ -139,17 +139,28 @@ function renderChipUI() {
     </div>
   ` : '';
 
-  // Chip button - always shown in top-right
-  const isWildcardActive = currentChip === 'wildcard';
-  const buttonClass = isWildcardActive ? 'chip-btn chip-btn-active' : 'chip-btn';
-  const buttonText = isWildcardActive ? '✓ Wildcard' : 'Play Wildcard';
+  // Define all chip types with their labels
+  const chips = [
+    { type: 'wildcard', label: 'Play WC', title: 'Select Wildcard chip for this gameweek' },
+    { type: 'freehit', label: 'Play FH', title: 'Select Free Hit chip for this gameweek' },
+    { type: 'bboost', label: 'Play BB', title: 'Select Bench Boost chip for this gameweek' },
+    { type: '3xc', label: 'Play TC', title: 'Select Triple Captain chip for this gameweek' }
+  ];
+
+  // Render all chip buttons
+  const chipButtons = chips.map(chip => {
+    const isActive = currentChip === chip.type;
+    const buttonClass = isActive ? 'chip-btn-small chip-btn-active' : 'chip-btn-small';
+    const buttonText = isActive ? `✓ ${chip.label.replace('Play ', '')}` : chip.label;
+    return `<button class="${buttonClass}" onclick="selectChip('${chip.type}')" title="${chip.title}">${buttonText}</button>`;
+  }).join('');
 
   return `
     <div class="chip-container">
       ${chipIndicator}
-      <button class="${buttonClass}" onclick="selectChip('wildcard')" title="Select Wildcard chip for this gameweek">
-        ${buttonText}
-      </button>
+      <div class="chip-buttons-row">
+        ${chipButtons}
+      </div>
     </div>
   `;
 }
