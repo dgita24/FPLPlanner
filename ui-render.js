@@ -154,7 +154,7 @@ function renderChipUI() {
   `;
 }
 
-function getChipDisplayName(chipType) {
+export function getChipDisplayName(chipType) {
   const chipNames = {
     'wildcard': 'Wildcard',
     'bboost': 'Bench Boost',

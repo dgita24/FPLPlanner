@@ -2,7 +2,7 @@
 
 import { state, history, calculateSellingPrice } from './data.js';
 import { validateStartingXI, validateClubLimit, getOverLimitClubs, getElementType, getPlayerTeamId, validateSquadComposition } from './validation.js';
-import { displayPrice, showMessage, renderPitch, renderBench, setPendingSwap, getPendingSwap } from './ui-render.js';
+import { displayPrice, showMessage, renderPitch, renderBench, setPendingSwap, getPendingSwap, getChipDisplayName } from './ui-render.js';
 
 // Track batch transfers: multiple players can be removed before adding replacements
 let batchTransfers = {
@@ -610,16 +610,6 @@ export function selectChip(chipType, updateUI) {
   }
   
   updateUI();
-}
-
-function getChipDisplayName(chipType) {
-  const chipNames = {
-    'wildcard': 'Wildcard',
-    'bboost': 'Bench Boost',
-    '3xc': 'Triple Captain',
-    'freehit': 'Free Hit'
-  };
-  return chipNames[chipType] || chipType;
 }
 
 export function getActiveChip(gw) {

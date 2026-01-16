@@ -253,10 +253,6 @@ export async function loadTeamEntry(managerId, gwRequested) {
         }
         state.plan[g].starting = deepCopy(starting);
         state.plan[g].bench = deepCopy(bench);
-        // Preserve chip selection if it exists
-        if (!state.plan[g].chip) {
-          state.plan[g].chip = null;
-        }
       }
 
       // Always show current GW in the UI after import
