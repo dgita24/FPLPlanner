@@ -377,7 +377,6 @@ position: absolute;
 width: 0;
 height: 0;
 border-style: solid;
-transform-origin: left center;
 }
 
 .status-flag.left {
@@ -385,6 +384,7 @@ left: -8px;
 top: 50%;
 transform: translateY(-50%);
 border-width: 5px 0 5px 10px;
+transform-origin: left center;
 animation: wave 2s ease-in-out infinite;
 }
 
@@ -393,6 +393,7 @@ right: -8px;
 top: 50%;
 transform: translateY(-50%) scaleX(-1);
 border-width: 5px 0 5px 10px;
+transform-origin: right center;
 animation: wave-right 2s ease-in-out infinite;
 }
 
@@ -1052,11 +1053,6 @@ body {
   width: 68px;
 }
 
-.player-card .badge {
-  width: 32px;
-  height: 32px;
-}
-
 .badge-container {
   width: 32px;
   height: 32px;
@@ -1161,11 +1157,6 @@ th, td {
 
 .player-card {
   width: 62px;
-}
-
-.player-card .badge {
-  width: 28px;
-  height: 28px;
 }
 
 .badge-container {
