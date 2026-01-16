@@ -488,9 +488,10 @@ export function initUI() {
 
       /* Chip buttons row - container for multiple chip buttons */
       .chip-buttons-row {
-        display: flex;
-        flex-direction: column;
-        gap: 4px;
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        grid-template-rows: repeat(2, 1fr);
+        gap: 6px;
       }
 
       /* Smaller chip buttons for multiple chips */
@@ -577,7 +578,7 @@ export function initUI() {
         }
 
         .chip-buttons-row {
-          gap: 3px;
+          gap: 4px;
         }
       }
     `;
