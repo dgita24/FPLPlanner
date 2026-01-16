@@ -120,6 +120,51 @@ export function ensureFixturesForView() {
 }
 
 /* -------------------------
+   CHIP UI
+-------------------------- */
+
+function renderChipUI() {
+  const team = state.plan[state.viewingGW];
+  if (!team) return '';
+
+  const currentChip = team.chip;
+  const gw = state.viewingGW;
+
+  // Chip indicator - shown when a chip is selected
+  const chipIndicator = currentChip ? `
+    <div class="chip-indicator">
+      <span class="chip-icon">🎯</span>
+      <span class="chip-name">${getChipDisplayName(currentChip)}</span>
+      <span class="chip-gw">GW${gw}</span>
+    </div>
+  ` : '';
+
+  // Chip button - always shown in top-right
+  const isWildcardActive = currentChip === 'wildcard';
+  const buttonClass = isWildcardActive ? 'chip-btn chip-btn-active' : 'chip-btn';
+  const buttonText = isWildcardActive ? '✓ Wildcard' : 'Play Wildcard';
+
+  return `
+    <div class="chip-container">
+      ${chipIndicator}
+      <button class="${buttonClass}" onclick="selectChip('wildcard')" title="Select Wildcard chip for this gameweek">
+        ${buttonText}
+      </button>
+    </div>
+  `;
+}
+
+function getChipDisplayName(chipType) {
+  const chipNames = {
+    'wildcard': 'Wildcard',
+    'bboost': 'Bench Boost',
+    '3xc': 'Triple Captain',
+    'freehit': 'Free Hit'
+  };
+  return chipNames[chipType] || chipType;
+}
+
+/* -------------------------
    RENDER
 -------------------------- */
 
@@ -165,7 +210,11 @@ export function renderPitch() {
 
   const renderCard = (e) => e.isPlaceholder ? placeholderCard(e, 'starting') : playerCard(e, 'starting');
 
+  // Add chip indicator and button
+  const chipUI = renderChipUI();
+
   pitch.innerHTML = `
+    ${chipUI}
     <div class="formation-line">${gk.map(renderCard).join('')}</div>
     <div class="formation-line">${def.map(renderCard).join('')}</div>
     <div class="formation-line">${mid.map(renderCard).join('')}</div>

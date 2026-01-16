@@ -4,7 +4,7 @@ import { state, history, loadTeamEntry } from './data.js';
 import { setupSidebarHandlers, closeSidebar } from './ui-sidebar.js';
 import { showMessage, renderPitch, renderBench, ensureFixturesForView } from './ui-render.js';
 import { renderFixtures } from './fixtures.js';
-import { cancelTransfer, substitutePlayer, addSelectedToSquad, removePlayer, resetTransferState, isPendingTransfer, getBatchTransferInfo, reinstatePlayer } from './team-operations.js';
+import { cancelTransfer, substitutePlayer, addSelectedToSquad, removePlayer, resetTransferState, isPendingTransfer, getBatchTransferInfo, reinstatePlayer, selectChip } from './team-operations.js';
 import { setPendingSwap } from './ui-render.js';
 
 // Helper function for pluralization
@@ -270,7 +270,7 @@ function resetToImportedTeam() {
 }
 
 export function initUI() {
-  // Inject CSS for two-click swap highlight + fixture UI + placeholder cards
+  // Inject CSS for two-click swap highlight + fixture UI + placeholder cards + chip UI
   if (!document.getElementById('plannerInjectedStyle')) {
     const style = document.createElement('style');
     style.id = 'plannerInjectedStyle';
@@ -403,6 +403,110 @@ export function initUI() {
         font-weight: 600;
         opacity: 0.95;
       }
+
+      /* Chip container - positioned at top-right of pitch */
+      .chip-container {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 8px;
+        z-index: 10;
+      }
+
+      /* Chip indicator - shown when chip is selected */
+      .chip-indicator {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 8px 12px;
+        background: rgba(255, 153, 0, 0.95);
+        border: 2px solid #ff9800;
+        border-radius: 8px;
+        font-weight: bold;
+        font-size: 13px;
+        color: white;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        animation: chipPulse 2s ease-in-out infinite;
+      }
+
+      @keyframes chipPulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+      }
+
+      .chip-icon {
+        font-size: 18px;
+      }
+
+      .chip-name {
+        font-weight: 700;
+        letter-spacing: 0.5px;
+      }
+
+      .chip-gw {
+        background: rgba(0, 0, 0, 0.3);
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-size: 11px;
+      }
+
+      /* Chip button */
+      .chip-btn {
+        padding: 10px 16px;
+        background: #00ff87;
+        color: #37003c;
+        border: 2px solid #00ff87;
+        border-radius: 6px;
+        font-weight: bold;
+        font-size: 13px;
+        cursor: pointer;
+        transition: all 0.2s;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+        white-space: nowrap;
+      }
+
+      .chip-btn:hover {
+        background: #00e676;
+        border-color: #00e676;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+      }
+
+      .chip-btn-active {
+        background: #ff9800;
+        border-color: #f57c00;
+        color: white;
+      }
+
+      .chip-btn-active:hover {
+        background: #f57c00;
+        border-color: #e65100;
+      }
+
+      /* Mobile adjustments for chip UI */
+      @media (max-width: 768px) {
+        .chip-container {
+          top: 5px;
+          right: 5px;
+        }
+
+        .chip-indicator {
+          padding: 6px 10px;
+          font-size: 11px;
+        }
+
+        .chip-icon {
+          font-size: 14px;
+        }
+
+        .chip-btn {
+          padding: 8px 12px;
+          font-size: 12px;
+        }
+      }
     `;
     document.head.appendChild(style);
   }
@@ -444,6 +548,9 @@ export function initUI() {
   window.loadTeam = loadTeam;
   window.undoLastAction = undoLastAction;
   window.resetToImportedTeam = resetToImportedTeam;
+
+  // Expose chip selection function
+  window.selectChip = (chipType) => selectChip(chipType, updateUI);
 
   // Setup sidebar event handlers
   setupSidebarHandlers();

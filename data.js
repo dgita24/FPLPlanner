@@ -27,7 +27,7 @@ export let state = {
   fixtures: [],
   bootstrap: {},
 
-  // Plan for 8 GWs: plan[gw] = { starting: [{id,purchasePrice,sellingPrice}], bench: [...] }
+  // Plan for 8 GWs: plan[gw] = { starting: [{id,purchasePrice,sellingPrice}], bench: [...], chip: null|'wildcard'|'bboost'|'3xc'|'freehit' }
   plan: {},
 };
 
@@ -67,7 +67,7 @@ function initEmptyPlan() {
   state.plan = {};
   for (let i = 0; i < 8; i++) {
     const gw = state.currentGW + i;
-    state.plan[gw] = { starting: [], bench: [] };
+    state.plan[gw] = { starting: [], bench: [], chip: null };
   }
 }
 

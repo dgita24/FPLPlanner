@@ -582,3 +582,47 @@ export function getBatchTransferInfo() {
     removedPlayers: batchTransfers.removedPlayers
   };
 }
+
+/* -------------------------
+   CHIP SELECTION
+-------------------------- */
+
+export function selectChip(chipType, updateUI) {
+  const gw = state.viewingGW;
+  const team = state.plan[gw];
+  
+  if (!team) {
+    showMessage('No team data for this gameweek', 'error');
+    return;
+  }
+
+  // Check if a chip is already selected for this GW
+  if (team.chip === chipType) {
+    // Unselect the chip
+    pushUndoState();
+    team.chip = null;
+    showMessage(`${getChipDisplayName(chipType)} deselected for GW${gw}`, 'success');
+  } else {
+    // Select the chip
+    pushUndoState();
+    team.chip = chipType;
+    showMessage(`${getChipDisplayName(chipType)} selected for GW${gw}`, 'success');
+  }
+  
+  updateUI();
+}
+
+function getChipDisplayName(chipType) {
+  const chipNames = {
+    'wildcard': 'Wildcard',
+    'bboost': 'Bench Boost',
+    '3xc': 'Triple Captain',
+    'freehit': 'Free Hit'
+  };
+  return chipNames[chipType] || chipType;
+}
+
+export function getActiveChip(gw) {
+  const team = state.plan[gw];
+  return team ? team.chip : null;
+}
