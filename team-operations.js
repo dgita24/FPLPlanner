@@ -2,7 +2,7 @@
 
 import { state, history, calculateSellingPrice } from './data.js';
 import { validateStartingXI, validateClubLimit, getOverLimitClubs, getElementType, getPlayerTeamId, validateSquadComposition } from './validation.js';
-import { displayPrice, showMessage, renderPitch, renderBench, setPendingSwap, getPendingSwap } from './ui-render.js';
+import { displayPrice, showMessage, renderPitch, renderBench, setPendingSwap, getPendingSwap, getChipDisplayName } from './ui-render.js';
 
 // Track batch transfers: multiple players can be removed before adding replacements
 let batchTransfers = {
@@ -581,4 +581,38 @@ export function getBatchTransferInfo() {
     removedCount: batchTransfers.removedPlayers.length,
     removedPlayers: batchTransfers.removedPlayers
   };
+}
+
+/* -------------------------
+   CHIP SELECTION
+-------------------------- */
+
+export function selectChip(chipType, updateUI) {
+  const gw = state.viewingGW;
+  const team = state.plan[gw];
+  
+  if (!team) {
+    showMessage('No team data for this gameweek', 'error');
+    return;
+  }
+
+  // Check if a chip is already selected for this GW
+  if (team.chip === chipType) {
+    // Unselect the chip
+    pushUndoState();
+    team.chip = null;
+    showMessage(`${getChipDisplayName(chipType)} deselected for GW${gw}`, 'success');
+  } else {
+    // Select the chip
+    pushUndoState();
+    team.chip = chipType;
+    showMessage(`${getChipDisplayName(chipType)} selected for GW${gw}`, 'success');
+  }
+  
+  updateUI();
+}
+
+export function getActiveChip(gw) {
+  const team = state.plan[gw];
+  return team ? team.chip : null;
 }

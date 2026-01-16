@@ -120,6 +120,90 @@ export function ensureFixturesForView() {
 }
 
 /* -------------------------
+   CHIP UI
+-------------------------- */
+
+function renderChipUI() {
+  const team = state.plan[state.viewingGW];
+  if (!team) return '';
+
+  const currentChip = team.chip;
+  const gw = state.viewingGW;
+
+  // Chip indicator - shown when a chip is selected
+  const chipIndicator = currentChip ? `
+    <div class="chip-indicator">
+      <span class="chip-icon">🎯</span>
+      <span class="chip-name">${getChipDisplayName(currentChip)}</span>
+      <span class="chip-gw">GW${gw}</span>
+    </div>
+  ` : '';
+
+  // Check which chips have been used in previous gameweeks
+  const usedChips = new Set();
+  for (let g = state.currentGW; g < gw; g++) {
+    const prevTeam = state.plan[g];
+    if (prevTeam && prevTeam.chip) {
+      usedChips.add(prevTeam.chip);
+    }
+  }
+
+  // Define all chip types with their labels
+  const chips = [
+    { type: 'wildcard', label: 'Play WC', title: 'Select Wildcard chip for this gameweek' },
+    { type: 'freehit', label: 'Play FH', title: 'Select Free Hit chip for this gameweek' },
+    { type: 'bboost', label: 'Play BB', title: 'Select Bench Boost chip for this gameweek' },
+    { type: '3xc', label: 'Play TC', title: 'Select Triple Captain chip for this gameweek' }
+  ];
+
+  // Render all chip buttons
+  const chipButtons = chips.map(chip => {
+    const isActive = currentChip === chip.type;
+    const isUsed = usedChips.has(chip.type);
+    
+    let buttonClass = 'chip-btn-small';
+    if (isActive) {
+      buttonClass += ' chip-btn-active';
+    } else if (isUsed) {
+      buttonClass += ' chip-btn-used';
+    }
+    
+    const buttonText = isActive 
+      ? `✓ ${chip.label.replace('Play ', '')}` 
+      : isUsed 
+        ? `${chip.label.replace('Play ', '')}` 
+        : chip.label;
+    
+    const buttonTitle = isUsed 
+      ? `${getChipDisplayName(chip.type)} already used in a previous gameweek` 
+      : chip.title;
+    
+    const disabledAttr = isUsed && !isActive ? 'disabled' : '';
+    
+    return `<button class="${buttonClass}" onclick="selectChip('${chip.type}')" title="${buttonTitle}" ${disabledAttr}>${buttonText}</button>`;
+  }).join('');
+
+  return `
+    <div class="chip-container">
+      ${chipIndicator}
+      <div class="chip-buttons-row">
+        ${chipButtons}
+      </div>
+    </div>
+  `;
+}
+
+export function getChipDisplayName(chipType) {
+  const chipNames = {
+    'wildcard': 'Wildcard',
+    'bboost': 'Bench Boost',
+    '3xc': 'Triple Captain',
+    'freehit': 'Free Hit'
+  };
+  return chipNames[chipType] || chipType;
+}
+
+/* -------------------------
    RENDER
 -------------------------- */
 
@@ -165,7 +249,11 @@ export function renderPitch() {
 
   const renderCard = (e) => e.isPlaceholder ? placeholderCard(e, 'starting') : playerCard(e, 'starting');
 
+  // Add chip indicator and button
+  const chipUI = renderChipUI();
+
   pitch.innerHTML = `
+    ${chipUI}
     <div class="formation-line">${gk.map(renderCard).join('')}</div>
     <div class="formation-line">${def.map(renderCard).join('')}</div>
     <div class="formation-line">${mid.map(renderCard).join('')}</div>
