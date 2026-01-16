@@ -119,6 +119,10 @@ font-weight: bold;
 font-size: 14px;
 cursor: pointer;
 transition: all 0.2s;
+height: 44px;
+display: inline-flex;
+align-items: center;
+justify-content: center;
 }
 
 .save-btn {
@@ -141,7 +145,7 @@ background: #1976d2;
 
 .sidebar-toggle {
 padding: 12px 20px;         
-height: auto;
+height: 44px;
 background: var(--primary);
 color: var(--bg);
 border: none;
@@ -260,7 +264,7 @@ align-items: flex-end;
 gap: 14px;
 margin-bottom: 8px;
 min-height: 100px;
-flex-wrap: wrap;
+flex-wrap: nowrap;
 }
 
 .player-card {
@@ -310,6 +314,9 @@ display: flex;
 justify-content: space-between;
 padding: 0 4px;
 font-weight: 600;
+white-space: nowrap;
+overflow: hidden;
+min-height: 14px;
 }
 
 .card-btn {
@@ -363,7 +370,7 @@ margin-bottom: 12px;
 display: flex;
 justify-content: center;
 gap: 25px;
-flex-wrap: wrap;
+flex-wrap: nowrap;
 }
 
 #plannerMain .bench {
@@ -751,6 +758,409 @@ margin-left: 2px;
 font-size: 9px;
 }
 
+/* ===== Help Modal ===== */
+
+.help-modal {
+position: fixed;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+background: rgba(0, 0, 0, 0.8);
+display: none;
+align-items: center;
+justify-content: center;
+z-index: 2000;
+padding: 20px;
+}
+
+.help-modal.open {
+display: flex;
+}
+
+.help-modal-content {
+background: var(--bg-dark);
+border-radius: 10px;
+max-width: 700px;
+width: 100%;
+max-height: 90vh;
+overflow-y: auto;
+padding: 30px;
+position: relative;
+box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+}
+
+.help-modal-close {
+position: absolute;
+top: 15px;
+right: 15px;
+background: var(--primary);
+color: var(--bg);
+border: none;
+border-radius: 50%;
+width: 35px;
+height: 35px;
+font-size: 24px;
+font-weight: bold;
+cursor: pointer;
+display: flex;
+align-items: center;
+justify-content: center;
+line-height: 1;
+transition: opacity 0.2s;
+}
+
+.help-modal-close:hover {
+opacity: 0.8;
+}
+
+.help-modal h2 {
+color: var(--primary);
+margin: 0 0 20px 0;
+padding-bottom: 10px;
+border-bottom: 2px solid var(--primary);
+}
+
+.help-modal h3 {
+color: var(--primary);
+margin: 20px 0 10px 0;
+font-size: 18px;
+}
+
+.help-modal p {
+margin: 10px 0;
+line-height: 1.6;
+}
+
+.help-modal ul {
+margin: 10px 0 10px 20px;
+line-height: 1.8;
+}
+
+.help-modal li {
+margin: 5px 0;
+}
+
+.help-modal strong {
+color: var(--primary);
+}
+
+/* ===== Responsive Design for Tablets and Mobile ===== */
+
+/* Small Laptop/Large Tablet (max-width: 1280px) */
+@media (max-width: 1280px) {
+.container {
+  max-width: 100%;
+  padding: 0 15px;
+}
+
+.pitch {
+  max-width: 100%;
+  padding: 20px 15px;
+}
+
+.pitch-stack {
+  max-width: 100%;
+}
+
+.bench {
+  max-width: 100%;
+}
+
+.player-card {
+  width: 160px;
+}
+
+.formation-line {
+  gap: 12px;
+}
+
+#plannerMain {
+  grid-template-columns: 300px 1fr;
+  gap: 10px;
+}
+
+#fixturesPanel {
+  margin-top: 40px;
+}
+}
+
+/* Tablet (max-width: 1024px) */
+@media (max-width: 1024px) {
+#plannerMain {
+  grid-template-columns: 1fr;
+  gap: 20px;
+}
+
+#fixturesPanel {
+  margin-top: 10px;
+  order: 2;
+}
+
+#mainColumn {
+  order: 1;
+}
+
+.header {
+  flex-wrap: wrap;
+  height: auto;
+  padding: 10px;
+}
+
+.header h1 {
+  width: 100%;
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.pitch {
+  padding: 20px 15px;
+}
+
+.player-card {
+  width: 150px;
+}
+
+.formation-line {
+  gap: 10px;
+}
+}
+
+/* Mobile (max-width: 768px) */
+@media (max-width: 768px) {
+body {
+  padding: 10px;
+}
+
+.header {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+}
+
+.header h1 {
+  font-size: 20px;
+}
+
+.bank-display,
+.price-toggle {
+  width: 100%;
+  justify-content: center;
+}
+
+.header-actions {
+  flex-direction: column;
+  width: 100%;
+}
+
+.header-btn,
+.sidebar-toggle {
+  width: 100%;
+  padding: 10px;
+}
+
+.sidebar {
+  width: 300px;
+}
+
+#plannerMain {
+  grid-template-columns: 1fr;
+}
+
+.pitch {
+  padding: 15px 5px;
+  min-height: 300px;
+}
+
+.player-card {
+  width: 68px;
+}
+
+.player-card .badge {
+  width: 32px;
+  height: 32px;
+}
+
+.player-card .name {
+  font-size: 10px;
+}
+
+.player-card .info {
+  font-size: 8px;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.formation-line {
+  gap: 4px;
+  justify-content: center;
+  flex-wrap: nowrap;
+}
+
+.bench-slots {
+  gap: 8px;
+  flex-wrap: nowrap;
+}
+
+.filters {
+  flex-direction: column;
+}
+
+.filters input,
+.filters select {
+  width: 100%;
+  min-width: unset;
+}
+
+.player-table {
+  overflow-x: auto;
+}
+
+table {
+  font-size: 12px;
+  min-width: 600px;
+}
+
+th, td {
+  padding: 6px 4px;
+}
+
+.add-btn-row {
+  flex-direction: column;
+}
+
+.fixture-row {
+  grid-template-columns: minmax(100px, 1fr) 50px minmax(100px, 1fr);
+  font-size: 12px;
+  padding: 5px 0;
+}
+
+.team-badge {
+  width: 18px;
+  height: 18px;
+}
+
+.fixture-time {
+  font-size: 10px;
+  padding: 2px 4px;
+}
+}
+
+/* Small Mobile (max-width: 480px) */
+@media (max-width: 480px) {
+.header h1 {
+  font-size: 18px;
+}
+
+.sidebar {
+  width: 100%;
+  /* Extra top padding to account for fixed header */
+  padding: 60px 15px 15px;
+}
+
+.pitch {
+  padding: 10px 3px;
+  min-height: 250px;
+}
+
+.player-card {
+  width: 62px;
+}
+
+.player-card .badge {
+  width: 28px;
+  height: 28px;
+}
+
+.player-card .name {
+  font-size: 9px;
+}
+
+.player-card .info {
+  font-size: 7px;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.formation-line {
+  gap: 3px;
+  min-height: 80px;
+  flex-wrap: nowrap;
+}
+
+.bench-slots {
+  gap: 6px;
+  flex-wrap: nowrap;
+}
+
+.card-btn {
+  width: 16px;
+  height: 16px;
+  font-size: 12px;
+}
+
+.gw-nav button {
+  padding: 6px 12px;
+  font-size: 13px;
+}
+
+.gw-nav h2 {
+  font-size: 18px;
+}
+
+table {
+  font-size: 11px;
+}
+
+th, td {
+  padding: 4px 2px;
+}
+
+.fixture-row {
+  grid-template-columns: minmax(80px, 1fr) 45px minmax(80px, 1fr);
+  font-size: 11px;
+}
+
+.team-name {
+  font-size: 11px;
+}
+
+.team-badge {
+  width: 16px;
+  height: 16px;
+}
+
+.fixture-date-banner {
+  font-size: 12px;
+  padding: 4px 8px;
+}
+
+.message {
+  bottom: 10px;
+  right: 10px;
+  left: 10px;
+  padding: 10px 15px;
+  font-size: 13px;
+}
+
+.help-modal-content {
+  padding: 20px;
+  max-height: 85vh;
+}
+
+.help-modal h2 {
+  font-size: 20px;
+}
+
+.help-modal h3 {
+  font-size: 16px;
+}
+
+.help-modal p, .help-modal li {
+  font-size: 14px;
+}
+}
+
 </style>
 </head>
 
@@ -779,7 +1189,7 @@ font-size: 9px;
         <button onclick="localLoad()" class="header-btn load-btn">📂 Local Load</button>
         <button onclick="undoLastAction()" class="header-btn load-btn">↩️ Undo</button>
         <button onclick="resetToImportedTeam()" class="header-btn load-btn">⏮️ Reset</button>
-
+        <button onclick="toggleHelpModal()" class="header-btn" style="background: #00ff87; color: #37003c;">❓ Help</button>
       </div>
 
       <button class="sidebar-toggle" onclick="toggleSidebarMenu()">Menu</button>
@@ -931,6 +1341,58 @@ font-size: 9px;
   </div>
 
   <div id="toast" class="message"></div>
+
+  <!-- Help Modal -->
+  <div id="helpModal" class="help-modal">
+    <div class="help-modal-content">
+      <button class="help-modal-close" onclick="toggleHelpModal()">×</button>
+      
+      <h2>📘 FPL Team Planner - User Guide</h2>
+      
+      <h3>🎯 Getting Started</h3>
+      <p>The FPL Team Planner helps you plan your Fantasy Premier League team transfers across multiple gameweeks. You can import your current team, plan changes, and see how your budget evolves.</p>
+      
+      <h3>💰 How Banking Works</h3>
+      <ul>
+        <li><strong>Bank:</strong> Shows your current available funds (starts at 100.0m for a new team)</li>
+        <li><strong>Transfers:</strong> When you remove a player, their <em>selling price</em> goes to your bank</li>
+        <li><strong>Adding Players:</strong> When you add a player, their <em>purchase price</em> is deducted from your bank</li>
+        <li><strong>Price Modes:</strong> Use the "Show" dropdown to toggle between Selling, Purchase, and Current prices</li>
+      </ul>
+      
+      <h3>🔧 Key Functions</h3>
+      <ul>
+        <li><strong>Import from FPL:</strong> Enter your FPL Team ID in the Menu to load your current team</li>
+        <li><strong>Add to Squad:</strong> Click on a player in the Transfers table, then click "Add to squad"</li>
+        <li><strong>Remove Player:</strong> Click the red ✕ button on any player card</li>
+        <li><strong>Swap Players:</strong> Click the blue ⇄ button to swap a player with the bench</li>
+        <li><strong>Gameweeks:</strong> Use ← GW and GW → buttons to plan across multiple weeks</li>
+        <li><strong>Undo/Reset:</strong> Use Undo to reverse your last action, or Reset to return to your imported team</li>
+        <li><strong>Local Save/Load:</strong> Save your planning session to browser storage</li>
+      </ul>
+      
+      <h3>📱 Mobile Usage</h3>
+      <ul>
+        <li><strong>Landscape Mode:</strong> For the best mobile experience, use landscape (horizontal) orientation</li>
+        <li><strong>Formation:</strong> The pitch maintains proper formation structure (1-3-5-2) on all devices</li>
+        <li><strong>Scrolling:</strong> The transfers table scrolls horizontally on mobile - swipe left/right to see all columns</li>
+        <li><strong>Touch Targets:</strong> All buttons are optimized for touch on mobile devices</li>
+      </ul>
+      
+      <h3>💡 Tips</h3>
+      <ul>
+        <li>Plan your transfers across multiple gameweeks to maximize value</li>
+        <li>Consider fixture difficulty when selecting players</li>
+        <li>Use filters (Position, Team, Max Price) to find the right players quickly</li>
+        <li>Sort columns by clicking on column headers (Price, Points, Stats)</li>
+        <li>Check player status indicators (🚑 injured, ⚠️ doubt, ⛔ suspended)</li>
+      </ul>
+      
+      <p style="margin-top: 30px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.2); text-align: center; font-size: 14px; opacity: 0.8;">
+        Need more help? Check the project repository or reach out to the developer.
+      </p>
+    </div>
+  </div>
 
   <!-- Module Loader -->
   <script type="module">

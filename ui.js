@@ -3,12 +3,13 @@
 
 // Import all the modularized components
 import { initUI } from './ui-init.js';
-import { toggleSidebarMenu } from './ui-sidebar.js';
+import { toggleSidebarMenu, toggleHelpModal } from './ui-sidebar.js';
 
 // Re-export initUI as the main entry point
 export { initUI };
 
-// Expose toggleSidebarMenu to window for inline onclick handlers
+// Expose toggleSidebarMenu and toggleHelpModal to window for inline onclick handlers
 window.toggleSidebarMenu = toggleSidebarMenu;
+window.toggleHelpModal = toggleHelpModal;
 
 
