@@ -366,64 +366,47 @@ margin: 0;
 
 .status-flag {
 position: absolute;
-width: 0;
-height: 0;
-border-style: solid;
+display: flex;
+align-items: center;
+justify-content: center;
 }
 
 .status-flag.left {
-left: -8px;
+left: -12px;
 top: 50%;
-border-width: 5px 0 5px 10px;
-transform-origin: left center;
-animation: wave 2s ease-in-out infinite;
+transform: translateY(-50%);
 }
 
 .status-flag.right {
-right: -8px;
+right: -12px;
 top: 50%;
-border-width: 5px 10px 5px 0;
+transform: translateY(-50%);
+}
+
+.status-flag-svg {
+width: 18px;
+height: 24px;
+filter: drop-shadow(0 1px 2px rgba(0,0,0,0.3));
+animation: wave-flag 2s ease-in-out infinite;
+}
+
+.status-flag-svg.left {
+transform-origin: left center;
+}
+
+.status-flag-svg.right {
 transform-origin: right center;
-animation: wave-right 2s ease-in-out infinite;
 }
 
-.status-flag.left.red {
-border-color: transparent transparent transparent #f44336;
-}
-
-.status-flag.left.yellow {
-border-color: transparent transparent transparent #ffd700;
-}
-
-.status-flag.right.red {
-border-color: transparent #f44336 transparent transparent;
-}
-
-.status-flag.right.yellow {
-border-color: transparent #ffd700 transparent transparent;
-}
-
-@keyframes wave {
+@keyframes wave-flag {
 0%, 100% {
-transform: translateY(-50%) rotate(0deg);
+transform: rotate(0deg);
 }
 25% {
-transform: translateY(-50%) rotate(-5deg);
+transform: rotate(-3deg);
 }
 75% {
-transform: translateY(-50%) rotate(5deg);
-}
-}
-
-@keyframes wave-right {
-0%, 100% {
-transform: translateY(-50%) scaleX(-1) rotate(0deg);
-}
-25% {
-transform: translateY(-50%) scaleX(-1) rotate(-5deg);
-}
-75% {
-transform: translateY(-50%) scaleX(-1) rotate(5deg);
+transform: rotate(3deg);
 }
 }
 
@@ -1062,13 +1045,16 @@ body {
 }
 
 .status-flag.left {
-  left: -6px;
-  border-width: 4px 0 4px 8px;
+  left: -10px;
 }
 
 .status-flag.right {
-  right: -6px;
-  border-width: 4px 8px 4px 0;
+  right: -10px;
+}
+
+.status-flag-svg {
+  width: 15px;
+  height: 20px;
 }
 
 .player-card .name {
@@ -1168,13 +1154,16 @@ th, td {
 }
 
 .status-flag.left {
-  left: -5px;
-  border-width: 3px 0 3px 6px;
+  left: -8px;
 }
 
 .status-flag.right {
-  right: -5px;
-  border-width: 3px 6px 3px 0;
+  right: -8px;
+}
+
+.status-flag-svg {
+  width: 12px;
+  height: 16px;
 }
 
 .player-card .name {
