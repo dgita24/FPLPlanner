@@ -23,7 +23,7 @@ function updateUI() {
   const prevBtn = document.getElementById('prevGW');
   const nextBtn = document.getElementById('nextGW');
   if (prevBtn) prevBtn.disabled = state.viewingGW <= state.currentGW;
-  if (nextBtn) nextBtn.disabled = state.viewingGW >= state.currentGW + 7;
+  if (nextBtn) nextBtn.disabled = state.viewingGW >= 38;
 
   const bankInput = document.getElementById('bankInput');
   if (bankInput) bankInput.value = Number(state.bank).toFixed(1);
@@ -59,7 +59,7 @@ function changeGW(delta) {
   }
 
   const minGW = state.currentGW;
-  const maxGW = state.currentGW + 7;
+  const maxGW = 38;
 
   let next = state.viewingGW + delta;
   if (next < minGW) next = minGW;
@@ -267,6 +267,55 @@ function resetToImportedTeam() {
 
   updateUI();
   showMessage('Team reset to imported state.', 'success');
+}
+
+// Captain/Vice-Captain functions
+function setCaptain(playerId) {
+  const team = state.plan[state.viewingGW];
+  if (!team) return;
+
+  // Check if player is in starting XI
+  const inStarting = team.starting.some(p => p.id === playerId);
+  if (!inStarting) {
+    showMessage('Only starting XI players can be captain.', 'error');
+    return;
+  }
+
+  // If this player is currently vice-captain, swap roles
+  if (team.viceCaptain === playerId) {
+    team.viceCaptain = team.captain;
+    team.captain = playerId;
+    showMessage('Captain and Vice-Captain swapped.', 'success');
+  } else {
+    team.captain = playerId;
+    showMessage('Captain set.', 'success');
+  }
+
+  updateUI();
+}
+
+function setViceCaptain(playerId) {
+  const team = state.plan[state.viewingGW];
+  if (!team) return;
+
+  // Check if player is in starting XI
+  const inStarting = team.starting.some(p => p.id === playerId);
+  if (!inStarting) {
+    showMessage('Only starting XI players can be vice-captain.', 'error');
+    return;
+  }
+
+  // If this player is currently captain, swap roles
+  if (team.captain === playerId) {
+    team.captain = team.viceCaptain;
+    team.viceCaptain = playerId;
+    showMessage('Captain and Vice-Captain swapped.', 'success');
+  } else {
+    team.viceCaptain = playerId;
+    showMessage('Vice-Captain set.', 'success');
+  }
+
+  updateUI();
 }
 
 export function initUI() {
@@ -622,6 +671,8 @@ export function initUI() {
   window.loadTeam = loadTeam;
   window.undoLastAction = undoLastAction;
   window.resetToImportedTeam = resetToImportedTeam;
+  window.setCaptain = setCaptain;
+  window.setViceCaptain = setViceCaptain;
 
   // Expose chip selection function
   window.selectChip = (chipType) => selectChip(chipType, updateUI);

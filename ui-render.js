@@ -398,10 +398,36 @@ function playerCard(entry, source) {
     `;
   }
 
+  // Captain/Vice-Captain UI - only show for starting XI players
+  const team = state.plan[state.viewingGW];
+  const isCaptain = team && team.captain === entry.id;
+  const isViceCaptain = team && team.viceCaptain === entry.id;
+  
+  let captainUI = '';
+  if (source === 'starting') {
+    if (isCaptain) {
+      // Show captain badge
+      captainUI = `<div class="captain-badge c">C</div>`;
+    } else if (isViceCaptain) {
+      // Show vice-captain badge
+      captainUI = `<div class="captain-badge vc">VC</div>`;
+    } else {
+      // Show selector on hover
+      captainUI = `
+        <div class="captain-selector">
+          <button class="captain-btn" onclick="setCaptain(${entry.id})" title="Set as Captain">C</button>
+          <button class="captain-btn" onclick="setViceCaptain(${entry.id})" title="Set as Vice-Captain">VC</button>
+        </div>
+      `;
+    }
+  }
+
   return `
     <div class="${cardClass}">
       <button class="card-btn btn-remove" onclick="${removeFn}" title="Transfer out">×</button>
       <button class="card-btn btn-swap" onclick="${subFn}" title="${swapTitle}">⇅</button>
+
+      ${captainUI}
 
       <div class="badge-container">
         ${statusFlags}

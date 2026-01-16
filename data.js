@@ -27,7 +27,7 @@ export let state = {
   fixtures: [],
   bootstrap: {},
 
-  // Plan for 8 GWs: plan[gw] = { starting: [{id,purchasePrice,sellingPrice}], bench: [...], chip: null|'wildcard'|'bboost'|'3xc'|'freehit' }
+  // Plan for all GWs up to GW38: plan[gw] = { starting: [{id,purchasePrice,sellingPrice}], bench: [...], chip: null|'wildcard'|'bboost'|'3xc'|'freehit', captain: null, viceCaptain: null }
   plan: {},
 };
 
@@ -65,9 +65,9 @@ async function parseJsonOrThrow(res) {
 
 function initEmptyPlan() {
   state.plan = {};
-  for (let i = 0; i < 8; i++) {
-    const gw = state.currentGW + i;
-    state.plan[gw] = { starting: [], bench: [], chip: null };
+  // Initialize plan up to GW38 to allow full season planning
+  for (let gw = state.currentGW; gw <= 38; gw++) {
+    state.plan[gw] = { starting: [], bench: [], chip: null, captain: null, viceCaptain: null };
   }
 }
 
@@ -219,6 +219,12 @@ export async function loadTeamEntry(managerId, gwRequested) {
       // Build starting/bench entries with purchase & selling prices
       const picks = json.picks || [];
 
+      // Extract captain and vice-captain from picks
+      const captainPick = picks.find(p => p.is_captain);
+      const viceCaptainPick = picks.find(p => p.is_vice_captain);
+      const captainId = captainPick ? captainPick.element : null;
+      const viceCaptainId = viceCaptainPick ? viceCaptainPick.element : null;
+
       const starting = picks
         .filter(p => p.position <= 11)
         .sort((a, b) => a.position - b.position)
@@ -245,14 +251,15 @@ export async function loadTeamEntry(managerId, gwRequested) {
           return { id: p.element, purchasePrice, sellingPrice };
         });
 
-      // Populate planner from currentGW forward
-      for (let i = 0; i < 8; i++) {
-        const g = state.currentGW + i;
+      // Populate planner from currentGW up to GW38
+      for (let g = state.currentGW; g <= 38; g++) {
         if (!state.plan[g]) {
-          state.plan[g] = { starting: [], bench: [], chip: null };
+          state.plan[g] = { starting: [], bench: [], chip: null, captain: null, viceCaptain: null };
         }
         state.plan[g].starting = deepCopy(starting);
         state.plan[g].bench = deepCopy(bench);
+        state.plan[g].captain = captainId;
+        state.plan[g].viceCaptain = viceCaptainId;
       }
 
       // Always show current GW in the UI after import
