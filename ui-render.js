@@ -394,7 +394,6 @@ function playerCard(entry, source) {
     const flagTitle = escapeHtml(p.news || (isDoubtful ? 'Doubtful' : 'Unavailable'));
     
     statusFlags = `
-      <div class="status-flag left ${flagColor}" title="${flagTitle}">${generateFlagCanvas('left', flagColor)}</div>
       <div class="status-flag right ${flagColor}" title="${flagTitle}">${generateFlagCanvas('right', flagColor)}</div>
     `;
   }
