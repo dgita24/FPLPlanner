@@ -4,11 +4,8 @@ import { state, loadFixtures } from './data.js';
 import { getElementType } from './validation.js';
 import { getBatchTransferInfo } from './team-operations.js';
 
-// --- Flag color constants ---
-const FLAG_COLORS = {
-  red: { fill: '#F44336', stroke: '#C62828' },
-  yellow: { fill: '#FFD700', stroke: '#DAA520' }
-};
+// --- Flag canvas counter for unique IDs ---
+let flagCanvasCounter = 0;
 
 // --- Fixtures cache (per GW) ---
 const fixturesByGW = new Map(); // gw -> fixtures[]
@@ -290,23 +287,50 @@ export function renderBench() {
   benchSlots.innerHTML = benchPlayers.map(renderCard).join('');
 }
 
-// Helper function to generate SVG flag
-function generateFlagSvg(direction, colorName) {
-  const colors = FLAG_COLORS[colorName];
+// Helper function to generate canvas-based waving flag
+function generateFlagCanvas(direction, colorName) {
+  const canvasId = `flag_${flagCanvasCounter++}`;
   const isLeft = direction === 'left';
-  const poleX = isLeft ? 5 : 25;
-  const pathD = isLeft 
-    ? 'M5,5 L25,5 Q28,8 25,15 Q28,22 25,35 L5,35 Z'
-    : 'M25,5 L5,5 Q2,8 5,15 Q2,22 5,35 L25,35 Z';
+  const color = colorName === 'red' ? 'red' : 'yellow';
+  
+  // Different transforms for left vs right flags
+  const transform = isLeft 
+    ? 'ctx.setTransform(-1, 0, 0.35, 1, 45, 0)'
+    : 'ctx.setTransform(1, 0, -0.35, 1, 0, 0)';
   
   return `
-    <svg class="status-flag-svg ${direction} ${colorName}" viewBox="0 0 30 40" xmlns="http://www.w3.org/2000/svg">
-      <path d="${pathD}" 
-            fill="${colors.fill}" 
-            stroke="${colors.stroke}" 
-            stroke-width="1"/>
-      <line x1="${poleX}" y1="0" x2="${poleX}" y2="40" stroke="#666" stroke-width="2"/>
-    </svg>
+    <canvas id="${canvasId}" width="45" height="35" class="status-flag-canvas ${direction} ${colorName}"></canvas>
+    <script>
+    (function() {
+      const canvas = document.getElementById("${canvasId}");
+      if (!canvas) return;
+      const ctx = canvas.getContext("2d");
+      
+      ${transform};
+      
+      ctx.lineWidth = 1.5 * .25;
+      
+      ctx.beginPath();
+      ctx.moveTo(35 * .25, 20 * .25);
+      ctx.lineTo(35 * .25, 120 * .25);
+      ctx.stroke();
+      
+      ctx.fillStyle = "${color}";
+      ctx.beginPath();
+      ctx.moveTo(35 * .25, 30 * .25);
+      
+      for (let i = 0; i <= 80; i += 8)
+        ctx.lineTo((35 + i) * .25, (30 + Math.sin(i * .12) * 4) * .25);
+      
+      for (let i = 0; i <= 38; i += 8)
+        ctx.lineTo((115 + Math.sin(i * .12) * 2) * .25, (30 + i) * .25);
+      
+      for (let i = 80; i >= 0; i -= 8)
+        ctx.lineTo((35 + i) * .25, (68 + Math.sin(i * .12) * 4) * .25);
+      
+      ctx.fill();
+    })();
+    </script>
   `;
 }
 
@@ -356,8 +380,8 @@ function playerCard(entry, source) {
     const flagTitle = escapeHtml(p.news || (isDoubtful ? 'Doubtful' : 'Unavailable'));
     
     statusFlags = `
-      <div class="status-flag left ${flagColor}" title="${flagTitle}">${generateFlagSvg('left', flagColor)}</div>
-      <div class="status-flag right ${flagColor}" title="${flagTitle}">${generateFlagSvg('right', flagColor)}</div>
+      <div class="status-flag left ${flagColor}" title="${flagTitle}">${generateFlagCanvas('left', flagColor)}</div>
+      <div class="status-flag right ${flagColor}" title="${flagTitle}">${generateFlagCanvas('right', flagColor)}</div>
     `;
   }
 
