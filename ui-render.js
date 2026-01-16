@@ -139,6 +139,15 @@ function renderChipUI() {
     </div>
   ` : '';
 
+  // Check which chips have been used in previous gameweeks
+  const usedChips = new Set();
+  for (let g = state.currentGW; g < gw; g++) {
+    const prevTeam = state.plan[g];
+    if (prevTeam && prevTeam.chip) {
+      usedChips.add(prevTeam.chip);
+    }
+  }
+
   // Define all chip types with their labels
   const chips = [
     { type: 'wildcard', label: 'Play WC', title: 'Select Wildcard chip for this gameweek' },
@@ -150,9 +159,28 @@ function renderChipUI() {
   // Render all chip buttons
   const chipButtons = chips.map(chip => {
     const isActive = currentChip === chip.type;
-    const buttonClass = isActive ? 'chip-btn-small chip-btn-active' : 'chip-btn-small';
-    const buttonText = isActive ? `✓ ${chip.label.replace('Play ', '')}` : chip.label;
-    return `<button class="${buttonClass}" onclick="selectChip('${chip.type}')" title="${chip.title}">${buttonText}</button>`;
+    const isUsed = usedChips.has(chip.type);
+    
+    let buttonClass = 'chip-btn-small';
+    if (isActive) {
+      buttonClass += ' chip-btn-active';
+    } else if (isUsed) {
+      buttonClass += ' chip-btn-used';
+    }
+    
+    const buttonText = isActive 
+      ? `✓ ${chip.label.replace('Play ', '')}` 
+      : isUsed 
+        ? `${chip.label.replace('Play ', '')}` 
+        : chip.label;
+    
+    const buttonTitle = isUsed 
+      ? `${getChipDisplayName(chip.type)} already used in a previous gameweek` 
+      : chip.title;
+    
+    const disabledAttr = isUsed && !isActive ? 'disabled' : '';
+    
+    return `<button class="${buttonClass}" onclick="selectChip('${chip.type}')" title="${buttonTitle}" ${disabledAttr}>${buttonText}</button>`;
   }).join('');
 
   return `

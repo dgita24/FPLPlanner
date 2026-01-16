@@ -528,6 +528,27 @@ export function initUI() {
         border-color: #e65100;
       }
 
+      /* Used/disabled chip buttons - crossed out appearance */
+      .chip-btn-small.chip-btn-used {
+        background: #cccccc;
+        border-color: #999999;
+        color: #666666;
+        cursor: not-allowed;
+        text-decoration: line-through;
+        opacity: 0.6;
+      }
+
+      .chip-btn-small.chip-btn-used:hover {
+        background: #cccccc;
+        border-color: #999999;
+        transform: none;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+      }
+
+      .chip-btn-small:disabled {
+        cursor: not-allowed;
+      }
+
       /* Mobile adjustments for chip UI */
       @media (max-width: 768px) {
         .chip-container {
