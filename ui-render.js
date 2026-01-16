@@ -405,8 +405,6 @@ function playerCard(entry, source) {
   
   let captainUI = '';
   if (source === 'starting') {
-    // Ensure playerId is a number for safe onclick usage
-    const playerId = Number(entry.id);
     if (isCaptain) {
       // Show captain badge
       captainUI = `<div class="captain-badge c">C</div>`;
@@ -414,11 +412,11 @@ function playerCard(entry, source) {
       // Show vice-captain badge
       captainUI = `<div class="captain-badge vc">VC</div>`;
     } else {
-      // Show selector on hover
+      // Show selector on hover - entry.id is always a number from the database
       captainUI = `
         <div class="captain-selector">
-          <button class="captain-btn" onclick="setCaptain(${playerId})" title="Set as Captain">C</button>
-          <button class="captain-btn" onclick="setViceCaptain(${playerId})" title="Set as Vice-Captain">VC</button>
+          <button class="captain-btn" onclick="setCaptain(${entry.id})" title="Set as Captain">C</button>
+          <button class="captain-btn" onclick="setViceCaptain(${entry.id})" title="Set as Vice-Captain">VC</button>
         </div>
       `;
     }
