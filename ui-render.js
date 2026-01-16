@@ -313,6 +313,13 @@ function playerCard(entry, source) {
   const cardClass = `player-card${armed ? ' pending-swap' : ''}`;
   const swapTitle = armed ? 'Cancel swap' : 'Swap';
 
+  // Simple HTML escape function
+  const escapeHtml = (text) => {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  };
+
   // Injury/suspension status - show waving flags beside badge
   // status: 'a' = available, 'd' = doubtful (yellow), 'i' = injured (red), 's' = suspended (red), 'u' = unavailable (red)
   // news: contains injury details text
@@ -320,7 +327,7 @@ function playerCard(entry, source) {
   if (p.status && p.status !== 'a') {
     const isDoubtful = p.status === 'd';
     const flagColor = isDoubtful ? 'yellow' : 'red';
-    const flagTitle = p.news || (isDoubtful ? 'Doubtful' : 'Unavailable');
+    const flagTitle = escapeHtml(p.news || (isDoubtful ? 'Doubtful' : 'Unavailable'));
     
     statusFlags = `
       <div class="status-flag left ${flagColor}" title="${flagTitle}"></div>
