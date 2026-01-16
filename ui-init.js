@@ -270,6 +270,9 @@ function resetToImportedTeam() {
 }
 
 // Captain/Vice-Captain functions
+// Logic: When setting a captain/VC on a player who already has the other role,
+// swap the roles between the two players (if both roles are currently assigned).
+// This prevents losing assignments when clicking on already-assigned players.
 function setCaptain(playerId) {
   const team = state.plan[state.viewingGW];
   if (!team) return;
@@ -281,7 +284,7 @@ function setCaptain(playerId) {
     return;
   }
 
-  // If this player is currently vice-captain, swap roles (only if captain exists)
+  // If this player is currently vice-captain AND there's a captain, swap roles
   if (team.viceCaptain === playerId && team.captain !== null) {
     const oldCaptain = team.captain;
     team.captain = playerId;
@@ -306,7 +309,7 @@ function setViceCaptain(playerId) {
     return;
   }
 
-  // If this player is currently captain, swap roles (only if vice-captain exists)
+  // If this player is currently captain AND there's a vice-captain, swap roles
   if (team.captain === playerId && team.viceCaptain !== null) {
     const oldViceCaptain = team.viceCaptain;
     team.viceCaptain = playerId;
