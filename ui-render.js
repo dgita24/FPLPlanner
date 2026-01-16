@@ -4,6 +4,12 @@ import { state, loadFixtures } from './data.js';
 import { getElementType } from './validation.js';
 import { getBatchTransferInfo } from './team-operations.js';
 
+// --- Flag color constants ---
+const FLAG_COLORS = {
+  red: { fill: '#F44336', stroke: '#C62828' },
+  yellow: { fill: '#FFD700', stroke: '#DAA520' }
+};
+
 // --- Fixtures cache (per GW) ---
 const fixturesByGW = new Map(); // gw -> fixtures[]
 let fixturesLoadToken = 0;
@@ -284,6 +290,26 @@ export function renderBench() {
   benchSlots.innerHTML = benchPlayers.map(renderCard).join('');
 }
 
+// Helper function to generate SVG flag
+function generateFlagSvg(direction, colorName) {
+  const colors = FLAG_COLORS[colorName];
+  const isLeft = direction === 'left';
+  const poleX = isLeft ? 5 : 25;
+  const pathD = isLeft 
+    ? 'M5,5 L25,5 Q28,8 25,15 Q28,22 25,35 L5,35 Z'
+    : 'M25,5 L5,5 Q2,8 5,15 Q2,22 5,35 L25,35 Z';
+  
+  return `
+    <svg class="status-flag-svg ${direction} ${colorName}" viewBox="0 0 30 40" xmlns="http://www.w3.org/2000/svg">
+      <path d="${pathD}" 
+            fill="${colors.fill}" 
+            stroke="${colors.stroke}" 
+            stroke-width="1"/>
+      <line x1="${poleX}" y1="0" x2="${poleX}" y2="40" stroke="#666" stroke-width="2"/>
+    </svg>
+  `;
+}
+
 function playerCard(entry, source) {
   const p = getPlayer(entry.id);
   if (!p) return '';
@@ -329,31 +355,9 @@ function playerCard(entry, source) {
     const flagColor = isDoubtful ? 'yellow' : 'red';
     const flagTitle = escapeHtml(p.news || (isDoubtful ? 'Doubtful' : 'Unavailable'));
     
-    // Left flag SVG
-    const leftFlagSvg = `
-      <svg class="status-flag-svg left ${flagColor}" viewBox="0 0 30 40" xmlns="http://www.w3.org/2000/svg">
-        <path d="M5,5 L25,5 Q28,8 25,15 Q28,22 25,35 L5,35 Z" 
-              fill="${isDoubtful ? '#FFD700' : '#F44336'}" 
-              stroke="${isDoubtful ? '#DAA520' : '#C62828'}" 
-              stroke-width="1"/>
-        <line x1="5" y1="0" x2="5" y2="40" stroke="#666" stroke-width="2"/>
-      </svg>
-    `;
-    
-    // Right flag SVG
-    const rightFlagSvg = `
-      <svg class="status-flag-svg right ${flagColor}" viewBox="0 0 30 40" xmlns="http://www.w3.org/2000/svg">
-        <path d="M25,5 L5,5 Q2,8 5,15 Q2,22 5,35 L25,35 Z" 
-              fill="${isDoubtful ? '#FFD700' : '#F44336'}" 
-              stroke="${isDoubtful ? '#DAA520' : '#C62828'}" 
-              stroke-width="1"/>
-        <line x1="25" y1="0" x2="25" y2="40" stroke="#666" stroke-width="2"/>
-      </svg>
-    `;
-    
     statusFlags = `
-      <div class="status-flag left ${flagColor}" title="${flagTitle}">${leftFlagSvg}</div>
-      <div class="status-flag right ${flagColor}" title="${flagTitle}">${rightFlagSvg}</div>
+      <div class="status-flag left ${flagColor}" title="${flagTitle}">${generateFlagSvg('left', flagColor)}</div>
+      <div class="status-flag right ${flagColor}" title="${flagTitle}">${generateFlagSvg('right', flagColor)}</div>
     `;
   }
 
