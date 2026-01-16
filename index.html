@@ -284,14 +284,6 @@ z-index: 10;
 box-shadow: 0 6px 12px rgba(0, 0, 0, 0.5);
 }
 
-.player-card .badge {
-width: 40px;
-height: 40px;
-object-fit: contain;
-margin: 0 auto 3px;
-display: block;
-}
-
 .player-card .name {
 font-size: 12px;
 font-weight: 700;
@@ -350,6 +342,89 @@ top: -6px;
 right: -6px;
 background: #4444ff;
 font-size: 11px;
+}
+
+/* ===== Waving Status Flags ===== */
+
+.badge-container {
+position: relative;
+width: 40px;
+height: 40px;
+margin: 0 auto 3px;
+display: flex;
+align-items: center;
+justify-content: center;
+}
+
+.badge-container .badge {
+width: 40px;
+height: 40px;
+object-fit: contain;
+display: block;
+margin: 0;
+}
+
+.status-flag {
+position: absolute;
+width: 0;
+height: 0;
+border-style: solid;
+}
+
+.status-flag.left {
+left: -8px;
+top: 50%;
+border-width: 5px 0 5px 10px;
+transform-origin: left center;
+animation: wave 2s ease-in-out infinite;
+}
+
+.status-flag.right {
+right: -8px;
+top: 50%;
+border-width: 5px 10px 5px 0;
+transform-origin: right center;
+animation: wave-right 2s ease-in-out infinite;
+}
+
+.status-flag.left.red {
+border-color: transparent transparent transparent #f44336;
+}
+
+.status-flag.left.yellow {
+border-color: transparent transparent transparent #ffd700;
+}
+
+.status-flag.right.red {
+border-color: transparent #f44336 transparent transparent;
+}
+
+.status-flag.right.yellow {
+border-color: transparent #ffd700 transparent transparent;
+}
+
+@keyframes wave {
+0%, 100% {
+transform: translateY(-50%) rotate(0deg);
+}
+25% {
+transform: translateY(-50%) rotate(-5deg);
+}
+75% {
+transform: translateY(-50%) rotate(5deg);
+}
+}
+
+@keyframes wave-right {
+0%, 100% {
+transform: translateY(-50%) scaleX(-1) rotate(0deg);
+}
+25% {
+transform: translateY(-50%) scaleX(-1) rotate(-5deg);
+}
+75% {
+transform: translateY(-50%) scaleX(-1) rotate(5deg);
+}
 }
 
 .bench {
@@ -976,9 +1051,24 @@ body {
   width: 68px;
 }
 
-.player-card .badge {
+.badge-container {
   width: 32px;
   height: 32px;
+}
+
+.badge-container .badge {
+  width: 32px;
+  height: 32px;
+}
+
+.status-flag.left {
+  left: -6px;
+  border-width: 4px 0 4px 8px;
+}
+
+.status-flag.right {
+  right: -6px;
+  border-width: 4px 8px 4px 0;
 }
 
 .player-card .name {
@@ -1067,9 +1157,24 @@ th, td {
   width: 62px;
 }
 
-.player-card .badge {
+.badge-container {
   width: 28px;
   height: 28px;
+}
+
+.badge-container .badge {
+  width: 28px;
+  height: 28px;
+}
+
+.status-flag.left {
+  left: -5px;
+  border-width: 3px 0 3px 6px;
+}
+
+.status-flag.right {
+  right: -5px;
+  border-width: 3px 6px 3px 0;
 }
 
 .player-card .name {

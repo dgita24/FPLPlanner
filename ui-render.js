@@ -313,17 +313,26 @@ function playerCard(entry, source) {
   const cardClass = `player-card${armed ? ' pending-swap' : ''}`;
   const swapTitle = armed ? 'Cancel swap' : 'Swap';
 
-  // Injury/suspension status - change name band color instead of showing triangle
+  // Simple HTML escape function
+  const escapeHtml = (text) => {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  };
+
+  // Injury/suspension status - show waving flags beside badge
   // status: 'a' = available, 'd' = doubtful (yellow), 'i' = injured (red), 's' = suspended (red), 'u' = unavailable (red)
   // news: contains injury details text
-  let nameStyle = '';
-  let nameTitle = '';
+  let statusFlags = '';
   if (p.status && p.status !== 'a') {
     const isDoubtful = p.status === 'd';
-    const bgColor = isDoubtful ? '#ffd700' : '#f44336'; // gold for doubtful, red for injured/suspended
-    const textColor = '#000'; // black text on both gold and red for consistency
-    nameStyle = `background: ${bgColor}; color: ${textColor};`;
-    nameTitle = p.news || (isDoubtful ? 'Doubtful' : 'Unavailable');
+    const flagColor = isDoubtful ? 'yellow' : 'red';
+    const flagTitle = escapeHtml(p.news || (isDoubtful ? 'Doubtful' : 'Unavailable'));
+    
+    statusFlags = `
+      <div class="status-flag left ${flagColor}" title="${flagTitle}"></div>
+      <div class="status-flag right ${flagColor}" title="${flagTitle}"></div>
+    `;
   }
 
   return `
@@ -331,10 +340,13 @@ function playerCard(entry, source) {
       <button class="card-btn btn-remove" onclick="${removeFn}" title="Transfer out">×</button>
       <button class="card-btn btn-swap" onclick="${subFn}" title="${swapTitle}">⇅</button>
 
-      <img src="https://resources.premierleague.com/premierleague/badges/70/t${teamCode}.png"
-           class="badge" alt="${teamShort}">
+      <div class="badge-container">
+        ${statusFlags}
+        <img src="https://resources.premierleague.com/premierleague/badges/70/t${teamCode}.png"
+             class="badge" alt="${teamShort}">
+      </div>
 
-      <div class="name" style="${nameStyle}" title="${nameTitle}">${p.web_name}</div>
+      <div class="name">${p.web_name}</div>
 
       <div class="info">
         <span class="team">${teamShort}</span>
@@ -371,8 +383,10 @@ function placeholderCard(removedPlayer, source) {
         <span class="placeholder-price">+£${price}m</span>
       </div>
 
-      <img src="https://resources.premierleague.com/premierleague/badges/70/t${teamCode}.png"
-           class="badge" alt="${teamShort}">
+      <div class="badge-container">
+        <img src="https://resources.premierleague.com/premierleague/badges/70/t${teamCode}.png"
+             class="badge" alt="${teamShort}">
+      </div>
 
       <div class="name">${p.web_name}</div>
 
