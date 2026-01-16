@@ -4,6 +4,57 @@ import { state, loadFixtures } from './data.js';
 import { getElementType } from './validation.js';
 import { getBatchTransferInfo } from './team-operations.js';
 
+// --- Flag canvas counter for unique IDs ---
+let flagCanvasCounter = 0;
+
+// Draw flag on canvas element
+function drawFlag(canvas, direction, colorName) {
+  if (!canvas) return;
+  const ctx = canvas.getContext("2d");
+  
+  const isLeft = direction === 'left';
+  const color = colorName === 'red' ? 'red' : 'yellow';
+  
+  // Different transforms for left vs right flags
+  if (isLeft) {
+    ctx.setTransform(-1, 0, 0.35, 1, 45, 0);
+  } else {
+    ctx.setTransform(1, 0, -0.35, 1, 0, 0);
+  }
+  
+  ctx.lineWidth = 1.5 * .25;
+  
+  ctx.beginPath();
+  ctx.moveTo(35 * .25, 20 * .25);
+  ctx.lineTo(35 * .25, 120 * .25);
+  ctx.stroke();
+  
+  ctx.fillStyle = color;
+  ctx.beginPath();
+  ctx.moveTo(35 * .25, 30 * .25);
+  
+  for (let i = 0; i <= 80; i += 8)
+    ctx.lineTo((35 + i) * .25, (30 + Math.sin(i * .12) * 4) * .25);
+  
+  for (let i = 0; i <= 38; i += 8)
+    ctx.lineTo((115 + Math.sin(i * .12) * 2) * .25, (30 + i) * .25);
+  
+  for (let i = 80; i >= 0; i -= 8)
+    ctx.lineTo((35 + i) * .25, (68 + Math.sin(i * .12) * 4) * .25);
+  
+  ctx.fill();
+}
+
+// Initialize flag canvases after DOM insertion
+function initFlagCanvases() {
+  document.querySelectorAll('.status-flag-canvas[data-flag-init="pending"]').forEach(canvas => {
+    const direction = canvas.dataset.direction;
+    const color = canvas.dataset.color;
+    drawFlag(canvas, direction, color);
+    canvas.dataset.flagInit = 'done';
+  });
+}
+
 // --- Fixtures cache (per GW) ---
 const fixturesByGW = new Map(); // gw -> fixtures[]
 let fixturesLoadToken = 0;
@@ -259,6 +310,9 @@ export function renderPitch() {
     <div class="formation-line">${mid.map(renderCard).join('')}</div>
     <div class="formation-line">${fwd.map(renderCard).join('')}</div>
   `;
+  
+  // Initialize flag canvases after DOM insertion
+  initFlagCanvases();
 }
 
 export function renderBench() {
@@ -282,6 +336,16 @@ export function renderBench() {
 
   const renderCard = (e) => e.isPlaceholder ? placeholderCard(e, 'bench') : playerCard(e, 'bench');
   benchSlots.innerHTML = benchPlayers.map(renderCard).join('');
+  
+  // Initialize flag canvases after DOM insertion
+  initFlagCanvases();
+}
+
+// Helper function to generate canvas-based waving flag
+function generateFlagCanvas(direction, colorName) {
+  const canvasId = `flag_${flagCanvasCounter++}`;
+  
+  return `<canvas id="${canvasId}" width="45" height="35" class="status-flag-canvas ${direction} ${colorName}" data-direction="${direction}" data-color="${colorName}" data-flag-init="pending"></canvas>`;
 }
 
 function playerCard(entry, source) {
@@ -330,8 +394,7 @@ function playerCard(entry, source) {
     const flagTitle = escapeHtml(p.news || (isDoubtful ? 'Doubtful' : 'Unavailable'));
     
     statusFlags = `
-      <div class="status-flag left ${flagColor}" title="${flagTitle}"></div>
-      <div class="status-flag right ${flagColor}" title="${flagTitle}"></div>
+      <div class="status-flag right ${flagColor}" title="${flagTitle}">${generateFlagCanvas('right', flagColor)}</div>
     `;
   }
 

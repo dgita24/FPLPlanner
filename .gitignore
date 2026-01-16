@@ -17,3 +17,5 @@ build/
 # OS files
 .DS_Store
 Thumbs.db
+flag-test.html
+flag-demo.html

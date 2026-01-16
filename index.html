@@ -366,65 +366,19 @@ margin: 0;
 
 .status-flag {
 position: absolute;
-width: 0;
-height: 0;
-border-style: solid;
-}
-
-.status-flag.left {
-left: -8px;
-top: 50%;
-border-width: 5px 0 5px 10px;
-transform-origin: left center;
-animation: wave 2s ease-in-out infinite;
+display: flex;
+align-items: center;
+justify-content: center;
 }
 
 .status-flag.right {
-right: -8px;
+right: -60px;
 top: 50%;
-border-width: 5px 10px 5px 0;
-transform-origin: right center;
-animation: wave-right 2s ease-in-out infinite;
+transform: translateY(-50%);
 }
 
-.status-flag.left.red {
-border-color: transparent transparent transparent #f44336;
-}
-
-.status-flag.left.yellow {
-border-color: transparent transparent transparent #ffd700;
-}
-
-.status-flag.right.red {
-border-color: transparent #f44336 transparent transparent;
-}
-
-.status-flag.right.yellow {
-border-color: transparent #ffd700 transparent transparent;
-}
-
-@keyframes wave {
-0%, 100% {
-transform: translateY(-50%) rotate(0deg);
-}
-25% {
-transform: translateY(-50%) rotate(-5deg);
-}
-75% {
-transform: translateY(-50%) rotate(5deg);
-}
-}
-
-@keyframes wave-right {
-0%, 100% {
-transform: translateY(-50%) scaleX(-1) rotate(0deg);
-}
-25% {
-transform: translateY(-50%) scaleX(-1) rotate(-5deg);
-}
-75% {
-transform: translateY(-50%) scaleX(-1) rotate(5deg);
-}
+.status-flag-canvas {
+display: block;
 }
 
 .bench {
@@ -1061,14 +1015,13 @@ body {
   height: 32px;
 }
 
-.status-flag.left {
-  left: -6px;
-  border-width: 4px 0 4px 8px;
+.status-flag.right {
+  right: -56px;
 }
 
-.status-flag.right {
-  right: -6px;
-  border-width: 4px 8px 4px 0;
+.status-flag-canvas {
+  width: 38px;
+  height: 29px;
 }
 
 .player-card .name {
@@ -1167,14 +1120,13 @@ th, td {
   height: 28px;
 }
 
-.status-flag.left {
-  left: -5px;
-  border-width: 3px 0 3px 6px;
+.status-flag.right {
+  right: -52px;
 }
 
-.status-flag.right {
-  right: -5px;
-  border-width: 3px 6px 3px 0;
+.status-flag-canvas {
+  width: 34px;
+  height: 26px;
 }
 
 .player-card .name {
