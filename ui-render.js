@@ -397,10 +397,6 @@ function placeholderCard(removedPlayer, source) {
     </div>
   `;
 }
-      </div>
-    </div>
-  `;
-}
 
 // Toast
 export function showMessage(text, type = 'info') {

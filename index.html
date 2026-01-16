@@ -378,7 +378,6 @@ width: 0;
 height: 0;
 border-style: solid;
 transform-origin: left center;
-animation: wave 2s ease-in-out infinite;
 }
 
 .status-flag.left {
@@ -386,6 +385,7 @@ left: -8px;
 top: 50%;
 transform: translateY(-50%);
 border-width: 5px 0 5px 10px;
+animation: wave 2s ease-in-out infinite;
 }
 
 .status-flag.right {
@@ -393,6 +393,7 @@ right: -8px;
 top: 50%;
 transform: translateY(-50%) scaleX(-1);
 border-width: 5px 0 5px 10px;
+animation: wave-right 2s ease-in-out infinite;
 }
 
 .status-flag.red {
@@ -413,10 +414,6 @@ transform: translateY(-50%) rotate(-5deg);
 75% {
 transform: translateY(-50%) rotate(5deg);
 }
-}
-
-.status-flag.right {
-animation: wave-right 2s ease-in-out infinite;
 }
 
 @keyframes wave-right {
