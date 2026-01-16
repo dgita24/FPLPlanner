@@ -751,6 +751,245 @@ margin-left: 2px;
 font-size: 9px;
 }
 
+/* ===== Responsive Design for Tablets and Mobile ===== */
+
+/* Tablet (max-width: 1024px) */
+@media (max-width: 1024px) {
+#plannerMain {
+  grid-template-columns: 1fr;
+  gap: 20px;
+}
+
+#fixturesPanel {
+  margin-top: 10px;
+  order: 2;
+}
+
+#mainColumn {
+  order: 1;
+}
+
+.header {
+  flex-wrap: wrap;
+  height: auto;
+  padding: 10px;
+}
+
+.header h1 {
+  width: 100%;
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.pitch {
+  padding: 20px 15px;
+}
+
+.player-card {
+  width: 150px;
+}
+
+.formation-line {
+  gap: 10px;
+}
+}
+
+/* Mobile (max-width: 768px) */
+@media (max-width: 768px) {
+body {
+  padding: 10px;
+}
+
+.header {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+}
+
+.header h1 {
+  font-size: 20px;
+}
+
+.bank-display,
+.price-toggle {
+  width: 100%;
+  justify-content: center;
+}
+
+.header-actions {
+  flex-direction: column;
+  width: 100%;
+}
+
+.header-btn,
+.sidebar-toggle {
+  width: 100%;
+  padding: 10px;
+}
+
+.sidebar {
+  width: 280px;
+}
+
+#plannerMain {
+  grid-template-columns: 1fr;
+}
+
+.pitch {
+  padding: 15px 10px;
+  min-height: 300px;
+}
+
+.player-card {
+  width: 130px;
+}
+
+.formation-line {
+  gap: 8px;
+  justify-content: center;
+}
+
+.bench-slots {
+  gap: 15px;
+}
+
+.filters {
+  flex-direction: column;
+}
+
+.filters input,
+.filters select {
+  width: 100%;
+  min-width: unset;
+}
+
+.player-table {
+  overflow-x: auto;
+}
+
+table {
+  font-size: 11px;
+  min-width: 600px;
+}
+
+th, td {
+  padding: 6px 4px;
+}
+
+.add-btn-row {
+  flex-direction: column;
+}
+
+.fixture-row {
+  grid-template-columns: minmax(100px, 1fr) 50px minmax(100px, 1fr);
+  font-size: 12px;
+  padding: 5px 0;
+}
+
+.team-badge {
+  width: 18px;
+  height: 18px;
+}
+
+.fixture-time {
+  font-size: 10px;
+  padding: 2px 4px;
+}
+}
+
+/* Small Mobile (max-width: 480px) */
+@media (max-width: 480px) {
+.header h1 {
+  font-size: 18px;
+}
+
+.sidebar {
+  width: 100%;
+  padding: 60px 15px 15px;
+}
+
+.pitch {
+  padding: 10px 5px;
+  min-height: 250px;
+}
+
+.player-card {
+  width: 100px;
+}
+
+.player-card .badge {
+  width: 30px;
+  height: 30px;
+}
+
+.player-card .name {
+  font-size: 10px;
+}
+
+.player-card .info {
+  font-size: 9px;
+}
+
+.formation-line {
+  gap: 5px;
+  min-height: 80px;
+}
+
+.bench-slots {
+  gap: 10px;
+}
+
+.card-btn {
+  width: 16px;
+  height: 16px;
+  font-size: 12px;
+}
+
+.gw-nav button {
+  padding: 6px 12px;
+  font-size: 13px;
+}
+
+.gw-nav h2 {
+  font-size: 18px;
+}
+
+table {
+  font-size: 10px;
+}
+
+th, td {
+  padding: 4px 2px;
+}
+
+.fixture-row {
+  grid-template-columns: minmax(80px, 1fr) 45px minmax(80px, 1fr);
+  font-size: 11px;
+}
+
+.team-name {
+  font-size: 11px;
+}
+
+.team-badge {
+  width: 16px;
+  height: 16px;
+}
+
+.fixture-date-banner {
+  font-size: 12px;
+  padding: 4px 8px;
+}
+
+.message {
+  bottom: 10px;
+  right: 10px;
+  left: 10px;
+  padding: 10px 15px;
+  font-size: 13px;
+}
+}
+
 </style>
 </head>
 
