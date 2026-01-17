@@ -9,7 +9,7 @@
 
   .pitch {
     max-width: 100%;
-    padding: 20px 15px;
+    padding: 17px 13px;
   }
 
   .pitch-stack {
@@ -21,20 +21,16 @@
   }
 
   .player-card {
-    width: 160px;
+    width: 136px;
   }
 
   .formation-line {
-    gap: 12px;
-  }
-
-  #plannerMain {
-    grid-template-columns: 300px 1fr;
     gap: 10px;
   }
 
-  #fixturesPanel {
-    margin-top: 40px;
+  #plannerMain {
+    grid-template-columns: 1fr 300px;
+    gap: 10px;
   }
 }
 
@@ -45,13 +41,17 @@
     gap: 20px;
   }
 
-  #fixturesPanel {
-    margin-top: 10px;
+  .transfer-panel {
     order: 2;
   }
 
   #mainColumn {
     order: 1;
+  }
+
+  #fixturesPanel {
+    order: 3;
+    margin-top: 10px;
   }
 
   .header {
@@ -67,23 +67,23 @@
   }
 
   .pitch {
-    padding: 20px 15px;
+    padding: 17px 13px;
   }
 
   .player-card {
-    width: 150px;
+    width: 128px;
   }
 
   .captain-selector {
-    left: -38px;
+    left: -32px;
   }
 
   .captain-badge {
-    left: -38px;
+    left: -32px;
   }
 
   .formation-line {
-    gap: 10px;
+    gap: 9px;
   }
 }
 

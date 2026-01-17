@@ -10,8 +10,32 @@ let tableSort = {
 
 const posNames = { 1: 'GK', 2: 'DEF', 3: 'MID', 4: 'FWD' };
 
-// Stat column keys
-const STAT_KEYS = ['goals_scored', 'assists', 'clean_sheets', 'bonus', 'transfers_in_event', 'transfers_out_event', 'selected_by_percent'];
+// Current stat selection
+let currentStatView = 'basic'; // 'basic' | 'goals_assists' | 'defensive' | 'transfers' | 'ownership'
+
+// Stat column configurations
+const statConfigs = {
+  basic: [
+    { key: 'goals_scored', label: 'G', tooltip: 'Goals' },
+    { key: 'assists', label: 'A', tooltip: 'Assists' }
+  ],
+  goals_assists: [
+    { key: 'goals_scored', label: 'G', tooltip: 'Goals' },
+    { key: 'assists', label: 'A', tooltip: 'Assists' }
+  ],
+  defensive: [
+    { key: 'clean_sheets', label: 'CS', tooltip: 'Clean Sheets' },
+    { key: 'bonus', label: 'Bns', tooltip: 'Bonus Points' }
+  ],
+  transfers: [
+    { key: 'transfers_in_event', label: 'TI', tooltip: 'Transfers In (GW)' },
+    { key: 'transfers_out_event', label: 'TO', tooltip: 'Transfers Out (GW)' }
+  ],
+  ownership: [
+    { key: 'selected_by_percent', label: 'TSB%', tooltip: 'Team Selection %' },
+    { key: 'transfers_in_event', label: 'TI', tooltip: 'Transfers In (GW)' }
+  ]
+};
 
 // Selected players (changed from single to multi-select)
 window.selectedPlayerIds = window.selectedPlayerIds ?? [];
@@ -34,18 +58,431 @@ function getSortIcons() {
   if (!sortIcons) {
     sortIcons = {
       price: document.getElementById('sortPriceIcon'),
-      points: document.getElementById('sortPointsIcon'),
-      goals_scored: document.getElementById('sortGoalsIcon'),
-      assists: document.getElementById('sortAssistsIcon'),
-      clean_sheets: document.getElementById('sortCleanSheetsIcon'),
-      bonus: document.getElementById('sortBonusIcon'),
-      transfers_in_event: document.getElementById('sortTransfersInIcon'),
-      transfers_out_event: document.getElementById('sortTransfersOutIcon'),
-      selected_by_percent: document.getElementById('sortSelectedByIcon')
+      points: document.getElementById('sortPointsIcon')
     };
   }
   return sortIcons;
 }
+
+/* ------------------------- FIXTURES (TABLE) -------------------------- */
+// Cache fixtures per GW so typing in filters doesn't spam requests.
+const fixturesByGW = new Map(); // gw -> fixtures[]
+let fixturesLoadToken = 0;
+
+function kickoffTimeValue(fx) {
+  // kickoff_time is ISO string or null; null should sort last.
+  if (!fx?.kickoff_time) return Number.POSITIVE_INFINITY;
+  const t = Date.parse(fx.kickoff_time);
+  return Number.isFinite(t) ? t : Number.POSITIVE_INFINITY;
+}
+
+function foldForSearch(s) {
+  return (s || '')
+    .toString()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .trim();
+}
+
+function bestFixtureForTeamInGW(teamId, fixtures) {
+  if (!Array.isArray(fixtures) || fixtures.length === 0) return null;
+  const matches = fixtures.filter((f) => f && (f.team_h === teamId || f.team_a === teamId));
+  if (matches.length === 0) return null;
+  matches.sort((a, b) => kickoffTimeValue(a) - kickoffTimeValue(b));
+  return matches[0]; // If DGW, pick the earliest kickoff
+}
+
+function getTeamShortName(teamId) {
+  const t = state.teams.find((x) => x.id === teamId);
+  return t ? (t.short_name || t.shortname || t.name) : '';
+}
+
+function formatOpponent(teamId, fixture) {
+  if (!fixture) return '--';
+  const isHome = fixture.team_h === teamId;
+  const oppId = isHome ? fixture.team_a : fixture.team_h;
+  const opp = getTeamShortName(oppId) || '???';
+  return `${opp} (${isHome ? 'H' : 'A'})`;
+}
+
+function getNextFixturesForTeam(teamId, startGW, count = 4) {
+  const out = [];
+  for (let i = 0; i < count; i++) {
+    const gw = startGW + i;
+    if (!fixturesByGW.has(gw)) {
+      out.push('--');
+      continue;
+    }
+    const list = fixturesByGW.get(gw);
+    const fx = bestFixtureForTeamInGW(teamId, list);
+    out.push(formatOpponent(teamId, fx));
+  }
+  return out;
+}
+
+function ensureFixturesForTable() {
+  const token = ++fixturesLoadToken;
+  const start = state.viewingGW;
+  const needed = [start, start + 1, start + 2, start + 3]; // Next 4
+  const missing = needed.filter((gw) => !fixturesByGW.has(gw));
+  if (missing.length === 0) return;
+
+  Promise.all(
+    missing.map((gw) =>
+      loadFixtures(gw)
+        .then((fx) => fixturesByGW.set(gw, Array.isArray(fx) ? fx : []))
+        .catch(() => fixturesByGW.set(gw, []))
+    )
+  ).then(() => {
+    if (token !== fixturesLoadToken) return;
+    renderTable(); // Re-render once fixtures arrive
+  });
+}
+
+/* ------------------------- TABLE RENDER -------------------------- */
+
+export function renderTable() {
+  ensureFixturesForTable();
+
+  const tbody = document.getElementById('tableBody');
+  if (!tbody) return;
+
+  const search = foldForSearch(document.getElementById('searchName')?.value || '');
+  const posFilter = document.getElementById('filterPos')?.value || '';
+
+  let filtered = state.elements.filter((player) => {
+    const matchesSearch = foldForSearch(player.web_name || '').includes(search);
+    const matchesPos = !posFilter || posNames[player.element_type] === posFilter;
+    return matchesSearch && matchesPos;
+  });
+
+  // -------- SORTING --------
+  if (tableSort.key) {
+    const dir = tableSort.dir === 'asc' ? 1 : -1;
+
+    filtered = filtered.slice().sort((a, b) => {
+      if (tableSort.key === 'price') {
+        return dir * ((a.now_cost / 10) - (b.now_cost / 10));
+      }
+
+      if (tableSort.key === 'points') {
+        return dir * (a.total_points - b.total_points);
+      }
+
+      // Handle stat columns
+      const parseStatValue = (val) => {
+        if (val == null) return 0;
+        const num = parseFloat(val);
+        return isNaN(num) ? 0 : num;
+      };
+      const aVal = parseStatValue(a[tableSort.key]);
+      const bVal = parseStatValue(b[tableSort.key]);
+      return dir * (aVal - bVal);
+    });
+  }
+
+  // Get current stat columns
+  const statCols = statConfigs[currentStatView] || statConfigs.basic;
+
+  // -------- RENDER --------
+  tbody.innerHTML = filtered
+    .map((player) => {
+      const checked = window.selectedPlayerIds.includes(player.id) ? 'checked' : '';
+
+      // Status flag for table - using circular badge similar to captain badges
+      let statusFlagHtml = '';
+      
+      // Pass events array for date-based suspension parsing
+      const events = state.bootstrap?.events || [];
+      if (shouldShowPlayerFlag(player, state.viewingGW, state.currentGW, events)) {
+        const isDoubtful = player.status === 'd';
+        
+        // For red flags (suspended/injured/unavailable): show "0"
+        // For yellow flags (doubtful): show chance of playing percentage
+        let badgeText = '0';
+        let badgeClass = 'red';
+        
+        if (isDoubtful) {
+          badgeClass = 'yellow';
+          // Use chance_of_playing_this_round for the viewing gameweek
+          const chanceOfPlaying = state.viewingGW === state.currentGW 
+            ? player.chance_of_playing_this_round 
+            : state.viewingGW === state.currentGW + 1 
+              ? player.chance_of_playing_next_round 
+              : null;
+          
+          // Show 25, 50, or 75 based on chance_of_playing
+          if (chanceOfPlaying !== null && chanceOfPlaying !== undefined) {
+            if (chanceOfPlaying <= 25) badgeText = '25';
+            else if (chanceOfPlaying <= 50) badgeText = '50';
+            else if (chanceOfPlaying <= 75) badgeText = '75';
+            else badgeText = '75'; // Default for any value > 75 but < 100
+          } else {
+            badgeText = '50'; // Default if no chance_of_playing data
+          }
+        }
+        
+        const flagTitle = player.news || (isDoubtful ? 'Doubtful' : 'Unavailable');
+        statusFlagHtml = `<span class="table-status-flag-badge ${badgeClass}" title="${flagTitle}">${badgeText}</span>`;
+      }
+
+      // Render dynamic stat columns
+      const statColsHtml = statCols.map(col => 
+        `<td class="stat-col-cell">${formatStatValue(player[col.key], col.key)}</td>`
+      ).join('');
+
+      return `
+        <tr onclick="selectPlayer(event, ${player.id})" class="${checked ? 'selected' : ''}">
+          <td><input type="checkbox" name="selectedPlayer" value="${player.id}" ${checked}></td>
+          <td class="status-cell">${statusFlagHtml}</td>
+          <td class="name-cell">${player.web_name}</td>
+          <td>${posNames[player.element_type]}</td>
+          <td>${(player.now_cost / 10).toFixed(1)}</td>
+          <td>${player.total_points}</td>
+          ${statColsHtml}
+          <td><button class="info-btn" onclick="showPlayerInfo(event, ${player.id})" title="View player stats">i</button></td>
+        </tr>
+      `;
+    })
+    .join('');
+
+  // Update sort icons after rendering
+  updateSortIcons();
+}
+
+export function populateFilters() {
+  // Note: Team filter removed from compact view
+}
+
+window.selectPlayer = function (ev, id) {
+  if (ev) ev.stopPropagation();
+  
+  // Toggle selection
+  const index = window.selectedPlayerIds.indexOf(id);
+  if (index > -1) {
+    window.selectedPlayerIds.splice(index, 1);
+  } else {
+    window.selectedPlayerIds.push(id);
+  }
+
+  // Update row styling
+  const row = ev?.target?.closest('tr');
+  if (row) {
+    if (window.selectedPlayerIds.includes(id)) {
+      row.classList.add('selected');
+    } else {
+      row.classList.remove('selected');
+    }
+  }
+
+  // Update checkbox
+  const checkbox = row?.querySelector('input[type="checkbox"]');
+  if (checkbox) {
+    checkbox.checked = window.selectedPlayerIds.includes(id);
+  }
+};
+
+// Expose for inline handlers
+window.renderTable = renderTable;
+window.populateFilters = populateFilters;
+
+window.sortTable = function (key) {
+  if (tableSort.key === key) {
+    // Toggle direction
+    tableSort.dir = tableSort.dir === 'asc' ? 'desc' : 'asc';
+  } else {
+    tableSort.key = key;
+    tableSort.dir = 'asc';
+  }
+
+  updateSortIcons();
+  renderTable();
+};
+
+function updateSortIcons() {
+  const icons = getSortIcons();
+
+  // Default: show neutral arrows for all sortable columns
+  Object.values(icons).forEach(icon => {
+    if (icon) icon.textContent = '⇅';
+  });
+
+  // Set active icon for sorted column
+  if (tableSort.key && icons[tableSort.key]) {
+    const arrow = tableSort.dir === 'asc' ? '▲' : '▼';
+    icons[tableSort.key].textContent = arrow;
+  }
+}
+
+// Update stat columns based on dropdown selection
+window.updateStatColumns = function () {
+  const statSelect = document.getElementById('statSelect');
+  if (!statSelect) return;
+  
+  currentStatView = statSelect.value;
+  
+  // Update table headers
+  const statCols = statConfigs[currentStatView] || statConfigs.basic;
+  const col1Header = document.getElementById('statCol1Header');
+  const col2Header = document.getElementById('statCol2Header');
+  
+  if (col1Header && statCols[0]) {
+    col1Header.innerHTML = `<span onclick="sortTable('${statCols[0].key}')" class="th-sortable" style="cursor: pointer;" title="${statCols[0].tooltip}">${statCols[0].label} <span id="sortStat1Icon">⇅</span></span>`;
+  }
+  
+  if (col2Header && statCols[1]) {
+    col2Header.innerHTML = `<span onclick="sortTable('${statCols[1].key}')" class="th-sortable" style="cursor: pointer;" title="${statCols[1].tooltip}">${statCols[1].label} <span id="sortStat2Icon">⇅</span></span>`;
+  }
+  
+  // Re-render table with new columns
+  renderTable();
+};
+
+// Show player info modal
+window.showPlayerInfo = function (ev, playerId) {
+  if (ev) {
+    ev.stopPropagation();
+    ev.preventDefault();
+  }
+  
+  const player = state.elements.find(p => p.id === playerId);
+  if (!player) return;
+  
+  const team = state.teams.find(t => t.id === player.team);
+  const teamName = team ? team.name : 'Unknown';
+  const teamCode = team ? team.code : '';
+  
+  // Create modal if it doesn't exist
+  let modal = document.getElementById('playerInfoModal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'playerInfoModal';
+    modal.className = 'player-info-modal';
+    document.body.appendChild(modal);
+  }
+  
+  // Build stats grid
+  const statsHtml = `
+    <div class="player-info-stats">
+      <div class="player-stat-item">
+        <div class="player-stat-label">Total Points</div>
+        <div class="player-stat-value">${player.total_points || 0}</div>
+      </div>
+      <div class="player-stat-item">
+        <div class="player-stat-label">Price</div>
+        <div class="player-stat-value">£${(player.now_cost / 10).toFixed(1)}m</div>
+      </div>
+      <div class="player-stat-item">
+        <div class="player-stat-label">Form</div>
+        <div class="player-stat-value">${player.form || '0'}</div>
+      </div>
+      <div class="player-stat-item">
+        <div class="player-stat-label">Goals Scored</div>
+        <div class="player-stat-value">${player.goals_scored || 0}</div>
+      </div>
+      <div class="player-stat-item">
+        <div class="player-stat-label">Assists</div>
+        <div class="player-stat-value">${player.assists || 0}</div>
+      </div>
+      <div class="player-stat-item">
+        <div class="player-stat-label">Clean Sheets</div>
+        <div class="player-stat-value">${player.clean_sheets || 0}</div>
+      </div>
+      <div class="player-stat-item">
+        <div class="player-stat-label">Bonus Points</div>
+        <div class="player-stat-value">${player.bonus || 0}</div>
+      </div>
+      <div class="player-stat-item">
+        <div class="player-stat-label">Minutes Played</div>
+        <div class="player-stat-value">${player.minutes || 0}</div>
+      </div>
+      <div class="player-stat-item">
+        <div class="player-stat-label">Goals Conceded</div>
+        <div class="player-stat-value">${player.goals_conceded || 0}</div>
+      </div>
+      <div class="player-stat-item">
+        <div class="player-stat-label">Yellow Cards</div>
+        <div class="player-stat-value">${player.yellow_cards || 0}</div>
+      </div>
+      <div class="player-stat-item">
+        <div class="player-stat-label">Red Cards</div>
+        <div class="player-stat-value">${player.red_cards || 0}</div>
+      </div>
+      <div class="player-stat-item">
+        <div class="player-stat-label">Saves</div>
+        <div class="player-stat-value">${player.saves || 0}</div>
+      </div>
+      <div class="player-stat-item">
+        <div class="player-stat-label">Penalties Saved</div>
+        <div class="player-stat-value">${player.penalties_saved || 0}</div>
+      </div>
+      <div class="player-stat-item">
+        <div class="player-stat-label">Penalties Missed</div>
+        <div class="player-stat-value">${player.penalties_missed || 0}</div>
+      </div>
+      <div class="player-stat-item">
+        <div class="player-stat-label">Owned By</div>
+        <div class="player-stat-value">${parseFloat(player.selected_by_percent || 0).toFixed(1)}%</div>
+      </div>
+      <div class="player-stat-item">
+        <div class="player-stat-label">Transfers In (GW)</div>
+        <div class="player-stat-value">${player.transfers_in_event || 0}</div>
+      </div>
+      <div class="player-stat-item">
+        <div class="player-stat-label">Transfers Out (GW)</div>
+        <div class="player-stat-value">${player.transfers_out_event || 0}</div>
+      </div>
+      <div class="player-stat-item">
+        <div class="player-stat-label">ICT Index</div>
+        <div class="player-stat-value">${parseFloat(player.ict_index || 0).toFixed(1)}</div>
+      </div>
+    </div>
+  `;
+  
+  const statusInfo = player.news ? `
+    <div class="player-info-section">
+      <h3>Status</h3>
+      <p style="color: rgba(255, 255, 255, 0.9); line-height: 1.6;">${player.news}</p>
+    </div>
+  ` : '';
+  
+  modal.innerHTML = `
+    <div class="player-info-content">
+      <button class="player-info-close" onclick="closePlayerInfo()">×</button>
+      
+      <div class="player-info-header">
+        <img src="https://resources.premierleague.com/premierleague/badges/70/t${teamCode}.png" 
+             class="player-info-badge" alt="${teamName}">
+        <div class="player-info-title">
+          <h2>${player.web_name}</h2>
+          <p>${teamName} • ${posNames[player.element_type]}</p>
+        </div>
+      </div>
+      
+      ${statusInfo}
+      
+      <div class="player-info-section">
+        <h3>Season Statistics</h3>
+        ${statsHtml}
+      </div>
+    </div>
+  `;
+  
+  modal.classList.add('open');
+};
+
+window.closePlayerInfo = function () {
+  const modal = document.getElementById('playerInfoModal');
+  if (modal) {
+    modal.classList.remove('open');
+  }
+};
+
+// Initialize stat columns on load
+document.addEventListener('DOMContentLoaded', () => {
+  window.updateStatColumns();
+});
 
 /* ------------------------- FIXTURES (TABLE) -------------------------- */
 // Cache fixtures per GW so typing in filters doesn't spam requests.

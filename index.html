@@ -64,8 +64,6 @@
 
     <!-- MAIN PLANNER -->
     <div id="plannerMain">
-      <div id="fixturesPanel"></div>
-
       <div id="mainColumn">
 
         <div class="pitch-stack">
@@ -84,7 +82,56 @@
         </div>
 
       </div>
+
+      <div id="transferPanel" class="transfer-panel">
+        <h3 style="margin-bottom: 10px; text-align: center;">Transfers</h3>
+        
+        <div class="filters-compact">
+          <input type="text" id="searchName" placeholder="Search..." onkeyup="renderTable()" />
+          
+          <select id="filterPos" onchange="renderTable()">
+            <option value="">All Players</option>
+            <option value="GK">Goalkeepers</option>
+            <option value="DEF">Defenders</option>
+            <option value="MID">Midfielders</option>
+            <option value="FWD">Forwards</option>
+          </select>
+
+          <select id="statSelect" onchange="updateStatColumns()">
+            <option value="basic">Basic Stats</option>
+            <option value="goals_assists">Goals & Assists</option>
+            <option value="defensive">Defensive</option>
+            <option value="transfers">Transfers</option>
+            <option value="ownership">Ownership</option>
+          </select>
+        </div>
+
+        <div class="player-table-compact">
+          <table id="pTable">
+            <thead>
+              <tr>
+                <th class="th-select">Select</th>
+                <th class="th-status">Status</th>
+                <th class="th-name">Name</th>
+                <th class="th-pos">Pos</th>
+                <th onclick="sortTable('price')" class="th-sortable th-price">
+                  £ <span id="sortPriceIcon"></span>
+                </th>
+                <th onclick="sortTable('points')" class="th-sortable th-points">
+                  Pts <span id="sortPointsIcon"></span>
+                </th>
+                <th class="th-stat-dynamic" id="statCol1Header"></th>
+                <th class="th-stat-dynamic" id="statCol2Header"></th>
+                <th class="th-info">Info</th>
+              </tr>
+            </thead>
+            <tbody id="tableBody"></tbody>
+          </table>
+        </div>
+      </div>
     </div>
+
+    <div id="fixturesPanel"></div>
 
     <div class="add-btn-row">
       <button id="addToSquadBtn"
@@ -113,78 +160,6 @@
       font-size: 15px;
       color: #fff;
     "></div>
-
-    <div class="transfer-section">
-      <h2>Transfers</h2>
-
-      <div class="filters">
-        <input type="text" id="searchName" placeholder="Name..." onkeyup="renderTable()" />
-
-        <select id="filterPos" onchange="renderTable()">
-          <option value="">All Positions</option>
-          <option value="GK">Goalkeepers</option>
-          <option value="DEF">Defenders</option>
-          <option value="MID">Midfielders</option>
-          <option value="FWD">Forwards</option>
-        </select>
-
-        <select id="filterTeam" onchange="renderTable()">
-          <option value="">All Teams</option>
-        </select>
-
-        <input type="number"
-               id="filterPrice"
-               placeholder="Max Price"
-               value="20.0"
-               step="0.5"
-               onchange="renderTable()" />
-      </div>
-
-      <div class="player-table">
-        <table id="pTable">
-          <thead>
-            <tr>
-              <th class="th-select">Select</th>
-              <th class="th-status">Status</th>
-              <th class="th-name">Name</th>
-              <th class="th-team">Team</th>
-              <th class="th-pos">
-                Pos
-              </th>
-              <th onclick="sortTable('price')" class="th-sortable th-price">
-                £ <span id="sortPriceIcon"></span>
-              </th>
-              <th onclick="sortTable('points')" class="th-sortable th-points">
-                Pts <span id="sortPointsIcon"></span>
-              </th>
-              <th onclick="sortTable('goals_scored')" class="th-sortable th-stat-col">
-                G <span id="sortGoalsIcon"></span>
-              </th>
-              <th onclick="sortTable('assists')" class="th-sortable th-stat-col">
-                A <span id="sortAssistsIcon"></span>
-              </th>
-              <th onclick="sortTable('clean_sheets')" class="th-sortable th-stat-col">
-                CS <span id="sortCleanSheetsIcon"></span>
-              </th>
-              <th onclick="sortTable('bonus')" class="th-sortable th-stat-col">
-                Bns <span id="sortBonusIcon"></span>
-              </th>
-              <th onclick="sortTable('transfers_in_event')" class="th-sortable th-stat-col">
-                Trs In GW <span id="sortTransfersInIcon"></span>
-              </th>
-              <th onclick="sortTable('transfers_out_event')" class="th-sortable th-stat-col">
-                Trs Out GW <span id="sortTransfersOutIcon"></span>
-              </th>
-              <th onclick="sortTable('selected_by_percent')" class="th-sortable th-stat-col">
-                TSB% <span id="sortSelectedByIcon"></span>
-              </th>
-              <th class="th-fixtures">Next 4</th>
-            </tr>
-          </thead>
-          <tbody id="tableBody"></tbody>
-        </table>
-      </div>
-    </div>
   </div>
 
   <div id="toast" class="message"></div>
