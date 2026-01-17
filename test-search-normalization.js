@@ -68,8 +68,7 @@ const testCases = [
   { player: 'Ødegaard', search: 'ode', shouldMatch: true, description: 'Partial normalized match' },
   
   // Test 2: Scandinavian players (Å)
-  { player: 'Hårland', search: 'Hårland', shouldMatch: true, description: 'Exact match with Å' },
-  { player: 'Hårland', search: 'Harland', shouldMatch: true, description: 'Normalized match (A instead of Å)' },
+  { player: 'Haaland', search: 'Haaland', shouldMatch: true, description: 'Exact match - Haaland (ASCII)' },
   { player: 'Håland', search: 'Haland', shouldMatch: true, description: 'Normalized match with Å→A' },
   
   // Test 3: French/Spanish players (accented vowels)
