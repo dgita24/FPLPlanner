@@ -158,7 +158,7 @@ function mergeDefconIntoElements(elements, defconData) {
 mergeDefconIntoElements(mockElements, defconTotals);
 
 mockElements.forEach(player => {
-  const expected = player.element_type === 1 ? 0 : 2; // All eligible players get 2 points
+  const expected = player.element_type === 1 ? 0 : 2; // GK gets 0, others get 2 in this test data
   const match = player.defensive_contribution === expected;
   console.log(`  ${player.web_name}: ${player.defensive_contribution} (expected: ${expected}) - ${match ? '✓ PASS' : '✗ FAIL'}`);
 });

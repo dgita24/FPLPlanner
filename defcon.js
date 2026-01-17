@@ -81,12 +81,16 @@ async function fetchLiveGameweek(gw) {
  * Awards 2 points per fixture if contributions meet threshold:
  * - DEF: 10+ contributions = 2 points
  * - MID/FWD: 12+ contributions = 2 points
+ * - GK: Not eligible (returns 0)
  * @param {Object} playerData - Player data from live endpoint
  * @param {number} elementType - Player position (1=GK, 2=DEF, 3=MID, 4=FWD)
  * @returns {number} Total DEFCON points awarded across all fixtures
  */
 function calculateDefconPoints(playerData, elementType) {
   if (!playerData || !playerData.explain) return 0;
+  
+  // GK not eligible for DEFCON points
+  if (elementType === 1) return 0;
   
   // Determine threshold based on position
   const threshold = elementType === 2 ? 10 : 12; // DEF needs 10, MID/FWD need 12
