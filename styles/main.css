@@ -264,25 +264,6 @@ body {
   cursor: not-allowed;
 }
 
-/* Transfer buttons in gw-nav keep their specific colors */
-.gw-nav .transfer-action-btn.add-btn {
-  background: #00ff87;
-  color: #000;
-}
-
-.gw-nav .transfer-action-btn.add-btn:hover {
-  background: #00e676;
-}
-
-.gw-nav .transfer-action-btn.cancel-btn {
-  background: #ff4444;
-  color: #fff;
-}
-
-.gw-nav .transfer-action-btn.cancel-btn:hover {
-  background: #dd3333;
-}
-
 /* Center group for GW nav buttons and heading */
 .gw-nav .gw-center {
   display: flex;
