@@ -1,6 +1,7 @@
 // table.js - Player table render/filter
 
 import { state, loadFixtures } from './data.js';
+import { getSuspensionEndGW, isSuspensionExpiredForGW } from './player-status-utils.js';
 
 let tableSort = {
   key: null,      // 'price' | 'points' | 'goals_scored' | 'assists' | 'clean_sheets' | 'bonus' | 'transfers_in_event' | 'transfers_out_event' | 'selected_by_percent'
@@ -101,41 +102,6 @@ function getNextFixturesForTeam(teamId, startGW, count = 4) {
     out.push(formatOpponent(teamId, fx));
   }
   return out;
-}
-
-// Helper function to parse suspension duration from news text
-function getSuspensionEndGW(player, currentGW) {
-  if (!player.news) return null;
-  
-  // Parse: "Suspended for 2 matches" or "Suspended for 2 games"
-  const matchesMatch = player.news.match(/Suspended for (\d+) (?:match|matches|game|games)/i);
-  if (matchesMatch) {
-    const suspendedMatches = parseInt(matchesMatch[1]);
-    // Suspension ends after the last suspended gameweek
-    return currentGW + suspendedMatches - 1;
-  }
-  
-  // Parse: "Unavailable until gameweek 24" or "Returns in gameweek 24"
-  const gwMatch = player.news.match(/(?:until|in) gameweek (\d+)/i);
-  if (gwMatch) {
-    return parseInt(gwMatch[1]) - 1; // Available FROM that GW, so ends before it
-  }
-  
-  return null; // Injury or unknown - treat as indefinite
-}
-
-// Helper function to check if a suspension has expired for a given gameweek
-function isSuspensionExpiredForGW(player, gwToCheck, currentGW) {
-  // Only applies to suspended players
-  if (player.status !== 's') return false;
-  
-  const suspensionEndGW = getSuspensionEndGW(player, currentGW);
-  
-  // If we can't parse suspension end, treat as indefinite (not expired)
-  if (!suspensionEndGW) return false;
-  
-  // Suspension has expired if viewing GW is after the suspension end GW
-  return gwToCheck > suspensionEndGW;
 }
 
 function ensureFixturesForTable() {
