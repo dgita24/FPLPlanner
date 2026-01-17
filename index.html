@@ -438,7 +438,61 @@ background: #00ff87;
 border-color: #00ff87;
 }
 
-/* ===== Waving Status Flags ===== */
+/* ===== Status Flag Badges (Circular style like captain badges) ===== */
+
+.status-flag-badge {
+position: absolute;
+right: -44px;
+top: 50%;
+transform: translateY(-50%);
+width: 24px;
+height: 24px;
+border-radius: 50%;
+color: #000;
+font-weight: bold;
+font-size: 9px;
+display: flex;
+align-items: center;
+justify-content: center;
+box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+z-index: 15;
+}
+
+.status-flag-badge.red {
+background: #ff0000;
+border: 2px solid #ff0000;
+}
+
+.status-flag-badge.yellow {
+background: #ffcc00;
+border: 2px solid #ffcc00;
+}
+
+/* Status flag badges in table */
+.table-status-flag-badge {
+display: inline-flex;
+align-items: center;
+justify-content: center;
+width: 22px;
+height: 22px;
+border-radius: 50%;
+color: #000;
+font-weight: bold;
+font-size: 9px;
+box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.table-status-flag-badge.red {
+background: #ff0000;
+border: 2px solid #ff0000;
+}
+
+.table-status-flag-badge.yellow {
+background: #ffcc00;
+border: 2px solid #ffcc00;
+}
+
+/* ===== OLD Waving Status Flags (kept for backwards compatibility) ===== */
 
 .badge-container {
 position: relative;

@@ -184,16 +184,41 @@ export function renderTable() {
       const next4 = getNextFixturesForTeam(player.team, state.viewingGW, 4);
       const next4Html = next4.map((x) => `<span class="fx">${x}</span>`).join(' ');
 
-      // Status flag for table - using flag emoji
+      // Status flag for table - using circular badge similar to captain badges
       let statusFlagHtml = '';
       
       // Pass events array for date-based suspension parsing
       const events = state.bootstrap?.events || [];
       if (shouldShowPlayerFlag(player, state.viewingGW, state.currentGW, events)) {
         const isDoubtful = player.status === 'd';
-        const flagEmoji = isDoubtful ? '🟨' : '🟥'; // Yellow square for doubtful, red square for injured/suspended
+        
+        // For red flags (suspended/injured/unavailable): show "0"
+        // For yellow flags (doubtful): show chance of playing percentage
+        let badgeText = '0';
+        let badgeClass = 'red';
+        
+        if (isDoubtful) {
+          badgeClass = 'yellow';
+          // Use chance_of_playing_this_round for the viewing gameweek
+          const chanceOfPlaying = state.viewingGW === state.currentGW 
+            ? player.chance_of_playing_this_round 
+            : state.viewingGW === state.currentGW + 1 
+              ? player.chance_of_playing_next_round 
+              : null;
+          
+          // Show 25, 50, or 75 based on chance_of_playing
+          if (chanceOfPlaying !== null && chanceOfPlaying !== undefined) {
+            if (chanceOfPlaying <= 25) badgeText = '25';
+            else if (chanceOfPlaying <= 50) badgeText = '50';
+            else if (chanceOfPlaying <= 75) badgeText = '75';
+            else badgeText = '75'; // Default for any value > 75 but < 100
+          } else {
+            badgeText = '50'; // Default if no chance_of_playing data
+          }
+        }
+        
         const flagTitle = player.news || (isDoubtful ? 'Doubtful' : 'Unavailable');
-        statusFlagHtml = `<span class="table-status-flag" title="${flagTitle}">${flagEmoji}</span>`;
+        statusFlagHtml = `<span class="table-status-flag-badge ${badgeClass}" title="${flagTitle}">${badgeText}</span>`;
       }
 
       return `
