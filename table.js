@@ -19,10 +19,6 @@ const statConfigs = {
     { key: 'goals_scored', label: 'G', tooltip: 'Goals' },
     { key: 'assists', label: 'A', tooltip: 'Assists' }
   ],
-  goals_assists: [
-    { key: 'goals_scored', label: 'G', tooltip: 'Goals' },
-    { key: 'assists', label: 'A', tooltip: 'Assists' }
-  ],
   defensive: [
     { key: 'clean_sheets', label: 'CS', tooltip: 'Clean Sheets' },
     { key: 'bonus', label: 'Bns', tooltip: 'Bonus Points' }
@@ -475,17 +471,35 @@ function initializeStatColumns() {
   
   currentStatView = statSelect.value || 'basic';
   
-  // Update table headers
+  // Update table headers with safe HTML escaping
   const statCols = statConfigs[currentStatView] || statConfigs.basic;
   const col1Header = document.getElementById('statCol1Header');
   const col2Header = document.getElementById('statCol2Header');
   
-  if (col1Header && statCols[0]) {
-    col1Header.innerHTML = `<span onclick="sortTable('${statCols[0].key}')" class="th-sortable" style="cursor: pointer;" title="${statCols[0].tooltip}">${statCols[0].label} <span id="sortStat1Icon">⇅</span></span>`;
+  // Escape HTML to prevent XSS
+  const escapeHtml = (text) => {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  };
+  
+  if (col1Header && statCols.length > 0) {
+    const col = statCols[0];
+    const escapedKey = escapeHtml(col.key);
+    const escapedLabel = escapeHtml(col.label);
+    const escapedTooltip = escapeHtml(col.tooltip);
+    col1Header.innerHTML = `<span onclick="sortTable('${escapedKey}')" class="th-sortable" style="cursor: pointer;" title="${escapedTooltip}">${escapedLabel} <span id="sortStat1Icon">⇅</span></span>`;
   }
   
-  if (col2Header && statCols[1]) {
-    col2Header.innerHTML = `<span onclick="sortTable('${statCols[1].key}')" class="th-sortable" style="cursor: pointer;" title="${statCols[1].tooltip}">${statCols[1].label} <span id="sortStat2Icon">⇅</span></span>`;
+  if (col2Header && statCols.length > 1) {
+    const col = statCols[1];
+    const escapedKey = escapeHtml(col.key);
+    const escapedLabel = escapeHtml(col.label);
+    const escapedTooltip = escapeHtml(col.tooltip);
+    col2Header.innerHTML = `<span onclick="sortTable('${escapedKey}')" class="th-sortable" style="cursor: pointer;" title="${escapedTooltip}">${escapedLabel} <span id="sortStat2Icon">⇅</span></span>`;
+  } else if (col2Header) {
+    // Hide the second column if not available
+    col2Header.innerHTML = '';
   }
 }
 
