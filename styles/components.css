@@ -810,7 +810,11 @@ td.fixtures-cell {
 }
 
 .player-table-compact .th-select {
-  width: 45px;
+  width: 60px;
+}
+
+.player-table-compact .th-club {
+  width: 35px;
 }
 
 .player-table-compact .th-status {
@@ -818,28 +822,44 @@ td.fixtures-cell {
 }
 
 .player-table-compact .th-name {
-  width: 110px;
+  width: 105px;
 }
 
 .player-table-compact .th-pos {
-  width: 40px;
+  width: 38px;
 }
 
 .player-table-compact .th-price {
-  width: 45px;
+  width: 42px;
 }
 
 .player-table-compact .th-points {
-  width: 45px;
+  width: 42px;
 }
 
 .player-table-compact .th-stat-dynamic {
-  width: 60px;
-  min-width: 60px;
+  width: 55px;
+  min-width: 55px;
 }
 
-.player-table-compact .th-info {
-  width: 40px;
+.select-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+.player-table-compact td.club-cell {
+  text-align: center;
+  padding: 2px;
+}
+
+.club-badge {
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+  display: block;
+  margin: 0 auto;
 }
 
 .info-btn {
@@ -847,15 +867,16 @@ td.fixtures-cell {
   color: white;
   border: none;
   border-radius: 50%;
-  width: 20px;
-  height: 20px;
-  font-size: 11px;
+  width: 18px;
+  height: 18px;
+  font-size: 10px;
   font-weight: bold;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   transition: all 0.2s;
+  flex-shrink: 0;
 }
 
 .info-btn:hover {

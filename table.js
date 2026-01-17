@@ -137,6 +137,11 @@ function getTeamShortName(teamId) {
   return t ? (t.short_name || t.shortname || t.name) : '';
 }
 
+function getTeamCode(teamId) {
+  const t = state.teams.find((x) => x.id === teamId);
+  return t ? t.code : null;
+}
+
 function formatOpponent(teamId, fixture) {
   if (!fixture) return '--';
   const isHome = fixture.team_h === teamId;
@@ -271,15 +276,25 @@ export function renderTable() {
       // Get stat value for the single filterable column
       const statValue = formatStatValue(player[statCol.key], statCol.key);
 
+      // Get team code for club badge
+      const teamCode = getTeamCode(player.team);
+      const teamShort = getTeamShortName(player.team);
+      const clubBadgeHtml = teamCode 
+        ? `<img src="https://resources.premierleague.com/premierleague/badges/70/t${teamCode}.png" alt="${teamShort}" class="club-badge" title="${teamShort}">`
+        : '';
+
       return `
         <tr onclick="selectPlayer(event, ${player.id})" class="${checked ? 'selected' : ''}">
-          <td><input type="checkbox" name="selectedPlayer" value="${player.id}" ${checked}></td>
+          <td class="select-cell">
+            <input type="checkbox" name="selectedPlayer" value="${player.id}" ${checked}>
+            <button class="info-btn" onclick="showPlayerInfo(event, ${player.id})" title="View player stats">i</button>
+          </td>
+          <td class="club-cell">${clubBadgeHtml}</td>
           <td class="status-cell">${statusFlagHtml}</td>
           <td class="name-cell">${player.web_name}</td>
           <td>${posNames[player.element_type]}</td>
           <td>${(player.now_cost / 10).toFixed(1)}</td>
           <td class="stat-col-cell">${statValue}</td>
-          <td><button class="info-btn" onclick="showPlayerInfo(event, ${player.id})" title="View player stats">i</button></td>
         </tr>
       `;
     })
