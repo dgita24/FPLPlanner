@@ -94,8 +94,8 @@ async function importTeam() {
   const importedGW = data._imported_gw || state.importedGW;
   if (importedGW && importedGW !== state.currentGW) {
     showMessage(
-      `Imported from GW${importedGW} (GW${state.currentGW} not public yet).`,
-      'success'
+      `⚠️ Imported from GW${importedGW} (GW${state.currentGW} picks not yet available). Your current squad may be different if you made transfers since GW${importedGW}.`,
+      'info'
     );
   } else {
     showMessage(`Team imported for GW${state.currentGW}.`, 'success');
