@@ -183,15 +183,18 @@ export function shouldShowPlayerFlag(player, viewingGW, currentGW, events = []) 
   if (!player.status || player.status === 'a') return false;
   
   // For current and next gameweek, use chance_of_playing fields if available
-  // These are more accurate than news parsing for immediate availability
-  if (viewingGW === currentGW && player.chance_of_playing_this_round !== null && player.chance_of_playing_this_round !== undefined) {
-    // If chance is 100%, don't show flag even if status says otherwise
-    if (player.chance_of_playing_this_round === 100) return false;
-  }
-  
-  if (viewingGW === currentGW + 1 && player.chance_of_playing_next_round !== null && player.chance_of_playing_next_round !== undefined) {
-    // If chance is 100%, don't show flag even if status says otherwise
-    if (player.chance_of_playing_next_round === 100) return false;
+  // BUT: Only for injuries/doubtful, NOT for suspensions
+  // Suspensions have definite end dates, so we use our calculation instead
+  if (player.status !== 's') {
+    if (viewingGW === currentGW && player.chance_of_playing_this_round !== null && player.chance_of_playing_this_round !== undefined) {
+      // If chance is 100%, don't show flag even if status says otherwise
+      if (player.chance_of_playing_this_round === 100) return false;
+    }
+    
+    if (viewingGW === currentGW + 1 && player.chance_of_playing_next_round !== null && player.chance_of_playing_next_round !== undefined) {
+      // If chance is 100%, don't show flag even if status says otherwise
+      if (player.chance_of_playing_next_round === 100) return false;
+    }
   }
   
   // For suspensions, check if expired
