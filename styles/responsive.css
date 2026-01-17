@@ -8,7 +8,7 @@
   }
 
   #plannerMain {
-    grid-template-columns: 280px 1fr 340px;
+    grid-template-columns: 260px 1fr 350px;
     gap: 10px;
   }
 
