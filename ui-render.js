@@ -405,21 +405,19 @@ function playerCard(entry, source) {
   
   let captainUI = '';
   if (source === 'starting') {
-    if (isCaptain) {
-      // Show captain badge
-      captainUI = `<div class="captain-badge c">C</div>`;
-    } else if (isViceCaptain) {
-      // Show vice-captain badge
-      captainUI = `<div class="captain-badge vc">VC</div>`;
-    } else {
-      // Show selector on hover - entry.id is always a number from the database
-      captainUI = `
-        <div class="captain-selector">
-          <button class="captain-btn" onclick="setCaptain(${entry.id})" title="Set as Captain">C</button>
-          <button class="captain-btn" onclick="setViceCaptain(${entry.id})" title="Set as Vice-Captain">VC</button>
-        </div>
-      `;
-    }
+    // Always show selector on hover for interactivity
+    // Show badge when assigned (visible when not hovering)
+    const badge = isCaptain ? `<div class="captain-badge c">C</div>` 
+                  : isViceCaptain ? `<div class="captain-badge vc">VC</div>` 
+                  : '';
+    
+    captainUI = `
+      ${badge}
+      <div class="captain-selector">
+        <button class="captain-btn" onclick="setCaptain(${entry.id})" title="Set as Captain">C</button>
+        <button class="captain-btn" onclick="setViceCaptain(${entry.id})" title="Set as Vice-Captain">VC</button>
+      </div>
+    `;
   }
 
   return `
