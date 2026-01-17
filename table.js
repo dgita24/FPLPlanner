@@ -210,16 +210,19 @@ export function renderTable() {
   // Initialize stat columns on first render
   if (isFirstRender) {
     initializeStatColumns();
+    populateTeamFilter();
     isFirstRender = false;
   }
 
   const search = foldForSearch(document.getElementById('searchName')?.value || '');
   const posFilter = document.getElementById('filterPos')?.value || '';
+  const teamFilter = document.getElementById('filterTeam')?.value || '';
 
   let filtered = state.elements.filter((player) => {
     const matchesSearch = foldForSearch(player.web_name || '').includes(search);
     const matchesPos = !posFilter || posNames[player.element_type] === posFilter;
-    return matchesSearch && matchesPos;
+    const matchesTeam = !teamFilter || String(player.team) === teamFilter;
+    return matchesSearch && matchesPos && matchesTeam;
   });
 
   // -------- SORTING --------
@@ -329,6 +332,27 @@ export function populateFilters() {
   // Note: Team filter removed from compact view
 }
 
+function populateTeamFilter() {
+  const teamSelect = document.getElementById('filterTeam');
+  if (!teamSelect || !state.teams) return;
+
+  // Sort teams alphabetically by name
+  const sortedTeams = [...state.teams].sort((a, b) => 
+    (a.name || '').localeCompare(b.name || '')
+  );
+
+  // Clear existing options except the first "All Clubs"
+  teamSelect.innerHTML = '<option value="">All Clubs</option>';
+
+  // Add team options
+  sortedTeams.forEach(team => {
+    const option = document.createElement('option');
+    option.value = String(team.id);
+    option.textContent = team.name;
+    teamSelect.appendChild(option);
+  });
+}
+
 window.selectPlayer = function (ev, id) {
   if (ev) ev.stopPropagation();
   
@@ -367,7 +391,8 @@ window.sortTable = function (key) {
     tableSort.dir = tableSort.dir === 'asc' ? 'desc' : 'asc';
   } else {
     tableSort.key = key;
-    tableSort.dir = 'asc';
+    // Default to descending (highest first) for numeric columns
+    tableSort.dir = 'desc';
   }
 
   updateSortIcons();
