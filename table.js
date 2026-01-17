@@ -23,8 +23,8 @@ const statConfig = {
   assists: { key: 'assists', label: 'A', tooltip: 'Assists' },
   clean_sheets: { key: 'clean_sheets', label: 'CS', tooltip: 'Clean Sheets' },
   bonus: { key: 'bonus', label: 'Bns', tooltip: 'Bonus Points' },
-  transfers_in_event: { key: 'transfers_in_event', label: 'TI', tooltip: 'Transfers In (GW)' },
-  transfers_out_event: { key: 'transfers_out_event', label: 'TO', tooltip: 'Transfers Out (GW)' },
+  transfers_in_event: { key: 'transfers_in_event', label: 'TI', tooltip: 'Transfers In (round)' },
+  transfers_out_event: { key: 'transfers_out_event', label: 'TO', tooltip: 'Transfers Out (round)' },
   selected_by_percent: { key: 'selected_by_percent', label: 'Own%', tooltip: 'Ownership %' },
   form: { key: 'form', label: 'Form', tooltip: 'Recent Performance Score' },
   minutes: { key: 'minutes', label: 'Min', tooltip: 'Minutes Played' },
@@ -40,7 +40,7 @@ const statConfig = {
   expected_assists: { key: 'expected_assists', label: 'xA', tooltip: 'Expected Assists' },
   expected_goals_conceded: { key: 'expected_goals_conceded', label: 'xGC', tooltip: 'Expected Goals Conceded' },
   expected_goal_involvements: { key: 'expected_goal_involvements', label: 'xGI', tooltip: 'Expected Goal Involvements' },
-  defensive_contribution: { key: 'defensive_contribution', label: 'DEFCON', tooltip: 'DEFCON Points: 2pts per game with 10+ contributions (DEF) or 12+ (MID/FWD)' }
+  defensive_contribution: { key: 'defensive_contribution', label: 'DEFCON', tooltip: 'DEFCON Pts Awarded: 2pts per game with 10+ contributions (DEF) or 12+ (MID/FWD)' }
 };
 
 // Selected players (changed from single to multi-select)
