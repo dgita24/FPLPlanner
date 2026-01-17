@@ -547,10 +547,10 @@ export function initUI() {
 
       /* Chip buttons row - container for multiple chip buttons */
       .chip-buttons-row {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        grid-template-rows: repeat(2, 1fr);
+        display: flex;
         gap: 6px;
+        flex-wrap: nowrap;
+        justify-content: center;
       }
 
       /* Smaller chip buttons for multiple chips */
