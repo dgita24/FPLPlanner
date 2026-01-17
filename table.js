@@ -1,7 +1,7 @@
 // table.js - Player table render/filter
 
 import { state, loadFixtures } from './data.js';
-import { getSuspensionEndGW, isSuspensionExpiredForGW } from './player-status-utils.js';
+import { shouldShowPlayerFlag } from './player-status-utils.js';
 
 let tableSort = {
   key: null,      // 'price' | 'points' | 'goals_scored' | 'assists' | 'clean_sheets' | 'bonus' | 'transfers_in_event' | 'transfers_out_event' | 'selected_by_percent'
@@ -187,11 +187,7 @@ export function renderTable() {
       // Status flag for table - using flag emoji
       let statusFlagHtml = '';
       
-      // Check if player should show a flag in the current viewing gameweek
-      const shouldShowFlag = (player.status && player.status !== 'a') && 
-                             !isSuspensionExpiredForGW(player, state.viewingGW, state.currentGW);
-      
-      if (shouldShowFlag) {
+      if (shouldShowPlayerFlag(player, state.viewingGW, state.currentGW)) {
         const isDoubtful = player.status === 'd';
         const flagEmoji = isDoubtful ? '🟨' : '🟥'; // Yellow square for doubtful, red square for injured/suspended
         const flagTitle = player.news || (isDoubtful ? 'Doubtful' : 'Unavailable');

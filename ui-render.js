@@ -3,7 +3,7 @@
 import { state, loadFixtures } from './data.js';
 import { getElementType } from './validation.js';
 import { getBatchTransferInfo } from './team-operations.js';
-import { getSuspensionEndGW, isSuspensionExpiredForGW } from './player-status-utils.js';
+import { shouldShowPlayerFlag } from './player-status-utils.js';
 
 // --- Flag canvas counter for unique IDs ---
 let flagCanvasCounter = 0;
@@ -390,11 +390,7 @@ function playerCard(entry, source) {
   // news: contains injury details text
   let statusFlags = '';
   
-  // Check if player should show a flag in the current viewing gameweek
-  const shouldShowFlag = (p.status && p.status !== 'a') && 
-                         !isSuspensionExpiredForGW(p, state.viewingGW, state.currentGW);
-  
-  if (shouldShowFlag) {
+  if (shouldShowPlayerFlag(p, state.viewingGW, state.currentGW)) {
     const isDoubtful = p.status === 'd';
     const flagColor = isDoubtful ? 'yellow' : 'red';
     const flagTitle = escapeHtml(p.news || (isDoubtful ? 'Doubtful' : 'Unavailable'));

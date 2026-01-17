@@ -10,9 +10,9 @@ export function getSuspensionEndGW(player, currentGW) {
   if (!player.news) return null;
   
   // Parse: "Suspended for 2 matches" or "Suspended for 2 games"
-  const matchesMatch = player.news.match(/Suspended for (\d+) (?:match|matches|game|games)/i);
-  if (matchesMatch) {
-    const suspendedMatches = parseInt(matchesMatch[1]);
+  const suspensionMatch = player.news.match(/Suspended for (\d+) (?:match|matches|game|games)/i);
+  if (suspensionMatch) {
+    const suspendedMatches = parseInt(suspensionMatch[1]);
     // Suspension ends after the last suspended gameweek
     return currentGW + suspendedMatches - 1;
   }
@@ -44,4 +44,24 @@ export function isSuspensionExpiredForGW(player, gwToCheck, currentGW) {
   
   // Suspension has expired if viewing GW is after the suspension end GW
   return gwToCheck > suspensionEndGW;
+}
+
+/**
+ * Check if a player should show a status flag in a given gameweek
+ * @param {Object} player - Player object with status and news
+ * @param {number} viewingGW - Gameweek being viewed
+ * @param {number} currentGW - Current gameweek number
+ * @returns {boolean} - True if flag should be shown, false otherwise
+ */
+export function shouldShowPlayerFlag(player, viewingGW, currentGW) {
+  // Player must have a non-available status to show a flag
+  if (!player.status || player.status === 'a') return false;
+  
+  // For suspensions, check if expired
+  if (player.status === 's' && isSuspensionExpiredForGW(player, viewingGW, currentGW)) {
+    return false;
+  }
+  
+  // For all other statuses (injuries, doubtful, etc.), show the flag
+  return true;
 }
