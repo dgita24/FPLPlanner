@@ -1,5 +1,24 @@
 // player-status-utils.js - Utility functions for player status and flags
 
+// Shared regex pattern for matching month names
+const MONTH_PATTERN = 'Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|Jun(?:e)?|Jul(?:y)?|Aug(?:ust)?|Sep(?:tember)?|Oct(?:ober)?|Nov(?:ember)?|Dec(?:ember)?';
+
+// Map month names to month numbers (0-indexed for JavaScript Date)
+const MONTH_MAP = {
+  'jan': 0, 'january': 0,
+  'feb': 1, 'february': 1,
+  'mar': 2, 'march': 2,
+  'apr': 3, 'april': 3,
+  'may': 4,
+  'jun': 5, 'june': 5,
+  'jul': 6, 'july': 6,
+  'aug': 7, 'august': 7,
+  'sep': 8, 'september': 8,
+  'oct': 9, 'october': 9,
+  'nov': 10, 'november': 10,
+  'dec': 11, 'december': 11
+};
+
 /**
  * Parse a date string from suspension news and convert to Date object
  * @param {string} dateStr - Date string like "31 January" or "Jan 31"
@@ -10,33 +29,29 @@ function parseSuspensionDate(dateStr, currentYear) {
   if (!dateStr) return null;
   
   // Extract date components: "31 January", "Jan 31", "January 31st"
-  const datePattern = /(\d+)\s+(Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|Jun(?:e)?|Jul(?:y)?|Aug(?:ust)?|Sep(?:tember)?|Oct(?:ober)?|Nov(?:ember)?|Dec(?:ember)?)|(?:Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|Jun(?:e)?|Jul(?:y)?|Aug(?:ust)?|Sep(?:tember)?|Oct(?:ober)?|Nov(?:ember)?|Dec(?:ember)?)\s+(\d+)/i;
-  const match = dateStr.match(datePattern);
+  // Pattern matches: (day) (month) OR (month) (day)
+  const dayFirst = new RegExp(`(\\d+)\\s+(${MONTH_PATTERN})`, 'i');
+  const monthFirst = new RegExp(`(${MONTH_PATTERN})\\s+(\\d+)`, 'i');
   
-  if (!match) return null;
+  let day, monthStr;
   
-  const day = parseInt(match[1] || match[3]);
-  const monthStr = (match[2] || match[1]) ? match[2] : dateStr.match(/[A-Za-z]+/)?.[0];
+  const dayFirstMatch = dateStr.match(dayFirst);
+  if (dayFirstMatch) {
+    day = parseInt(dayFirstMatch[1]);
+    monthStr = dayFirstMatch[2];
+  } else {
+    const monthFirstMatch = dateStr.match(monthFirst);
+    if (monthFirstMatch) {
+      monthStr = monthFirstMatch[1];
+      day = parseInt(monthFirstMatch[2]);
+    } else {
+      return null;
+    }
+  }
   
   if (!monthStr) return null;
   
-  // Map month names to month numbers (0-indexed)
-  const monthMap = {
-    'jan': 0, 'january': 0,
-    'feb': 1, 'february': 1,
-    'mar': 2, 'march': 2,
-    'apr': 3, 'april': 3,
-    'may': 4,
-    'jun': 5, 'june': 5,
-    'jul': 6, 'july': 6,
-    'aug': 7, 'august': 7,
-    'sep': 8, 'september': 8,
-    'oct': 9, 'october': 9,
-    'nov': 10, 'november': 10,
-    'dec': 11, 'december': 11
-  };
-  
-  const month = monthMap[monthStr.toLowerCase()];
+  const month = MONTH_MAP[monthStr.toLowerCase()];
   if (month === undefined) return null;
   
   // Handle year rollover (if month is before June, assume next year during current season)
@@ -117,7 +132,8 @@ export function getSuspensionEndGW(player, currentGW, events = []) {
   }
   
   // Parse date-based suspension: "Suspended until 31 January" or "Expected back 31 Jan"
-  const dateMatch = player.news.match(/(?:until|back|return)\s+(?:on\s+)?(\d+\s+(?:Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|Jun(?:e)?|Jul(?:y)?|Aug(?:ust)?|Sep(?:tember)?|Oct(?:ober)?|Nov(?:ember)?|Dec(?:ember)?)|\b(?:Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|Jun(?:e)?|Jul(?:y)?|Aug(?:ust)?|Sep(?:tember)?|Oct(?:ober)?|Nov(?:ember)?|Dec(?:ember)?)\s+\d+)(?:st|nd|rd|th)?/i);
+  const dateRegex = new RegExp(`(?:until|back|return)\\s+(?:on\\s+)?(\\d+\\s+(?:${MONTH_PATTERN})|(?:${MONTH_PATTERN})\\s+\\d+)(?:st|nd|rd|th)?`, 'i');
+  const dateMatch = player.news.match(dateRegex);
   if (dateMatch && events && events.length > 0) {
     const currentYear = new Date().getFullYear();
     const suspensionDate = parseSuspensionDate(dateMatch[1], currentYear);

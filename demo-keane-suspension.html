@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Keane Suspension Fix Demo</title>
+  <style>
+    body {
+      font-family: "Segoe UI", sans-serif;
+      background: #37003c;
+      color: #fff;
+      padding: 20px;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+    
+    h1 {
+      color: #00ff87;
+      margin-bottom: 30px;
+    }
+    
+    .demo-section {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    
+    .timeline {
+      display: flex;
+      gap: 15px;
+      margin: 20px 0;
+      overflow-x: auto;
+    }
+    
+    .gw-box {
+      min-width: 150px;
+      padding: 15px;
+      border-radius: 8px;
+      text-align: center;
+    }
+    
+    .gw-box.suspended {
+      background: rgba(255, 0, 0, 0.3);
+      border: 2px solid #ff0000;
+    }
+    
+    .gw-box.available {
+      background: rgba(0, 255, 135, 0.3);
+      border: 2px solid #00ff87;
+    }
+    
+    .gw-label {
+      font-weight: bold;
+      font-size: 18px;
+      margin-bottom: 5px;
+    }
+    
+    .gw-deadline {
+      font-size: 12px;
+      opacity: 0.8;
+      margin-bottom: 10px;
+    }
+    
+    .flag-status {
+      padding: 8px 15px;
+      border-radius: 5px;
+      font-weight: bold;
+      margin-top: 10px;
+      display: inline-block;
+    }
+    
+    .flag-red {
+      background: #ff0000;
+      color: white;
+    }
+    
+    .flag-none {
+      background: #00ff87;
+      color: #37003c;
+    }
+    
+    .code-example {
+      background: #000;
+      padding: 15px;
+      border-radius: 5px;
+      font-family: 'Courier New', monospace;
+      font-size: 13px;
+      margin: 15px 0;
+      overflow-x: auto;
+    }
+    
+    .highlight {
+      color: #00ff87;
+      font-weight: bold;
+    }
+    
+    .before-after {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin: 20px 0;
+    }
+    
+    .before, .after {
+      padding: 15px;
+      border-radius: 8px;
+    }
+    
+    .before {
+      background: rgba(255, 0, 0, 0.2);
+      border: 2px solid #ff0000;
+    }
+    
+    .after {
+      background: rgba(0, 255, 135, 0.2);
+      border: 2px solid #00ff87;
+    }
+    
+    @media (max-width: 768px) {
+      .before-after {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>🚩 Keane Suspension Fix - Date-Based Parsing</h1>
+  
+  <div class="demo-section">
+    <h2>The Problem</h2>
+    <p><strong>Original Issue:</strong> Keane shows as red flagged for the whole season even though his suspension ends on Jan 31.</p>
+    <p><strong>Root Cause:</strong> The system couldn't parse date-based suspension news like "Suspended until 31 January".</p>
+  </div>
+  
+  <div class="demo-section">
+    <h2>The Fix</h2>
+    <div class="before-after">
+      <div class="before">
+        <h3>❌ Before</h3>
+        <ul>
+          <li>Only parsed "Suspended for X matches"</li>
+          <li>Couldn't handle date-based news</li>
+          <li>Keane flagged indefinitely</li>
+        </ul>
+      </div>
+      <div class="after">
+        <h3>✅ After</h3>
+        <ul>
+          <li>Parses dates like "31 January"</li>
+          <li>Converts dates to gameweeks</li>
+          <li>Flag removed after GW23</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  
+  <div class="demo-section">
+    <h2>Keane's Case: "Suspended until 31 January"</h2>
+    <p><strong>Current Gameweek:</strong> 22</p>
+    <p><strong>Suspension Until:</strong> January 31, 2026</p>
+    <p><strong>Logic:</strong> Player is unavailable until end of Jan 31. GW23 deadline is Jan 31 at 14:00, so he misses GW23. Available from GW24 onwards.</p>
+    
+    <div class="timeline">
+      <div class="gw-box suspended">
+        <div class="gw-label">GW 22</div>
+        <div class="gw-deadline">Deadline: Jan 24</div>
+        <div class="flag-status flag-red">🟥 SUSPENDED</div>
+        <div style="margin-top: 10px; font-size: 12px;">1st suspended match</div>
+      </div>
+      
+      <div class="gw-box suspended">
+        <div class="gw-label">GW 23</div>
+        <div class="gw-deadline">Deadline: Jan 31</div>
+        <div class="flag-status flag-red">🟥 SUSPENDED</div>
+        <div style="margin-top: 10px; font-size: 12px;">Deadline on suspension date</div>
+      </div>
+      
+      <div class="gw-box available">
+        <div class="gw-label">GW 24</div>
+        <div class="gw-deadline">Deadline: Feb 7</div>
+        <div class="flag-status flag-none">✅ AVAILABLE</div>
+        <div style="margin-top: 10px; font-size: 12px;">Suspension expired</div>
+      </div>
+      
+      <div class="gw-box available">
+        <div class="gw-label">GW 25</div>
+        <div class="gw-deadline">Deadline: Feb 14</div>
+        <div class="flag-status flag-none">✅ AVAILABLE</div>
+        <div style="margin-top: 10px; font-size: 12px;">Available</div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="demo-section">
+    <h2>Implementation Details</h2>
+    
+    <h3>Step 1: Parse the Date</h3>
+    <div class="code-example">
+news: <span class="highlight">"Suspended until 31 January"</span>
+↓
+Regex match: <span class="highlight">/(?:until|back|return)\s+(?:on\s+)?(\d+\s+January)/i</span>
+↓
+Parsed: <span class="highlight">Date(2026, 0, 31)</span> // Jan 31, 2026
+    </div>
+    
+    <h3>Step 2: Find Last Suspended Gameweek</h3>
+    <div class="code-example">
+Compare suspension date with gameweek deadlines:
+- GW22 deadline (Jan 24) <= Jan 31? <span class="highlight">YES</span> ✓ Suspended
+- GW23 deadline (Jan 31 14:00) <= Jan 31 23:59? <span class="highlight">YES</span> ✓ Suspended
+- GW24 deadline (Feb 7) <= Jan 31? <span class="highlight">NO</span> ✗ Available
+↓
+Last suspended GW: <span class="highlight">23</span>
+    </div>
+    
+    <h3>Step 3: Show/Hide Flag Based on Viewing GW</h3>
+    <div class="code-example">
+if (viewingGW > suspensionEndGW) {
+  <span class="highlight">// Don't show flag</span>
+  return false;
+}
+// Otherwise show flag
+
+Examples:
+- Viewing GW22: 22 > 23? NO → <span class="highlight">Show flag ✓</span>
+- Viewing GW23: 23 > 23? NO → <span class="highlight">Show flag ✓</span>
+- Viewing GW24: 24 > 23? YES → <span class="highlight">Hide flag ✓</span>
+- Viewing GW25: 25 > 23? YES → <span class="highlight">Hide flag ✓</span>
+    </div>
+  </div>
+  
+  <div class="demo-section">
+    <h2>Supported Date Formats</h2>
+    <ul>
+      <li>✅ "Suspended until 31 January" (Keane's format)</li>
+      <li>✅ "Suspended until Jan 31"</li>
+      <li>✅ "Expected back 7 February"</li>
+      <li>✅ "Suspended until February 14th" (with ordinal suffix)</li>
+      <li>✅ "Suspended for 2 matches" (original format still works)</li>
+    </ul>
+  </div>
+  
+  <div class="demo-section">
+    <h2>Additional Enhancements</h2>
+    <h3>chance_of_playing Fields</h3>
+    <p>For current and next gameweek, the system now also checks:</p>
+    <ul>
+      <li><code>chance_of_playing_this_round</code> - If 100%, no flag shown</li>
+      <li><code>chance_of_playing_next_round</code> - If 100%, no flag shown</li>
+    </ul>
+    <p>This provides additional accuracy beyond just parsing the news text.</p>
+  </div>
+  
+  <div class="demo-section" style="background: rgba(0, 255, 135, 0.2); border: 2px solid #00ff87;">
+    <h2>✅ Result</h2>
+    <p style="font-size: 18px;"><strong>Keane now correctly shows:</strong></p>
+    <ul style="font-size: 16px;">
+      <li>🟥 Red flag in GW22</li>
+      <li>🟥 Red flag in GW23</li>
+      <li>✅ NO flag from GW24 onwards</li>
+    </ul>
+    <p style="margin-top: 20px;">The system now handles date-based suspensions accurately!</p>
+  </div>
+</body>
+</html>
