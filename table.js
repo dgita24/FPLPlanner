@@ -31,6 +31,18 @@ const statConfig = {
 // Selected players (changed from single to multi-select)
 window.selectedPlayerIds = window.selectedPlayerIds ?? [];
 
+// Helper function to escape HTML attributes
+function escapeHtml(text) {
+  const map = {
+    '"': '&quot;',
+    "'": '&#39;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '&': '&amp;'
+  };
+  return String(text).replace(/["'<>&]/g, m => map[m]);
+}
+
 // Helper function to format stat values
 function formatStatValue(value, statKey) {
   if (value === null || value === undefined) {
@@ -278,13 +290,15 @@ export function renderTable() {
       const team = state.teams.find(t => t.id === player.team);
       const teamCode = team ? team.code : '';
       const teamName = team ? team.name : 'Unknown';
+      const teamNameEscaped = escapeHtml(teamName);
+      const playerNameEscaped = escapeHtml(player.web_name);
       const badgeUrl = teamCode 
-        ? TEAM_BADGE_URL_TEMPLATE.replace('{code}', teamCode)
+        ? `https://resources.premierleague.com/premierleague/badges/70/t${teamCode}.png`
         : '';
       
       // Only render badge img if URL is available
       const badgeHtml = badgeUrl 
-        ? `<img class="club-badge" src="${badgeUrl}" alt="${teamName}" title="${teamName}" />`
+        ? `<img class="club-badge" src="${badgeUrl}" alt="${teamNameEscaped}" title="${teamNameEscaped}" />`
         : '';
 
       return `
@@ -295,7 +309,7 @@ export function renderTable() {
           </td>
           <td class="club-cell">${badgeHtml}</td>
           <td class="status-cell">${statusFlagHtml}</td>
-          <td class="name-cell">${player.web_name}</td>
+          <td class="name-cell">${playerNameEscaped}</td>
           <td>${posNames[player.element_type]}</td>
           <td>${(player.now_cost / 10).toFixed(1)}</td>
           <td class="stat-col-cell">${statValue}</td>
@@ -400,6 +414,9 @@ window.showPlayerInfo = function (ev, playerId) {
   const team = state.teams.find(t => t.id === player.team);
   const teamName = team ? team.name : 'Unknown';
   const teamCode = team ? team.code : '';
+  const teamNameEscaped = escapeHtml(teamName);
+  const playerNameEscaped = escapeHtml(player.web_name);
+  const newsEscaped = player.news ? escapeHtml(player.news) : '';
   
   // Create modal if it doesn't exist
   let modal = document.getElementById('playerInfoModal');
@@ -491,7 +508,7 @@ window.showPlayerInfo = function (ev, playerId) {
   const statusInfo = player.news ? `
     <div class="player-info-section">
       <h3>Status</h3>
-      <p style="color: rgba(255, 255, 255, 0.9); line-height: 1.6;">${player.news}</p>
+      <p style="color: rgba(255, 255, 255, 0.9); line-height: 1.6;">${newsEscaped}</p>
     </div>
   ` : '';
   
@@ -501,10 +518,10 @@ window.showPlayerInfo = function (ev, playerId) {
       
       <div class="player-info-header">
         <img src="https://resources.premierleague.com/premierleague/badges/70/t${teamCode}.png" 
-             class="player-info-badge" alt="${teamName}">
+             class="player-info-badge" alt="${teamNameEscaped}">
         <div class="player-info-title">
-          <h2>${player.web_name}</h2>
-          <p>${teamName} • ${posNames[player.element_type]}</p>
+          <h2>${playerNameEscaped}</h2>
+          <p>${teamNameEscaped} • ${posNames[player.element_type]}</p>
         </div>
       </div>
       
