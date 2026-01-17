@@ -346,6 +346,17 @@ font-size: 11px;
 
 /* ===== Captain/Vice-Captain Selection ===== */
 
+/* Extend hover area to cover the gap between badge and selector */
+.badge-container::before {
+content: '';
+position: absolute;
+left: -50px;
+top: 0;
+width: 50px;
+height: 100%;
+z-index: 19;
+}
+
 .captain-selector {
 position: absolute;
 left: -44px;
