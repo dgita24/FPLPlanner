@@ -94,6 +94,13 @@ function getSortIcons() {
       price: document.getElementById('sortPriceIcon')
     };
   }
+  
+  // Always update the stat icon since it changes with dropdown selection
+  const statKey = currentStatView ? statConfig[currentStatView]?.key : null;
+  if (statKey) {
+    sortIcons[statKey] = document.getElementById('sortStatIcon');
+  }
+  
   return sortIcons;
 }
 
@@ -446,9 +453,24 @@ function updateSortIcons() {
 
 // Update stat columns based on dropdown selection
 window.updateStatColumns = function () {
+  // Automatically sort by the selected stat column (highest to lowest)
+  const statSelect = document.getElementById('statSelect');
+  if (statSelect) {
+    const selectedStat = statSelect.value || 'points';
+    const statCol = statConfig[selectedStat] || statConfig.points;
+    
+    // Set the sort to the selected stat column in descending order (highest first)
+    tableSort.key = statCol.key;
+    tableSort.dir = 'desc';
+  }
+  
   initializeStatColumns();
-  // Re-render table with new columns
+  
+  // Re-render table with new columns and sorting
   renderTable();
+  
+  // Update sort icons after rendering
+  updateSortIcons();
 };
 
 // Show player info modal
