@@ -376,4 +376,39 @@
   .help-modal p, .help-modal li {
     font-size: 14px;
   }
+
+  .player-info-modal {
+    padding: 10px;
+  }
+
+  .player-info-content {
+    padding: 20px 15px;
+    max-height: 85vh;
+  }
+
+  .player-info-header {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .player-info-stats {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 10px;
+  }
+
+  .player-stat-item {
+    padding: 10px;
+  }
+
+  .player-stat-value {
+    font-size: 18px;
+  }
+
+  .transfer-panel {
+    max-height: 600px;
+  }
+
+  .player-table-compact {
+    max-height: 450px;
+  }
 }
