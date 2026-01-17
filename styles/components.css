@@ -2,28 +2,153 @@
 
 .pitch-stack {
   width: 100%;
-  max-width: 1100px;
+  max-width: 935px;
   margin-top: 0;
 }
 
 .pitch {
   background: linear-gradient(to bottom, #2d5016 0%, #1a3d0a 100%);
-  padding: 25px 20px;
+  padding: 21px 17px;
   border-radius: 10px;
-  max-width: 1100px;
+  max-width: 935px;
   margin: 0 auto 10px;
   position: relative;
-  min-height: 380px;
+  min-height: 323px;
   border: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Pitch top controls container */
+.pitch-top-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 16px;
+  min-height: 36px;
+}
+
+/* Transfer actions on the left */
+.transfer-actions-left {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  /* No margin-top: transfer buttons align with chip buttons at the top */
+}
+
+.transfer-action-btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+  height: 36px;
+}
+
+.transfer-action-btn.add-btn {
+  background: #00ff87;
+  color: #000;
+}
+
+.transfer-action-btn.add-btn:hover {
+  background: #00e676;
+}
+
+.transfer-action-btn.cancel-btn {
+  background: #ff4444;
+  color: #fff;
+}
+
+.transfer-action-btn.cancel-btn:hover {
+  background: #dd3333;
+}
+
+/* Chip UI styles */
+.chip-container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.chip-indicator {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  background: rgba(0, 255, 135, 0.15);
+  border: 2px solid #00ff87;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.chip-icon {
+  font-size: 14px;
+}
+
+.chip-name {
+  color: #00ff87;
+}
+
+.chip-gw {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 11px;
+}
+
+.chip-buttons-row {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.chip-btn-small {
+  padding: 8px 14px;
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+  height: 36px;
+  background: rgba(0, 255, 135, 0.2);
+  color: #00ff87;
+  border: 1px solid #00ff87;
+}
+
+.chip-btn-small:hover:not(:disabled) {
+  background: rgba(0, 255, 135, 0.3);
+  transform: translateY(-1px);
+}
+
+.chip-btn-small.chip-btn-active {
+  background: #00ff87;
+  color: #000;
+  border-color: #00ff87;
+}
+
+.chip-btn-small.chip-btn-used {
+  background: rgba(100, 100, 100, 0.2);
+  color: rgba(255, 255, 255, 0.4);
+  border-color: rgba(255, 255, 255, 0.2);
+  cursor: not-allowed;
+}
+
+.chip-btn-small:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .formation-line {
   display: flex;
   justify-content: center;
   align-items: flex-end;
-  gap: 14px;
-  margin-bottom: 8px;
-  min-height: 100px;
+  gap: 12px;
+  margin-bottom: 7px;
+  min-height: 85px;
   flex-wrap: nowrap;
 }
 
@@ -35,10 +160,10 @@
 /* ===== Player Cards ===== */
 
 .player-card {
-  width: 170px;
+  width: 145px;
   background: rgba(255, 255, 255, 0.95);
-  border-radius: 8px;
-  padding: 6px;
+  border-radius: 7px;
+  padding: 5px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
   position: relative;
   transition: all 0.2s;
@@ -52,14 +177,14 @@
 }
 
 .player-card .name {
-  font-size: 12px;
+  font-size: 10px;
   font-weight: 700;
   color: #000;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   background: #eee;
-  padding: 2px 4px;
+  padding: 2px 3px;
   border-radius: 3px;
   margin: 2px 0;
   text-align: center;
@@ -67,21 +192,21 @@
 }
 
 .player-card .info {
-  font-size: 10px;
+  font-size: 9px;
   color: #333;
   display: flex;
   justify-content: space-between;
-  padding: 0 4px;
+  padding: 0 3px;
   font-weight: 600;
   white-space: nowrap;
   overflow: hidden;
-  min-height: 14px;
+  min-height: 12px;
 }
 
 .card-btn {
   position: absolute;
-  width: 18px;
-  height: 18px;
+  width: 15px;
+  height: 15px;
   border-radius: 50%;
   border: none;
   color: white;
@@ -90,7 +215,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 14px;
+  font-size: 12px;
   transition: transform 0.1s;
 }
 
@@ -99,33 +224,33 @@
 }
 
 .btn-remove {
-  top: -6px;
-  left: -6px;
+  top: -5px;
+  left: -5px;
   background: #ff4444;
 }
 
 .btn-swap {
-  top: -6px;
-  right: -6px;
+  top: -5px;
+  right: -5px;
   background: #4444ff;
-  font-size: 11px;
+  font-size: 9px;
 }
 
 /* ===== Badge Container ===== */
 
 .badge-container {
   position: relative;
-  width: 40px;
-  height: 40px;
-  margin: 0 auto 3px;
+  width: 34px;
+  height: 34px;
+  margin: 0 auto 2px;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .badge-container .badge {
-  width: 40px;
-  height: 40px;
+  width: 34px;
+  height: 34px;
   object-fit: contain;
   display: block;
   margin: 0;
@@ -148,12 +273,12 @@
 
 .captain-selector {
   position: absolute;
-  left: -44px;
+  left: -37px;
   top: 50%;
   transform: translateY(-50%);
   display: none;
   flex-direction: column;
-  gap: 3px;
+  gap: 2px;
   z-index: 20;
   pointer-events: auto;
 }
@@ -170,14 +295,14 @@
 }
 
 .captain-btn {
-  width: 24px;
-  height: 24px;
+  width: 20px;
+  height: 20px;
   border-radius: 50%;
   border: 2px solid #00ff87;
   background: #00ff87;
   color: #000;
   font-weight: bold;
-  font-size: 10px;
+  font-size: 8px;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -199,16 +324,16 @@
 
 .captain-badge {
   position: absolute;
-  left: -44px;
+  left: -37px;
   top: 50%;
   transform: translateY(-50%);
-  width: 24px;
-  height: 24px;
+  width: 20px;
+  height: 20px;
   border-radius: 50%;
   background: #00ff87;
   color: #000;
   font-weight: bold;
-  font-size: 10px;
+  font-size: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -229,15 +354,15 @@
 
 .status-flag-badge {
   position: absolute;
-  right: -44px;
+  right: -37px;
   top: 50%;
   transform: translateY(-50%);
-  width: 24px;
-  height: 24px;
+  width: 20px;
+  height: 20px;
   border-radius: 50%;
   color: #000;
   font-weight: bold;
-  font-size: 9px;
+  font-size: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -302,10 +427,10 @@
 
 .bench {
   background: rgba(0, 0, 0, 0.2);
-  padding: 15px;
+  padding: 13px;
   border-radius: 10px;
-  max-width: 1100px;
-  margin: 0 auto 30px;
+  max-width: 935px;
+  margin: 0 auto 25px;
 }
 
 .bench h3 {
@@ -317,7 +442,7 @@
 .bench-slots {
   display: flex;
   justify-content: center;
-  gap: 25px;
+  gap: 21px;
   flex-wrap: nowrap;
 }
 
@@ -503,7 +628,7 @@ td.fixtures-cell {
 
 .fixture-date {
   margin: 12px 0 8px;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 700;
   opacity: 0.9;
   text-align: center;
@@ -511,23 +636,23 @@ td.fixtures-cell {
 
 .fixture-row {
   display: grid;
-  grid-template-columns: minmax(120px, 1fr) 64px minmax(120px, 1fr);
+  grid-template-columns: 1fr auto 1fr;
   align-items: center;
   padding: 6px 0;
   border-bottom: 1px solid rgba(255,255,255,0.15);
-  font-size: 13px;
+  font-size: 12px;
 }
 
 .fixture-row .team {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 5px;
 }
 
 .fixture-team {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 5px;
   white-space: nowrap;
 }
 
@@ -547,44 +672,44 @@ td.fixtures-cell {
   background: rgba(0,0,0,0.35);
   border-radius: 4px;
   padding: 2px 6px;
-  font-size: 12px;
+  font-size: 11px;
 }
 
-/* Home team (flows right → away from centre) */
+/* Home team (flows right → towards centre) */
 .fixture-row .team.home {
   display: flex;
   justify-content: flex-end;
   align-items: center;
-  gap: 6px;
+  gap: 5px;
   text-align: right;
 }
 
-/* Away team (flows left ← away from centre) */
+/* Away team (flows left ← from centre) */
 .fixture-row .team.away {
   display: flex;
   justify-content: flex-start;
   align-items: center;
-  gap: 6px;
+  gap: 5px;
   text-align: left;
 }
 
 .team-name {
   white-space: nowrap;
+  font-size: 11px;
 }
 
 .team-badge {
-  width: 22px;
-  height: 22px;
+  width: 20px;
+  height: 20px;
   object-fit: contain;
 }
 
 /* Kickoff time – dead centre */
 .fixture-row .ko {
-  justify-self: center;
   text-align: center;
-  min-width: 42px;
+  min-width: 50px;
   background: rgba(0,0,0,0.6);
-  padding: 3px 6px;
+  padding: 3px 8px;
   border-radius: 4px;
   font-size: 11px;
   font-weight: bold;
@@ -600,4 +725,264 @@ td.fixtures-cell {
   text-align: center;
   border-radius: 6px;
   letter-spacing: 0.3px;
+}
+
+/* ===== Transfer Panel (Right Side) ===== */
+
+.transfer-panel {
+  background: rgba(0, 0, 0, 0.25);
+  padding: 15px;
+  border-radius: 10px;
+  overflow-y: auto;
+  max-height: calc(100vh - 150px);
+}
+
+.transfer-panel h3 {
+  color: #fff;
+  margin: 0 0 10px 0;
+}
+
+.filters-compact {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.filters-compact input,
+.filters-compact select {
+  padding: 8px;
+  border-radius: 4px;
+  border: none;
+  text-align: center;
+  font-size: 13px;
+}
+
+.player-table-compact {
+  background: #fff;
+  color: #000;
+  border-radius: 5px;
+  overflow: hidden;
+  max-height: calc(100vh - 350px);
+  overflow-y: auto;
+}
+
+.player-table-compact table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+.player-table-compact th {
+  background: var(--bg);
+  color: #fff;
+  padding: 8px 4px;
+  text-align: center;
+  position: sticky;
+  top: 0;
+  border-right: 1px solid rgba(255, 255, 255, 0.2);
+  font-size: 11px;
+}
+
+.player-table-compact th.th-name {
+  text-align: left;
+  padding-left: 6px;
+}
+
+.player-table-compact td {
+  padding: 6px 4px;
+  border-bottom: 1px solid #eee;
+  border-right: 1px solid #ddd;
+  text-align: center;
+  font-size: 11px;
+}
+
+.player-table-compact td.name-cell {
+  text-align: left;
+  padding-left: 6px;
+}
+
+.player-table-compact tr:hover {
+  background: #f0f0f0;
+  cursor: pointer;
+}
+
+.player-table-compact tr.selected {
+  background: #e6fffa;
+}
+
+.player-table-compact .th-select {
+  width: 45px;
+}
+
+.player-table-compact .th-status {
+  width: 35px;
+}
+
+.player-table-compact .th-name {
+  width: 110px;
+}
+
+.player-table-compact .th-pos {
+  width: 40px;
+}
+
+.player-table-compact .th-price {
+  width: 45px;
+}
+
+.player-table-compact .th-points {
+  width: 45px;
+}
+
+.player-table-compact .th-stat-dynamic {
+  width: 60px;
+  min-width: 60px;
+}
+
+.player-table-compact .th-info {
+  width: 40px;
+}
+
+.info-btn {
+  background: #2196f3;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  font-size: 11px;
+  font-weight: bold;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.info-btn:hover {
+  background: #1976d2;
+  transform: scale(1.1);
+}
+
+/* ===== Player Info Modal ===== */
+
+.player-info-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 2500;
+  padding: 20px;
+}
+
+.player-info-modal.open {
+  display: flex;
+}
+
+.player-info-content {
+  background: var(--bg-dark);
+  border-radius: 10px;
+  max-width: 800px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 30px;
+  position: relative;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+}
+
+.player-info-close {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: var(--primary);
+  color: var(--bg);
+  border: none;
+  border-radius: 50%;
+  width: 35px;
+  height: 35px;
+  font-size: 24px;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  transition: opacity 0.2s;
+}
+
+.player-info-close:hover {
+  opacity: 0.8;
+}
+
+.player-info-header {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 2px solid var(--primary);
+}
+
+.player-info-badge {
+  width: 60px;
+  height: 60px;
+  object-fit: contain;
+}
+
+.player-info-title h2 {
+  color: var(--primary);
+  margin: 0;
+  font-size: 24px;
+}
+
+.player-info-title p {
+  color: rgba(255, 255, 255, 0.8);
+  margin: 5px 0 0 0;
+  font-size: 14px;
+}
+
+.player-info-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.player-stat-item {
+  background: rgba(255, 255, 255, 0.05);
+  padding: 12px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.player-stat-label {
+  color: var(--primary);
+  font-size: 12px;
+  font-weight: 600;
+  margin-bottom: 5px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.player-stat-value {
+  color: #fff;
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.player-info-section {
+  margin-top: 20px;
+}
+
+.player-info-section h3 {
+  color: var(--primary);
+  margin-bottom: 10px;
+  font-size: 18px;
 }

@@ -34,31 +34,39 @@ body {
   gap: 15px;
   margin-bottom: 10px;
   padding: 8px 12px;
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--bg);
   border-radius: 10px;
-  height: 55px;
+  height: 50px;
+  max-width: 100%;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 0 0 auto;
 }
 
 .bank-display {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 0 14px;
-  height: 44px;                 
+  padding: 0 12px;
+  height: 32px;                 
   border-radius: 6px;
   background: rgba(0,0,0,0.35);
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 700;
   white-space: nowrap;
 }
 
 .bank-display input {
-  width: 70px;
-  height: 26px;
-  padding: 4px 6px;
+  width: 65px;
+  height: 22px;
+  padding: 3px 5px;
   border-radius: 4px;
   border: none;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 700;
   text-align: center;
   background: rgba(255, 255, 255, 0.95);
@@ -68,11 +76,11 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 0 14px;
-  height: 44px;
+  padding: 0 12px;
+  height: 32px;
   border-radius: 6px;
   background: rgba(33, 150, 243, 0.85); 
-  font-size: 14px;
+  font-size: 13px;
   white-space: nowrap;
 }
 
@@ -82,7 +90,7 @@ body {
 }
 
 .price-toggle select {
-  height: 26px;
+  height: 22px;
   padding: 2px 6px;
   border-radius: 4px;
   border: none;
@@ -94,6 +102,8 @@ body {
 .header-actions {
   display: flex;
   gap: 8px;
+  justify-content: flex-end;
+  align-items: center;
 }
 
 .team-meta {
@@ -107,17 +117,18 @@ body {
 }
 
 .header-btn {
-  padding: 12px 20px;
+  padding: 8px 16px;
   border: none;
   border-radius: 5px;
   font-weight: bold;
-  font-size: 14px;
+  font-size: 13px;
   cursor: pointer;
   transition: all 0.2s;
-  height: 44px;
+  height: 32px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  white-space: nowrap;
 }
 
 .save-btn {
@@ -139,15 +150,15 @@ body {
 }
 
 .sidebar-toggle {
-  padding: 12px 20px;         
-  height: 44px;
+  padding: 8px 16px;         
+  height: 32px;
   background: var(--primary);
   color: var(--bg);
   border: none;
   border-radius: 5px;
   cursor: pointer;
   font-weight: bold;
-  font-size: 14px;
+  font-size: 13px;
   white-space: nowrap;
   transition: opacity 0.2s;
   display: inline-flex;
@@ -226,8 +237,9 @@ body {
 
 #plannerMain {
   display: grid;
-  grid-template-columns: 340px 1fr;
+  grid-template-columns: 300px 1fr 360px;
   gap: 12px;
+  justify-content: center;
 }
 
 .gw-nav {
@@ -283,30 +295,7 @@ body {
   text-align: center;
 }
 
-.add-btn-row {
-  margin-top: 15px;
-  display: flex;
-  gap: 10px;
-}
-
-.add-btn-row button {
-  flex: 1;
-  padding: 12px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  font-weight: bold;
-  color: var(--bg);
-}
-
-.bench .add-btn-row {
-  display: flex;
-  justify-content: center;
-  margin: 25px auto 20px;
-  max-width: 500px;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-  padding-top: 15px;
-}
+/* Removed - transfer actions now in pitch top controls */
 
 /* ===== Messages ===== */
 

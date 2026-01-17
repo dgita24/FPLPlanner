@@ -10,8 +10,20 @@ let tableSort = {
 
 const posNames = { 1: 'GK', 2: 'DEF', 3: 'MID', 4: 'FWD' };
 
-// Stat column keys
-const STAT_KEYS = ['goals_scored', 'assists', 'clean_sheets', 'bonus', 'transfers_in_event', 'transfers_out_event', 'selected_by_percent'];
+// Current stat selection - single column
+let currentStatView = 'points'; // 'points' | 'goals_scored' | 'assists' | 'clean_sheets' | 'bonus' | 'transfers_in_event' | 'transfers_out_event' | 'selected_by_percent'
+
+// Stat column configuration - single filterable column
+const statConfig = {
+  points: { key: 'total_points', label: 'Pts', tooltip: 'Total Points' },
+  goals_scored: { key: 'goals_scored', label: 'G', tooltip: 'Goals' },
+  assists: { key: 'assists', label: 'A', tooltip: 'Assists' },
+  clean_sheets: { key: 'clean_sheets', label: 'CS', tooltip: 'Clean Sheets' },
+  bonus: { key: 'bonus', label: 'Bns', tooltip: 'Bonus Points' },
+  transfers_in_event: { key: 'transfers_in_event', label: 'TI', tooltip: 'Transfers In (GW)' },
+  transfers_out_event: { key: 'transfers_out_event', label: 'TO', tooltip: 'Transfers Out (GW)' },
+  selected_by_percent: { key: 'selected_by_percent', label: 'Own%', tooltip: 'Ownership %' }
+};
 
 // Selected players (changed from single to multi-select)
 window.selectedPlayerIds = window.selectedPlayerIds ?? [];
@@ -33,15 +45,7 @@ let sortIcons = null;
 function getSortIcons() {
   if (!sortIcons) {
     sortIcons = {
-      price: document.getElementById('sortPriceIcon'),
-      points: document.getElementById('sortPointsIcon'),
-      goals_scored: document.getElementById('sortGoalsIcon'),
-      assists: document.getElementById('sortAssistsIcon'),
-      clean_sheets: document.getElementById('sortCleanSheetsIcon'),
-      bonus: document.getElementById('sortBonusIcon'),
-      transfers_in_event: document.getElementById('sortTransfersInIcon'),
-      transfers_out_event: document.getElementById('sortTransfersOutIcon'),
-      selected_by_percent: document.getElementById('sortSelectedByIcon')
+      price: document.getElementById('sortPriceIcon')
     };
   }
   return sortIcons;
@@ -131,18 +135,19 @@ export function renderTable() {
   const tbody = document.getElementById('tableBody');
   if (!tbody) return;
 
+  // Initialize stat columns on first render
+  if (isFirstRender) {
+    initializeStatColumns();
+    isFirstRender = false;
+  }
+
   const search = foldForSearch(document.getElementById('searchName')?.value || '');
   const posFilter = document.getElementById('filterPos')?.value || '';
-  const teamFilter = document.getElementById('filterTeam')?.value || '';
-  const maxPrice = parseFloat(document.getElementById('filterPrice')?.value);
-  const max = Number.isFinite(maxPrice) ? maxPrice : Infinity;
 
   let filtered = state.elements.filter((player) => {
     const matchesSearch = foldForSearch(player.web_name || '').includes(search);
     const matchesPos = !posFilter || posNames[player.element_type] === posFilter;
-    const matchesTeam = !teamFilter || String(player.team) === String(teamFilter);
-    const matchesPrice = (player.now_cost / 10) <= max;
-    return matchesSearch && matchesPos && matchesTeam && matchesPrice;
+    return matchesSearch && matchesPos;
   });
 
   // -------- SORTING --------
@@ -154,35 +159,25 @@ export function renderTable() {
         return dir * ((a.now_cost / 10) - (b.now_cost / 10));
       }
 
-      if (tableSort.key === 'points') {
-        return dir * (a.total_points - b.total_points);
-      }
-
-      // Handle all stat columns
-      if (STAT_KEYS.includes(tableSort.key)) {
-        const parseStatValue = (val) => {
-          if (val == null) return 0;
-          const num = parseFloat(val);
-          return isNaN(num) ? 0 : num;
-        };
-        const aVal = parseStatValue(a[tableSort.key]);
-        const bVal = parseStatValue(b[tableSort.key]);
-        return dir * (aVal - bVal);
-      }
-
-      return 0;
+      // Handle stat columns
+      const parseStatValue = (val) => {
+        if (val == null) return 0;
+        const num = parseFloat(val);
+        return isNaN(num) ? 0 : num;
+      };
+      const aVal = parseStatValue(a[tableSort.key]);
+      const bVal = parseStatValue(b[tableSort.key]);
+      return dir * (aVal - bVal);
     });
   }
+
+  // Get current stat column configuration
+  const statCol = statConfig[currentStatView] || statConfig.points;
 
   // -------- RENDER --------
   tbody.innerHTML = filtered
     .map((player) => {
-      const teamName =
-        state.teams.find((t) => t.id === player.team)?.short_name || '';
       const checked = window.selectedPlayerIds.includes(player.id) ? 'checked' : '';
-
-      const next4 = getNextFixturesForTeam(player.team, state.viewingGW, 4);
-      const next4Html = next4.map((x) => `<span class="fx">${x}</span>`).join(' ');
 
       // Status flag for table - using circular badge similar to captain badges
       let statusFlagHtml = '';
@@ -221,23 +216,18 @@ export function renderTable() {
         statusFlagHtml = `<span class="table-status-flag-badge ${badgeClass}" title="${flagTitle}">${badgeText}</span>`;
       }
 
+      // Get stat value for the single filterable column
+      const statValue = formatStatValue(player[statCol.key], statCol.key);
+
       return `
         <tr onclick="selectPlayer(event, ${player.id})" class="${checked ? 'selected' : ''}">
           <td><input type="checkbox" name="selectedPlayer" value="${player.id}" ${checked}></td>
           <td class="status-cell">${statusFlagHtml}</td>
           <td class="name-cell">${player.web_name}</td>
-          <td>${teamName}</td>
           <td>${posNames[player.element_type]}</td>
           <td>${(player.now_cost / 10).toFixed(1)}</td>
-          <td>${player.total_points}</td>
-          <td class="stat-col-cell">${formatStatValue(player.goals_scored, 'goals_scored')}</td>
-          <td class="stat-col-cell">${formatStatValue(player.assists, 'assists')}</td>
-          <td class="stat-col-cell">${formatStatValue(player.clean_sheets, 'clean_sheets')}</td>
-          <td class="stat-col-cell">${formatStatValue(player.bonus, 'bonus')}</td>
-          <td class="stat-col-cell">${formatStatValue(player.transfers_in_event, 'transfers_in_event')}</td>
-          <td class="stat-col-cell">${formatStatValue(player.transfers_out_event, 'transfers_out_event')}</td>
-          <td class="stat-col-cell">${formatStatValue(player.selected_by_percent, 'selected_by_percent')}</td>
-          <td class="fixtures-cell">${next4Html}</td>
+          <td class="stat-col-cell">${statValue}</td>
+          <td><button class="info-btn" onclick="showPlayerInfo(event, ${player.id})" title="View player stats">i</button></td>
         </tr>
       `;
     })
@@ -248,14 +238,7 @@ export function renderTable() {
 }
 
 export function populateFilters() {
-  const teamSelect = document.getElementById('filterTeam');
-  if (!teamSelect) return;
-
-  teamSelect.innerHTML =
-    `<option value="">All Teams</option>` +
-    state.teams
-      .map((t) => `<option value="${t.id}">${t.short_name}</option>`)
-      .join('');
+  // Note: Team filter removed from compact view
 }
 
 window.selectPlayer = function (ev, id) {
@@ -303,6 +286,14 @@ window.sortTable = function (key) {
   renderTable();
 };
 
+// Set default sort to points (descending) - called after team import
+export function setDefaultSort() {
+  tableSort.key = 'total_points';
+  tableSort.dir = 'desc'; // Descending so highest points first
+  updateSortIcons();
+  renderTable();
+}
+
 function updateSortIcons() {
   const icons = getSortIcons();
 
@@ -317,4 +308,180 @@ function updateSortIcons() {
     icons[tableSort.key].textContent = arrow;
   }
 }
+
+// Update stat columns based on dropdown selection
+window.updateStatColumns = function () {
+  initializeStatColumns();
+  // Re-render table with new columns
+  renderTable();
+};
+
+// Show player info modal
+window.showPlayerInfo = function (ev, playerId) {
+  if (ev) {
+    ev.stopPropagation();
+    ev.preventDefault();
+  }
+  
+  const player = state.elements.find(p => p.id === playerId);
+  if (!player) return;
+  
+  const team = state.teams.find(t => t.id === player.team);
+  const teamName = team ? team.name : 'Unknown';
+  const teamCode = team ? team.code : '';
+  
+  // Create modal if it doesn't exist
+  let modal = document.getElementById('playerInfoModal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'playerInfoModal';
+    modal.className = 'player-info-modal';
+    document.body.appendChild(modal);
+  }
+  
+  // Build stats grid
+  const statsHtml = `
+    <div class="player-info-stats">
+      <div class="player-stat-item">
+        <div class="player-stat-label">Total Points</div>
+        <div class="player-stat-value">${player.total_points || 0}</div>
+      </div>
+      <div class="player-stat-item">
+        <div class="player-stat-label">Price</div>
+        <div class="player-stat-value">£${(player.now_cost / 10).toFixed(1)}m</div>
+      </div>
+      <div class="player-stat-item">
+        <div class="player-stat-label">Form</div>
+        <div class="player-stat-value">${player.form || '0'}</div>
+      </div>
+      <div class="player-stat-item">
+        <div class="player-stat-label">Goals Scored</div>
+        <div class="player-stat-value">${player.goals_scored || 0}</div>
+      </div>
+      <div class="player-stat-item">
+        <div class="player-stat-label">Assists</div>
+        <div class="player-stat-value">${player.assists || 0}</div>
+      </div>
+      <div class="player-stat-item">
+        <div class="player-stat-label">Clean Sheets</div>
+        <div class="player-stat-value">${player.clean_sheets || 0}</div>
+      </div>
+      <div class="player-stat-item">
+        <div class="player-stat-label">Bonus Points</div>
+        <div class="player-stat-value">${player.bonus || 0}</div>
+      </div>
+      <div class="player-stat-item">
+        <div class="player-stat-label">Minutes Played</div>
+        <div class="player-stat-value">${player.minutes || 0}</div>
+      </div>
+      <div class="player-stat-item">
+        <div class="player-stat-label">Goals Conceded</div>
+        <div class="player-stat-value">${player.goals_conceded || 0}</div>
+      </div>
+      <div class="player-stat-item">
+        <div class="player-stat-label">Yellow Cards</div>
+        <div class="player-stat-value">${player.yellow_cards || 0}</div>
+      </div>
+      <div class="player-stat-item">
+        <div class="player-stat-label">Red Cards</div>
+        <div class="player-stat-value">${player.red_cards || 0}</div>
+      </div>
+      <div class="player-stat-item">
+        <div class="player-stat-label">Saves</div>
+        <div class="player-stat-value">${player.saves || 0}</div>
+      </div>
+      <div class="player-stat-item">
+        <div class="player-stat-label">Penalties Saved</div>
+        <div class="player-stat-value">${player.penalties_saved || 0}</div>
+      </div>
+      <div class="player-stat-item">
+        <div class="player-stat-label">Penalties Missed</div>
+        <div class="player-stat-value">${player.penalties_missed || 0}</div>
+      </div>
+      <div class="player-stat-item">
+        <div class="player-stat-label">Owned By</div>
+        <div class="player-stat-value">${parseFloat(player.selected_by_percent || 0).toFixed(1)}%</div>
+      </div>
+      <div class="player-stat-item">
+        <div class="player-stat-label">Transfers In (GW)</div>
+        <div class="player-stat-value">${player.transfers_in_event || 0}</div>
+      </div>
+      <div class="player-stat-item">
+        <div class="player-stat-label">Transfers Out (GW)</div>
+        <div class="player-stat-value">${player.transfers_out_event || 0}</div>
+      </div>
+      <div class="player-stat-item">
+        <div class="player-stat-label">ICT Index</div>
+        <div class="player-stat-value">${parseFloat(player.ict_index || 0).toFixed(1)}</div>
+      </div>
+    </div>
+  `;
+  
+  const statusInfo = player.news ? `
+    <div class="player-info-section">
+      <h3>Status</h3>
+      <p style="color: rgba(255, 255, 255, 0.9); line-height: 1.6;">${player.news}</p>
+    </div>
+  ` : '';
+  
+  modal.innerHTML = `
+    <div class="player-info-content">
+      <button class="player-info-close" onclick="closePlayerInfo()">×</button>
+      
+      <div class="player-info-header">
+        <img src="https://resources.premierleague.com/premierleague/badges/70/t${teamCode}.png" 
+             class="player-info-badge" alt="${teamName}">
+        <div class="player-info-title">
+          <h2>${player.web_name}</h2>
+          <p>${teamName} • ${posNames[player.element_type]}</p>
+        </div>
+      </div>
+      
+      ${statusInfo}
+      
+      <div class="player-info-section">
+        <h3>Season Statistics</h3>
+        ${statsHtml}
+      </div>
+    </div>
+  `;
+  
+  modal.classList.add('open');
+};
+
+window.closePlayerInfo = function () {
+  const modal = document.getElementById('playerInfoModal');
+  if (modal) {
+    modal.classList.remove('open');
+  }
+};
+
+// Initialize stat columns after table headers are rendered
+function initializeStatColumns() {
+  const statSelect = document.getElementById('statSelect');
+  if (!statSelect) return;
+  
+  currentStatView = statSelect.value || 'points';
+  
+  // Update table header with safe HTML escaping for single filterable column
+  const statCol = statConfig[currentStatView] || statConfig.points;
+  const colHeader = document.getElementById('statColHeader');
+  
+  // Escape HTML to prevent XSS
+  const escapeHtml = (text) => {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  };
+  
+  if (colHeader) {
+    const escapedKey = escapeHtml(statCol.key);
+    const escapedLabel = escapeHtml(statCol.label);
+    const escapedTooltip = escapeHtml(statCol.tooltip);
+    colHeader.innerHTML = `<span onclick="sortTable('${escapedKey}')" class="th-sortable" style="cursor: pointer;" title="${escapedTooltip}">${escapedLabel} <span id="sortStatIcon">⇅</span></span>`;
+  }
+}
+
+// Call initialization on first render
+let isFirstRender = true;
 

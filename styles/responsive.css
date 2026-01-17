@@ -7,9 +7,14 @@
     padding: 0 15px;
   }
 
+  #plannerMain {
+    grid-template-columns: 280px 1fr 340px;
+    gap: 10px;
+  }
+
   .pitch {
     max-width: 100%;
-    padding: 20px 15px;
+    padding: 17px 13px;
   }
 
   .pitch-stack {
@@ -21,15 +26,10 @@
   }
 
   .player-card {
-    width: 160px;
+    width: 136px;
   }
 
   .formation-line {
-    gap: 12px;
-  }
-
-  #plannerMain {
-    grid-template-columns: 300px 1fr;
     gap: 10px;
   }
 
@@ -46,44 +46,64 @@
   }
 
   #fixturesPanel {
+    order: 1;
     margin-top: 10px;
-    order: 2;
   }
 
   #mainColumn {
-    order: 1;
+    order: 2;
+  }
+
+  .transfer-panel {
+    order: 3;
+  }
+
+  #fixturesPanel {
+    order: 3;
+    margin-top: 10px;
   }
 
   .header {
     flex-wrap: wrap;
+    gap: 8px;
+    width: 100%;
     height: auto;
-    padding: 10px;
+  }
+
+  .header-left {
+    flex-wrap: wrap;
+    justify-content: center;
   }
 
   .header h1 {
     width: 100%;
     text-align: center;
-    margin-bottom: 10px;
+    margin-bottom: 5px;
+  }
+
+  .header-actions {
+    width: 100%;
+    justify-content: center;
   }
 
   .pitch {
-    padding: 20px 15px;
+    padding: 17px 13px;
   }
 
   .player-card {
-    width: 150px;
+    width: 128px;
   }
 
   .captain-selector {
-    left: -38px;
+    left: -32px;
   }
 
   .captain-badge {
-    left: -38px;
+    left: -32px;
   }
 
   .formation-line {
-    gap: 10px;
+    gap: 9px;
   }
 }
 
@@ -94,13 +114,21 @@
   }
 
   .header {
+    padding: 8px;
+    width: 100%;
+    height: auto;
     flex-direction: column;
-    align-items: stretch;
-    gap: 8px;
+  }
+
+  .header-left {
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
   }
 
   .header h1 {
     font-size: 20px;
+    margin-bottom: 8px;
   }
 
   .bank-display,
@@ -214,8 +242,17 @@
     padding: 6px 4px;
   }
 
-  .add-btn-row {
+  /* Transfer actions now in pitch - responsive stacking */
+  .transfer-actions-left {
     flex-direction: column;
+    gap: 4px;
+  }
+
+  .transfer-action-btn {
+    width: 100%;
+    padding: 6px 12px;
+    font-size: 12px;
+    height: 32px;
   }
 
   .fixture-row {
@@ -375,5 +412,40 @@
 
   .help-modal p, .help-modal li {
     font-size: 14px;
+  }
+
+  .player-info-modal {
+    padding: 10px;
+  }
+
+  .player-info-content {
+    padding: 20px 15px;
+    max-height: 85vh;
+  }
+
+  .player-info-header {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .player-info-stats {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 10px;
+  }
+
+  .player-stat-item {
+    padding: 10px;
+  }
+
+  .player-stat-value {
+    font-size: 18px;
+  }
+
+  .transfer-panel {
+    max-height: 600px;
+  }
+
+  .player-table-compact {
+    max-height: 450px;
   }
 }

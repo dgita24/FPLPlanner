@@ -6,6 +6,7 @@ import { showMessage, renderPitch, renderBench, ensureFixturesForView } from './
 import { renderFixtures } from './fixtures.js';
 import { cancelTransfer, substitutePlayer, addSelectedToSquad, removePlayer, resetTransferState, isPendingTransfer, getBatchTransferInfo, reinstatePlayer, selectChip } from './team-operations.js';
 import { setPendingSwap } from './ui-render.js';
+import { setDefaultSort } from './table.js';
 
 // Helper function for pluralization
 function pluralize(word, count) {
@@ -94,15 +95,18 @@ async function importTeam() {
   const importedGW = data._imported_gw || state.importedGW;
   if (importedGW && importedGW !== state.currentGW) {
     showMessage(
-      `Imported from GW${importedGW} (GW${state.currentGW} not public yet).`,
-      'success'
+      `⚠️ Imported from GW${importedGW} (GW${state.currentGW} picks not yet available). Your current squad may be different if you made transfers since GW${importedGW}.`,
+      'info'
     );
   } else {
     showMessage(`Team imported for GW${state.currentGW}.`, 'success');
   }
 
-  // Always show/planning the active GW after import
-  state.viewingGW = state.currentGW;
+  // Set viewing GW to next gameweek for planning purposes
+  const events = state.bootstrap?.events || [];
+  const next = events.find(e => e.is_next)?.id;
+  const current = events.find(e => e.is_current)?.id;
+  state.viewingGW = next || current || state.currentGW;
 
   // reset transient UI state
   resetTransferState();
@@ -111,6 +115,9 @@ async function importTeam() {
   closeSidebar();
 
   updateUI();
+  
+  // Set default sort to points (descending) after import
+  setDefaultSort();
 }
 
 // Local Save/Load

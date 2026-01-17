@@ -14,32 +14,32 @@
 <body>
   <div class="container">
     <div class="header">
-      <h1 style="font-size: 24px;">FPL Team Planner</h1>
+      <div class="header-left">
+        <h1 style="font-size: 20px;">FPL Team Planner</h1>
+        
+        <div class="bank-display">
+          <span>Bank</span>
+          <input type="number" id="bankInput" value="100.0" step="0.1" />
+          <span>m</span>
+        </div>
 
-      <div class="bank-display">
-        <span>Bank</span>
-        <input type="number" id="bankInput" value="100.0" step="0.1" />
-        <span>m</span>
-      </div>
-
-      <div class="price-toggle">
-        <span>Show</span>
-        <select id="priceModeSelect">
-          <option value="selling">Selling</option>
-          <option value="purchase">Purchase</option>
-          <option value="current">Current</option>
-        </select>
+        <div class="price-toggle">
+          <span>Prices</span>
+          <select id="priceModeSelect">
+            <option value="selling">Selling</option>
+            <option value="purchase">Purchase</option>
+            <option value="current">Current</option>
+          </select>
+        </div>
       </div>
 
       <div class="header-actions">
-        <button onclick="localSave()" class="header-btn save-btn">💾 Local Save</button>
         <button onclick="localLoad()" class="header-btn load-btn">📂 Local Load</button>
-        <button onclick="undoLastAction()" class="header-btn load-btn">↩️ Undo</button>
+        <button onclick="localSave()" class="header-btn save-btn">💾 Local Save</button>
         <button onclick="resetToImportedTeam()" class="header-btn load-btn">⏮️ Reset</button>
         <button onclick="toggleHelpModal()" class="header-btn" style="background: #00ff87; color: #37003c;">❓ Help</button>
+        <button class="sidebar-toggle" onclick="toggleSidebarMenu()">Import/Save</button>
       </div>
-
-      <button class="sidebar-toggle" onclick="toggleSidebarMenu()">Menu</button>
     </div>
 
     <div class="sidebar" id="sidebar">
@@ -84,21 +84,55 @@
         </div>
 
       </div>
+
+      <div id="transferPanel" class="transfer-panel">
+        <h3 style="margin-bottom: 10px; text-align: center;">Transfers</h3>
+        
+        <div class="filters-compact">
+          <input type="text" id="searchName" placeholder="Search..." onkeyup="renderTable()" />
+          
+          <select id="filterPos" onchange="renderTable()">
+            <option value="">All Players</option>
+            <option value="GK">Goalkeepers</option>
+            <option value="DEF">Defenders</option>
+            <option value="MID">Midfielders</option>
+            <option value="FWD">Forwards</option>
+          </select>
+
+          <select id="statSelect" onchange="updateStatColumns()">
+            <option value="points">Points</option>
+            <option value="goals_scored">Goals</option>
+            <option value="assists">Assists</option>
+            <option value="clean_sheets">Clean Sheets</option>
+            <option value="bonus">Bonus</option>
+            <option value="transfers_in_event">Transfers In</option>
+            <option value="transfers_out_event">Transfers Out</option>
+            <option value="selected_by_percent">Ownership %</option>
+          </select>
+        </div>
+
+        <div class="player-table-compact">
+          <table id="pTable">
+            <thead>
+              <tr>
+                <th class="th-select">Select</th>
+                <th class="th-status">Status</th>
+                <th class="th-name">Name</th>
+                <th class="th-pos">Pos</th>
+                <th onclick="sortTable('price')" class="th-sortable th-price">
+                  £ <span id="sortPriceIcon"></span>
+                </th>
+                <th class="th-stat-dynamic" id="statColHeader"></th>
+                <th class="th-info">Info</th>
+              </tr>
+            </thead>
+            <tbody id="tableBody"></tbody>
+          </table>
+        </div>
+      </div>
     </div>
 
-    <div class="add-btn-row">
-      <button id="addToSquadBtn"
-              style="background: #00ff87"
-              onclick="addSelectedToSquad()">
-        Add to squad
-      </button>
 
-      <button id="cancelTransferBtn"
-              style="background: #ff4444; color: #fff"
-              onclick="cancelTransfer()">
-        Cancel transfer
-      </button>
-    </div>
 
     <div id="batchTransferStatus" style="
       display: none;
@@ -113,78 +147,6 @@
       font-size: 15px;
       color: #fff;
     "></div>
-
-    <div class="transfer-section">
-      <h2>Transfers</h2>
-
-      <div class="filters">
-        <input type="text" id="searchName" placeholder="Name..." onkeyup="renderTable()" />
-
-        <select id="filterPos" onchange="renderTable()">
-          <option value="">All Positions</option>
-          <option value="GK">Goalkeepers</option>
-          <option value="DEF">Defenders</option>
-          <option value="MID">Midfielders</option>
-          <option value="FWD">Forwards</option>
-        </select>
-
-        <select id="filterTeam" onchange="renderTable()">
-          <option value="">All Teams</option>
-        </select>
-
-        <input type="number"
-               id="filterPrice"
-               placeholder="Max Price"
-               value="20.0"
-               step="0.5"
-               onchange="renderTable()" />
-      </div>
-
-      <div class="player-table">
-        <table id="pTable">
-          <thead>
-            <tr>
-              <th class="th-select">Select</th>
-              <th class="th-status">Status</th>
-              <th class="th-name">Name</th>
-              <th class="th-team">Team</th>
-              <th class="th-pos">
-                Pos
-              </th>
-              <th onclick="sortTable('price')" class="th-sortable th-price">
-                £ <span id="sortPriceIcon"></span>
-              </th>
-              <th onclick="sortTable('points')" class="th-sortable th-points">
-                Pts <span id="sortPointsIcon"></span>
-              </th>
-              <th onclick="sortTable('goals_scored')" class="th-sortable th-stat-col">
-                G <span id="sortGoalsIcon"></span>
-              </th>
-              <th onclick="sortTable('assists')" class="th-sortable th-stat-col">
-                A <span id="sortAssistsIcon"></span>
-              </th>
-              <th onclick="sortTable('clean_sheets')" class="th-sortable th-stat-col">
-                CS <span id="sortCleanSheetsIcon"></span>
-              </th>
-              <th onclick="sortTable('bonus')" class="th-sortable th-stat-col">
-                Bns <span id="sortBonusIcon"></span>
-              </th>
-              <th onclick="sortTable('transfers_in_event')" class="th-sortable th-stat-col">
-                Trs In GW <span id="sortTransfersInIcon"></span>
-              </th>
-              <th onclick="sortTable('transfers_out_event')" class="th-sortable th-stat-col">
-                Trs Out GW <span id="sortTransfersOutIcon"></span>
-              </th>
-              <th onclick="sortTable('selected_by_percent')" class="th-sortable th-stat-col">
-                TSB% <span id="sortSelectedByIcon"></span>
-              </th>
-              <th class="th-fixtures">Next 4</th>
-            </tr>
-          </thead>
-          <tbody id="tableBody"></tbody>
-        </table>
-      </div>
-    </div>
   </div>
 
   <div id="toast" class="message"></div>
@@ -214,7 +176,7 @@
         <li><strong>Remove Player:</strong> Click the red ✕ button on any player card</li>
         <li><strong>Swap Players:</strong> Click the blue ⇄ button to swap a player with the bench</li>
         <li><strong>Gameweeks:</strong> Use ← GW and GW → buttons to plan across multiple weeks</li>
-        <li><strong>Undo/Reset:</strong> Use Undo to reverse your last action, or Reset to return to your imported team</li>
+        <li><strong>Reset:</strong> Use Reset to return to your imported team</li>
         <li><strong>Local Save/Load:</strong> Save your planning session to browser storage</li>
       </ul>
       
