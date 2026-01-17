@@ -286,6 +286,14 @@ window.sortTable = function (key) {
   renderTable();
 };
 
+// Set default sort to points (descending) - called after team import
+export function setDefaultSort() {
+  tableSort.key = 'total_points';
+  tableSort.dir = 'desc'; // Descending so highest points first
+  updateSortIcons();
+  renderTable();
+}
+
 function updateSortIcons() {
   const icons = getSortIcons();
 

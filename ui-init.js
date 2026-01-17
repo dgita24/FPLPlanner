@@ -6,6 +6,7 @@ import { showMessage, renderPitch, renderBench, ensureFixturesForView } from './
 import { renderFixtures } from './fixtures.js';
 import { cancelTransfer, substitutePlayer, addSelectedToSquad, removePlayer, resetTransferState, isPendingTransfer, getBatchTransferInfo, reinstatePlayer, selectChip } from './team-operations.js';
 import { setPendingSwap } from './ui-render.js';
+import { setDefaultSort } from './table.js';
 
 // Helper function for pluralization
 function pluralize(word, count) {
@@ -114,6 +115,9 @@ async function importTeam() {
   closeSidebar();
 
   updateUI();
+  
+  // Set default sort to points (descending) after import
+  setDefaultSort();
 }
 
 // Local Save/Load
