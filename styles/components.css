@@ -38,12 +38,17 @@
   height: 36px;
 }
 
+.transfer-action-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .transfer-action-btn.add-btn {
   background: #00ff87;
   color: #000;
 }
 
-.transfer-action-btn.add-btn:hover {
+.transfer-action-btn.add-btn:hover:not(:disabled) {
   background: #00e676;
 }
 
@@ -52,7 +57,7 @@
   color: #fff;
 }
 
-.transfer-action-btn.cancel-btn:hover {
+.transfer-action-btn.cancel-btn:hover:not(:disabled) {
   background: #dd3333;
 }
 
