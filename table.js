@@ -108,7 +108,7 @@ function getSuspensionEndGW(player, currentGW) {
   if (!player.news) return null;
   
   // Parse: "Suspended for 2 matches" or "Suspended for 2 games"
-  const matchesMatch = player.news.match(/Suspended for (\d+) (?:matches?|games?)/i);
+  const matchesMatch = player.news.match(/Suspended for (\d+) (?:match|matches|game|games)/i);
   if (matchesMatch) {
     const suspendedMatches = parseInt(matchesMatch[1]);
     // Suspension ends after the last suspended gameweek
