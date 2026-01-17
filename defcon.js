@@ -199,9 +199,7 @@ export function mergeDefconIntoElements(elements, defconData) {
  * Clears the DEFCON cache (useful for testing or forcing refresh).
  */
 export function clearDefconCache() {
-  defconCache = {
-    data: null,
-    completedGWs: null,
-    lastFetch: null
-  };
+  defconCache.data = null;
+  defconCache.completedGWs = null;
+  defconCache.lastFetch = null;
 }
