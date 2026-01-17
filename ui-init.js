@@ -472,6 +472,7 @@ export function initUI() {
         align-items: center;
         gap: 8px;
         justify-content: center;
+        z-index: 10;
       }
 
       /* Chip indicator - shown when chip is selected */
