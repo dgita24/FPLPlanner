@@ -3,57 +3,7 @@
 import { state, loadFixtures } from './data.js';
 import { getElementType } from './validation.js';
 import { getBatchTransferInfo } from './team-operations.js';
-
-// --- Flag canvas counter for unique IDs ---
-let flagCanvasCounter = 0;
-
-// Draw flag on canvas element
-function drawFlag(canvas, direction, colorName) {
-  if (!canvas) return;
-  const ctx = canvas.getContext("2d");
-  
-  const isLeft = direction === 'left';
-  const color = colorName === 'red' ? 'red' : 'yellow';
-  
-  // Different transforms for left vs right flags
-  if (isLeft) {
-    ctx.setTransform(-1, 0, 0.35, 1, 45, 0);
-  } else {
-    ctx.setTransform(1, 0, -0.35, 1, 0, 0);
-  }
-  
-  ctx.lineWidth = 1.5 * .25;
-  
-  ctx.beginPath();
-  ctx.moveTo(35 * .25, 20 * .25);
-  ctx.lineTo(35 * .25, 120 * .25);
-  ctx.stroke();
-  
-  ctx.fillStyle = color;
-  ctx.beginPath();
-  ctx.moveTo(35 * .25, 30 * .25);
-  
-  for (let i = 0; i <= 80; i += 8)
-    ctx.lineTo((35 + i) * .25, (30 + Math.sin(i * .12) * 4) * .25);
-  
-  for (let i = 0; i <= 38; i += 8)
-    ctx.lineTo((115 + Math.sin(i * .12) * 2) * .25, (30 + i) * .25);
-  
-  for (let i = 80; i >= 0; i -= 8)
-    ctx.lineTo((35 + i) * .25, (68 + Math.sin(i * .12) * 4) * .25);
-  
-  ctx.fill();
-}
-
-// Initialize flag canvases after DOM insertion
-function initFlagCanvases() {
-  document.querySelectorAll('.status-flag-canvas[data-flag-init="pending"]').forEach(canvas => {
-    const direction = canvas.dataset.direction;
-    const color = canvas.dataset.color;
-    drawFlag(canvas, direction, color);
-    canvas.dataset.flagInit = 'done';
-  });
-}
+import { shouldShowPlayerFlag } from './player-status-utils.js';
 
 // --- Fixtures cache (per GW) ---
 const fixturesByGW = new Map(); // gw -> fixtures[]
@@ -310,9 +260,6 @@ export function renderPitch() {
     <div class="formation-line">${mid.map(renderCard).join('')}</div>
     <div class="formation-line">${fwd.map(renderCard).join('')}</div>
   `;
-  
-  // Initialize flag canvases after DOM insertion
-  initFlagCanvases();
 }
 
 export function renderBench() {
@@ -336,16 +283,6 @@ export function renderBench() {
 
   const renderCard = (e) => e.isPlaceholder ? placeholderCard(e, 'bench') : playerCard(e, 'bench');
   benchSlots.innerHTML = benchPlayers.map(renderCard).join('');
-  
-  // Initialize flag canvases after DOM insertion
-  initFlagCanvases();
-}
-
-// Helper function to generate canvas-based waving flag
-function generateFlagCanvas(direction, colorName) {
-  const canvasId = `flag_${flagCanvasCounter++}`;
-  
-  return `<canvas id="${canvasId}" width="45" height="35" class="status-flag-canvas ${direction} ${colorName}" data-direction="${direction}" data-color="${colorName}" data-flag-init="pending"></canvas>`;
 }
 
 function playerCard(entry, source) {
@@ -384,17 +321,46 @@ function playerCard(entry, source) {
     return div.innerHTML;
   };
 
-  // Injury/suspension status - show waving flags beside badge
+  // Injury/suspension status - show circular badges similar to captain badges
   // status: 'a' = available, 'd' = doubtful (yellow), 'i' = injured (red), 's' = suspended (red), 'u' = unavailable (red)
   // news: contains injury details text
   let statusFlags = '';
-  if (p.status && p.status !== 'a') {
+  
+  // Pass events array for date-based suspension parsing
+  const events = state.bootstrap?.events || [];
+  if (shouldShowPlayerFlag(p, state.viewingGW, state.currentGW, events)) {
     const isDoubtful = p.status === 'd';
-    const flagColor = isDoubtful ? 'yellow' : 'red';
+    const isSuspended = p.status === 's';
+    
+    // For red flags (suspended/injured/unavailable): show "0"
+    // For yellow flags (doubtful): show chance of playing percentage
+    let badgeText = '0';
+    let badgeClass = 'red';
+    
+    if (isDoubtful) {
+      badgeClass = 'yellow';
+      // Use chance_of_playing_this_round for the viewing gameweek
+      const chanceOfPlaying = state.viewingGW === state.currentGW 
+        ? p.chance_of_playing_this_round 
+        : state.viewingGW === state.currentGW + 1 
+          ? p.chance_of_playing_next_round 
+          : null;
+      
+      // Show 25, 50, or 75 based on chance_of_playing
+      if (chanceOfPlaying !== null && chanceOfPlaying !== undefined) {
+        if (chanceOfPlaying <= 25) badgeText = '25';
+        else if (chanceOfPlaying <= 50) badgeText = '50';
+        else if (chanceOfPlaying <= 75) badgeText = '75';
+        else badgeText = '75'; // Default for any value > 75 but < 100
+      } else {
+        badgeText = '50'; // Default if no chance_of_playing data
+      }
+    }
+    
     const flagTitle = escapeHtml(p.news || (isDoubtful ? 'Doubtful' : 'Unavailable'));
     
     statusFlags = `
-      <div class="status-flag right ${flagColor}" title="${flagTitle}">${generateFlagCanvas('right', flagColor)}</div>
+      <div class="status-flag-badge ${badgeClass}" title="${flagTitle}">${badgeText}</div>
     `;
   }
 
