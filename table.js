@@ -40,7 +40,7 @@ const statConfig = {
   expected_assists: { key: 'expected_assists', label: 'xA', tooltip: 'Expected Assists' },
   expected_goals_conceded: { key: 'expected_goals_conceded', label: 'xGC', tooltip: 'Expected Goals Conceded' },
   expected_goal_involvements: { key: 'expected_goal_involvements', label: 'xGI', tooltip: 'Expected Goal Involvements' },
-  defensive_contribution: { key: 'defensive_contribution', label: 'DEFCON', tooltip: 'Defensive Contributions (DEF/MID only)' }
+  defensive_contribution: { key: 'defensive_contribution', label: 'DEFCON', tooltip: 'DEFCON Points: 2pts per game with 10+ contributions (DEF) or 12+ (MID/FWD)' }
 };
 
 // Selected players (changed from single to multi-select)

@@ -77,35 +77,47 @@ async function fetchLiveGameweek(gw) {
 }
 
 /**
- * Extracts defensive_contribution value from a player's explain array.
+ * Calculates DEFCON points awarded from a player's explain array.
+ * Awards 2 points per fixture if contributions meet threshold:
+ * - DEF: 10+ contributions = 2 points
+ * - MID/FWD: 12+ contributions = 2 points
  * @param {Object} playerData - Player data from live endpoint
- * @returns {number} Total defensive contribution for this gameweek
+ * @param {number} elementType - Player position (1=GK, 2=DEF, 3=MID, 4=FWD)
+ * @returns {number} Total DEFCON points awarded across all fixtures
  */
-function extractDefensiveContribution(playerData) {
+function calculateDefconPoints(playerData, elementType) {
   if (!playerData || !playerData.explain) return 0;
   
-  let total = 0;
+  // Determine threshold based on position
+  const threshold = elementType === 2 ? 10 : 12; // DEF needs 10, MID/FWD need 12
+  let totalPoints = 0;
   
   // explain is an array of gameweek fixtures for this player
   for (const fixture of playerData.explain) {
     if (!fixture.stats) continue;
     
-    // stats is an array of stat entries
+    // Count contributions for this fixture
+    let fixtureContributions = 0;
     for (const stat of fixture.stats) {
       if (stat.identifier === 'defensive_contribution' && typeof stat.value === 'number') {
-        total += stat.value;
+        fixtureContributions += stat.value;
       }
+    }
+    
+    // Award 2 points if threshold met
+    if (fixtureContributions >= threshold) {
+      totalPoints += 2;
     }
   }
   
-  return total;
+  return totalPoints;
 }
 
 /**
- * Fetches and aggregates DEFCON data across all completed gameweeks.
- * Only aggregates for DEF (element_type 2) and MID (element_type 3) positions.
+ * Fetches and aggregates DEFCON points across all completed gameweeks.
+ * Awards points for DEF (≥10 contributions), MID (≥12), and FWD (≥12) per fixture.
  * @param {Array<Object>} playerElements - Array of player elements from bootstrap-static with properties: id, element_type, etc.
- * @returns {Promise<Map<number, number>>} Map of player_id -> total DEFCON score
+ * @returns {Promise<Map<number, number>>} Map of player_id -> total DEFCON points
  */
 export async function fetchDefconData(playerElements) {
   // Check cache validity (cache for 5 minutes)
@@ -117,12 +129,13 @@ export async function fetchDefconData(playerElements) {
 
   console.log('Fetching fresh DEFCON data...');
   
-  // Create a set of eligible player IDs (DEF and MID only)
-  const eligiblePlayers = new Set();
+  // Create maps of eligible player IDs with their positions (DEF, MID, FWD only - not GK)
+  const eligiblePlayers = new Map(); // playerId -> element_type
   playerElements.forEach(player => {
     // element_type: 1=GK, 2=DEF, 3=MID, 4=FWD
-    if (player.element_type === 2 || player.element_type === 3) {
-      eligiblePlayers.add(player.id);
+    // Include DEF, MID, and FWD (exclude GK)
+    if (player.element_type === 2 || player.element_type === 3 || player.element_type === 4) {
+      eligiblePlayers.set(player.id, player.element_type);
     }
   });
 
@@ -138,7 +151,7 @@ export async function fetchDefconData(playerElements) {
   
   defconCache.completedGWs = completedGWs;
 
-  // Aggregate DEFCON across all completed gameweeks
+  // Aggregate DEFCON points across all completed gameweeks
   const defconTotals = new Map();
 
   // Fetch live data for each completed gameweek
@@ -156,18 +169,20 @@ export async function fetchDefconData(playerElements) {
     liveData.elements.forEach(playerData => {
       const playerId = playerData.id;
       
-      // Only process eligible players (DEF and MID)
+      // Only process eligible players (DEF, MID, FWD)
       if (!eligiblePlayers.has(playerId)) return;
 
-      const defcon = extractDefensiveContribution(playerData);
-      if (defcon > 0) {
+      const elementType = eligiblePlayers.get(playerId);
+      const defconPoints = calculateDefconPoints(playerData, elementType);
+      
+      if (defconPoints > 0) {
         const current = defconTotals.get(playerId) || 0;
-        defconTotals.set(playerId, current + defcon);
+        defconTotals.set(playerId, current + defconPoints);
       }
     });
   });
 
-  console.log(`DEFCON data aggregated for ${defconTotals.size} players across ${completedGWs.length} gameweeks`);
+  console.log(`DEFCON points aggregated for ${defconTotals.size} players across ${completedGWs.length} gameweeks`);
 
   // Update cache
   defconCache.data = defconTotals;
@@ -177,15 +192,15 @@ export async function fetchDefconData(playerElements) {
 }
 
 /**
- * Merges DEFCON data into player elements array.
+ * Merges DEFCON points into player elements array.
  * Adds a 'defensive_contribution' field to each eligible player.
  * @param {Array} elements - Array of player elements from bootstrap-static
- * @param {Map} defconData - Map of player_id -> total DEFCON score
+ * @param {Map} defconData - Map of player_id -> total DEFCON points
  */
 export function mergeDefconIntoElements(elements, defconData) {
   elements.forEach(player => {
-    // Only set DEFCON for DEF and MID positions
-    if (player.element_type === 2 || player.element_type === 3) {
+    // Set DEFCON points for DEF, MID, and FWD positions (not GK)
+    if (player.element_type === 2 || player.element_type === 3 || player.element_type === 4) {
       player.defensive_contribution = defconData.get(player.id) || 0;
     } else {
       player.defensive_contribution = 0;
