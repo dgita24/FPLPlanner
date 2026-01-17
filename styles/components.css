@@ -22,8 +22,8 @@
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: 16px;
-  min-height: 40px;
+  margin-bottom: 12px;
+  min-height: 36px;
 }
 
 /* Transfer actions on the left */
@@ -61,6 +61,84 @@
 
 .transfer-action-btn.cancel-btn:hover {
   background: #dd3333;
+}
+
+/* Chip UI styles */
+.chip-container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.chip-indicator {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  background: rgba(0, 255, 135, 0.15);
+  border: 2px solid #00ff87;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.chip-icon {
+  font-size: 14px;
+}
+
+.chip-name {
+  color: #00ff87;
+}
+
+.chip-gw {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 11px;
+}
+
+.chip-buttons-row {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.chip-btn-small {
+  padding: 8px 14px;
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+  height: 36px;
+  background: rgba(0, 255, 135, 0.2);
+  color: #00ff87;
+  border: 1px solid #00ff87;
+}
+
+.chip-btn-small:hover:not(:disabled) {
+  background: rgba(0, 255, 135, 0.3);
+  transform: translateY(-1px);
+}
+
+.chip-btn-small.chip-btn-active {
+  background: #00ff87;
+  color: #000;
+  border-color: #00ff87;
+}
+
+.chip-btn-small.chip-btn-used {
+  background: rgba(100, 100, 100, 0.2);
+  color: rgba(255, 255, 255, 0.4);
+  border-color: rgba(255, 255, 255, 0.2);
+  cursor: not-allowed;
+}
+
+.chip-btn-small:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .formation-line {

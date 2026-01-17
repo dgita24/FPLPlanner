@@ -1,10 +1,19 @@
 /* ===== Responsive Design for Tablets and Mobile ===== */
 
-/* Small Laptop/Large Tablet (max-width: 1280px) */
-@media (max-width: 1280px) {
+/* Small Laptop/Large Tablet (max-width: 1680px) */
+@media (max-width: 1680px) {
   .container {
     max-width: 100%;
     padding: 0 15px;
+  }
+
+  #plannerMain {
+    grid-template-columns: 280px 1fr 340px;
+    gap: 10px;
+  }
+
+  .header {
+    width: 100%;
   }
 
   .pitch {
@@ -25,11 +34,6 @@
   }
 
   .formation-line {
-    gap: 10px;
-  }
-
-  #plannerMain {
-    grid-template-columns: 280px 1fr 340px;
     gap: 10px;
   }
 
