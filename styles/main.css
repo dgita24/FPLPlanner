@@ -244,9 +244,9 @@ body {
 
 .gw-nav {
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
-  gap: 20px;
+  gap: 12px;
   margin-bottom: 16px;
 }
 
@@ -262,6 +262,32 @@ body {
 .gw-nav button:disabled {
   background: #666;
   cursor: not-allowed;
+}
+
+/* Transfer buttons in gw-nav keep their specific colors */
+.gw-nav .transfer-action-btn.add-btn {
+  background: #00ff87;
+  color: #000;
+}
+
+.gw-nav .transfer-action-btn.add-btn:hover {
+  background: #00e676;
+}
+
+.gw-nav .transfer-action-btn.cancel-btn {
+  background: #ff4444;
+  color: #fff;
+}
+
+.gw-nav .transfer-action-btn.cancel-btn:hover {
+  background: #dd3333;
+}
+
+/* Center group for GW nav buttons and heading */
+.gw-nav .gw-center {
+  display: flex;
+  align-items: center;
+  gap: 20px;
 }
 
 #mainColumn {

@@ -17,22 +17,13 @@
   border: 2px solid rgba(255, 255, 255, 0.1);
 }
 
-/* Pitch top controls container */
+/* Pitch top controls container - now only contains chip UI */
 .pitch-top-controls {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
   align-items: flex-start;
   margin-bottom: 16px;
   min-height: 36px;
-  padding-top: 10px;
-}
-
-/* Transfer actions on the left */
-.transfer-actions-left {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-  /* No margin-top: transfer buttons align with chip buttons at the top */
 }
 
 .transfer-action-btn {
