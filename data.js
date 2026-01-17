@@ -86,8 +86,9 @@ export async function loadBootstrap() {
     const current = events.find(e => e.is_current)?.id;
     const next = events.find(e => e.is_next)?.id;
 
-    // Use the *upcoming* GW as the planner's current GW when available
-    state.currentGW = next || current || 1;
+    // Use the current GW when available (GW is live)
+    // Only use next GW during the gap between gameweeks
+    state.currentGW = current || next || 1;
     state.viewingGW = state.currentGW;
 
     initEmptyPlan();
