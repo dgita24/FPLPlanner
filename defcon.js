@@ -104,10 +104,10 @@ function extractDefensiveContribution(playerData) {
 /**
  * Fetches and aggregates DEFCON data across all completed gameweeks.
  * Only aggregates for DEF (element_type 2) and MID (element_type 3) positions.
- * @param {Array} elements - Array of player elements from bootstrap-static
- * @returns {Promise<Map>} Map of player_id -> total DEFCON score
+ * @param {Array<Object>} playerElements - Array of player elements from bootstrap-static with properties: id, element_type, etc.
+ * @returns {Promise<Map<number, number>>} Map of player_id -> total DEFCON score
  */
-export async function fetchDefconData(elements) {
+export async function fetchDefconData(playerElements) {
   // Check cache validity (cache for 5 minutes)
   const now = Date.now();
   if (defconCache.data && defconCache.lastFetch && (now - defconCache.lastFetch) < 5 * 60 * 1000) {
@@ -119,7 +119,7 @@ export async function fetchDefconData(elements) {
   
   // Create a set of eligible player IDs (DEF and MID only)
   const eligiblePlayers = new Set();
-  elements.forEach(player => {
+  playerElements.forEach(player => {
     // element_type: 1=GK, 2=DEF, 3=MID, 4=FWD
     if (player.element_type === 2 || player.element_type === 3) {
       eligiblePlayers.add(player.id);
@@ -133,10 +133,8 @@ export async function fetchDefconData(elements) {
     return new Map();
   }
 
-  const completedGWs = [];
-  for (let gw = 1; gw <= latestCompleted; gw++) {
-    completedGWs.push(gw);
-  }
+  // Create array of completed gameweeks [1, 2, ..., latestCompleted]
+  const completedGWs = Array.from({ length: latestCompleted }, (_, i) => i + 1);
   
   defconCache.completedGWs = completedGWs;
 
@@ -199,7 +197,9 @@ export function mergeDefconIntoElements(elements, defconData) {
  * Clears the DEFCON cache (useful for testing or forcing refresh).
  */
 export function clearDefconCache() {
-  defconCache.data = null;
-  defconCache.completedGWs = null;
-  defconCache.lastFetch = null;
+  Object.assign(defconCache, {
+    data: null,
+    completedGWs: null,
+    lastFetch: null
+  });
 }

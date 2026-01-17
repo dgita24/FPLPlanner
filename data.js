@@ -1,7 +1,6 @@
 // data.js - FPL data via Cloudflare Pages Functions proxy (/api/fpl/*)
 
 import { fetchDefconData, mergeDefconIntoElements } from './defcon.js';
-import { renderTable } from './table.js';
 
 export let history = {
   baseline: null,
@@ -120,8 +119,10 @@ export async function loadDefconData() {
     mergeDefconIntoElements(state.elements, defconData);
     console.log('DEFCON data loaded successfully');
     
-    // Trigger table re-render if table is initialized
-    renderTable();
+    // Trigger table re-render if available (avoid circular dependency)
+    if (typeof window.renderTable === 'function') {
+      window.renderTable();
+    }
   } catch (error) {
     console.error('Failed to load DEFCON data:', error);
   }
