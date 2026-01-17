@@ -43,6 +43,11 @@ function escapeHtml(text) {
   return String(text).replace(/["'<>&]/g, m => map[m]);
 }
 
+// Helper function to get team badge URL
+function getTeamBadgeUrl(teamCode) {
+  return teamCode ? TEAM_BADGE_URL_TEMPLATE.replace('{code}', teamCode) : '';
+}
+
 // Helper function to format stat values
 function formatStatValue(value, statKey) {
   if (value === null || value === undefined) {
@@ -292,9 +297,7 @@ export function renderTable() {
       const teamName = team ? team.name : 'Unknown';
       const teamNameEscaped = escapeHtml(teamName);
       const playerNameEscaped = escapeHtml(player.web_name);
-      const badgeUrl = teamCode 
-        ? TEAM_BADGE_URL_TEMPLATE.replace('{code}', teamCode)
-        : '';
+      const badgeUrl = getTeamBadgeUrl(teamCode);
       
       // Only render badge img if URL is available
       const badgeHtml = badgeUrl 
@@ -517,7 +520,7 @@ window.showPlayerInfo = function (ev, playerId) {
       <button class="player-info-close" onclick="closePlayerInfo()">×</button>
       
       <div class="player-info-header">
-        <img src="${TEAM_BADGE_URL_TEMPLATE.replace('{code}', teamCode)}" 
+        <img src="${getTeamBadgeUrl(teamCode)}" 
              class="player-info-badge" alt="${teamNameEscaped}">
         <div class="player-info-title">
           <h2>${playerNameEscaped}</h2>
@@ -554,13 +557,6 @@ function initializeStatColumns() {
   // Update table header with safe HTML escaping for single filterable column
   const statCol = statConfig[currentStatView] || statConfig.points;
   const colHeader = document.getElementById('statColHeader');
-  
-  // Escape HTML to prevent XSS
-  const escapeHtml = (text) => {
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
-  };
   
   if (colHeader) {
     const escapedKey = escapeHtml(statCol.key);
