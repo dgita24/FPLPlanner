@@ -100,8 +100,10 @@ function getGameweekForDate(targetDate, events) {
     }
   }
   
-  // If all deadlines are before the suspension date,
-  // player is suspended for all remaining gameweeks
+  // Edge case: If all deadlines are before the suspension date,
+  // the suspension extends beyond all known gameweeks.
+  // Example: "Suspended until May 1" but we only have data through March.
+  // In this case, player is suspended for all remaining gameweeks we know about.
   return events[events.length - 1]?.id || null;
 }
 

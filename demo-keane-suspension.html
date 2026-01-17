@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Keane Suspension Fix Demo</title>
+  <title>Keane Suspension Fix - Corrected Semantics</title>
   <style>
     body {
       font-family: "Segoe UI", sans-serif;
@@ -95,6 +95,11 @@
       font-weight: bold;
     }
     
+    .error {
+      color: #ff6b6b;
+      font-weight: bold;
+    }
+    
     .before-after {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -125,62 +130,71 @@
   </style>
 </head>
 <body>
-  <h1>🚩 Keane Suspension Fix - Date-Based Parsing</h1>
+  <h1>🚩 Keane Suspension Fix - Corrected FPL Semantics</h1>
   
   <div class="demo-section">
-    <h2>The Problem</h2>
-    <p><strong>Original Issue:</strong> Keane shows as red flagged for the whole season even though his suspension ends on Jan 31.</p>
-    <p><strong>Root Cause:</strong> The system couldn't parse date-based suspension news like "Suspended until 31 January".</p>
+    <h2>The Issue</h2>
+    <p><strong>User Report:</strong> Keane showing wrong flags after initial fix.</p>
+    <ul>
+      <li><span class="error">❌ GW22: NO FLAG (wrong)</span></li>
+      <li>✅ GW23: RED FLAG (correct)</li>
+      <li><span class="error">❌ GW24: RED FLAG (wrong)</span></li>
+      <li>✅ GW25+: NO FLAG (correct)</li>
+    </ul>
+    <p><strong>Root Cause:</strong> Misinterpreted FPL semantics for "Suspended until 31 January".</p>
   </div>
   
   <div class="demo-section">
-    <h2>The Fix</h2>
+    <h2>FPL Semantics Clarification</h2>
     <div class="before-after">
       <div class="before">
-        <h3>❌ Before</h3>
+        <h3>❌ Wrong Interpretation</h3>
+        <p><strong>"Suspended until Jan 31"</strong></p>
         <ul>
-          <li>Only parsed "Suspended for X matches"</li>
-          <li>Couldn't handle date-based news</li>
-          <li>Keane flagged indefinitely</li>
+          <li>Unavailable THROUGH end of Jan 31</li>
+          <li>Not available FOR Jan 31 matches</li>
+          <li>Available FROM Feb 1 onwards</li>
         </ul>
       </div>
       <div class="after">
-        <h3>✅ After</h3>
+        <h3>✅ Correct Interpretation</h3>
+        <p><strong>"Suspended until Jan 31"</strong></p>
         <ul>
-          <li>Parses dates like "31 January"</li>
-          <li>Converts dates to gameweeks</li>
-          <li>Flag removed after GW23</li>
+          <li>Unavailable UP TO Jan 31</li>
+          <li>Available FOR Jan 31 matches</li>
+          <li>Available FROM Jan 31 onwards</li>
         </ul>
       </div>
     </div>
+    <p style="margin-top: 10px;"><em>User confirmed: "suspended until Jan 31st actually means he's available for the Jan 31st match"</em></p>
   </div>
   
   <div class="demo-section">
-    <h2>Keane's Case: "Suspended until 31 January"</h2>
+    <h2>Keane's Case: "Suspended until 31 January" (CORRECTED)</h2>
     <p><strong>Current Gameweek:</strong> 22</p>
     <p><strong>Suspension Until:</strong> January 31, 2026</p>
-    <p><strong>Logic:</strong> Player is unavailable until end of Jan 31. GW23 deadline is Jan 31 at 14:00, so he misses GW23. Available from GW24 onwards.</p>
+    <p><strong>Corrected Logic:</strong> Player is unavailable UP TO (but not including) Jan 31. GW23 deadline is Jan 31 at 14:00, so he CAN play in GW23. Available from GW23 onwards.</p>
     
     <div class="timeline">
       <div class="gw-box suspended">
         <div class="gw-label">GW 22</div>
         <div class="gw-deadline">Deadline: Jan 24</div>
         <div class="flag-status flag-red">🟥 SUSPENDED</div>
-        <div style="margin-top: 10px; font-size: 12px;">1st suspended match</div>
+        <div style="margin-top: 10px; font-size: 12px;">Last suspended match</div>
       </div>
       
-      <div class="gw-box suspended">
+      <div class="gw-box available">
         <div class="gw-label">GW 23</div>
         <div class="gw-deadline">Deadline: Jan 31</div>
-        <div class="flag-status flag-red">🟥 SUSPENDED</div>
-        <div style="margin-top: 10px; font-size: 12px;">Deadline on suspension date</div>
+        <div class="flag-status flag-none">✅ AVAILABLE</div>
+        <div style="margin-top: 10px; font-size: 12px;">Available FROM this date</div>
       </div>
       
       <div class="gw-box available">
         <div class="gw-label">GW 24</div>
         <div class="gw-deadline">Deadline: Feb 7</div>
         <div class="flag-status flag-none">✅ AVAILABLE</div>
-        <div style="margin-top: 10px; font-size: 12px;">Suspension expired</div>
+        <div style="margin-top: 10px; font-size: 12px;">Available</div>
       </div>
       
       <div class="gw-box available">
@@ -193,7 +207,7 @@
   </div>
   
   <div class="demo-section">
-    <h2>Implementation Details</h2>
+    <h2>Implementation Details (CORRECTED)</h2>
     
     <h3>Step 1: Parse the Date</h3>
     <div class="code-example">
@@ -204,63 +218,76 @@ Regex match: <span class="highlight">/(?:until|back|return)\s+(?:on\s+)?(\d+\s+J
 Parsed: <span class="highlight">Date(2026, 0, 31)</span> // Jan 31, 2026
     </div>
     
-    <h3>Step 2: Find Last Suspended Gameweek</h3>
+    <h3>Step 2: Find First Available Gameweek (CORRECTED)</h3>
     <div class="code-example">
+<span class="error">// OLD (WRONG): Find LAST GW with deadline <= suspension date</span>
+<span class="highlight">// NEW (CORRECT): Find FIRST GW with deadline >= suspension date</span>
+
 Compare suspension date with gameweek deadlines:
-- GW22 deadline (Jan 24) <= Jan 31? <span class="highlight">YES</span> ✓ Suspended
-- GW23 deadline (Jan 31 14:00) <= Jan 31 23:59? <span class="highlight">YES</span> ✓ Suspended
-- GW24 deadline (Feb 7) <= Jan 31? <span class="highlight">NO</span> ✗ Available
+- GW22 deadline (Jan 24) >= Jan 31? <span class="error">NO</span> → Suspended
+- GW23 deadline (Jan 31) >= Jan 31? <span class="highlight">YES</span> → <span class="highlight">AVAILABLE!</span>
 ↓
-Last suspended GW: <span class="highlight">23</span>
+First available GW: <span class="highlight">23</span>
+Last suspended GW: <span class="highlight">23 - 1 = 22</span>
     </div>
     
     <h3>Step 3: Show/Hide Flag Based on Viewing GW</h3>
     <div class="code-example">
+suspensionEndGW = <span class="highlight">22</span> (last suspended GW)
+
 if (viewingGW > suspensionEndGW) {
   <span class="highlight">// Don't show flag</span>
   return false;
 }
-// Otherwise show flag
 
 Examples:
-- Viewing GW22: 22 > 23? NO → <span class="highlight">Show flag ✓</span>
-- Viewing GW23: 23 > 23? NO → <span class="highlight">Show flag ✓</span>
-- Viewing GW24: 24 > 23? YES → <span class="highlight">Hide flag ✓</span>
-- Viewing GW25: 25 > 23? YES → <span class="highlight">Hide flag ✓</span>
+- Viewing GW22: 22 > 22? NO → <span class="highlight">Show flag ✓</span>
+- Viewing GW23: 23 > 22? YES → <span class="highlight">Hide flag ✓</span>
+- Viewing GW24: 24 > 22? YES → <span class="highlight">Hide flag ✓</span>
+- Viewing GW25: 25 > 22? YES → <span class="highlight">Hide flag ✓</span>
     </div>
   </div>
   
   <div class="demo-section">
-    <h2>Supported Date Formats</h2>
-    <ul>
-      <li>✅ "Suspended until 31 January" (Keane's format)</li>
-      <li>✅ "Suspended until Jan 31"</li>
-      <li>✅ "Expected back 7 February"</li>
-      <li>✅ "Suspended until February 14th" (with ordinal suffix)</li>
-      <li>✅ "Suspended for 2 matches" (original format still works)</li>
-    </ul>
-  </div>
+    <h2>Code Changes</h2>
+    <div class="code-example">
+<span class="error">// BEFORE (WRONG)</span>
+function getGameweekForDate(targetDate, events) {
+  // Find LAST GW with deadline <= suspension date
+  const suspensionEndOfDay = new Date(targetDate);
+  suspensionEndOfDay.setHours(23, 59, 59, 999);
   
-  <div class="demo-section">
-    <h2>Additional Enhancements</h2>
-    <h3>chance_of_playing Fields</h3>
-    <p>For current and next gameweek, the system now also checks:</p>
-    <ul>
-      <li><code>chance_of_playing_this_round</code> - If 100%, no flag shown</li>
-      <li><code>chance_of_playing_next_round</code> - If 100%, no flag shown</li>
-    </ul>
-    <p>This provides additional accuracy beyond just parsing the news text.</p>
+  for (const event of events) {
+    if (deadline <= suspensionEndOfDay) {
+      lastSuspendedGW = event.id; <span class="error">// WRONG!</span>
+    }
+  }
+  return lastSuspendedGW;
+}
+
+<span class="highlight">// AFTER (CORRECT)</span>
+function getGameweekForDate(targetDate, events) {
+  // Find FIRST GW with deadline >= suspension date
+  for (const event of events) {
+    const deadline = new Date(event.deadline_time);
+    
+    if (deadline >= targetDate) {
+      return event.id - 1; <span class="highlight">// CORRECT!</span>
+    }
+  }
+}
+    </div>
   </div>
   
   <div class="demo-section" style="background: rgba(0, 255, 135, 0.2); border: 2px solid #00ff87;">
-    <h2>✅ Result</h2>
+    <h2>✅ Result (CORRECTED)</h2>
     <p style="font-size: 18px;"><strong>Keane now correctly shows:</strong></p>
     <ul style="font-size: 16px;">
-      <li>🟥 Red flag in GW22</li>
-      <li>🟥 Red flag in GW23</li>
-      <li>✅ NO flag from GW24 onwards</li>
+      <li>✅ Red flag in GW22 (last suspended match)</li>
+      <li>✅ NO flag in GW23 (available FROM this GW)</li>
+      <li>✅ NO flag in GW24 onwards</li>
     </ul>
-    <p style="margin-top: 20px;">The system now handles date-based suspensions accurately!</p>
+    <p style="margin-top: 20px; font-weight: bold;">The system now correctly interprets FPL's "suspended until" semantics!</p>
   </div>
 </body>
 </html>
