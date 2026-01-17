@@ -74,21 +74,17 @@ function parseSuspensionDate(dateStr, currentYear) {
 /**
  * Find the gameweek for a given date based on event deadlines
  * Returns the LAST gameweek the player is suspended for
- * @param {Date} targetDate - The date until which player is suspended
+ * @param {Date} targetDate - The date until which player is suspended (exclusive - available FROM this date)
  * @param {Array} events - Array of gameweek objects with deadline_time
  * @returns {number|null} - Last suspended gameweek number or null if not found
  */
 function getGameweekForDate(targetDate, events) {
   if (!targetDate || !events || events.length === 0) return null;
   
-  // Player is suspended UNTIL targetDate (inclusive, entire day)
-  // Set to end of day to ensure we capture deadlines on the same day
-  const suspensionEndOfDay = new Date(targetDate);
-  suspensionEndOfDay.setHours(23, 59, 59, 999);
-  
-  // Find the last gameweek whose deadline is on or before the end of the suspension date
-  // That's the last GW they're suspended for
-  let lastSuspendedGW = null;
+  // FPL semantics: "Suspended until Jan 31" means available FROM Jan 31
+  // So we find the FIRST gameweek with deadline >= suspension date
+  // That's the first GW they're available for
+  // suspensionEndGW = that GW - 1
   
   for (let i = 0; i < events.length; i++) {
     const event = events[i];
@@ -96,17 +92,17 @@ function getGameweekForDate(targetDate, events) {
     
     const deadline = new Date(event.deadline_time);
     
-    // If the deadline is on or before the end of suspension date,
-    // the player is suspended for this gameweek
-    if (deadline <= suspensionEndOfDay) {
-      lastSuspendedGW = event.id;
-    } else {
-      // Once we find a deadline after the suspension date, we're done
-      break;
+    // If the deadline is on or after the suspension date,
+    // the player is available for this gameweek
+    if (deadline >= targetDate) {
+      // First available GW found, so last suspended GW is previous one
+      return event.id - 1;
     }
   }
   
-  return lastSuspendedGW;
+  // If all deadlines are before the suspension date,
+  // player is suspended for all remaining gameweeks
+  return events[events.length - 1]?.id || null;
 }
 
 /**

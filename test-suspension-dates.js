@@ -12,26 +12,27 @@ const mockEvents = [
   { id: 26, deadline_time: '2026-02-21T14:00:00Z' }   // GW26 deadline: Feb 21
 ];
 
-// Test cases
+// Test cases - UPDATED with correct FPL semantics
+// "Suspended until X" means available FROM X (not through end of X)
 const testCases = [
   {
     news: 'Suspended until 31 January',
-    expectedGW: 23,  // Suspended through GW23 (deadline Jan 31), available from GW24
-    description: 'Keane case - suspended until Jan 31 (GW23 deadline day)'
+    expectedGW: 22,  // Available FROM GW23 (Jan 31), so suspended through GW22
+    description: 'Keane case - suspended until Jan 31 (available FROM GW23)'
   },
   {
     news: 'Suspended until Jan 24',
-    expectedGW: 22,  // Suspended through GW22 (deadline Jan 24), available from GW23
+    expectedGW: 21,  // Available FROM GW22 (Jan 24), so suspended through GW21
     description: 'Suspended until GW22 deadline day'
   },
   {
     news: 'Expected back 7 February',
-    expectedGW: 24,  // Back on Feb 7 = GW24 deadline, so suspended through GW24
+    expectedGW: 23,  // Available FROM GW24 (Feb 7), so suspended through GW23
     description: 'Expected back on GW24 deadline day'
   },
   {
     news: 'Suspended until February 14th',
-    expectedGW: 25,  // Suspended through GW25 (deadline Feb 14)
+    expectedGW: 24,  // Available FROM GW25 (Feb 14), so suspended through GW24
     description: 'With ordinal suffix'
   },
   {
@@ -90,25 +91,20 @@ function parseSuspensionDate(dateStr, currentYear) {
 function getGameweekForDate(targetDate, events) {
   if (!targetDate || !events || events.length === 0) return null;
   
-  const suspensionEndOfDay = new Date(targetDate);
-  suspensionEndOfDay.setHours(23, 59, 59, 999);
-  
-  let lastSuspendedGW = null;
-  
+  // FPL semantics: "Suspended until Jan 31" means available FROM Jan 31
   for (let i = 0; i < events.length; i++) {
     const event = events[i];
     if (!event.deadline_time) continue;
     
     const deadline = new Date(event.deadline_time);
     
-    if (deadline <= suspensionEndOfDay) {
-      lastSuspendedGW = event.id;
-    } else {
-      break;
+    if (deadline >= targetDate) {
+      // First available GW, so last suspended GW is previous one
+      return event.id - 1;
     }
   }
   
-  return lastSuspendedGW;
+  return events[events.length - 1]?.id || null;
 }
 
 function getSuspensionEndGW(news, currentGW, events) {
