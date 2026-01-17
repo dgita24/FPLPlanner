@@ -148,6 +148,12 @@ export function renderTable() {
   const tbody = document.getElementById('tableBody');
   if (!tbody) return;
 
+  // Initialize stat columns on first render
+  if (isFirstRender) {
+    initializeStatColumns();
+    isFirstRender = false;
+  }
+
   const search = foldForSearch(document.getElementById('searchName')?.value || '');
   const posFilter = document.getElementById('filterPos')?.value || '';
 
@@ -317,24 +323,7 @@ function updateSortIcons() {
 
 // Update stat columns based on dropdown selection
 window.updateStatColumns = function () {
-  const statSelect = document.getElementById('statSelect');
-  if (!statSelect) return;
-  
-  currentStatView = statSelect.value;
-  
-  // Update table headers
-  const statCols = statConfigs[currentStatView] || statConfigs.basic;
-  const col1Header = document.getElementById('statCol1Header');
-  const col2Header = document.getElementById('statCol2Header');
-  
-  if (col1Header && statCols[0]) {
-    col1Header.innerHTML = `<span onclick="sortTable('${statCols[0].key}')" class="th-sortable" style="cursor: pointer;" title="${statCols[0].tooltip}">${statCols[0].label} <span id="sortStat1Icon">⇅</span></span>`;
-  }
-  
-  if (col2Header && statCols[1]) {
-    col2Header.innerHTML = `<span onclick="sortTable('${statCols[1].key}')" class="th-sortable" style="cursor: pointer;" title="${statCols[1].tooltip}">${statCols[1].label} <span id="sortStat2Icon">⇅</span></span>`;
-  }
-  
+  initializeStatColumns();
   // Re-render table with new columns
   renderTable();
 };
@@ -479,8 +468,27 @@ window.closePlayerInfo = function () {
   }
 };
 
-// Initialize stat columns on load
-document.addEventListener('DOMContentLoaded', () => {
-  window.updateStatColumns();
-});
+// Initialize stat columns after table headers are rendered
+function initializeStatColumns() {
+  const statSelect = document.getElementById('statSelect');
+  if (!statSelect) return;
+  
+  currentStatView = statSelect.value || 'basic';
+  
+  // Update table headers
+  const statCols = statConfigs[currentStatView] || statConfigs.basic;
+  const col1Header = document.getElementById('statCol1Header');
+  const col2Header = document.getElementById('statCol2Header');
+  
+  if (col1Header && statCols[0]) {
+    col1Header.innerHTML = `<span onclick="sortTable('${statCols[0].key}')" class="th-sortable" style="cursor: pointer;" title="${statCols[0].tooltip}">${statCols[0].label} <span id="sortStat1Icon">⇅</span></span>`;
+  }
+  
+  if (col2Header && statCols[1]) {
+    col2Header.innerHTML = `<span onclick="sortTable('${statCols[1].key}')" class="th-sortable" style="cursor: pointer;" title="${statCols[1].tooltip}">${statCols[1].label} <span id="sortStat2Icon">⇅</span></span>`;
+  }
+}
+
+// Call initialization on first render
+let isFirstRender = true;
 
