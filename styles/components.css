@@ -809,8 +809,12 @@ td.fixtures-cell {
   background: #e6fffa;
 }
 
-.player-table-compact .th-select {
-  width: 45px;
+.player-table-compact .th-info {
+  width: 35px;
+}
+
+.player-table-compact .th-club {
+  width: 35px;
 }
 
 .player-table-compact .th-status {
@@ -838,8 +842,21 @@ td.fixtures-cell {
   min-width: 60px;
 }
 
-.player-table-compact .th-info {
-  width: 40px;
+.player-table-compact .info-cell {
+  padding: 4px;
+  text-align: center;
+}
+
+.player-table-compact .club-cell {
+  padding: 4px;
+  text-align: center;
+}
+
+.club-badge {
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+  vertical-align: middle;
 }
 
 .info-btn {
@@ -849,6 +866,7 @@ td.fixtures-cell {
   border-radius: 50%;
   width: 20px;
   height: 20px;
+  min-width: 20px;
   font-size: 11px;
   font-weight: bold;
   cursor: pointer;
@@ -856,6 +874,7 @@ td.fixtures-cell {
   align-items: center;
   justify-content: center;
   transition: all 0.2s;
+  flex-shrink: 0;
 }
 
 .info-btn:hover {

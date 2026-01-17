@@ -10,6 +10,9 @@ let tableSort = {
 
 const posNames = { 1: 'GK', 2: 'DEF', 3: 'MID', 4: 'FWD' };
 
+// Team badge URL template
+const TEAM_BADGE_URL_TEMPLATE = 'https://resources.premierleague.com/premierleague/badges/70/t{code}.png';
+
 // Current stat selection - single column
 let currentStatView = 'points'; // 'points' | 'goals_scored' | 'assists' | 'clean_sheets' | 'bonus' | 'transfers_in_event' | 'transfers_out_event' | 'selected_by_percent'
 
@@ -22,21 +25,63 @@ const statConfig = {
   bonus: { key: 'bonus', label: 'Bns', tooltip: 'Bonus Points' },
   transfers_in_event: { key: 'transfers_in_event', label: 'TI', tooltip: 'Transfers In (GW)' },
   transfers_out_event: { key: 'transfers_out_event', label: 'TO', tooltip: 'Transfers Out (GW)' },
-  selected_by_percent: { key: 'selected_by_percent', label: 'Own%', tooltip: 'Ownership %' }
+  selected_by_percent: { key: 'selected_by_percent', label: 'Own%', tooltip: 'Ownership %' },
+  form: { key: 'form', label: 'Form', tooltip: 'Recent Performance Score' },
+  minutes: { key: 'minutes', label: 'Min', tooltip: 'Minutes Played' },
+  goals_conceded: { key: 'goals_conceded', label: 'GC', tooltip: 'Goals Conceded' },
+  yellow_cards: { key: 'yellow_cards', label: 'YC', tooltip: 'Yellow Cards' },
+  red_cards: { key: 'red_cards', label: 'RC', tooltip: 'Red Cards' },
+  saves: { key: 'saves', label: 'Sav', tooltip: 'Saves' },
+  penalties_saved: { key: 'penalties_saved', label: 'PS', tooltip: 'Penalties Saved' },
+  penalties_missed: { key: 'penalties_missed', label: 'PM', tooltip: 'Penalties Missed' },
+  ict_index: { key: 'ict_index', label: 'ICT', tooltip: 'ICT Index' },
+  points_per_game: { key: 'points_per_game', label: 'PPG', tooltip: 'Points per Game' },
+  expected_goals: { key: 'expected_goals', label: 'xG', tooltip: 'Expected Goals' },
+  expected_assists: { key: 'expected_assists', label: 'xA', tooltip: 'Expected Assists' },
+  expected_goals_conceded: { key: 'expected_goals_conceded', label: 'xGC', tooltip: 'Expected Goals Conceded' },
+  expected_goal_involvements: { key: 'expected_goal_involvements', label: 'xGI', tooltip: 'Expected Goal Involvements' }
 };
 
 // Selected players (changed from single to multi-select)
 window.selectedPlayerIds = window.selectedPlayerIds ?? [];
+
+// Helper function to escape HTML attributes
+function escapeHtml(text) {
+  const map = {
+    '"': '&quot;',
+    "'": '&#39;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '&': '&amp;'
+  };
+  return String(text).replace(/["'<>&]/g, m => map[m]);
+}
+
+// Helper function to get team badge URL
+function getTeamBadgeUrl(teamCode) {
+  return teamCode ? TEAM_BADGE_URL_TEMPLATE.replace('{code}', teamCode) : '';
+}
 
 // Helper function to format stat values
 function formatStatValue(value, statKey) {
   if (value === null || value === undefined) {
     return '-';
   }
+  
+  // Format percentage values
   if (statKey === 'selected_by_percent') {
     const numVal = parseFloat(value);
     return isNaN(numVal) ? '-' : numVal.toFixed(1) + '%';
   }
+  
+  // Format decimal values (form, ICT index, expected stats, points per game)
+  if (statKey === 'form' || statKey === 'ict_index' || statKey === 'points_per_game' ||
+      statKey === 'expected_goals' || statKey === 'expected_assists' || 
+      statKey === 'expected_goals_conceded' || statKey === 'expected_goal_involvements') {
+    const numVal = parseFloat(value);
+    return isNaN(numVal) ? '-' : numVal.toFixed(1);
+  }
+  
   return String(value);
 }
 
@@ -190,16 +235,19 @@ export function renderTable() {
   // Initialize stat columns on first render
   if (isFirstRender) {
     initializeStatColumns();
+    populateTeamFilter();
     isFirstRender = false;
   }
 
   const search = foldForSearch(document.getElementById('searchName')?.value || '');
   const posFilter = document.getElementById('filterPos')?.value || '';
+  const teamFilter = document.getElementById('filterTeam')?.value || '';
 
   let filtered = state.elements.filter((player) => {
     const matchesSearch = foldForSearch(player.web_name || '').includes(search);
     const matchesPos = !posFilter || posNames[player.element_type] === posFilter;
-    return matchesSearch && matchesPos;
+    const matchesTeam = !teamFilter || String(player.team) === teamFilter;
+    return matchesSearch && matchesPos && matchesTeam;
   });
 
   // -------- SORTING --------
@@ -271,15 +319,30 @@ export function renderTable() {
       // Get stat value for the single filterable column
       const statValue = formatStatValue(player[statCol.key], statCol.key);
 
+      // Get team badge for club column
+      const team = state.teams.find(t => t.id === player.team);
+      const teamCode = team ? team.code : '';
+      const teamName = team ? team.name : 'Unknown';
+      const teamNameEscaped = escapeHtml(teamName);
+      const playerNameEscaped = escapeHtml(player.web_name);
+      const badgeUrl = getTeamBadgeUrl(teamCode);
+      
+      // Only render badge img if URL is available
+      const badgeHtml = badgeUrl 
+        ? `<img class="club-badge" src="${badgeUrl}" alt="${teamNameEscaped}" title="${teamNameEscaped}" />`
+        : '';
+
       return `
-        <tr onclick="selectPlayer(event, ${player.id})" class="${checked ? 'selected' : ''}">
-          <td><input type="checkbox" name="selectedPlayer" value="${player.id}" ${checked}></td>
+        <tr onclick="selectPlayer(event, ${player.id})" data-player-id="${player.id}" class="${checked ? 'selected' : ''}">
+          <td class="info-cell">
+            <button class="info-btn" onclick="showPlayerInfo(event, ${player.id})" title="View player stats">i</button>
+          </td>
+          <td class="club-cell">${badgeHtml}</td>
           <td class="status-cell">${statusFlagHtml}</td>
-          <td class="name-cell">${player.web_name}</td>
+          <td class="name-cell">${playerNameEscaped}</td>
           <td>${posNames[player.element_type]}</td>
           <td>${(player.now_cost / 10).toFixed(1)}</td>
           <td class="stat-col-cell">${statValue}</td>
-          <td><button class="info-btn" onclick="showPlayerInfo(event, ${player.id})" title="View player stats">i</button></td>
         </tr>
       `;
     })
@@ -290,35 +353,53 @@ export function renderTable() {
 }
 
 export function populateFilters() {
-  // Note: Team filter removed from compact view
+  // Filters are now populated dynamically in renderTable
+}
+
+function populateTeamFilter() {
+  const teamSelect = document.getElementById('filterTeam');
+  if (!teamSelect || !state.teams) return;
+
+  // Sort teams alphabetically by name
+  const sortedTeams = [...state.teams].sort((a, b) => 
+    (a.name || '').localeCompare(b.name || '')
+  );
+
+  // Clear existing options except the first "All Clubs"
+  teamSelect.innerHTML = '<option value="">All Clubs</option>';
+
+  // Add team options
+  sortedTeams.forEach(team => {
+    const option = document.createElement('option');
+    option.value = String(team.id);
+    option.textContent = team.name;
+    teamSelect.appendChild(option);
+  });
 }
 
 window.selectPlayer = function (ev, id) {
   if (ev) ev.stopPropagation();
   
-  // Toggle selection
-  const index = window.selectedPlayerIds.indexOf(id);
-  if (index > -1) {
-    window.selectedPlayerIds.splice(index, 1);
+  // Single selection only - replace previous selection
+  const previouslySelected = window.selectedPlayerIds.length > 0 ? window.selectedPlayerIds[0] : null;
+  
+  // If clicking the same player, deselect
+  if (previouslySelected === id) {
+    window.selectedPlayerIds = [];
   } else {
-    window.selectedPlayerIds.push(id);
+    window.selectedPlayerIds = [id];
   }
 
-  // Update row styling
-  const row = ev?.target?.closest('tr');
-  if (row) {
-    if (window.selectedPlayerIds.includes(id)) {
+  // Update all row styling
+  const allRows = document.querySelectorAll('#tableBody tr[data-player-id]');
+  allRows.forEach(row => {
+    const rowId = parseInt(row.getAttribute('data-player-id'));
+    if (rowId === id && window.selectedPlayerIds.includes(id)) {
       row.classList.add('selected');
     } else {
       row.classList.remove('selected');
     }
-  }
-
-  // Update checkbox
-  const checkbox = row?.querySelector('input[type="checkbox"]');
-  if (checkbox) {
-    checkbox.checked = window.selectedPlayerIds.includes(id);
-  }
+  });
 };
 
 // Expose for inline handlers
@@ -331,7 +412,8 @@ window.sortTable = function (key) {
     tableSort.dir = tableSort.dir === 'asc' ? 'desc' : 'asc';
   } else {
     tableSort.key = key;
-    tableSort.dir = 'asc';
+    // Default to descending (highest first) for numeric columns
+    tableSort.dir = 'desc';
   }
 
   updateSortIcons();
@@ -381,6 +463,9 @@ window.showPlayerInfo = function (ev, playerId) {
   const team = state.teams.find(t => t.id === player.team);
   const teamName = team ? team.name : 'Unknown';
   const teamCode = team ? team.code : '';
+  const teamNameEscaped = escapeHtml(teamName);
+  const playerNameEscaped = escapeHtml(player.web_name);
+  const newsEscaped = player.news ? escapeHtml(player.news) : '';
   
   // Create modal if it doesn't exist
   let modal = document.getElementById('playerInfoModal');
@@ -472,7 +557,7 @@ window.showPlayerInfo = function (ev, playerId) {
   const statusInfo = player.news ? `
     <div class="player-info-section">
       <h3>Status</h3>
-      <p style="color: rgba(255, 255, 255, 0.9); line-height: 1.6;">${player.news}</p>
+      <p style="color: rgba(255, 255, 255, 0.9); line-height: 1.6;">${newsEscaped}</p>
     </div>
   ` : '';
   
@@ -481,11 +566,11 @@ window.showPlayerInfo = function (ev, playerId) {
       <button class="player-info-close" onclick="closePlayerInfo()">×</button>
       
       <div class="player-info-header">
-        <img src="https://resources.premierleague.com/premierleague/badges/70/t${teamCode}.png" 
-             class="player-info-badge" alt="${teamName}">
+        <img src="${getTeamBadgeUrl(teamCode)}" 
+             class="player-info-badge" alt="${teamNameEscaped}">
         <div class="player-info-title">
-          <h2>${player.web_name}</h2>
-          <p>${teamName} • ${posNames[player.element_type]}</p>
+          <h2>${playerNameEscaped}</h2>
+          <p>${teamNameEscaped} • ${posNames[player.element_type]}</p>
         </div>
       </div>
       
@@ -518,13 +603,6 @@ function initializeStatColumns() {
   // Update table header with safe HTML escaping for single filterable column
   const statCol = statConfig[currentStatView] || statConfig.points;
   const colHeader = document.getElementById('statColHeader');
-  
-  // Escape HTML to prevent XSS
-  const escapeHtml = (text) => {
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
-  };
   
   if (colHeader) {
     const escapedKey = escapeHtml(statCol.key);
