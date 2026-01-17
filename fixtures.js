@@ -25,7 +25,11 @@ export async function loadFixturesData() {
       fixturesByGW.get(f.event).push(f);
     }
 
-    fixturesGW = state.currentGW;
+    // Default to showing next gameweek's fixtures for planning
+    const events = state.bootstrap?.events || [];
+    const next = events.find(e => e.is_next)?.id;
+    const current = events.find(e => e.is_current)?.id;
+    fixturesGW = next || current || state.currentGW;
     renderFixtures();
   } catch (error) {
     console.error('Error loading fixtures:', error);

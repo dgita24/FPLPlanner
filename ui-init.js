@@ -101,8 +101,11 @@ async function importTeam() {
     showMessage(`Team imported for GW${state.currentGW}.`, 'success');
   }
 
-  // Always show/planning the active GW after import
-  state.viewingGW = state.currentGW;
+  // Set viewing GW to next gameweek for planning purposes
+  const events = state.bootstrap?.events || [];
+  const next = events.find(e => e.is_next)?.id;
+  const current = events.find(e => e.is_current)?.id;
+  state.viewingGW = next || current || state.currentGW;
 
   // reset transient UI state
   resetTransferState();

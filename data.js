@@ -86,10 +86,13 @@ export async function loadBootstrap() {
     const current = events.find(e => e.is_current)?.id;
     const next = events.find(e => e.is_next)?.id;
 
-    // Use the current GW when available (GW is live)
+    // Use the current GW when available (GW is live) for importing data
     // Only use next GW during the gap between gameweeks
     state.currentGW = current || next || 1;
-    state.viewingGW = state.currentGW;
+    
+    // For planning purposes, default to viewing the next GW
+    // This allows users to plan for the upcoming gameweek
+    state.viewingGW = next || current || 1;
 
     initEmptyPlan();
     return true;
@@ -257,8 +260,10 @@ export async function loadTeamEntry(managerId, gwRequested) {
         state.plan[g].viceCaptain = viceCaptainId;
       }
 
-      // Always show current GW in the UI after import
-      state.viewingGW = state.currentGW;
+      // Set viewing GW to next gameweek for planning purposes
+      const events = state.bootstrap?.events || [];
+      const next = events.find(e => e.is_next)?.id;
+      state.viewingGW = next || state.currentGW;
 
       // Save baseline state for Reset
       history.baseline = JSON.parse(JSON.stringify(state));
