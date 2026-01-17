@@ -10,6 +10,9 @@ let tableSort = {
 
 const posNames = { 1: 'GK', 2: 'DEF', 3: 'MID', 4: 'FWD' };
 
+// Team badge URL template
+const TEAM_BADGE_URL_TEMPLATE = 'https://resources.premierleague.com/premierleague/badges/70/t{code}.png';
+
 // Current stat selection - single column
 let currentStatView = 'points'; // 'points' | 'goals_scored' | 'assists' | 'clean_sheets' | 'bonus' | 'transfers_in_event' | 'transfers_out_event' | 'selected_by_percent'
 
@@ -276,7 +279,12 @@ export function renderTable() {
       const teamCode = team ? team.code : '';
       const teamName = team ? team.name : 'Unknown';
       const badgeUrl = teamCode 
-        ? `https://resources.premierleague.com/premierleague/badges/70/t${teamCode}.png`
+        ? TEAM_BADGE_URL_TEMPLATE.replace('{code}', teamCode)
+        : '';
+      
+      // Only render badge img if URL is available
+      const badgeHtml = badgeUrl 
+        ? `<img class="club-badge" src="${badgeUrl}" alt="${teamName}" title="${teamName}" />`
         : '';
 
       return `
@@ -285,7 +293,7 @@ export function renderTable() {
             <input type="checkbox" name="selectedPlayer" value="${player.id}" ${checked}>
             <button class="info-btn" onclick="showPlayerInfo(event, ${player.id})" title="View player stats">i</button>
           </td>
-          <td class="club-cell"><img class="club-badge" src="${badgeUrl}" alt="${teamName}" title="${teamName}" /></td>
+          <td class="club-cell">${badgeHtml}</td>
           <td class="status-cell">${statusFlagHtml}</td>
           <td class="name-cell">${player.web_name}</td>
           <td>${posNames[player.element_type]}</td>
