@@ -249,7 +249,15 @@
   }
 
   .gw-nav .gw-center {
-    order: -1; /* Show GW nav at top on mobile */
+    order: 1; /* Show GW nav at top on mobile */
+  }
+
+  .gw-nav #addToSquadBtn {
+    order: 2;
+  }
+
+  .gw-nav #cancelTransferBtn {
+    order: 3;
   }
 
   .gw-nav .transfer-action-btn {
