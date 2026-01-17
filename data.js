@@ -1,5 +1,7 @@
 // data.js - FPL data via Cloudflare Pages Functions proxy (/api/fpl/*)
 
+import { fetchDefconData, mergeDefconIntoElements } from './defcon.js';
+
 export let history = {
   baseline: null,
   undoStack: []
@@ -95,10 +97,34 @@ export async function loadBootstrap() {
     state.viewingGW = next || current || 1;
 
     initEmptyPlan();
+    
+    // Load DEFCON data in the background (non-blocking)
+    loadDefconData();
+    
     return true;
   } catch (err) {
     console.error('Bootstrap error:', err);
     return false;
+  }
+}
+
+/**
+ * Loads DEFCON data and merges it into elements.
+ * This is called after bootstrap loads and runs in the background.
+ */
+export async function loadDefconData() {
+  try {
+    console.log('Loading DEFCON data...');
+    const defconData = await fetchDefconData(state.elements);
+    mergeDefconIntoElements(state.elements, defconData);
+    console.log('DEFCON data loaded successfully');
+    
+    // Trigger table re-render if DEFCON is the current stat view
+    if (typeof window.renderTable === 'function') {
+      window.renderTable();
+    }
+  } catch (error) {
+    console.error('Failed to load DEFCON data:', error);
   }
 }
 

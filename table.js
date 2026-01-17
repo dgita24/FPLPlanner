@@ -4,7 +4,7 @@ import { state, loadFixtures } from './data.js';
 import { shouldShowPlayerFlag } from './player-status-utils.js';
 
 let tableSort = {
-  key: null,      // 'price' | 'points' | 'goals_scored' | 'assists' | 'clean_sheets' | 'bonus' | 'transfers_in_event' | 'transfers_out_event' | 'selected_by_percent'
+  key: null,      // 'price' | 'points' | 'goals_scored' | 'assists' | 'clean_sheets' | 'bonus' | 'transfers_in_event' | 'transfers_out_event' | 'selected_by_percent' | 'defensive_contribution'
   dir: 'asc'      // 'asc' | 'desc'
 };
 
@@ -14,7 +14,7 @@ const posNames = { 1: 'GK', 2: 'DEF', 3: 'MID', 4: 'FWD' };
 const TEAM_BADGE_URL_TEMPLATE = 'https://resources.premierleague.com/premierleague/badges/70/t{code}.png';
 
 // Current stat selection - single column
-let currentStatView = 'points'; // 'points' | 'goals_scored' | 'assists' | 'clean_sheets' | 'bonus' | 'transfers_in_event' | 'transfers_out_event' | 'selected_by_percent'
+let currentStatView = 'points'; // 'points' | 'goals_scored' | 'assists' | 'clean_sheets' | 'bonus' | 'transfers_in_event' | 'transfers_out_event' | 'selected_by_percent' | 'defensive_contribution'
 
 // Stat column configuration - single filterable column
 const statConfig = {
@@ -39,7 +39,8 @@ const statConfig = {
   expected_goals: { key: 'expected_goals', label: 'xG', tooltip: 'Expected Goals' },
   expected_assists: { key: 'expected_assists', label: 'xA', tooltip: 'Expected Assists' },
   expected_goals_conceded: { key: 'expected_goals_conceded', label: 'xGC', tooltip: 'Expected Goals Conceded' },
-  expected_goal_involvements: { key: 'expected_goal_involvements', label: 'xGI', tooltip: 'Expected Goal Involvements' }
+  expected_goal_involvements: { key: 'expected_goal_involvements', label: 'xGI', tooltip: 'Expected Goal Involvements' },
+  defensive_contribution: { key: 'defensive_contribution', label: 'DEFCON', tooltip: 'Defensive Contributions (DEF/MID only)' }
 };
 
 // Selected players (changed from single to multi-select)
