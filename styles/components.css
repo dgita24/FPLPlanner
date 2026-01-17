@@ -1,0 +1,603 @@
+/* ===== Pitch and Formation ===== */
+
+.pitch-stack {
+  width: 100%;
+  max-width: 1100px;
+  margin-top: 0;
+}
+
+.pitch {
+  background: linear-gradient(to bottom, #2d5016 0%, #1a3d0a 100%);
+  padding: 25px 20px;
+  border-radius: 10px;
+  max-width: 1100px;
+  margin: 0 auto 10px;
+  position: relative;
+  min-height: 380px;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.formation-line {
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  gap: 14px;
+  margin-bottom: 8px;
+  min-height: 100px;
+  flex-wrap: nowrap;
+}
+
+#plannerMain .pitch {
+  margin: 0;
+  max-width: none;
+}
+
+/* ===== Player Cards ===== */
+
+.player-card {
+  width: 170px;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 8px;
+  padding: 6px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  position: relative;
+  transition: all 0.2s;
+  cursor: pointer;
+}
+
+.player-card:hover {
+  transform: translateY(-5px);
+  z-index: 10;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.5);
+}
+
+.player-card .name {
+  font-size: 12px;
+  font-weight: 700;
+  color: #000;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  background: #eee;
+  padding: 2px 4px;
+  border-radius: 3px;
+  margin: 2px 0;
+  text-align: center;
+  letter-spacing: 0.2px;
+}
+
+.player-card .info {
+  font-size: 10px;
+  color: #333;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 4px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  min-height: 14px;
+}
+
+.card-btn {
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: none;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  transition: transform 0.1s;
+}
+
+.card-btn:hover {
+  transform: scale(1.15);
+}
+
+.btn-remove {
+  top: -6px;
+  left: -6px;
+  background: #ff4444;
+}
+
+.btn-swap {
+  top: -6px;
+  right: -6px;
+  background: #4444ff;
+  font-size: 11px;
+}
+
+/* ===== Badge Container ===== */
+
+.badge-container {
+  position: relative;
+  width: 40px;
+  height: 40px;
+  margin: 0 auto 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.badge-container .badge {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+  display: block;
+  margin: 0;
+}
+
+/* ===== Captain/Vice-Captain Selection ===== */
+
+/* Extend hover area to cover the gap between badge and selector */
+/* This invisible bridge prevents selector from disappearing during mouse movement */
+/* z-index 19: below selector (20), above badge (15) */
+.badge-container::before {
+  content: '';
+  position: absolute;
+  left: -50px;
+  top: 0;
+  width: 50px;
+  height: 100%;
+  z-index: 19;
+}
+
+.captain-selector {
+  position: absolute;
+  left: -44px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: none;
+  flex-direction: column;
+  gap: 3px;
+  z-index: 20;
+  pointer-events: auto;
+}
+
+/* Show selector when hovering over badge-container OR the selector itself */
+.badge-container:hover .captain-selector,
+.captain-selector:hover {
+  display: flex;
+}
+
+/* Hide badge when hovering to show selector */
+.badge-container:hover .captain-badge {
+  display: none;
+}
+
+.captain-btn {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 2px solid #00ff87;
+  background: #00ff87;
+  color: #000;
+  font-weight: bold;
+  font-size: 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  pointer-events: auto;
+}
+
+.captain-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.4);
+}
+
+.captain-btn.active {
+  background: #00e676;
+  border-color: #00e676;
+}
+
+.captain-badge {
+  position: absolute;
+  left: -44px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #00ff87;
+  color: #000;
+  font-weight: bold;
+  font-size: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  border: 2px solid #00ff87;
+  z-index: 15;
+  pointer-events: auto;
+}
+
+/* Both captain and vice-captain badges use the same styling */
+.captain-badge.vc,
+.captain-badge.c {
+  background: #00ff87;
+  border-color: #00ff87;
+}
+
+/* ===== Status Flag Badges (Circular style like captain badges) ===== */
+
+.status-flag-badge {
+  position: absolute;
+  right: -44px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  color: #000;
+  font-weight: bold;
+  font-size: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  z-index: 15;
+}
+
+.status-flag-badge.red {
+  background: #ff0000;
+  border: 2px solid #ff0000;
+}
+
+.status-flag-badge.yellow {
+  background: #ffcc00;
+  border: 2px solid #ffcc00;
+}
+
+/* Status flag badges in table */
+.table-status-flag-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  color: #000;
+  font-weight: bold;
+  font-size: 9px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.table-status-flag-badge.red {
+  background: #ff0000;
+  border: 2px solid #ff0000;
+}
+
+.table-status-flag-badge.yellow {
+  background: #ffcc00;
+  border: 2px solid #ffcc00;
+}
+
+/* ===== OLD Waving Status Flags (kept for backwards compatibility) ===== */
+
+.status-flag {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.status-flag.right {
+  right: -60px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.status-flag-canvas {
+  display: block;
+}
+
+/* ===== Bench ===== */
+
+.bench {
+  background: rgba(0, 0, 0, 0.2);
+  padding: 15px;
+  border-radius: 10px;
+  max-width: 1100px;
+  margin: 0 auto 30px;
+}
+
+.bench h3 {
+  text-align: center;
+  color: #fff;
+  margin-bottom: 12px;
+}
+
+.bench-slots {
+  display: flex;
+  justify-content: center;
+  gap: 25px;
+  flex-wrap: nowrap;
+}
+
+#plannerMain .bench {
+  margin: 0;
+  max-width: none;
+}
+
+/* ===== Player Table ===== */
+
+.player-table {
+  background: #fff;
+  color: #000;
+  border-radius: 5px;
+  overflow: hidden;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+th {
+  background: var(--bg);
+  color: #fff;
+  padding: 10px;
+  text-align: center;
+  position: sticky;
+  top: 0;
+  border-right: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+th.th-name {
+  text-align: left;
+}
+
+th:last-child {
+  border-right: none;
+}
+
+th[style*="text-align:center"] {
+  padding: 10px 0;
+}
+
+td {
+  padding: 8px 10px;
+  border-bottom: 1px solid #eee;
+  border-right: 1px solid #ddd;
+  text-align: center;
+}
+
+td.name-cell {
+  text-align: left;
+}
+
+td:last-child {
+  border-right: none;
+}
+
+td[style*="text-align:center"][style*="width:30px"] {
+  padding: 8px 0;
+}
+
+tr:hover {
+  background: #f0f0f0;
+  cursor: pointer;
+}
+
+tr.selected {
+  background: #e6fffa;
+}
+
+td.status-cell {
+  text-align: center;
+  width: 40px;
+  vertical-align: middle;
+  padding: 8px 0;
+}
+
+td.stat-value-cell {
+  text-align: center;
+}
+
+td.fixtures-cell {
+  text-align: center;
+  white-space: nowrap;
+}
+
+th.th-select {
+  width: 55px;
+}
+
+th.th-status {
+  text-align: center;
+  width: 40px;
+  vertical-align: middle;
+}
+
+th.th-name {
+  width: 150px;
+}
+
+th.th-team {
+  width: 55px;
+}
+
+th.th-sortable {
+  cursor: pointer;
+}
+
+th.th-pos {
+  width: 50px;
+}
+
+th.th-price {
+  width: 50px;
+}
+
+th.th-points {
+  width: 55px;
+}
+
+th.th-stat-col {
+  width: 55px;
+  font-size: 11px;
+  text-align: center;
+  padding: 8px 6px;
+}
+
+th.th-fixtures {
+  text-align: center;
+  width: 220px;
+}
+
+td.stat-col-cell {
+  text-align: center;
+  font-size: 12px;
+  padding: 6px 6px;
+}
+
+td.fixtures-cell {
+  font-size: 11px;
+}
+
+.sort-icon {
+  margin-left: 2px;
+  font-size: 9px;
+}
+
+/* ===== Fixtures Panel ===== */
+
+#fixturesPanel {
+  background: rgba(0,0,0,0.25);
+  border-radius: 10px;
+  padding: 10px;
+  color: white;
+  margin-top: 48px;
+}
+
+/* Fixtures panel GW arrows */
+#fixturesPanel button {
+  background: #00ff87;
+  color: #000;
+  border: none;
+  border-radius: 6px;
+  padding: 4px 10px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+#fixturesPanel button:hover {
+  background: #00e676;
+}
+
+.fixtures-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.fixture-date {
+  margin: 12px 0 8px;
+  font-size: 13px;
+  font-weight: 700;
+  opacity: 0.9;
+  text-align: center;
+}
+
+.fixture-row {
+  display: grid;
+  grid-template-columns: minmax(120px, 1fr) 64px minmax(120px, 1fr);
+  align-items: center;
+  padding: 6px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.15);
+  font-size: 13px;
+}
+
+.fixture-row .team {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.fixture-team {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.fixture-team.home {
+  justify-content: flex-end;
+  text-align: right;
+}
+
+.fixture-team.away {
+  justify-content: flex-start;
+  text-align: left;
+}
+
+.fixture-time {
+  text-align: center;
+  font-weight: 600;
+  background: rgba(0,0,0,0.35);
+  border-radius: 4px;
+  padding: 2px 6px;
+  font-size: 12px;
+}
+
+/* Home team (flows right → away from centre) */
+.fixture-row .team.home {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 6px;
+  text-align: right;
+}
+
+/* Away team (flows left ← away from centre) */
+.fixture-row .team.away {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 6px;
+  text-align: left;
+}
+
+.team-name {
+  white-space: nowrap;
+}
+
+.team-badge {
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+}
+
+/* Kickoff time – dead centre */
+.fixture-row .ko {
+  justify-self: center;
+  text-align: center;
+  min-width: 42px;
+  background: rgba(0,0,0,0.6);
+  padding: 3px 6px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: bold;
+}
+
+.fixture-date-banner {
+  margin: 12px 0 6px;
+  padding: 6px 10px;
+  background: rgba(0, 0, 0, 0.35);
+  color: #ffffff;
+  font-weight: 600;
+  font-size: 13px;
+  text-align: center;
+  border-radius: 6px;
+  letter-spacing: 0.3px;
+}
