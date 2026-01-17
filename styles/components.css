@@ -24,6 +24,7 @@
   align-items: flex-start;
   margin-bottom: 16px;
   min-height: 36px;
+  padding-top: 10px;
 }
 
 /* Transfer actions on the left */
