@@ -37,8 +37,6 @@ body {
   background: rgba(0, 0, 0, 0.25);
   border-radius: 10px;
   height: 50px;
-  /* Fixed width to match the three-column layout: 300px + 935px + 360px + 24px gaps */
-  width: 1619px;
   max-width: 100%;
 }
 
@@ -239,7 +237,7 @@ body {
 
 #plannerMain {
   display: grid;
-  grid-template-columns: 300px 935px 360px;
+  grid-template-columns: 300px 1fr 360px;
   gap: 12px;
   justify-content: center;
 }
