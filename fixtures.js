@@ -4,21 +4,33 @@ const fixturesByGW = new Map();
 let fixturesGW = null;
 
 export async function loadFixturesData() {
-  const res = await fetch('/api/fpl/fixtures');
-  const data = await res.json();
-
-  fixturesByGW.clear();
-
-  for (const f of data) {
-    if (!f.event) continue;
-    if (!fixturesByGW.has(f.event)) {
-      fixturesByGW.set(f.event, []);
+  try {
+    const res = await fetch('/api/fpl/fixtures');
+    
+    if (!res.ok) {
+      console.error(`Failed to load fixtures: HTTP ${res.status}`);
+      renderFixturesError(`Unable to load fixtures (HTTP ${res.status})`);
+      return;
     }
-    fixturesByGW.get(f.event).push(f);
-  }
 
-  fixturesGW = state.currentGW;
-  renderFixtures();
+    const data = await res.json();
+
+    fixturesByGW.clear();
+
+    for (const f of data) {
+      if (!f.event) continue;
+      if (!fixturesByGW.has(f.event)) {
+        fixturesByGW.set(f.event, []);
+      }
+      fixturesByGW.get(f.event).push(f);
+    }
+
+    fixturesGW = state.currentGW;
+    renderFixtures();
+  } catch (error) {
+    console.error('Error loading fixtures:', error);
+    renderFixturesError('Unable to load fixtures. Please check your connection.');
+  }
 }
 
 window.changeFixturesGW = function (delta) {
@@ -33,6 +45,7 @@ export function renderFixtures() {
   const fixtures = fixturesByGW.get(fixturesGW) || [];
 
   const groups = groupByDate(fixtures);
+  const hasFixtures = Object.keys(groups).length > 0;
 
   panel.innerHTML = `
     <div class="fixtures-header">
@@ -41,12 +54,29 @@ export function renderFixtures() {
       <button onclick="changeFixturesGW(1)">→</button>
     </div>
 
-    ${Object.entries(groups)
-      .map(([date, games]) => `
-        <div class="fixture-date-banner">${date}</div>
-        ${games.map(renderFixtureRow).join('')}
-      `)
-      .join('')}
+    ${hasFixtures 
+      ? Object.entries(groups)
+          .map(([date, games]) => `
+            <div class="fixture-date-banner">${date}</div>
+            ${games.map(renderFixtureRow).join('')}
+          `)
+          .join('')
+      : '<div style="text-align: center; padding: 20px; opacity: 0.7;">No fixtures available for this gameweek</div>'
+    }
+  `;
+}
+
+function renderFixturesError(message) {
+  const panel = document.getElementById('fixturesPanel');
+  if (!panel) return;
+
+  panel.innerHTML = `
+    <div class="fixtures-header">
+      <strong>Fixtures</strong>
+    </div>
+    <div style="text-align: center; padding: 20px; color: #ff6b6b;">
+      ${message}
+    </div>
   `;
 }
 
