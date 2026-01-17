@@ -355,9 +355,12 @@ display: none;
 flex-direction: column;
 gap: 3px;
 z-index: 20;
+pointer-events: auto;
 }
 
-.badge-container:hover .captain-selector {
+/* Show selector when hovering over badge-container OR the selector itself */
+.badge-container:hover .captain-selector,
+.captain-selector:hover {
 display: flex;
 }
 
@@ -381,6 +384,7 @@ align-items: center;
 justify-content: center;
 transition: all 0.2s;
 box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+pointer-events: auto;
 }
 
 .captain-btn:hover {
@@ -411,6 +415,7 @@ justify-content: center;
 box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 border: 2px solid #00ff87;
 z-index: 15;
+pointer-events: auto;
 }
 
 /* Both captain and vice-captain badges use the same styling */
