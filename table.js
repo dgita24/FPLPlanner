@@ -293,7 +293,7 @@ export function renderTable() {
       const teamNameEscaped = escapeHtml(teamName);
       const playerNameEscaped = escapeHtml(player.web_name);
       const badgeUrl = teamCode 
-        ? `https://resources.premierleague.com/premierleague/badges/70/t${teamCode}.png`
+        ? TEAM_BADGE_URL_TEMPLATE.replace('{code}', teamCode)
         : '';
       
       // Only render badge img if URL is available
@@ -517,7 +517,7 @@ window.showPlayerInfo = function (ev, playerId) {
       <button class="player-info-close" onclick="closePlayerInfo()">×</button>
       
       <div class="player-info-header">
-        <img src="https://resources.premierleague.com/premierleague/badges/70/t${teamCode}.png" 
+        <img src="${TEAM_BADGE_URL_TEMPLATE.replace('{code}', teamCode)}" 
              class="player-info-badge" alt="${teamNameEscaped}">
         <div class="player-info-title">
           <h2>${playerNameEscaped}</h2>
