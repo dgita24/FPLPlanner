@@ -3,6 +3,11 @@
 // Shared regex pattern for matching month names
 const MONTH_PATTERN = 'Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|Jun(?:e)?|Jul(?:y)?|Aug(?:ust)?|Sep(?:tember)?|Oct(?:ober)?|Nov(?:ember)?|Dec(?:ember)?';
 
+// Compiled regex patterns for date parsing (cached for performance)
+const DAY_FIRST_REGEX = new RegExp(`(\\d+)\\s+(${MONTH_PATTERN})`, 'i');
+const MONTH_FIRST_REGEX = new RegExp(`(${MONTH_PATTERN})\\s+(\\d+)`, 'i');
+const DATE_IN_NEWS_REGEX = new RegExp(`(?:until|back|return)\\s+(?:on\\s+)?(\\d+\\s+(?:${MONTH_PATTERN})|(?:${MONTH_PATTERN})\\s+\\d+)(?:st|nd|rd|th)?`, 'i');
+
 // Map month names to month numbers (0-indexed for JavaScript Date)
 const MONTH_MAP = {
   'jan': 0, 'january': 0,
@@ -29,18 +34,15 @@ function parseSuspensionDate(dateStr, currentYear) {
   if (!dateStr) return null;
   
   // Extract date components: "31 January", "Jan 31", "January 31st"
-  // Pattern matches: (day) (month) OR (month) (day)
-  const dayFirst = new RegExp(`(\\d+)\\s+(${MONTH_PATTERN})`, 'i');
-  const monthFirst = new RegExp(`(${MONTH_PATTERN})\\s+(\\d+)`, 'i');
-  
+  // Use cached regexes for performance
   let day, monthStr;
   
-  const dayFirstMatch = dateStr.match(dayFirst);
+  const dayFirstMatch = dateStr.match(DAY_FIRST_REGEX);
   if (dayFirstMatch) {
     day = parseInt(dayFirstMatch[1]);
     monthStr = dayFirstMatch[2];
   } else {
-    const monthFirstMatch = dateStr.match(monthFirst);
+    const monthFirstMatch = dateStr.match(MONTH_FIRST_REGEX);
     if (monthFirstMatch) {
       monthStr = monthFirstMatch[1];
       day = parseInt(monthFirstMatch[2]);
@@ -132,8 +134,7 @@ export function getSuspensionEndGW(player, currentGW, events = []) {
   }
   
   // Parse date-based suspension: "Suspended until 31 January" or "Expected back 31 Jan"
-  const dateRegex = new RegExp(`(?:until|back|return)\\s+(?:on\\s+)?(\\d+\\s+(?:${MONTH_PATTERN})|(?:${MONTH_PATTERN})\\s+\\d+)(?:st|nd|rd|th)?`, 'i');
-  const dateMatch = player.news.match(dateRegex);
+  const dateMatch = player.news.match(DATE_IN_NEWS_REGEX);
   if (dateMatch && events && events.length > 0) {
     const currentYear = new Date().getFullYear();
     const suspensionDate = parseSuspensionDate(dateMatch[1], currentYear);
