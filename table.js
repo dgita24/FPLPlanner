@@ -10,27 +10,19 @@ let tableSort = {
 
 const posNames = { 1: 'GK', 2: 'DEF', 3: 'MID', 4: 'FWD' };
 
-// Current stat selection
-let currentStatView = 'basic'; // 'basic' | 'goals_assists' | 'defensive' | 'transfers' | 'ownership'
+// Current stat selection - single column
+let currentStatView = 'points'; // 'points' | 'goals_scored' | 'assists' | 'clean_sheets' | 'bonus' | 'transfers_in_event' | 'transfers_out_event' | 'selected_by_percent'
 
-// Stat column configurations
-const statConfigs = {
-  basic: [
-    { key: 'goals_scored', label: 'G', tooltip: 'Goals' },
-    { key: 'assists', label: 'A', tooltip: 'Assists' }
-  ],
-  defensive: [
-    { key: 'clean_sheets', label: 'CS', tooltip: 'Clean Sheets' },
-    { key: 'bonus', label: 'Bns', tooltip: 'Bonus Points' }
-  ],
-  transfers: [
-    { key: 'transfers_in_event', label: 'TI', tooltip: 'Transfers In (GW)' },
-    { key: 'transfers_out_event', label: 'TO', tooltip: 'Transfers Out (GW)' }
-  ],
-  ownership: [
-    { key: 'selected_by_percent', label: 'TSB%', tooltip: 'Team Selection %' },
-    { key: 'transfers_in_event', label: 'TI', tooltip: 'Transfers In (GW)' }
-  ]
+// Stat column configuration - single filterable column
+const statConfig = {
+  points: { key: 'total_points', label: 'Pts', tooltip: 'Total Points' },
+  goals_scored: { key: 'goals_scored', label: 'G', tooltip: 'Goals' },
+  assists: { key: 'assists', label: 'A', tooltip: 'Assists' },
+  clean_sheets: { key: 'clean_sheets', label: 'CS', tooltip: 'Clean Sheets' },
+  bonus: { key: 'bonus', label: 'Bns', tooltip: 'Bonus Points' },
+  transfers_in_event: { key: 'transfers_in_event', label: 'TI', tooltip: 'Transfers In (GW)' },
+  transfers_out_event: { key: 'transfers_out_event', label: 'TO', tooltip: 'Transfers Out (GW)' },
+  selected_by_percent: { key: 'selected_by_percent', label: 'Own%', tooltip: 'Ownership %' }
 };
 
 // Selected players (changed from single to multi-select)
@@ -53,8 +45,7 @@ let sortIcons = null;
 function getSortIcons() {
   if (!sortIcons) {
     sortIcons = {
-      price: document.getElementById('sortPriceIcon'),
-      points: document.getElementById('sortPointsIcon')
+      price: document.getElementById('sortPriceIcon')
     };
   }
   return sortIcons;
@@ -168,10 +159,6 @@ export function renderTable() {
         return dir * ((a.now_cost / 10) - (b.now_cost / 10));
       }
 
-      if (tableSort.key === 'points') {
-        return dir * (a.total_points - b.total_points);
-      }
-
       // Handle stat columns
       const parseStatValue = (val) => {
         if (val == null) return 0;
@@ -184,8 +171,8 @@ export function renderTable() {
     });
   }
 
-  // Get current stat columns
-  const statCols = statConfigs[currentStatView] || statConfigs.basic;
+  // Get current stat column configuration
+  const statCol = statConfig[currentStatView] || statConfig.points;
 
   // -------- RENDER --------
   tbody.innerHTML = filtered
@@ -229,10 +216,8 @@ export function renderTable() {
         statusFlagHtml = `<span class="table-status-flag-badge ${badgeClass}" title="${flagTitle}">${badgeText}</span>`;
       }
 
-      // Render dynamic stat columns
-      const statColsHtml = statCols.map(col => 
-        `<td class="stat-col-cell">${formatStatValue(player[col.key], col.key)}</td>`
-      ).join('');
+      // Get stat value for the single filterable column
+      const statValue = formatStatValue(player[statCol.key], statCol.key);
 
       return `
         <tr onclick="selectPlayer(event, ${player.id})" class="${checked ? 'selected' : ''}">
@@ -241,8 +226,7 @@ export function renderTable() {
           <td class="name-cell">${player.web_name}</td>
           <td>${posNames[player.element_type]}</td>
           <td>${(player.now_cost / 10).toFixed(1)}</td>
-          <td>${player.total_points}</td>
-          ${statColsHtml}
+          <td class="stat-col-cell">${statValue}</td>
           <td><button class="info-btn" onclick="showPlayerInfo(event, ${player.id})" title="View player stats">i</button></td>
         </tr>
       `;
@@ -469,12 +453,11 @@ function initializeStatColumns() {
   const statSelect = document.getElementById('statSelect');
   if (!statSelect) return;
   
-  currentStatView = statSelect.value || 'basic';
+  currentStatView = statSelect.value || 'points';
   
-  // Update table headers with safe HTML escaping
-  const statCols = statConfigs[currentStatView] || statConfigs.basic;
-  const col1Header = document.getElementById('statCol1Header');
-  const col2Header = document.getElementById('statCol2Header');
+  // Update table header with safe HTML escaping for single filterable column
+  const statCol = statConfig[currentStatView] || statConfig.points;
+  const colHeader = document.getElementById('statColHeader');
   
   // Escape HTML to prevent XSS
   const escapeHtml = (text) => {
@@ -483,23 +466,11 @@ function initializeStatColumns() {
     return div.innerHTML;
   };
   
-  if (col1Header && statCols.length > 0) {
-    const col = statCols[0];
-    const escapedKey = escapeHtml(col.key);
-    const escapedLabel = escapeHtml(col.label);
-    const escapedTooltip = escapeHtml(col.tooltip);
-    col1Header.innerHTML = `<span onclick="sortTable('${escapedKey}')" class="th-sortable" style="cursor: pointer;" title="${escapedTooltip}">${escapedLabel} <span id="sortStat1Icon">⇅</span></span>`;
-  }
-  
-  if (col2Header && statCols.length > 1) {
-    const col = statCols[1];
-    const escapedKey = escapeHtml(col.key);
-    const escapedLabel = escapeHtml(col.label);
-    const escapedTooltip = escapeHtml(col.tooltip);
-    col2Header.innerHTML = `<span onclick="sortTable('${escapedKey}')" class="th-sortable" style="cursor: pointer;" title="${escapedTooltip}">${escapedLabel} <span id="sortStat2Icon">⇅</span></span>`;
-  } else if (col2Header) {
-    // Hide the second column if not available
-    col2Header.innerHTML = '';
+  if (colHeader) {
+    const escapedKey = escapeHtml(statCol.key);
+    const escapedLabel = escapeHtml(statCol.label);
+    const escapedTooltip = escapeHtml(statCol.tooltip);
+    colHeader.innerHTML = `<span onclick="sortTable('${escapedKey}')" class="th-sortable" style="cursor: pointer;" title="${escapedTooltip}">${escapedLabel} <span id="sortStatIcon">⇅</span></span>`;
   }
 }
 
