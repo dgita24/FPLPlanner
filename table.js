@@ -25,7 +25,21 @@ const statConfig = {
   bonus: { key: 'bonus', label: 'Bns', tooltip: 'Bonus Points' },
   transfers_in_event: { key: 'transfers_in_event', label: 'TI', tooltip: 'Transfers In (GW)' },
   transfers_out_event: { key: 'transfers_out_event', label: 'TO', tooltip: 'Transfers Out (GW)' },
-  selected_by_percent: { key: 'selected_by_percent', label: 'Own%', tooltip: 'Ownership %' }
+  selected_by_percent: { key: 'selected_by_percent', label: 'Own%', tooltip: 'Ownership %' },
+  form: { key: 'form', label: 'Form', tooltip: 'Recent Performance Score' },
+  minutes: { key: 'minutes', label: 'Min', tooltip: 'Minutes Played' },
+  goals_conceded: { key: 'goals_conceded', label: 'GC', tooltip: 'Goals Conceded' },
+  yellow_cards: { key: 'yellow_cards', label: 'YC', tooltip: 'Yellow Cards' },
+  red_cards: { key: 'red_cards', label: 'RC', tooltip: 'Red Cards' },
+  saves: { key: 'saves', label: 'Sav', tooltip: 'Saves' },
+  penalties_saved: { key: 'penalties_saved', label: 'PS', tooltip: 'Penalties Saved' },
+  penalties_missed: { key: 'penalties_missed', label: 'PM', tooltip: 'Penalties Missed' },
+  ict_index: { key: 'ict_index', label: 'ICT', tooltip: 'ICT Index' },
+  points_per_game: { key: 'points_per_game', label: 'PPG', tooltip: 'Points per Game' },
+  expected_goals: { key: 'expected_goals', label: 'xG', tooltip: 'Expected Goals' },
+  expected_assists: { key: 'expected_assists', label: 'xA', tooltip: 'Expected Assists' },
+  expected_goals_conceded: { key: 'expected_goals_conceded', label: 'xGC', tooltip: 'Expected Goals Conceded' },
+  expected_goal_involvements: { key: 'expected_goal_involvements', label: 'xGI', tooltip: 'Expected Goal Involvements' }
 };
 
 // Selected players (changed from single to multi-select)
@@ -53,10 +67,21 @@ function formatStatValue(value, statKey) {
   if (value === null || value === undefined) {
     return '-';
   }
+  
+  // Format percentage values
   if (statKey === 'selected_by_percent') {
     const numVal = parseFloat(value);
     return isNaN(numVal) ? '-' : numVal.toFixed(1) + '%';
   }
+  
+  // Format decimal values (form, ICT index, expected stats, points per game)
+  if (statKey === 'form' || statKey === 'ict_index' || statKey === 'points_per_game' ||
+      statKey === 'expected_goals' || statKey === 'expected_assists' || 
+      statKey === 'expected_goals_conceded' || statKey === 'expected_goal_involvements') {
+    const numVal = parseFloat(value);
+    return isNaN(numVal) ? '-' : numVal.toFixed(1);
+  }
+  
   return String(value);
 }
 
