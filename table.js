@@ -4,7 +4,7 @@ import { state, loadFixtures } from './data.js';
 import { shouldShowPlayerFlag } from './player-status-utils.js';
 
 let tableSort = {
-  key: null,      // 'price' | 'points' | 'goals_scored' | 'assists' | 'clean_sheets' | 'bonus' | 'transfers_in_event' | 'transfers_out_event' | 'selected_by_percent'
+  key: null,      // 'price' | 'points' | 'goals_scored' | 'assists' | 'clean_sheets' | 'bonus' | 'transfers_in_event' | 'transfers_out_event' | 'selected_by_percent' | 'defensive_contribution'
   dir: 'asc'      // 'asc' | 'desc'
 };
 
@@ -14,7 +14,7 @@ const posNames = { 1: 'GK', 2: 'DEF', 3: 'MID', 4: 'FWD' };
 const TEAM_BADGE_URL_TEMPLATE = 'https://resources.premierleague.com/premierleague/badges/70/t{code}.png';
 
 // Current stat selection - single column
-let currentStatView = 'points'; // 'points' | 'goals_scored' | 'assists' | 'clean_sheets' | 'bonus' | 'transfers_in_event' | 'transfers_out_event' | 'selected_by_percent'
+let currentStatView = 'points'; // 'points' | 'goals_scored' | 'assists' | 'clean_sheets' | 'bonus' | 'transfers_in_event' | 'transfers_out_event' | 'selected_by_percent' | 'defensive_contribution'
 
 // Stat column configuration - single filterable column
 const statConfig = {
@@ -23,8 +23,8 @@ const statConfig = {
   assists: { key: 'assists', label: 'A', tooltip: 'Assists' },
   clean_sheets: { key: 'clean_sheets', label: 'CS', tooltip: 'Clean Sheets' },
   bonus: { key: 'bonus', label: 'Bns', tooltip: 'Bonus Points' },
-  transfers_in_event: { key: 'transfers_in_event', label: 'TI', tooltip: 'Transfers In (GW)' },
-  transfers_out_event: { key: 'transfers_out_event', label: 'TO', tooltip: 'Transfers Out (GW)' },
+  transfers_in_event: { key: 'transfers_in_event', label: 'TI', tooltip: 'Transfers In (round)' },
+  transfers_out_event: { key: 'transfers_out_event', label: 'TO', tooltip: 'Transfers Out (round)' },
   selected_by_percent: { key: 'selected_by_percent', label: 'Own%', tooltip: 'Ownership %' },
   form: { key: 'form', label: 'Form', tooltip: 'Recent Performance Score' },
   minutes: { key: 'minutes', label: 'Min', tooltip: 'Minutes Played' },
@@ -39,7 +39,8 @@ const statConfig = {
   expected_goals: { key: 'expected_goals', label: 'xG', tooltip: 'Expected Goals' },
   expected_assists: { key: 'expected_assists', label: 'xA', tooltip: 'Expected Assists' },
   expected_goals_conceded: { key: 'expected_goals_conceded', label: 'xGC', tooltip: 'Expected Goals Conceded' },
-  expected_goal_involvements: { key: 'expected_goal_involvements', label: 'xGI', tooltip: 'Expected Goal Involvements' }
+  expected_goal_involvements: { key: 'expected_goal_involvements', label: 'xGI', tooltip: 'Expected Goal Involvements' },
+  defensive_contribution: { key: 'defensive_contribution', label: 'DEFCON', tooltip: 'DEFCON Pts Awarded: 2pts per game with 10+ contributions (DEF) or 12+ (MID/FWD)' }
 };
 
 // Selected players (changed from single to multi-select)
@@ -93,6 +94,13 @@ function getSortIcons() {
       price: document.getElementById('sortPriceIcon')
     };
   }
+  
+  // Always update the stat icon since it changes with dropdown selection
+  const statKey = currentStatView ? statConfig[currentStatView]?.key : null;
+  if (statKey) {
+    sortIcons[statKey] = document.getElementById('sortStatIcon');
+  }
+  
   return sortIcons;
 }
 
@@ -445,9 +453,24 @@ function updateSortIcons() {
 
 // Update stat columns based on dropdown selection
 window.updateStatColumns = function () {
+  // Automatically sort by the selected stat column (highest to lowest)
+  const statSelect = document.getElementById('statSelect');
+  if (statSelect) {
+    const selectedStat = statSelect.value || 'points';
+    const statCol = statConfig[selectedStat] || statConfig.points;
+    
+    // Set the sort to the selected stat column in descending order (highest first)
+    tableSort.key = statCol.key;
+    tableSort.dir = 'desc';
+  }
+  
   initializeStatColumns();
-  // Re-render table with new columns
+  
+  // Re-render table with new columns and sorting
   renderTable();
+  
+  // Update sort icons after rendering
+  updateSortIcons();
 };
 
 // Show player info modal
