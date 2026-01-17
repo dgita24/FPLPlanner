@@ -398,12 +398,35 @@ function playerCard(entry, source) {
     `;
   }
 
+  // Captain/Vice-Captain UI - only show for starting XI players
+  const team = state.plan[state.viewingGW];
+  const isCaptain = team && team.captain === entry.id;
+  const isViceCaptain = team && team.viceCaptain === entry.id;
+  
+  let captainUI = '';
+  if (source === 'starting') {
+    // Always show selector on hover for interactivity
+    // Show badge when assigned (visible when not hovering)
+    const badge = isCaptain ? `<div class="captain-badge c">C</div>` 
+                  : isViceCaptain ? `<div class="captain-badge vc">VC</div>` 
+                  : '';
+    
+    captainUI = `
+      ${badge}
+      <div class="captain-selector">
+        <button class="captain-btn" onclick="setCaptain(${entry.id})" title="Set as Captain">C</button>
+        <button class="captain-btn" onclick="setViceCaptain(${entry.id})" title="Set as Vice-Captain">VC</button>
+      </div>
+    `;
+  }
+
   return `
     <div class="${cardClass}">
       <button class="card-btn btn-remove" onclick="${removeFn}" title="Transfer out">×</button>
       <button class="card-btn btn-swap" onclick="${subFn}" title="${swapTitle}">⇅</button>
 
       <div class="badge-container">
+        ${captainUI}
         ${statusFlags}
         <img src="https://resources.premierleague.com/premierleague/badges/70/t${teamCode}.png"
              class="badge" alt="${teamShort}">

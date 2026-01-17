@@ -344,6 +344,100 @@ background: #4444ff;
 font-size: 11px;
 }
 
+/* ===== Captain/Vice-Captain Selection ===== */
+
+/* Extend hover area to cover the gap between badge and selector */
+/* This invisible bridge prevents selector from disappearing during mouse movement */
+/* z-index 19: below selector (20), above badge (15) */
+.badge-container::before {
+content: '';
+position: absolute;
+left: -50px;
+top: 0;
+width: 50px;
+height: 100%;
+z-index: 19;
+}
+
+.captain-selector {
+position: absolute;
+left: -44px;
+top: 50%;
+transform: translateY(-50%);
+display: none;
+flex-direction: column;
+gap: 3px;
+z-index: 20;
+pointer-events: auto;
+}
+
+/* Show selector when hovering over badge-container OR the selector itself */
+.badge-container:hover .captain-selector,
+.captain-selector:hover {
+display: flex;
+}
+
+/* Hide badge when hovering to show selector */
+.badge-container:hover .captain-badge {
+display: none;
+}
+
+.captain-btn {
+width: 24px;
+height: 24px;
+border-radius: 50%;
+border: 2px solid #00ff87;
+background: #00ff87;
+color: #000;
+font-weight: bold;
+font-size: 10px;
+cursor: pointer;
+display: flex;
+align-items: center;
+justify-content: center;
+transition: all 0.2s;
+box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+pointer-events: auto;
+}
+
+.captain-btn:hover {
+transform: scale(1.05);
+box-shadow: 0 3px 6px rgba(0, 0, 0, 0.4);
+}
+
+.captain-btn.active {
+background: #00e676;
+border-color: #00e676;
+}
+
+.captain-badge {
+position: absolute;
+left: -44px;
+top: 50%;
+transform: translateY(-50%);
+width: 24px;
+height: 24px;
+border-radius: 50%;
+background: #00ff87;
+color: #000;
+font-weight: bold;
+font-size: 10px;
+display: flex;
+align-items: center;
+justify-content: center;
+box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+border: 2px solid #00ff87;
+z-index: 15;
+pointer-events: auto;
+}
+
+/* Both captain and vice-captain badges use the same styling */
+.captain-badge.vc,
+.captain-badge.c {
+background: #00ff87;
+border-color: #00ff87;
+}
+
 /* ===== Waving Status Flags ===== */
 
 .badge-container {
@@ -950,6 +1044,14 @@ color: var(--primary);
   width: 150px;
 }
 
+.captain-selector {
+  left: -38px;
+}
+
+.captain-badge {
+  left: -38px;
+}
+
 .formation-line {
   gap: 10px;
 }
@@ -1003,6 +1105,20 @@ body {
 
 .player-card {
   width: 68px;
+}
+
+.captain-selector,
+.captain-badge {
+  left: -32px;
+  width: 20px;
+  height: 20px;
+  font-size: 8px;
+}
+
+.captain-btn {
+  width: 20px;
+  height: 20px;
+  font-size: 8px;
 }
 
 .badge-container {
@@ -1108,6 +1224,20 @@ th, td {
 
 .player-card {
   width: 62px;
+}
+
+.captain-selector,
+.captain-badge {
+  left: -28px;
+  width: 18px;
+  height: 18px;
+  font-size: 7px;
+}
+
+.captain-btn {
+  width: 18px;
+  height: 18px;
+  font-size: 7px;
 }
 
 .badge-container {

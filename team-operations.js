@@ -163,7 +163,7 @@ export function substitutePlayer(playerId, updateUI) {
   const b = playerId;
 
   // Validate formation for every affected GW before applying
-  for (let g = gw; g <= state.currentGW + 7; g++) {
+  for (let g = gw; g <= 38; g++) {
     const t = state.plan[g];
     if (!t) continue;
 
@@ -183,10 +183,19 @@ export function substitutePlayer(playerId, updateUI) {
   }
 
   // Apply swap from this GW forward
-  for (let g = gw; g <= state.currentGW + 7; g++) {
+  for (let g = gw; g <= 38; g++) {
     const t = state.plan[g];
     if (!t) continue;
     swapWithinTeam(t, a, b);
+    
+    // Clear captain/vice-captain if they are being moved to the bench
+    const aInBench = t.bench.some(e => e.id === a);
+    const bInBench = t.bench.some(e => e.id === b);
+    
+    if (aInBench && t.captain === a) t.captain = null;
+    if (aInBench && t.viceCaptain === a) t.viceCaptain = null;
+    if (bInBench && t.captain === b) t.captain = null;
+    if (bInBench && t.viceCaptain === b) t.viceCaptain = null;
   }
 
   setPendingSwap(null);
@@ -239,11 +248,15 @@ export function removePlayer(playerId, source, updateUI) {
   state.bank = Number((state.bank + sell).toFixed(1));
 
   // Remove from this GW and all future planned GWs
-  for (let g = gw; g <= state.currentGW + 7; g++) {
+  for (let g = gw; g <= 38; g++) {
     const t = state.plan[g];
     if (!t) continue;
     t.starting = t.starting.filter((e) => e.id !== playerId);
     t.bench = t.bench.filter((e) => e.id !== playerId);
+    
+    // Clear captain/vice-captain if this player was assigned
+    if (t.captain === playerId) t.captain = null;
+    if (t.viceCaptain === playerId) t.viceCaptain = null;
   }
 
   const removedCount = batchTransfers.removedPlayers.length;
@@ -285,7 +298,7 @@ export function reinstatePlayer(playerId, updateUI) {
   }
 
   // Restore the player to all future GWs
-  for (let g = gw; g <= state.currentGW + 7; g++) {
+  for (let g = gw; g <= 38; g++) {
     const t = state.plan[g];
     if (!t) continue;
 
@@ -464,7 +477,7 @@ function addSinglePlayerToSquad(playerId, team, gw, updateUI) {
   const entry = { id: playerId, purchasePrice, sellingPrice };
 
   // ---------- VALIDATE ACROSS FUTURE GWs ----------
-  for (let g = gw; g <= state.currentGW + 7; g++) {
+  for (let g = gw; g <= 38; g++) {
     const t = state.plan[g];
     if (!t) continue;
 
@@ -510,7 +523,7 @@ function addSinglePlayerToSquad(playerId, team, gw, updateUI) {
   pushUndoState();
   state.bank = Number((state.bank - buy).toFixed(1));
 
-  for (let g = gw; g <= state.currentGW + 7; g++) {
+  for (let g = gw; g <= 38; g++) {
     const t = state.plan[g];
     if (!t) continue;
 
