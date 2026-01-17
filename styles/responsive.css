@@ -242,8 +242,17 @@
     padding: 6px 4px;
   }
 
-  .add-btn-row {
+  /* Transfer actions now in pitch - responsive stacking */
+  .transfer-actions-left {
     flex-direction: column;
+    gap: 4px;
+  }
+
+  .transfer-action-btn {
+    width: 100%;
+    padding: 6px 12px;
+    font-size: 12px;
+    height: 32px;
   }
 
   .fixture-row {

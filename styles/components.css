@@ -17,6 +17,52 @@
   border: 2px solid rgba(255, 255, 255, 0.1);
 }
 
+/* Pitch top controls container */
+.pitch-top-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 16px;
+  min-height: 40px;
+}
+
+/* Transfer actions on the left */
+.transfer-actions-left {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.transfer-action-btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+  height: 36px;
+}
+
+.transfer-action-btn.add-btn {
+  background: #00ff87;
+  color: #000;
+}
+
+.transfer-action-btn.add-btn:hover {
+  background: #00e676;
+}
+
+.transfer-action-btn.cancel-btn {
+  background: #ff4444;
+  color: #fff;
+}
+
+.transfer-action-btn.cancel-btn:hover {
+  background: #dd3333;
+}
+
 .formation-line {
   display: flex;
   justify-content: center;
@@ -605,7 +651,7 @@ td.fixtures-cell {
 /* ===== Transfer Panel (Right Side) ===== */
 
 .transfer-panel {
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(0, 0, 0, 0.25);
   padding: 15px;
   border-radius: 10px;
   overflow-y: auto;
