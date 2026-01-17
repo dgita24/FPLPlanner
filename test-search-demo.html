@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Search Normalization Test - FPL Planner</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      max-width: 1200px;
+      margin: 20px auto;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+    
+    h1 {
+      color: #37003c;
+      text-align: center;
+    }
+    
+    .test-section {
+      background: white;
+      border-radius: 8px;
+      padding: 20px;
+      margin: 20px 0;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    .search-box {
+      width: 100%;
+      padding: 12px;
+      font-size: 16px;
+      border: 2px solid #00ff87;
+      border-radius: 6px;
+      margin-bottom: 20px;
+    }
+    
+    .player-list {
+      max-height: 400px;
+      overflow-y: auto;
+    }
+    
+    .player-item {
+      padding: 10px;
+      border-bottom: 1px solid #eee;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .player-item:hover {
+      background: #f9f9f9;
+    }
+    
+    .player-item.hidden {
+      display: none;
+    }
+    
+    .player-name {
+      font-weight: bold;
+      color: #37003c;
+    }
+    
+    .player-team {
+      color: #666;
+      font-size: 14px;
+    }
+    
+    .player-price {
+      color: #00ff87;
+      font-weight: bold;
+    }
+    
+    .no-results {
+      text-align: center;
+      padding: 40px;
+      color: #999;
+      font-style: italic;
+    }
+    
+    .test-info {
+      background: #e8f5e9;
+      border-left: 4px solid #4caf50;
+      padding: 15px;
+      margin-bottom: 20px;
+    }
+    
+    .test-info h3 {
+      margin-top: 0;
+      color: #2e7d32;
+    }
+    
+    .test-info ul {
+      margin: 10px 0;
+      padding-left: 20px;
+    }
+    
+    .test-info li {
+      margin: 5px 0;
+    }
+    
+    .result-count {
+      text-align: center;
+      padding: 10px;
+      background: #f5f5f5;
+      border-radius: 4px;
+      margin-bottom: 10px;
+      font-weight: bold;
+    }
+    
+    .success {
+      color: #4caf50;
+    }
+    
+    .warning {
+      color: #ff9800;
+    }
+  </style>
+</head>
+<body>
+  <h1>🔍 Transfer Table Search Test</h1>
+  
+  <div class="test-section">
+    <div class="test-info">
+      <h3>✅ Test Instructions</h3>
+      <p>This page demonstrates the fix for searching players with non-ASCII characters.</p>
+      <ul>
+        <li>Try searching: <strong>"Ødegaard"</strong> or <strong>"Odegaard"</strong> (both should work)</li>
+        <li>Try searching: <strong>"Håland"</strong> or <strong>"Haland"</strong></li>
+        <li>Try searching: <strong>"Sørloth"</strong> or <strong>"Sorloth"</strong></li>
+        <li>Try searching: <strong>"José"</strong> or <strong>"Jose"</strong></li>
+        <li>Regular ASCII names like <strong>"Salah"</strong> should work as before</li>
+      </ul>
+    </div>
+    
+    <input 
+      type="text" 
+      id="searchBox" 
+      class="search-box" 
+      placeholder="Search for players... (try 'Odegaard' or 'Ødegaard')"
+      autofocus
+    />
+    
+    <div id="resultCount" class="result-count"></div>
+    
+    <div id="playerList" class="player-list"></div>
+  </div>
+  
+  <script type="module">
+    // Import the foldForSearch function (copied from table.js for standalone testing)
+    function foldForSearch(s) {
+      // Character replacement map for common non-ASCII letters
+      // This enables diacritic-insensitive searching
+      const charMap = {
+        'ø': 'o', 'Ø': 'O',
+        'å': 'a', 'Å': 'A',
+        'æ': 'ae', 'Æ': 'AE',
+        'é': 'e', 'É': 'E',
+        'è': 'e', 'È': 'E',
+        'ê': 'e', 'Ê': 'E',
+        'ë': 'e', 'Ë': 'E',
+        'á': 'a', 'Á': 'A',
+        'à': 'a', 'À': 'A',
+        'â': 'a', 'Â': 'A',
+        'ä': 'a', 'Ä': 'A',
+        'ã': 'a', 'Ã': 'A',
+        'í': 'i', 'Í': 'I',
+        'ì': 'i', 'Ì': 'I',
+        'î': 'i', 'Î': 'I',
+        'ï': 'i', 'Ï': 'I',
+        'ó': 'o', 'Ó': 'O',
+        'ò': 'o', 'Ò': 'O',
+        'ô': 'o', 'Ô': 'O',
+        'ö': 'o', 'Ö': 'O',
+        'õ': 'o', 'Õ': 'O',
+        'ú': 'u', 'Ú': 'U',
+        'ù': 'u', 'Ù': 'U',
+        'û': 'u', 'Û': 'U',
+        'ü': 'u', 'Ü': 'U',
+        'ý': 'y', 'Ý': 'Y',
+        'ÿ': 'y', 'Ÿ': 'Y',
+        'ñ': 'n', 'Ñ': 'N',
+        'ç': 'c', 'Ç': 'C',
+        'ß': 'ss',
+        'ð': 'd', 'Ð': 'D',
+        'þ': 'th', 'Þ': 'TH'
+      };
+      
+      let str = (s || '').toString();
+      
+      // First replace common non-ASCII characters
+      for (const [from, to] of Object.entries(charMap)) {
+        str = str.replace(new RegExp(from, 'g'), to);
+      }
+      
+      // Then normalize and remove any remaining combining diacritics
+      str = str
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '');
+      
+      return str.toLowerCase().trim();
+    }
+    
+    // Mock player data with non-ASCII names
+    const mockPlayers = [
+      { id: 1, web_name: 'Ødegaard', team: 'Arsenal', price: 8.3, position: 'MID' },
+      { id: 2, web_name: 'Haaland', team: 'Man City', price: 14.5, position: 'FWD' },
+      { id: 3, web_name: 'Sørloth', team: 'Atlético Madrid', price: 6.5, position: 'FWD' },
+      { id: 4, web_name: 'Salah', team: 'Liverpool', price: 13.5, position: 'MID' },
+      { id: 5, web_name: 'José Sá', team: 'Wolves', price: 4.5, position: 'GK' },
+      { id: 6, web_name: 'Fernández', team: 'Chelsea', price: 5.0, position: 'DEF' },
+      { id: 7, web_name: 'Édouard', team: 'Crystal Palace', price: 5.5, position: 'FWD' },
+      { id: 8, web_name: 'Håland', team: 'Test Team', price: 7.0, position: 'MID' },
+      { id: 9, web_name: 'Müller', team: 'Bayern', price: 7.5, position: 'MID' },
+      { id: 10, web_name: 'Öztürk', team: 'Test Team', price: 4.0, position: 'DEF' },
+      { id: 11, web_name: 'Smith', team: 'Arsenal', price: 5.0, position: 'DEF' },
+      { id: 12, web_name: 'Bruno Fernandes', team: 'Man Utd', price: 8.5, position: 'MID' },
+      { id: 13, web_name: 'João Pedro', team: 'Brighton', price: 5.5, position: 'FWD' },
+      { id: 14, web_name: 'Martinéz', team: 'Aston Villa', price: 5.0, position: 'GK' },
+      { id: 15, web_name: 'Çalhanoğlu', team: 'Inter Milan', price: 6.5, position: 'MID' },
+    ];
+    
+    // Render initial player list
+    function renderPlayers(filteredPlayers) {
+      const playerList = document.getElementById('playerList');
+      const resultCount = document.getElementById('resultCount');
+      
+      if (filteredPlayers.length === 0) {
+        playerList.innerHTML = '<div class="no-results">No players found. Try a different search.</div>';
+        resultCount.innerHTML = '<span class="warning">0 players found</span>';
+        return;
+      }
+      
+      resultCount.innerHTML = `<span class="success">${filteredPlayers.length} player${filteredPlayers.length !== 1 ? 's' : ''} found</span>`;
+      
+      playerList.innerHTML = filteredPlayers.map(player => `
+        <div class="player-item">
+          <div>
+            <span class="player-name">${player.web_name}</span>
+            <span class="player-team"> • ${player.team} • ${player.position}</span>
+          </div>
+          <div class="player-price">£${player.price}m</div>
+        </div>
+      `).join('');
+    }
+    
+    // Filter players based on search
+    function filterPlayers(searchTerm) {
+      const search = foldForSearch(searchTerm);
+      
+      return mockPlayers.filter(player => {
+        const playerName = foldForSearch(player.web_name);
+        return playerName.includes(search);
+      });
+    }
+    
+    // Setup search box
+    const searchBox = document.getElementById('searchBox');
+    searchBox.addEventListener('input', (e) => {
+      const searchTerm = e.target.value;
+      const filtered = filterPlayers(searchTerm);
+      renderPlayers(filtered);
+    });
+    
+    // Initial render - show all players
+    renderPlayers(mockPlayers);
+    
+    // Log test info to console
+    console.log('=== Search Test Ready ===');
+    console.log('Test with: Ødegaard, Odegaard, Håland, Haland, Sørloth, Sorloth, José, Jose');
+    console.log('Mock players loaded:', mockPlayers.length);
+  </script>
+</body>
+</html>

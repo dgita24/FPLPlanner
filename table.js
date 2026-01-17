@@ -63,13 +63,65 @@ function kickoffTimeValue(fx) {
   return Number.isFinite(t) ? t : Number.POSITIVE_INFINITY;
 }
 
+// Pre-compiled regex for efficient character replacement in search
+// Build a single regex pattern from all character mappings
+const searchCharMap = {
+  'ø': 'o', 'Ø': 'O',
+  'å': 'a', 'Å': 'A',
+  'æ': 'ae', 'Æ': 'AE',
+  'é': 'e', 'É': 'E',
+  'è': 'e', 'È': 'E',
+  'ê': 'e', 'Ê': 'E',
+  'ë': 'e', 'Ë': 'E',
+  'á': 'a', 'Á': 'A',
+  'à': 'a', 'À': 'A',
+  'â': 'a', 'Â': 'A',
+  'ä': 'a', 'Ä': 'A',
+  'ã': 'a', 'Ã': 'A',
+  'í': 'i', 'Í': 'I',
+  'ì': 'i', 'Ì': 'I',
+  'î': 'i', 'Î': 'I',
+  'ï': 'i', 'Ï': 'I',
+  'ó': 'o', 'Ó': 'O',
+  'ò': 'o', 'Ò': 'O',
+  'ô': 'o', 'Ô': 'O',
+  'ö': 'o', 'Ö': 'O',
+  'õ': 'o', 'Õ': 'O',
+  'ú': 'u', 'Ú': 'U',
+  'ù': 'u', 'Ù': 'U',
+  'û': 'u', 'Û': 'U',
+  'ü': 'u', 'Ü': 'U',
+  'ý': 'y', 'Ý': 'Y',
+  'ÿ': 'y', 'Ÿ': 'Y',
+  'ñ': 'n', 'Ñ': 'N',
+  'ç': 'c', 'Ç': 'C',
+  'ß': 'ss',
+  'ð': 'd', 'Ð': 'D',
+  'þ': 'th', 'Þ': 'TH'
+};
+
+// Pre-compile regex pattern for performance (used on every keystroke)
+const searchCharPattern = new RegExp('[' + Object.keys(searchCharMap).join('') + ']', 'g');
+
+/**
+ * Normalizes a string for search matching, handling both ASCII and non-ASCII characters.
+ * Enables searching "Odegaard" to find "Ødegaard", "Haaland" to find "Haaland", etc.
+ * 
+ * @param {string} s - The string to normalize
+ * @returns {string} - Normalized lowercase string with diacritics removed
+ */
 function foldForSearch(s) {
-  return (s || '')
-    .toString()
+  let str = (s || '').toString();
+  
+  // Replace common non-ASCII characters using pre-compiled regex
+  str = str.replace(searchCharPattern, (match) => searchCharMap[match] || match);
+  
+  // Then normalize and remove any remaining combining diacritics
+  str = str
     .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .toLowerCase()
-    .trim();
+    .replace(/[\u0300-\u036f]/g, '');
+  
+  return str.toLowerCase().trim();
 }
 
 function bestFixtureForTeamInGW(teamId, fixtures) {
