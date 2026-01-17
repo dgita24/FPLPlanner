@@ -390,7 +390,9 @@ function playerCard(entry, source) {
   // news: contains injury details text
   let statusFlags = '';
   
-  if (shouldShowPlayerFlag(p, state.viewingGW, state.currentGW)) {
+  // Pass events array for date-based suspension parsing
+  const events = state.bootstrap?.events || [];
+  if (shouldShowPlayerFlag(p, state.viewingGW, state.currentGW, events)) {
     const isDoubtful = p.status === 'd';
     const flagColor = isDoubtful ? 'yellow' : 'red';
     const flagTitle = escapeHtml(p.news || (isDoubtful ? 'Doubtful' : 'Unavailable'));

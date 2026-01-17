@@ -187,7 +187,9 @@ export function renderTable() {
       // Status flag for table - using flag emoji
       let statusFlagHtml = '';
       
-      if (shouldShowPlayerFlag(player, state.viewingGW, state.currentGW)) {
+      // Pass events array for date-based suspension parsing
+      const events = state.bootstrap?.events || [];
+      if (shouldShowPlayerFlag(player, state.viewingGW, state.currentGW, events)) {
         const isDoubtful = player.status === 'd';
         const flagEmoji = isDoubtful ? '🟨' : '🟥'; // Yellow square for doubtful, red square for injured/suspended
         const flagTitle = player.news || (isDoubtful ? 'Doubtful' : 'Unavailable');
