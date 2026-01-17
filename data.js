@@ -173,7 +173,7 @@ export async function loadTeamEntry(managerId, gwRequested) {
   // Purchase-price map from transfers (best-effort)
   const purchaseMap = await loadTransfersPurchaseMap(managerId);
 
-  // Fetch entry summary (for free transfers etc.)
+  // Fetch entry summary for current bank balance
   let entrySummary = null;
   try {
     const entryRes = await fetch(`${FPL_BASE}/entry/${managerId}/`);
@@ -183,12 +183,6 @@ export async function loadTeamEntry(managerId, gwRequested) {
   } catch (e) {
     // non-fatal
   }
-
-  // Derive free transfers (simple + safe)
-  // if (entrySummary) {
-  //   const usedLastGW = entrySummary.last_deadline_total_transfers ?? 0;
-  //   state.freeTransfers = usedLastGW === 0 ? 2 : 1;
-  // }
 
   for (const gw of unique) {
     try {
@@ -204,17 +198,17 @@ export async function loadTeamEntry(managerId, gwRequested) {
       state.importedGW = gw;
       json._imported_gw = gw;
 
-      // Extract bank at last deadline (entry_history.bank is in 0.1 units)
-      const bankTenths = json.entry_history?.bank;
-      if (typeof bankTenths === 'number') {
-        state.bank = bankTenths / 10;
+      // Use current bank from entry summary if available (most accurate for current GW)
+      // Otherwise fall back to historical bank from picks
+      if (entrySummary && typeof entrySummary.last_deadline_bank === 'number') {
+        state.bank = entrySummary.last_deadline_bank / 10;
+      } else {
+        // Extract bank at last deadline (entry_history.bank is in 0.1 units)
+        const bankTenths = json.entry_history?.bank;
+        if (typeof bankTenths === 'number') {
+          state.bank = bankTenths / 10;
+        }
       }
-      
-      // Extract free transfers for this GW
-      // const freeTransfers = json.entry_history?.free_transfers;
-      // if (typeof freeTransfers === 'number') {
-      //   state.freeTransfers = freeTransfers;
-      // }
 
       // Build starting/bench entries with purchase & selling prices
       const picks = json.picks || [];
@@ -265,7 +259,7 @@ export async function loadTeamEntry(managerId, gwRequested) {
       // Always show current GW in the UI after import
       state.viewingGW = state.currentGW;
 
-      // Save baseline state for Reset / Undo
+      // Save baseline state for Reset
       history.baseline = JSON.parse(JSON.stringify(state));
       history.undoStack = [];
 
