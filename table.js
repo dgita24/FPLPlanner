@@ -308,7 +308,7 @@ export function renderTable() {
         : '';
 
       return `
-        <tr onclick="selectPlayer(event, ${player.id})" class="${checked ? 'selected' : ''}">
+        <tr onclick="selectPlayer(event, ${player.id})" data-player-id="${player.id}" class="${checked ? 'selected' : ''}">
           <td class="info-cell">
             <button class="info-btn" onclick="showPlayerInfo(event, ${player.id})" title="View player stats">i</button>
           </td>
@@ -328,7 +328,7 @@ export function renderTable() {
 }
 
 export function populateFilters() {
-  // Note: Team filter removed from compact view
+  // Filters are now populated dynamically in renderTable
 }
 
 function populateTeamFilter() {
@@ -366,9 +366,9 @@ window.selectPlayer = function (ev, id) {
   }
 
   // Update all row styling
-  const allRows = document.querySelectorAll('#tableBody tr');
+  const allRows = document.querySelectorAll('#tableBody tr[data-player-id]');
   allRows.forEach(row => {
-    const rowId = parseInt(row.getAttribute('onclick')?.match(/\d+/)?.[0]);
+    const rowId = parseInt(row.getAttribute('data-player-id'));
     if (rowId === id && window.selectedPlayerIds.includes(id)) {
       row.classList.add('selected');
     } else {
