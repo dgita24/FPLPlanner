@@ -347,6 +347,8 @@ font-size: 11px;
 /* ===== Captain/Vice-Captain Selection ===== */
 
 /* Extend hover area to cover the gap between badge and selector */
+/* This invisible bridge prevents selector from disappearing during mouse movement */
+/* z-index 19: below selector (20), above badge (15) */
 .badge-container::before {
 content: '';
 position: absolute;
