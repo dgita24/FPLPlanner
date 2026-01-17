@@ -465,16 +465,13 @@ export function initUI() {
         opacity: 0.95;
       }
 
-      /* Chip container - positioned at top-right of pitch */
+      /* Chip container - positioned at top center of pitch */
       .chip-container {
-        position: absolute;
-        top: 10px;
-        right: 10px;
         display: flex;
-        flex-direction: column;
-        align-items: flex-end;
+        flex-direction: row;
+        align-items: center;
         gap: 8px;
-        z-index: 10;
+        justify-content: center;
       }
 
       /* Chip indicator - shown when chip is selected */
@@ -613,11 +610,6 @@ export function initUI() {
 
       /* Mobile adjustments for chip UI */
       @media (max-width: 768px) {
-        .chip-container {
-          top: 5px;
-          right: 5px;
-        }
-
         .chip-indicator {
           padding: 6px 10px;
           font-size: 11px;
