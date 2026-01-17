@@ -503,7 +503,7 @@ td.fixtures-cell {
 
 .fixture-date {
   margin: 12px 0 8px;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 700;
   opacity: 0.9;
   text-align: center;
@@ -515,19 +515,19 @@ td.fixtures-cell {
   align-items: center;
   padding: 6px 0;
   border-bottom: 1px solid rgba(255,255,255,0.15);
-  font-size: 13px;
+  font-size: 12px;
 }
 
 .fixture-row .team {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 5px;
 }
 
 .fixture-team {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 5px;
   white-space: nowrap;
 }
 
@@ -547,7 +547,7 @@ td.fixtures-cell {
   background: rgba(0,0,0,0.35);
   border-radius: 4px;
   padding: 2px 6px;
-  font-size: 12px;
+  font-size: 11px;
 }
 
 /* Home team (flows right → away from centre) */
@@ -555,7 +555,7 @@ td.fixtures-cell {
   display: flex;
   justify-content: flex-end;
   align-items: center;
-  gap: 6px;
+  gap: 5px;
   text-align: right;
 }
 
@@ -564,17 +564,18 @@ td.fixtures-cell {
   display: flex;
   justify-content: flex-start;
   align-items: center;
-  gap: 6px;
+  gap: 5px;
   text-align: left;
 }
 
 .team-name {
   white-space: nowrap;
+  font-size: 11px;
 }
 
 .team-badge {
-  width: 22px;
-  height: 22px;
+  width: 20px;
+  height: 20px;
   object-fit: contain;
 }
 
