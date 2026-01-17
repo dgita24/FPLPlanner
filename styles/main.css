@@ -29,14 +29,28 @@ body {
 
 .header {
   display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 10px;
+  padding: 10px 12px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  /* Width expands to match the three-column layout */
+  width: calc(300px + 100% - 300px + 360px);
+  max-width: 100%;
+}
+
+.header-top-row {
+  display: flex;
   justify-content: space-between;
   align-items: center;
   gap: 15px;
-  margin-bottom: 10px;
-  padding: 8px 12px;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 10px;
-  height: 55px;
+}
+
+.header-top-controls {
+  display: flex;
+  gap: 10px;
+  align-items: center;
 }
 
 .bank-display {
@@ -44,7 +58,7 @@ body {
   align-items: center;
   gap: 6px;
   padding: 0 14px;
-  height: 44px;                 
+  height: 36px;                 
   border-radius: 6px;
   background: rgba(0,0,0,0.35);
   font-size: 14px;
@@ -54,7 +68,7 @@ body {
 
 .bank-display input {
   width: 70px;
-  height: 26px;
+  height: 24px;
   padding: 4px 6px;
   border-radius: 4px;
   border: none;
@@ -69,7 +83,7 @@ body {
   align-items: center;
   gap: 6px;
   padding: 0 14px;
-  height: 44px;
+  height: 36px;
   border-radius: 6px;
   background: rgba(33, 150, 243, 0.85); 
   font-size: 14px;
@@ -82,7 +96,7 @@ body {
 }
 
 .price-toggle select {
-  height: 26px;
+  height: 24px;
   padding: 2px 6px;
   border-radius: 4px;
   border: none;
@@ -94,6 +108,7 @@ body {
 .header-actions {
   display: flex;
   gap: 8px;
+  justify-content: flex-end;
 }
 
 .team-meta {
@@ -107,17 +122,18 @@ body {
 }
 
 .header-btn {
-  padding: 12px 20px;
+  padding: 10px 18px;
   border: none;
   border-radius: 5px;
   font-weight: bold;
-  font-size: 14px;
+  font-size: 13px;
   cursor: pointer;
   transition: all 0.2s;
-  height: 44px;
+  height: 36px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  white-space: nowrap;
 }
 
 .save-btn {
@@ -139,15 +155,15 @@ body {
 }
 
 .sidebar-toggle {
-  padding: 12px 20px;         
-  height: 44px;
+  padding: 10px 18px;         
+  height: 36px;
   background: var(--primary);
   color: var(--bg);
   border: none;
   border-radius: 5px;
   cursor: pointer;
   font-weight: bold;
-  font-size: 14px;
+  font-size: 13px;
   white-space: nowrap;
   transition: opacity 0.2s;
   display: inline-flex;

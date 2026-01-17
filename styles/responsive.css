@@ -64,15 +64,24 @@
   }
 
   .header {
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+  }
+
+  .header-top-row {
     flex-wrap: wrap;
-    height: auto;
-    padding: 10px;
   }
 
   .header h1 {
     width: 100%;
     text-align: center;
-    margin-bottom: 10px;
+    margin-bottom: 5px;
+  }
+
+  .header-top-controls {
+    width: 100%;
+    justify-content: center;
   }
 
   .pitch {
@@ -103,13 +112,24 @@
   }
 
   .header {
+    padding: 8px;
+    width: 100%;
+  }
+
+  .header-top-row {
     flex-direction: column;
-    align-items: stretch;
-    gap: 8px;
+    align-items: center;
   }
 
   .header h1 {
     font-size: 20px;
+    margin-bottom: 8px;
+  }
+
+  .header-top-controls {
+    flex-direction: column;
+    width: 100%;
+    gap: 8px;
   }
 
   .bank-display,
