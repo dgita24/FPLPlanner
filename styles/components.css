@@ -695,7 +695,7 @@ td.fixtures-cell {
 }
 
 .player-table-compact .th-name {
-  width: 100px;
+  width: 110px;
 }
 
 .player-table-compact .th-pos {
@@ -711,7 +711,8 @@ td.fixtures-cell {
 }
 
 .player-table-compact .th-stat-dynamic {
-  width: 50px;
+  width: 60px;
+  min-width: 60px;
 }
 
 .player-table-compact .th-info {
