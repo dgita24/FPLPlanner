@@ -809,8 +809,8 @@ td.fixtures-cell {
   background: #e6fffa;
 }
 
-.player-table-compact .th-select {
-  width: 60px;
+.player-table-compact .th-info {
+  width: 35px;
 }
 
 .player-table-compact .th-club {
@@ -822,7 +822,7 @@ td.fixtures-cell {
 }
 
 .player-table-compact .th-name {
-  width: 105px;
+  width: 110px;
 }
 
 .player-table-compact .th-pos {
@@ -842,11 +842,9 @@ td.fixtures-cell {
   min-width: 60px;
 }
 
-.player-table-compact .select-cell {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  padding: 4px 6px;
+.player-table-compact .info-cell {
+  padding: 4px;
+  text-align: center;
 }
 
 .player-table-compact .club-cell {

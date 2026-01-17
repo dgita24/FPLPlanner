@@ -309,8 +309,7 @@ export function renderTable() {
 
       return `
         <tr onclick="selectPlayer(event, ${player.id})" class="${checked ? 'selected' : ''}">
-          <td class="select-cell">
-            <input type="checkbox" name="selectedPlayer" value="${player.id}" ${checked}>
+          <td class="info-cell">
             <button class="info-btn" onclick="showPlayerInfo(event, ${player.id})" title="View player stats">i</button>
           </td>
           <td class="club-cell">${badgeHtml}</td>
@@ -356,29 +355,26 @@ function populateTeamFilter() {
 window.selectPlayer = function (ev, id) {
   if (ev) ev.stopPropagation();
   
-  // Toggle selection
-  const index = window.selectedPlayerIds.indexOf(id);
-  if (index > -1) {
-    window.selectedPlayerIds.splice(index, 1);
+  // Single selection only - replace previous selection
+  const previouslySelected = window.selectedPlayerIds.length > 0 ? window.selectedPlayerIds[0] : null;
+  
+  // If clicking the same player, deselect
+  if (previouslySelected === id) {
+    window.selectedPlayerIds = [];
   } else {
-    window.selectedPlayerIds.push(id);
+    window.selectedPlayerIds = [id];
   }
 
-  // Update row styling
-  const row = ev?.target?.closest('tr');
-  if (row) {
-    if (window.selectedPlayerIds.includes(id)) {
+  // Update all row styling
+  const allRows = document.querySelectorAll('#tableBody tr');
+  allRows.forEach(row => {
+    const rowId = parseInt(row.getAttribute('onclick')?.match(/\d+/)?.[0]);
+    if (rowId === id && window.selectedPlayerIds.includes(id)) {
       row.classList.add('selected');
     } else {
       row.classList.remove('selected');
     }
-  }
-
-  // Update checkbox
-  const checkbox = row?.querySelector('input[type="checkbox"]');
-  if (checkbox) {
-    checkbox.checked = window.selectedPlayerIds.includes(id);
-  }
+  });
 };
 
 // Expose for inline handlers
