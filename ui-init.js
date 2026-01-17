@@ -465,15 +465,13 @@ export function initUI() {
         opacity: 0.95;
       }
 
-      /* Chip container - positioned at top-right of pitch */
+      /* Chip container - positioned at top center of pitch */
       .chip-container {
-        position: absolute;
-        top: 10px;
-        right: 10px;
         display: flex;
-        flex-direction: column;
-        align-items: flex-end;
+        flex-direction: row;
+        align-items: center;
         gap: 8px;
+        justify-content: center;
         z-index: 10;
       }
 
@@ -549,10 +547,10 @@ export function initUI() {
 
       /* Chip buttons row - container for multiple chip buttons */
       .chip-buttons-row {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        grid-template-rows: repeat(2, 1fr);
+        display: flex;
         gap: 6px;
+        flex-wrap: nowrap;
+        justify-content: center;
       }
 
       /* Smaller chip buttons for multiple chips */
@@ -613,11 +611,6 @@ export function initUI() {
 
       /* Mobile adjustments for chip UI */
       @media (max-width: 768px) {
-        .chip-container {
-          top: 5px;
-          right: 5px;
-        }
-
         .chip-indicator {
           padding: 6px 10px;
           font-size: 11px;

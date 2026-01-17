@@ -242,13 +242,25 @@
     padding: 6px 4px;
   }
 
-  /* Transfer actions now in pitch - responsive stacking */
-  .transfer-actions-left {
+  /* GW nav with transfer buttons - stack on mobile */
+  .gw-nav {
     flex-direction: column;
-    gap: 4px;
+    gap: 8px;
   }
 
-  .transfer-action-btn {
+  .gw-nav .gw-center {
+    order: 1; /* Show GW nav at top on mobile */
+  }
+
+  .gw-nav #addToSquadBtn {
+    order: 2;
+  }
+
+  .gw-nav #cancelTransferBtn {
+    order: 3;
+  }
+
+  .gw-nav .transfer-action-btn {
     width: 100%;
     padding: 6px 12px;
     font-size: 12px;

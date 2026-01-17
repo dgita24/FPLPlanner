@@ -17,21 +17,14 @@
   border: 2px solid rgba(255, 255, 255, 0.1);
 }
 
-/* Pitch top controls container */
+/* Pitch top controls container - contains chip UI centered at top */
 .pitch-top-controls {
   display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 16px;
-  min-height: 36px;
-}
-
-/* Transfer actions on the left */
-.transfer-actions-left {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-  /* No margin-top: transfer buttons align with chip buttons at the top */
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 10px;
+  margin-top: -15px;
+  min-height: 0;
 }
 
 .transfer-action-btn {
@@ -46,12 +39,17 @@
   height: 36px;
 }
 
+.transfer-action-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .transfer-action-btn.add-btn {
   background: #00ff87;
   color: #000;
 }
 
-.transfer-action-btn.add-btn:hover {
+.transfer-action-btn.add-btn:hover:not(:disabled) {
   background: #00e676;
 }
 
@@ -60,7 +58,7 @@
   color: #fff;
 }
 
-.transfer-action-btn.cancel-btn:hover {
+.transfer-action-btn.cancel-btn:hover:not(:disabled) {
   background: #dd3333;
 }
 
@@ -100,8 +98,8 @@
 .chip-buttons-row {
   display: flex;
   gap: 6px;
-  flex-wrap: wrap;
-  justify-content: flex-end;
+  flex-wrap: nowrap;
+  justify-content: center;
 }
 
 .chip-btn-small {

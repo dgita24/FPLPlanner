@@ -34,8 +34,8 @@
       </div>
 
       <div class="header-actions">
-        <button onclick="localLoad()" class="header-btn load-btn">📂 Local Load</button>
         <button onclick="localSave()" class="header-btn save-btn">💾 Local Save</button>
+        <button onclick="localLoad()" class="header-btn load-btn">📂 Local Load</button>
         <button onclick="resetToImportedTeam()" class="header-btn load-btn">⏮️ Reset</button>
         <button onclick="toggleHelpModal()" class="header-btn" style="background: #00ff87; color: #37003c;">❓ Help</button>
         <button class="sidebar-toggle" onclick="toggleSidebarMenu()">Import/Save</button>
@@ -70,9 +70,13 @@
 
         <div class="pitch-stack">
           <div class="gw-nav">
-            <button onclick="changeGW(-1)" id="prevGW">← GW</button>
-            <h2>Gameweek <span id="currentGWDisplay">1</span></h2>
-            <button onclick="changeGW(1)" id="nextGW">GW →</button>
+            <button class="transfer-action-btn add-btn" onclick="addSelectedToSquad()" id="addToSquadBtn">Add to squad</button>
+            <div class="gw-center">
+              <button onclick="changeGW(-1)" id="prevGW">← GW</button>
+              <h2>Gameweek <span id="currentGWDisplay">1</span></h2>
+              <button onclick="changeGW(1)" id="nextGW">GW →</button>
+            </div>
+            <button class="transfer-action-btn cancel-btn" onclick="cancelTransfer()" id="cancelTransferBtn">Cancel transfer</button>
           </div>
 
           <div id="pitch" class="pitch"></div>

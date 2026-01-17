@@ -255,10 +255,6 @@ export function renderPitch() {
 
   pitch.innerHTML = `
     <div class="pitch-top-controls">
-      <div class="transfer-actions-left">
-        <button class="transfer-action-btn add-btn" onclick="addSelectedToSquad()">Add to squad</button>
-        <button class="transfer-action-btn cancel-btn" onclick="cancelTransfer()">Cancel transfer</button>
-      </div>
       ${chipUI}
     </div>
     <div class="formation-line">${gk.map(renderCard).join('')}</div>
