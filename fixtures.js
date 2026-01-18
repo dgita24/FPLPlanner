@@ -52,6 +52,33 @@ export function renderFixtures() {
   const hasFixtures = Object.keys(groups).length > 0;
 
   panel.innerHTML = `
+    <div class="fixtures-controls">
+      <div class="fixtures-button-grid">
+        <button class="fixtures-control-btn import-save-btn" onclick="toggleSidebarMenu()">Menu/Login</button>
+        <button class="fixtures-control-btn donate-btn" onclick="donatePlaceholder()">💝 Donate</button>
+        
+        <div class="bank-display">
+          <span>Bank</span>
+          <input type="number" id="bankInput" value="${state.bank.toFixed(1)}" step="0.1" />
+          <span>m</span>
+        </div>
+        <button class="fixtures-control-btn local-btn" onclick="localLoad()">📂 Local Load</button>
+        
+        <div class="price-toggle">
+          <span>Prices</span>
+          <select id="priceModeSelect">
+            <option value="selling" ${state.priceMode === 'selling' ? 'selected' : ''}>Selling</option>
+            <option value="purchase" ${state.priceMode === 'purchase' ? 'selected' : ''}>Purchase</option>
+            <option value="current" ${state.priceMode === 'current' ? 'selected' : ''}>Current</option>
+          </select>
+        </div>
+        <button class="fixtures-control-btn local-btn" onclick="localSave()">💾 Local Save</button>
+        
+        <button class="fixtures-control-btn" onclick="resetToImportedTeam()">⏮️ Reset</button>
+        <button class="fixtures-control-btn" onclick="toggleHelpModal()">❓ Help</button>
+      </div>
+    </div>
+
     <div class="fixtures-header">
       <button onclick="changeFixturesGW(-1)">←</button>
       <strong>GW ${fixturesGW}</strong>
@@ -68,6 +95,38 @@ export function renderFixtures() {
       : '<div style="text-align: center; padding: 20px; opacity: 0.7;">No fixtures available for this gameweek</div>'
     }
   `;
+
+  // Always reattach event listeners after rendering
+  reattachFixturesControls();
+}
+
+function reattachFixturesControls() {
+  const bankInput = document.getElementById('bankInput');
+  if (bankInput) {
+    bankInput.addEventListener('change', (e) => {
+      const v = parseFloat(e.target.value);
+      if (!Number.isFinite(v) || v < 0) {
+        e.target.value = state.bank.toFixed(1);
+        return;
+      }
+      state.bank = v;
+      // Trigger updateUI if available globally
+      if (window.updateUI) {
+        window.updateUI();
+      }
+    });
+  }
+
+  const pm = document.getElementById('priceModeSelect');
+  if (pm) {
+    pm.addEventListener('change', (e) => {
+      state.priceMode = e.target.value;
+      // Trigger updateUI if available globally
+      if (window.updateUI) {
+        window.updateUI();
+      }
+    });
+  }
 }
 
 function renderFixturesError(message) {

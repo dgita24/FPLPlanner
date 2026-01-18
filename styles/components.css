@@ -629,6 +629,68 @@ td.fixtures-cell {
   border: 1px solid var(--border);
 }
 
+/* Fixtures control buttons at top */
+.fixtures-controls {
+  margin-bottom: 10px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border);
+}
+
+.fixtures-button-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+
+.fixtures-control-btn {
+  padding: 6px 8px;
+  border: none;
+  border-radius: 5px;
+  font-weight: bold;
+  font-size: 11px;
+  cursor: pointer;
+  transition: all 0.2s;
+  height: 30px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  background: var(--primary);
+  color: white;
+}
+
+.fixtures-control-btn:hover {
+  background: var(--primary-light);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(56, 0, 60, 0.3);
+}
+
+/* Local Load/Save buttons - smaller size */
+.fixtures-control-btn.local-btn {
+  padding: 6px;
+  font-size: 10px;
+}
+
+/* Import/Save button - orange */
+.fixtures-control-btn.import-save-btn {
+  background: var(--warning) !important;
+}
+
+.fixtures-control-btn.import-save-btn:hover {
+  background: var(--warning-hover) !important;
+  box-shadow: 0 2px 8px rgba(255, 152, 0, 0.3);
+}
+
+/* Donate button - green */
+.fixtures-control-btn.donate-btn {
+  background: var(--accent) !important;
+}
+
+.fixtures-control-btn.donate-btn:hover {
+  background: var(--accent-hover) !important;
+  box-shadow: 0 2px 8px rgba(0, 208, 132, 0.3);
+}
+
 /* Fixtures panel GW arrows */
 #fixturesPanel button {
   background: var(--primary);
@@ -734,22 +796,23 @@ td.fixtures-cell {
 /* Kickoff time – dead centre */
 .fixture-row .ko {
   text-align: center;
-  min-width: 50px;
+  min-width: 40px;
   background: var(--bg-darker);
-  padding: 3px 8px;
+  padding: 3px 6px;
   border-radius: 4px;
   font-size: 11px;
   font-weight: bold;
   color: var(--text);
+  margin: 0 4px;
 }
 
 .fixture-date-banner {
-  margin: 12px 25px 6px;
-  padding: 6px 10px;
+  margin: 12px 0 6px;
+  padding: 4px 10px;
   background: var(--bg-dark);
   color: var(--text);
   font-weight: 600;
-  font-size: 13px;
+  font-size: 12px;
   text-align: center;
   border-radius: 6px;
   letter-spacing: 0.3px;
@@ -775,22 +838,25 @@ td.fixtures-cell {
 }
 
 .filters-compact {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  margin-bottom: 12px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  margin-bottom: 10px;
   flex-shrink: 0;
 }
 
 .filters-compact input,
 .filters-compact select {
-  padding: 8px;
+  padding: 6px;
   border-radius: 4px;
   border: 1px solid var(--border);
   text-align: center;
-  font-size: 13px;
-  background: var(--bg);
-  color: var(--text);
+  font-size: 12px;
+  background: var(--primary);
+  color: white;
+  width: 100%;
+  box-sizing: border-box;
+  font-weight: 600;
 }
 
 .player-table-compact {

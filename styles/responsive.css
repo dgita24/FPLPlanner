@@ -66,20 +66,10 @@
     height: auto;
   }
 
-  .header-left {
-    flex-wrap: wrap;
-    justify-content: center;
-  }
-
   .header h1 {
     width: 100%;
     text-align: center;
     margin-bottom: 5px;
-  }
-
-  .header-actions {
-    width: 100%;
-    justify-content: center;
   }
 
   .pitch {
@@ -116,36 +106,13 @@
     flex-direction: column;
   }
 
-  .header-left {
-    flex-direction: column;
-    align-items: center;
-    width: 100%;
-  }
-
   .header h1 {
     font-size: 20px;
     margin-bottom: 8px;
   }
 
-  .bank-display,
-  .price-toggle {
-    width: 100%;
-    justify-content: center;
-  }
-
-  .header-actions {
-    flex-direction: column;
-    width: 100%;
-  }
-
-  .header-btn,
-  .sidebar-toggle {
-    width: 100%;
-    padding: 10px;
-  }
-
   .sidebar {
-    width: 300px;
+    width: 260px;
   }
 
   #plannerMain {

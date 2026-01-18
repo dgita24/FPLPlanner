@@ -680,6 +680,9 @@ export function initUI() {
   window.setViceCaptain = setViceCaptain;
   window.donatePlaceholder = () => showMessage('Donate feature coming soon! This is a placeholder for now.', 'info');
 
+  // Expose updateUI so it can be called from fixtures.js
+  window.updateUI = updateUI;
+
   // Expose chip selection function
   window.selectChip = (chipType) => selectChip(chipType, updateUI);
 
