@@ -852,10 +852,11 @@ td.fixtures-cell {
   border: 1px solid var(--border);
   text-align: center;
   font-size: 12px;
-  background: var(--bg);
-  color: var(--text);
+  background: var(--primary);
+  color: white;
   width: 100%;
   box-sizing: border-box;
+  font-weight: 600;
 }
 
 .player-table-compact {
