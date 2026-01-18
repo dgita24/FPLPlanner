@@ -47,6 +47,7 @@
 .pitch-corner-btn {
   position: absolute;
   top: 10px;
+  height: 36px;
   z-index: 10;
 }
 
