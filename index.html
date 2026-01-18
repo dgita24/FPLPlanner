@@ -15,8 +15,6 @@
   <div class="container">
     <div class="header">
       <div class="header-left">
-        <h1 style="font-size: 20px; color: var(--primary);">FPL Team Planner</h1>
-        
         <div class="bank-display">
           <span>Bank</span>
           <input type="number" id="bankInput" value="100.0" step="0.1" />
@@ -33,11 +31,16 @@
         </div>
       </div>
 
-      <div class="header-actions">
+      <div class="header-center">
+        <button onclick="donatePlaceholder()" class="donate-btn">💝 Donate</button>
+        <h1>FPL TEAM PLANNER</h1>
         <button onclick="localSave()" class="header-btn save-btn">💾 Local Save</button>
+      </div>
+
+      <div class="header-actions">
         <button onclick="localLoad()" class="header-btn load-btn">📂 Local Load</button>
         <button onclick="resetToImportedTeam()" class="header-btn load-btn">⏮️ Reset</button>
-        <button onclick="toggleHelpModal()" class="header-btn" style="background: var(--accent); color: white;">❓ Help</button>
+        <button onclick="toggleHelpModal()" class="header-btn load-btn">❓ Help</button>
         <button class="sidebar-toggle" onclick="toggleSidebarMenu()">Import/Save</button>
       </div>
     </div>

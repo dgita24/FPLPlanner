@@ -678,6 +678,7 @@ export function initUI() {
   window.resetToImportedTeam = resetToImportedTeam;
   window.setCaptain = setCaptain;
   window.setViceCaptain = setViceCaptain;
+  window.donatePlaceholder = () => showMessage('Donate feature coming soon! This is a placeholder for now.', 'info');
 
   // Expose chip selection function
   window.selectChip = (chipType) => selectChip(chipType, updateUI);
