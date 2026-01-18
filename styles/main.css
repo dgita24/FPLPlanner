@@ -225,10 +225,10 @@ body {
   position: fixed;
   right: 0;
   top: 0;
-  width: 320px;
+  width: 280px;
   height: 100vh;
   background: var(--bg-light);
-  padding: 70px 20px 20px;
+  padding: 60px 15px 15px;
   box-shadow: -5px 0 15px rgba(0, 0, 0, 0.15);
   transform: translateX(100%);
   transition: transform 0.3s ease;
@@ -242,31 +242,34 @@ body {
 }
 
 .sidebar h2 {
-  margin: 20px 0 10px;
+  margin: 15px 0 8px;
   color: var(--primary);
+  font-size: 18px;
 }
 
 .sidebar h3 {
-  margin: 20px 0 10px;
+  margin: 15px 0 8px;
   color: var(--primary);
   border-bottom: 1px solid var(--border);
-  padding-bottom: 5px;
+  padding-bottom: 4px;
+  font-size: 16px;
 }
 
 .sidebar input {
   width: 100%;
-  padding: 10px;
-  margin: 5px 0;
+  padding: 8px;
+  margin: 4px 0;
   border-radius: 5px;
   border: 1px solid var(--border);
   background: var(--bg);
   color: var(--text);
+  font-size: 13px;
 }
 
 .sidebar button {
   width: 100%;
-  padding: 10px;
-  margin-top: 5px;
+  padding: 8px;
+  margin-top: 4px;
   background: var(--accent);
   border: none;
   border-radius: 5px;

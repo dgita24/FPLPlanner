@@ -838,8 +838,8 @@ td.fixtures-cell {
 }
 
 .filters-compact {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   gap: 8px;
   margin-bottom: 12px;
   flex-shrink: 0;

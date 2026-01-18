@@ -55,7 +55,7 @@ export function renderFixtures() {
   panel.innerHTML = `
     <div class="fixtures-controls">
       <div class="fixtures-button-grid">
-        <button class="fixtures-control-btn import-save-btn" onclick="toggleSidebarMenu()">Import/Save</button>
+        <button class="fixtures-control-btn import-save-btn" onclick="toggleSidebarMenu()">Menu/Login</button>
         <button class="fixtures-control-btn donate-btn" onclick="donatePlaceholder()">💝 Donate</button>
         
         <div class="bank-display">
