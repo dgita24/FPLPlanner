@@ -38,12 +38,6 @@
     gap: 10px;
   }
 
-  /* Fix button overlay issue on initial load */
-  .pitch-corner-btn {
-    top: 50px;
-    z-index: 100;
-  }
-
   /* Ensure chip buttons have proper spacing */
   .chip-buttons-row {
     margin-top: 8px;
@@ -103,24 +97,16 @@
   .formation-line {
     gap: 9px;
   }
-
-  /* Adjust button positioning for tablets */
-  .pitch-corner-btn {
-    top: 40px;
-  }
 }
 
 /* Mobile (max-width: 768px) */
 @media (max-width: 768px) {
   body {
     padding: 10px;
-    /* Enable pinch-to-zoom and panning */
-    touch-action: pan-x pan-y;
   }
 
   .container {
-    /* Enable horizontal scrolling if content overflows viewport */
-    overflow-x: auto;
+    max-width: 100%;
   }
 
   .header {
@@ -154,6 +140,17 @@
     min-height: 300px;
     /* Ensure pitch doesn't cause overflow */
     overflow: visible;
+  }
+
+  /* Stack transfer action buttons vertically on mobile */
+  .transfer-actions {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .transfer-actions .transfer-action-btn {
+    max-width: 100%;
+    width: 100%;
   }
 
   .player-card {
@@ -272,21 +269,6 @@
 
   .gw-nav .gw-center {
     order: 1;
-  }
-
-  /* Position transfer action buttons below GW nav to avoid overlap */
-  .pitch-corner-btn {
-    position: relative;
-    display: inline-block;
-    margin: 5px;
-    font-size: 11px;
-    padding: 6px 10px;
-  }
-
-  /* Override absolute positioning for action buttons on mobile */
-  .pitch-corner-left,
-  .pitch-corner-right {
-    position: static;
   }
 
   .fixture-row {
@@ -500,12 +482,5 @@
     max-height: 450px;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
-  }
-
-  /* Ensure buttons don't overlap on small mobile */
-  .pitch-corner-btn {
-    font-size: 10px;
-    padding: 5px 8px;
-    height: auto;
   }
 }

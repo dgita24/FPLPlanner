@@ -44,21 +44,6 @@
   cursor: not-allowed;
 }
 
-.pitch-corner-btn {
-  position: absolute;
-  top: 60px;
-  height: 36px;
-  z-index: 100;
-}
-
-.pitch-corner-left {
-  left: 10px;
-}
-
-.pitch-corner-right {
-  right: 10px;
-}
-
 .transfer-action-btn.add-btn {
   background: var(--warning);
   color: white;
@@ -830,6 +815,20 @@ td.fixtures-cell {
   max-height: calc(100vh - 150px);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   border: 1px solid var(--border);
+}
+
+/* Transfer action buttons container */
+.transfer-actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
+  flex-shrink: 0;
+}
+
+.transfer-actions .transfer-action-btn {
+  flex: 1;
+  max-width: 48%;
 }
 
 .transfer-panel h3 {
