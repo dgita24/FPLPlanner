@@ -43,7 +43,7 @@ body {
 
 .header {
   display: grid;
-  grid-template-columns: 1fr auto 1fr;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
   align-items: center;
   gap: 15px;
   margin-bottom: 10px;
@@ -61,6 +61,13 @@ body {
   align-items: center;
   gap: 12px;
   justify-content: flex-start;
+}
+
+.header-center {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  justify-content: center;
 }
 
 .bank-display {
@@ -148,7 +155,7 @@ body {
   align-items: center;
 }
 
-.header h1 {
+.header-center h1 {
   font-size: 24px;
   font-weight: 900;
   color: var(--accent);

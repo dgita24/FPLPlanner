@@ -29,14 +29,15 @@
             <option value="current">Current</option>
           </select>
         </div>
-
-        <button onclick="donatePlaceholder()" class="donate-btn">💝 Donate</button>
       </div>
 
-      <h1>FPL TEAM PLANNER</h1>
+      <div class="header-center">
+        <button onclick="donatePlaceholder()" class="donate-btn">💝 Donate</button>
+        <h1>FPL TEAM PLANNER</h1>
+        <button onclick="localSave()" class="header-btn save-btn">💾 Local Save</button>
+      </div>
 
       <div class="header-actions">
-        <button onclick="localSave()" class="header-btn save-btn">💾 Local Save</button>
         <button onclick="localLoad()" class="header-btn load-btn">📂 Local Load</button>
         <button onclick="resetToImportedTeam()" class="header-btn load-btn">⏮️ Reset</button>
         <button onclick="toggleHelpModal()" class="header-btn load-btn">❓ Help</button>

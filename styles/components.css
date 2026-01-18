@@ -744,7 +744,7 @@ td.fixtures-cell {
 }
 
 .fixture-date-banner {
-  margin: 12px 15px 6px;
+  margin: 12px 25px 6px;
   padding: 6px 10px;
   background: var(--bg-dark);
   color: var(--text);
