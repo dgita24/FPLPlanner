@@ -2,6 +2,7 @@ import { state } from './data.js';
 
 const fixturesByGW = new Map();
 let fixturesGW = null;
+let listenersAttached = false;
 
 export async function loadFixturesData() {
   try {
@@ -96,8 +97,26 @@ export function renderFixtures() {
     }
   `;
 
-  // Reattach event listeners for bank input and price mode select
-  reattachFixturesControls();
+  // Attach event listeners only once
+  if (!listenersAttached) {
+    reattachFixturesControls();
+    listenersAttached = true;
+  } else {
+    // Just update the values when re-rendering
+    updateControlValues();
+  }
+}
+
+function updateControlValues() {
+  const bankInput = document.getElementById('bankInput');
+  if (bankInput) {
+    bankInput.value = state.bank.toFixed(1);
+  }
+
+  const pm = document.getElementById('priceModeSelect');
+  if (pm && pm.value !== state.priceMode) {
+    pm.value = state.priceMode;
+  }
 }
 
 function reattachFixturesControls() {
