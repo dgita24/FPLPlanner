@@ -42,10 +42,9 @@ body {
 /* ===== Header ===== */
 
 .header {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  display: flex;
   align-items: center;
-  gap: 15px;
+  justify-content: center;
   margin-bottom: 10px;
   padding: 8px 12px;
   background: var(--bg-light);
@@ -56,29 +55,26 @@ body {
   border: 1px solid var(--border);
 }
 
-.header-left {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  justify-content: flex-start;
-}
-
-.header-center {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  justify-content: center;
+.header h1 {
+  font-size: 24px;
+  font-weight: 900;
+  color: var(--accent);
+  text-align: center;
+  letter-spacing: 1px;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+  margin: 0;
+  white-space: nowrap;
 }
 
 .bank-display {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 0 12px;
-  height: 32px;                 
+  padding: 4px 10px;
+  height: 30px;                 
   border-radius: 6px;
   background: var(--primary);
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 700;
   white-space: nowrap;
   color: white;
@@ -86,12 +82,12 @@ body {
 }
 
 .bank-display input {
-  width: 65px;
-  height: 22px;
-  padding: 3px 5px;
+  width: 60px;
+  height: 20px;
+  padding: 2px 4px;
   border-radius: 4px;
   border: 1px solid rgba(255, 255, 255, 0.3);
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 700;
   text-align: center;
   background: rgba(255, 255, 255, 0.9);
@@ -102,11 +98,11 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 0 12px;
-  height: 32px;
+  padding: 4px 10px;
+  height: 30px;
   border-radius: 6px;
   background: var(--primary);
-  font-size: 13px;
+  font-size: 12px;
   white-space: nowrap;
   color: white;
   border: 1px solid var(--primary);
@@ -118,24 +114,24 @@ body {
 }
 
 .price-toggle select {
-  height: 22px;
-  padding: 2px 6px;
+  height: 20px;
+  padding: 1px 5px;
   border-radius: 4px;
   border: 1px solid var(--border);
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 600;
   background: white;
   color: var(--text);
 }
 
 .donate-btn {
-  padding: 0 12px;
-  height: 32px;
+  padding: 4px 10px;
+  height: 30px;
   border-radius: 6px;
   background: var(--accent);
   color: white;
   border: none;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 700;
   cursor: pointer;
   transition: all 0.2s;
@@ -155,7 +151,7 @@ body {
   align-items: center;
 }
 
-.header-center h1 {
+.header h1 {
   font-size: 24px;
   font-weight: 900;
   color: var(--accent);
@@ -178,14 +174,14 @@ body {
 }
 
 .header-btn {
-  padding: 8px 16px;
+  padding: 6px 12px;
   border: none;
   border-radius: 5px;
   font-weight: bold;
-  font-size: 13px;
+  font-size: 12px;
   cursor: pointer;
   transition: all 0.2s;
-  height: 32px;
+  height: 30px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -211,15 +207,15 @@ body {
 }
 
 .sidebar-toggle {
-  padding: 8px 16px;         
-  height: 32px;
+  padding: 6px 12px;         
+  height: 30px;
   background: var(--primary);
   color: white;
   border: none;
   border-radius: 5px;
   cursor: pointer;
   font-weight: bold;
-  font-size: 13px;
+  font-size: 12px;
   white-space: nowrap;
   transition: all 0.2s;
   display: inline-flex;
