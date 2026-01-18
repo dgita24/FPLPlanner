@@ -213,12 +213,13 @@ export function renderPitch() {
   const pitch = document.getElementById('pitch');
   const team = state.plan[state.viewingGW];
   
-  // Always append buttons first, even if there's no team data
-  appendPitchButton('addToSquadBtn', pitch);
-  appendPitchButton('cancelTransferBtn', pitch);
-  
   if (!pitch || !team) {
-    if (pitch) pitch.innerHTML = '';
+    if (pitch) {
+      pitch.innerHTML = '';
+      // Append buttons even when there's no team data
+      appendPitchButton('addToSquadBtn', pitch);
+      appendPitchButton('cancelTransferBtn', pitch);
+    }
     return;
   }
 
@@ -275,8 +276,31 @@ export function renderPitch() {
 
 // Helper function to append buttons to pitch
 function appendPitchButton(buttonId, pitchElement) {
-  const button = document.getElementById(buttonId);
-  if (button && !pitchElement.contains(button)) {
+  let button = document.getElementById(buttonId);
+  
+  // If button doesn't exist, create it
+  if (!button) {
+    button = document.createElement('button');
+    button.id = buttonId;
+    button.className = 'transfer-action-btn pitch-corner-btn';
+    
+    if (buttonId === 'addToSquadBtn') {
+      button.className += ' add-btn pitch-corner-left';
+      button.textContent = 'Add to squad';
+      button.onclick = function() {
+        if (window.addSelectedToSquad) window.addSelectedToSquad();
+      };
+    } else if (buttonId === 'cancelTransferBtn') {
+      button.className += ' cancel-btn pitch-corner-right';
+      button.textContent = 'Cancel transfer';
+      button.onclick = function() {
+        if (window.cancelTransfer) window.cancelTransfer();
+      };
+    }
+  }
+  
+  // Append to pitch if not already there
+  if (!pitchElement.contains(button)) {
     button.style.removeProperty('display');
     pitchElement.appendChild(button);
   }
