@@ -43,7 +43,7 @@
   /* Fix button overlay issue on initial load */
   .pitch-corner-btn {
     top: 50px;
-    z-index: 50;
+    z-index: 100;
   }
 
   /* Ensure chip buttons have proper spacing */
@@ -123,9 +123,8 @@
   }
 
   .container {
-    /* Allow horizontal scrolling if needed */
+    /* Enable horizontal scrolling if content overflows viewport */
     overflow-x: auto;
-    min-width: 100%;
   }
 
   .header {
@@ -237,7 +236,7 @@
     gap: 4px;
     justify-content: center;
     flex-wrap: nowrap;
-    /* Prevent cards from getting squashed */
+    /* Enable horizontal scrolling when formation line content overflows */
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
   }
