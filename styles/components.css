@@ -44,22 +44,37 @@
   cursor: not-allowed;
 }
 
+.pitch-corner-btn {
+  position: absolute;
+  top: 10px;
+  height: 36px;
+  z-index: 10;
+}
+
+.pitch-corner-left {
+  left: 10px;
+}
+
+.pitch-corner-right {
+  right: 10px;
+}
+
 .transfer-action-btn.add-btn {
-  background: #00ff87;
-  color: #000;
+  background: var(--accent);
+  color: white;
 }
 
 .transfer-action-btn.add-btn:hover:not(:disabled) {
-  background: #00e676;
+  background: var(--accent-hover);
 }
 
 .transfer-action-btn.cancel-btn {
-  background: #ff4444;
+  background: var(--error);
   color: #fff;
 }
 
 .transfer-action-btn.cancel-btn:hover:not(:disabled) {
-  background: #dd3333;
+  background: var(--error-hover);
 }
 
 /* Chip UI styles */
@@ -75,8 +90,8 @@
   align-items: center;
   gap: 6px;
   padding: 4px 12px;
-  background: rgba(0, 255, 135, 0.15);
-  border: 2px solid #00ff87;
+  background: rgba(0, 208, 132, 0.1);
+  border: 2px solid var(--accent);
   border-radius: 6px;
   font-size: 12px;
   font-weight: 700;
@@ -87,11 +102,11 @@
 }
 
 .chip-name {
-  color: #00ff87;
+  color: var(--accent);
 }
 
 .chip-gw {
-  color: rgba(255, 255, 255, 0.7);
+  color: var(--text-light);
   font-size: 11px;
 }
 
@@ -112,26 +127,26 @@
   transition: all 0.2s;
   white-space: nowrap;
   height: 36px;
-  background: rgba(0, 255, 135, 0.2);
-  color: #00ff87;
-  border: 1px solid #00ff87;
+  background: rgba(0, 208, 132, 0.1);
+  color: var(--accent);
+  border: 1px solid var(--accent);
 }
 
 .chip-btn-small:hover:not(:disabled) {
-  background: rgba(0, 255, 135, 0.3);
+  background: rgba(0, 208, 132, 0.2);
   transform: translateY(-1px);
 }
 
 .chip-btn-small.chip-btn-active {
-  background: #00ff87;
-  color: #000;
-  border-color: #00ff87;
+  background: var(--accent);
+  color: white;
+  border-color: var(--accent);
 }
 
 .chip-btn-small.chip-btn-used {
-  background: rgba(100, 100, 100, 0.2);
-  color: rgba(255, 255, 255, 0.4);
-  border-color: rgba(255, 255, 255, 0.2);
+  background: var(--bg-darker);
+  color: var(--text-light);
+  border-color: var(--border);
   cursor: not-allowed;
 }
 
@@ -159,7 +174,7 @@
 
 .player-card {
   width: 145px;
-  background: rgba(255, 255, 255, 0.95);
+  background: var(--bg);
   border-radius: 7px;
   padding: 5px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
@@ -181,7 +196,7 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  background: #eee;
+  background: #d4dae3;
   padding: 2px 3px;
   border-radius: 3px;
   margin: 2px 0;
@@ -296,9 +311,9 @@
   width: 20px;
   height: 20px;
   border-radius: 50%;
-  border: 2px solid #00ff87;
-  background: #00ff87;
-  color: #000;
+  border: 2px solid var(--accent);
+  background: var(--accent);
+  color: white;
   font-weight: bold;
   font-size: 8px;
   cursor: pointer;
@@ -316,8 +331,8 @@
 }
 
 .captain-btn.active {
-  background: #00e676;
-  border-color: #00e676;
+  background: var(--accent-hover);
+  border-color: var(--accent-hover);
 }
 
 .captain-badge {
@@ -328,15 +343,15 @@
   width: 20px;
   height: 20px;
   border-radius: 50%;
-  background: #00ff87;
-  color: #000;
+  background: var(--accent);
+  color: white;
   font-weight: bold;
   font-size: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-  border: 2px solid #00ff87;
+  border: 2px solid var(--accent);
   z-index: 15;
   pointer-events: auto;
 }
@@ -344,8 +359,8 @@
 /* Both captain and vice-captain badges use the same styling */
 .captain-badge.vc,
 .captain-badge.c {
-  background: #00ff87;
-  border-color: #00ff87;
+  background: var(--accent);
+  border-color: var(--accent);
 }
 
 /* ===== Status Flag Badges (Circular style like captain badges) ===== */
@@ -424,16 +439,18 @@
 /* ===== Bench ===== */
 
 .bench {
-  background: rgba(0, 0, 0, 0.2);
+  background: var(--bg-light);
   padding: 13px;
   border-radius: 10px;
   max-width: 935px;
   margin: 0 auto 25px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border: 1px solid var(--border);
 }
 
 .bench h3 {
   text-align: center;
-  color: #fff;
+  color: var(--text);
   margin-bottom: 12px;
 }
 
@@ -452,7 +469,7 @@
 /* ===== Player Table ===== */
 
 .player-table {
-  background: #fff;
+  background: var(--bg);
   color: #000;
   border-radius: 5px;
   overflow: hidden;
@@ -467,7 +484,7 @@ table {
 }
 
 th {
-  background: var(--bg);
+  background: var(--primary);
   color: #fff;
   padding: 10px;
   text-align: center;
@@ -490,8 +507,8 @@ th[style*="text-align:center"] {
 
 td {
   padding: 8px 10px;
-  border-bottom: 1px solid #eee;
-  border-right: 1px solid #ddd;
+  border-bottom: 1px solid var(--border);
+  border-right: 1px solid var(--border);
   text-align: center;
 }
 
@@ -508,12 +525,19 @@ td[style*="text-align:center"][style*="width:30px"] {
 }
 
 tr:hover {
-  background: #f0f0f0;
+  background: var(--bg-dark);
   cursor: pointer;
+  transition: background-color 0.2s ease;
 }
 
 tr.selected {
-  background: #e6fffa;
+  background: var(--selected-bg);
+  font-weight: 600;
+  border-left: 3px solid var(--accent);
+}
+
+tr.selected:hover {
+  background: var(--selected-hover-bg);
 }
 
 td.status-cell {
@@ -596,26 +620,30 @@ td.fixtures-cell {
 /* ===== Fixtures Panel ===== */
 
 #fixturesPanel {
-  background: rgba(0,0,0,0.25);
+  background: var(--bg-light);
   border-radius: 10px;
   padding: 10px;
-  color: white;
+  color: var(--text);
   margin-top: 48px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border: 1px solid var(--border);
 }
 
 /* Fixtures panel GW arrows */
 #fixturesPanel button {
-  background: #00ff87;
-  color: #000;
+  background: var(--accent);
+  color: white;
   border: none;
   border-radius: 6px;
   padding: 4px 10px;
   font-weight: 700;
   cursor: pointer;
+  transition: all 0.2s;
 }
 
 #fixturesPanel button:hover {
-  background: #00e676;
+  background: var(--accent-hover);
+  transform: translateY(-1px);
 }
 
 .fixtures-header {
@@ -637,7 +665,7 @@ td.fixtures-cell {
   grid-template-columns: 1fr auto 1fr;
   align-items: center;
   padding: 6px 0;
-  border-bottom: 1px solid rgba(255,255,255,0.15);
+  border-bottom: 1px solid var(--border);
   font-size: 12px;
 }
 
@@ -667,10 +695,11 @@ td.fixtures-cell {
 .fixture-time {
   text-align: center;
   font-weight: 600;
-  background: rgba(0,0,0,0.35);
+  background: var(--bg-dark);
   border-radius: 4px;
   padding: 2px 6px;
   font-size: 11px;
+  color: var(--text);
 }
 
 /* Home team (flows right → towards centre) */
@@ -706,18 +735,19 @@ td.fixtures-cell {
 .fixture-row .ko {
   text-align: center;
   min-width: 50px;
-  background: rgba(0,0,0,0.6);
+  background: var(--bg-darker);
   padding: 3px 8px;
   border-radius: 4px;
   font-size: 11px;
   font-weight: bold;
+  color: var(--text);
 }
 
 .fixture-date-banner {
   margin: 12px 0 6px;
   padding: 6px 10px;
-  background: rgba(0, 0, 0, 0.35);
-  color: #ffffff;
+  background: var(--bg-dark);
+  color: var(--text);
   font-weight: 600;
   font-size: 13px;
   text-align: center;
@@ -728,15 +758,17 @@ td.fixtures-cell {
 /* ===== Transfer Panel (Right Side) ===== */
 
 .transfer-panel {
-  background: rgba(0, 0, 0, 0.25);
+  background: var(--bg-light);
   padding: 15px;
   border-radius: 10px;
   overflow-y: auto;
   max-height: calc(100vh - 150px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border: 1px solid var(--border);
 }
 
 .transfer-panel h3 {
-  color: #fff;
+  color: var(--text);
   margin: 0 0 10px 0;
 }
 
@@ -751,13 +783,15 @@ td.fixtures-cell {
 .filters-compact select {
   padding: 8px;
   border-radius: 4px;
-  border: none;
+  border: 1px solid var(--border);
   text-align: center;
   font-size: 13px;
+  background: var(--bg);
+  color: var(--text);
 }
 
 .player-table-compact {
-  background: #fff;
+  background: var(--bg);
   color: #000;
   border-radius: 5px;
   overflow: hidden;
@@ -772,7 +806,7 @@ td.fixtures-cell {
 }
 
 .player-table-compact th {
-  background: var(--bg);
+  background: var(--primary);
   color: #fff;
   padding: 8px 4px;
   text-align: center;
@@ -789,8 +823,8 @@ td.fixtures-cell {
 
 .player-table-compact td {
   padding: 6px 4px;
-  border-bottom: 1px solid #eee;
-  border-right: 1px solid #ddd;
+  border-bottom: 1px solid var(--border);
+  border-right: 1px solid var(--border);
   text-align: center;
   font-size: 11px;
 }
@@ -801,12 +835,19 @@ td.fixtures-cell {
 }
 
 .player-table-compact tr:hover {
-  background: #f0f0f0;
+  background: var(--bg-dark);
   cursor: pointer;
+  transition: background-color 0.2s ease;
 }
 
 .player-table-compact tr.selected {
-  background: #e6fffa;
+  background: var(--selected-bg);
+  font-weight: 600;
+  border-left: 3px solid var(--accent);
+}
+
+.player-table-compact tr.selected:hover {
+  background: var(--selected-hover-bg);
 }
 
 .player-table-compact .th-info {
@@ -860,7 +901,7 @@ td.fixtures-cell {
 }
 
 .info-btn {
-  background: #2196f3;
+  background: var(--primary);
   color: white;
   border: none;
   border-radius: 50%;
@@ -878,7 +919,7 @@ td.fixtures-cell {
 }
 
 .info-btn:hover {
-  background: #1976d2;
+  background: var(--primary-light);
   transform: scale(1.1);
 }
 
@@ -903,7 +944,7 @@ td.fixtures-cell {
 }
 
 .player-info-content {
-  background: var(--bg-dark);
+  background: var(--bg-light);
   border-radius: 10px;
   max-width: 800px;
   width: 100%;
@@ -911,15 +952,16 @@ td.fixtures-cell {
   overflow-y: auto;
   padding: 30px;
   position: relative;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--border);
 }
 
 .player-info-close {
   position: absolute;
   top: 15px;
   right: 15px;
-  background: var(--primary);
-  color: var(--bg);
+  background: var(--accent);
+  color: white;
   border: none;
   border-radius: 50%;
   width: 35px;
@@ -931,11 +973,12 @@ td.fixtures-cell {
   align-items: center;
   justify-content: center;
   line-height: 1;
-  transition: opacity 0.2s;
+  transition: all 0.2s;
 }
 
 .player-info-close:hover {
-  opacity: 0.8;
+  background: var(--accent-hover);
+  transform: scale(1.1);
 }
 
 .player-info-header {
@@ -960,7 +1003,7 @@ td.fixtures-cell {
 }
 
 .player-info-title p {
-  color: rgba(255, 255, 255, 0.8);
+  color: var(--text-light);
   margin: 5px 0 0 0;
   font-size: 14px;
 }
@@ -973,10 +1016,10 @@ td.fixtures-cell {
 }
 
 .player-stat-item {
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--bg);
   padding: 12px;
   border-radius: 6px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--border);
 }
 
 .player-stat-label {
@@ -989,7 +1032,7 @@ td.fixtures-cell {
 }
 
 .player-stat-value {
-  color: #fff;
+  color: var(--text);
   font-size: 20px;
   font-weight: bold;
 }

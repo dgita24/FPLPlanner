@@ -212,6 +212,11 @@ export function getChipDisplayName(chipType) {
 export function renderPitch() {
   const pitch = document.getElementById('pitch');
   const team = state.plan[state.viewingGW];
+  
+  // Always append buttons first, even if there's no team data
+  appendPitchButton('addToSquadBtn', pitch);
+  appendPitchButton('cancelTransferBtn', pitch);
+  
   if (!pitch || !team) {
     if (pitch) pitch.innerHTML = '';
     return;
@@ -262,6 +267,19 @@ export function renderPitch() {
     <div class="formation-line">${mid.map(renderCard).join('')}</div>
     <div class="formation-line">${fwd.map(renderCard).join('')}</div>
   `;
+
+  // Add corner buttons after rendering pitch content
+  appendPitchButton('addToSquadBtn', pitch);
+  appendPitchButton('cancelTransferBtn', pitch);
+}
+
+// Helper function to append buttons to pitch
+function appendPitchButton(buttonId, pitchElement) {
+  const button = document.getElementById(buttonId);
+  if (button && !pitchElement.contains(button)) {
+    button.style.removeProperty('display');
+    pitchElement.appendChild(button);
+  }
 }
 
 export function renderBench() {
