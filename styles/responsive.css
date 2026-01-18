@@ -12,6 +12,13 @@
     gap: 10px;
   }
 
+  /* Fix fixtures panel cutoff and scrolling */
+  #fixturesPanel {
+    overflow-x: auto;
+    overflow-y: auto;
+    max-height: calc(100vh - 150px);
+  }
+
   .pitch {
     max-width: 100%;
     padding: 17px 13px;
@@ -32,6 +39,17 @@
   .formation-line {
     gap: 10px;
   }
+
+  /* Fix button overlay issue on initial load */
+  .pitch-corner-btn {
+    top: 50px;
+    z-index: 50;
+  }
+
+  /* Ensure chip buttons have proper spacing */
+  .chip-buttons-row {
+    margin-top: 8px;
+  }
 }
 
 /* Tablet (max-width: 1024px) */
@@ -44,6 +62,9 @@
   #fixturesPanel {
     order: 1;
     margin-top: 0;
+    overflow-x: auto;
+    overflow-y: auto;
+    max-height: 500px;
   }
 
   #mainColumn {
@@ -52,11 +73,6 @@
 
   .transfer-panel {
     order: 3;
-  }
-
-  #fixturesPanel {
-    order: 3;
-    margin-top: 0;
   }
 
   .header {
@@ -91,12 +107,25 @@
   .formation-line {
     gap: 9px;
   }
+
+  /* Adjust button positioning for tablets */
+  .pitch-corner-btn {
+    top: 40px;
+  }
 }
 
 /* Mobile (max-width: 768px) */
 @media (max-width: 768px) {
   body {
     padding: 10px;
+    /* Enable pinch-to-zoom and panning */
+    touch-action: pan-x pan-y;
+  }
+
+  .container {
+    /* Allow horizontal scrolling if needed */
+    overflow-x: auto;
+    min-width: 100%;
   }
 
   .header {
@@ -119,13 +148,52 @@
     grid-template-columns: 1fr;
   }
 
+  /* Fix fixtures panel for mobile */
+  #fixturesPanel {
+    overflow-x: auto;
+    overflow-y: auto;
+    max-height: 400px;
+    -webkit-overflow-scrolling: touch;
+  }
+
   .pitch {
     padding: 15px 5px;
     min-height: 300px;
+    /* Ensure pitch doesn't cause overflow */
+    overflow: visible;
   }
 
   .player-card {
     width: 68px;
+    /* Prevent squashing */
+    min-width: 68px;
+    flex-shrink: 0;
+  }
+
+  /* Fix player card info display */
+  .player-card .info {
+    font-size: 8px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: flex;
+    justify-content: space-between;
+    padding: 0 2px;
+  }
+
+  /* Ensure price is visible */
+  .player-card .info .price {
+    display: inline-block;
+    flex-shrink: 0;
+  }
+
+  /* Contain fixtures within card boundaries */
+  .player-card .fixtures {
+    font-size: 7px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
   }
 
   .captain-selector,
@@ -165,21 +233,21 @@
     font-size: 10px;
   }
 
-  .player-card .info {
-    font-size: 8px;
-    white-space: nowrap;
-    overflow: hidden;
-  }
-
   .formation-line {
     gap: 4px;
     justify-content: center;
     flex-wrap: nowrap;
+    /* Prevent cards from getting squashed */
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
   }
 
   .bench-slots {
     gap: 8px;
     flex-wrap: nowrap;
+    /* Allow horizontal scrolling if needed */
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
   }
 
   .filters {
@@ -194,6 +262,7 @@
 
   .player-table {
     overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
   }
 
   table {
@@ -205,20 +274,34 @@
     padding: 6px 4px;
   }
 
-  /* GW nav with transfer buttons - stack on mobile */
+  /* Fix button overlap on mobile */
   .gw-nav {
     flex-direction: column;
     gap: 8px;
+    position: relative;
   }
 
   .gw-nav .gw-center {
-    order: 1; /* Show GW nav at top on mobile */
+    order: 1;
   }
 
-  /* Pitch corner buttons responsive positioning */
+  /* Position transfer action buttons below GW nav to avoid overlap */
   .pitch-corner-btn {
+    position: relative;
+    top: auto;
+    left: auto;
+    right: auto;
+    display: inline-block;
+    margin: 5px;
     font-size: 11px;
     padding: 6px 10px;
+  }
+
+  /* Create container for action buttons on mobile */
+  .pitch-corner-left,
+  .pitch-corner-right {
+    position: static;
+    width: auto;
   }
 
   .fixture-row {
@@ -235,6 +318,12 @@
   .fixture-time {
     font-size: 10px;
     padding: 2px 4px;
+  }
+
+  /* Ensure transfer panel is scrollable */
+  .transfer-panel {
+    max-height: 600px;
+    overflow-y: auto;
   }
 }
 
@@ -257,6 +346,31 @@
 
   .player-card {
     width: 62px;
+    min-width: 62px;
+    flex-shrink: 0;
+  }
+
+  /* Fix player card info for very small screens */
+  .player-card .info {
+    font-size: 7px;
+    display: flex;
+    justify-content: space-between;
+    gap: 2px;
+  }
+
+  /* Ensure price is always visible */
+  .player-card .info .price {
+    display: inline-block !important;
+    visibility: visible !important;
+  }
+
+  /* Contain fixtures within card */
+  .player-card .fixtures {
+    font-size: 6px;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .captain-selector,
@@ -296,21 +410,19 @@
     font-size: 9px;
   }
 
-  .player-card .info {
-    font-size: 7px;
-    white-space: nowrap;
-    overflow: hidden;
-  }
-
   .formation-line {
     gap: 3px;
     min-height: 80px;
     flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
   }
 
   .bench-slots {
     gap: 6px;
     flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
   }
 
   .card-btn {
@@ -413,5 +525,14 @@
 
   .player-table-compact {
     max-height: 450px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Ensure buttons don't overlap on small mobile */
+  .pitch-corner-btn {
+    font-size: 10px;
+    padding: 5px 8px;
+    height: auto;
   }
 }

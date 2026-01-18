@@ -298,6 +298,8 @@ body {
   grid-template-columns: 280px 1fr 370px;
   gap: 12px;
   justify-content: center;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .gw-nav {
