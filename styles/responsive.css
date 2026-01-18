@@ -14,8 +14,7 @@
 
   /* Fix fixtures panel cutoff and scrolling */
   #fixturesPanel {
-    overflow-x: auto;
-    overflow-y: auto;
+    overflow: auto;
     max-height: calc(100vh - 150px);
   }
 
@@ -62,8 +61,7 @@
   #fixturesPanel {
     order: 1;
     margin-top: 0;
-    overflow-x: auto;
-    overflow-y: auto;
+    overflow: auto;
     max-height: 500px;
   }
 
@@ -149,8 +147,7 @@
 
   /* Fix fixtures panel for mobile */
   #fixturesPanel {
-    overflow-x: auto;
-    overflow-y: auto;
+    overflow: auto;
     max-height: 400px;
     -webkit-overflow-scrolling: touch;
   }
