@@ -212,6 +212,11 @@ export function getChipDisplayName(chipType) {
 export function renderPitch() {
   const pitch = document.getElementById('pitch');
   const team = state.plan[state.viewingGW];
+  
+  // Always append buttons first, even if there's no team data
+  appendPitchButton('addToSquadBtn', pitch);
+  appendPitchButton('cancelTransferBtn', pitch);
+  
   if (!pitch || !team) {
     if (pitch) pitch.innerHTML = '';
     return;
