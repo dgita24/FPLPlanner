@@ -163,14 +163,10 @@
     flex-shrink: 0;
   }
 
-  /* Fix player card info display */
+  /* Adjust player card info for mobile */
   .player-card .info {
     font-size: 8px;
-    white-space: nowrap;
-    overflow: hidden;
     text-overflow: ellipsis;
-    display: flex;
-    justify-content: space-between;
     padding: 0 2px;
   }
 
@@ -339,24 +335,15 @@
     flex-shrink: 0;
   }
 
-  /* Adjust player card info for very small screens */
+  /* Further reduce sizes for very small screens */
   .player-card .info {
     font-size: 7px;
     gap: 2px;
   }
 
-  /* Ensure price is always visible */
-  .player-card .info .price {
-    display: inline-block;
-  }
-
-  /* Contain fixtures within card */
+  /* Adjust fixtures size for very small screens */
   .player-card .fixtures {
     font-size: 6px;
-    max-width: 100%;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
   }
 
   .captain-selector,
