@@ -14,7 +14,6 @@
 
   /* Fix fixtures panel cutoff and scrolling */
   #fixturesPanel {
-    overflow: auto;
     max-height: calc(100vh - 150px);
   }
 
@@ -61,7 +60,6 @@
   #fixturesPanel {
     order: 1;
     margin-top: 0;
-    overflow: auto;
     max-height: 500px;
   }
 
@@ -147,7 +145,6 @@
 
   /* Fix fixtures panel for mobile */
   #fixturesPanel {
-    overflow: auto;
     max-height: 400px;
     -webkit-overflow-scrolling: touch;
   }
@@ -284,9 +281,6 @@
   /* Position transfer action buttons below GW nav to avoid overlap */
   .pitch-corner-btn {
     position: relative;
-    top: auto;
-    left: auto;
-    right: auto;
     display: inline-block;
     margin: 5px;
     font-size: 11px;
@@ -345,11 +339,9 @@
     flex-shrink: 0;
   }
 
-  /* Fix player card info for very small screens */
+  /* Adjust player card info for very small screens */
   .player-card .info {
     font-size: 7px;
-    display: flex;
-    justify-content: space-between;
     gap: 2px;
   }
 
