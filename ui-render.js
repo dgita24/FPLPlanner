@@ -262,6 +262,18 @@ export function renderPitch() {
     <div class="formation-line">${mid.map(renderCard).join('')}</div>
     <div class="formation-line">${fwd.map(renderCard).join('')}</div>
   `;
+
+  // Add corner buttons after rendering pitch content
+  const addToSquadBtn = document.getElementById('addToSquadBtn');
+  const cancelTransferBtn = document.getElementById('cancelTransferBtn');
+  if (addToSquadBtn && !pitch.contains(addToSquadBtn)) {
+    addToSquadBtn.style.display = '';
+    pitch.appendChild(addToSquadBtn);
+  }
+  if (cancelTransferBtn && !pitch.contains(cancelTransferBtn)) {
+    cancelTransferBtn.style.display = '';
+    pitch.appendChild(cancelTransferBtn);
+  }
 }
 
 export function renderBench() {

@@ -77,10 +77,11 @@
             </div>
           </div>
 
-          <div id="pitch" class="pitch">
-            <button class="transfer-action-btn add-btn pitch-corner-btn pitch-corner-left" onclick="addSelectedToSquad()" id="addToSquadBtn">Add to squad</button>
-            <button class="transfer-action-btn cancel-btn pitch-corner-btn pitch-corner-right" onclick="cancelTransfer()" id="cancelTransferBtn">Cancel transfer</button>
-          </div>
+          <!-- Buttons will be moved into pitch by JavaScript -->
+          <button class="transfer-action-btn add-btn pitch-corner-btn pitch-corner-left" onclick="addSelectedToSquad()" id="addToSquadBtn" style="display: none;">Add to squad</button>
+          <button class="transfer-action-btn cancel-btn pitch-corner-btn pitch-corner-right" onclick="cancelTransfer()" id="cancelTransferBtn" style="display: none;">Cancel transfer</button>
+
+          <div id="pitch" class="pitch"></div>
         </div>
 
         <div class="bench">
