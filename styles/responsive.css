@@ -296,11 +296,10 @@
     padding: 6px 10px;
   }
 
-  /* Create container for action buttons on mobile */
+  /* Override absolute positioning for action buttons on mobile */
   .pitch-corner-left,
   .pitch-corner-right {
     position: static;
-    width: auto;
   }
 
   .fixture-row {
@@ -360,7 +359,6 @@
   /* Ensure price is always visible */
   .player-card .info .price {
     display: inline-block;
-    visibility: visible;
   }
 
   /* Contain fixtures within card */
