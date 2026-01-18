@@ -4,6 +4,7 @@
   --primary: #38003c;
   --primary-light: #6b1b71;
   --accent: #00d084;
+  --accent-hover: #00b874;
   --bg: #f5f7fa;
   --bg-dark: #e8ecf1;
   --bg-darker: #d4dae3;
@@ -13,6 +14,9 @@
   --success: #00c853;
   --warning: #ff9800;
   --error: #d50000;
+  --error-hover: #b71c1c;
+  --selected-bg: #fff9e6;
+  --selected-hover-bg: #fff4d1;
 }
 
 * {
@@ -185,7 +189,7 @@ body {
 }
 
 .sidebar-toggle:hover {
-  background: #00b874;
+  background: var(--accent-hover);
   transform: translateY(-1px);
   box-shadow: 0 2px 8px rgba(0, 208, 132, 0.3);
 }
@@ -248,7 +252,7 @@ body {
 }
 
 .sidebar button:hover {
-  background: #00b874;
+  background: var(--accent-hover);
   transform: translateY(-1px);
   box-shadow: 0 2px 8px rgba(0, 208, 132, 0.3);
 }
@@ -288,7 +292,7 @@ body {
 }
 
 .gw-nav button:hover:not(:disabled) {
-  background: #00b874;
+  background: var(--accent-hover);
   transform: translateY(-1px);
   box-shadow: 0 2px 8px rgba(0, 208, 132, 0.3);
 }
@@ -424,7 +428,7 @@ body {
 }
 
 .help-modal-close:hover {
-  background: #00b874;
+  background: var(--accent-hover);
   transform: scale(1.1);
 }
 

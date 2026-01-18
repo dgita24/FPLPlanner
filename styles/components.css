@@ -50,7 +50,7 @@
 }
 
 .transfer-action-btn.add-btn:hover:not(:disabled) {
-  background: #00b874;
+  background: var(--accent-hover);
 }
 
 .transfer-action-btn.cancel-btn {
@@ -59,7 +59,7 @@
 }
 
 .transfer-action-btn.cancel-btn:hover:not(:disabled) {
-  background: #b71c1c;
+  background: var(--error-hover);
 }
 
 /* Chip UI styles */
@@ -316,8 +316,8 @@
 }
 
 .captain-btn.active {
-  background: #00b874;
-  border-color: #00b874;
+  background: var(--accent-hover);
+  border-color: var(--accent-hover);
 }
 
 .captain-badge {
@@ -516,13 +516,13 @@ tr:hover {
 }
 
 tr.selected {
-  background: #fff9e6;
+  background: var(--selected-bg);
   font-weight: 600;
   border-left: 3px solid var(--accent);
 }
 
 tr.selected:hover {
-  background: #fff4d1;
+  background: var(--selected-hover-bg);
 }
 
 td.status-cell {
@@ -627,7 +627,7 @@ td.fixtures-cell {
 }
 
 #fixturesPanel button:hover {
-  background: #00b874;
+  background: var(--accent-hover);
   transform: translateY(-1px);
 }
 
@@ -826,13 +826,13 @@ td.fixtures-cell {
 }
 
 .player-table-compact tr.selected {
-  background: #fff9e6;
+  background: var(--selected-bg);
   font-weight: 600;
   border-left: 3px solid var(--accent);
 }
 
 .player-table-compact tr.selected:hover {
-  background: #fff4d1;
+  background: var(--selected-hover-bg);
 }
 
 .player-table-compact .th-info {
@@ -962,7 +962,7 @@ td.fixtures-cell {
 }
 
 .player-info-close:hover {
-  background: #00b874;
+  background: var(--accent-hover);
   transform: scale(1.1);
 }
 
