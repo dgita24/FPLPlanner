@@ -60,12 +60,12 @@
 }
 
 .transfer-action-btn.add-btn {
-  background: var(--accent);
+  background: var(--primary);
   color: white;
 }
 
 .transfer-action-btn.add-btn:hover:not(:disabled) {
-  background: var(--accent-hover);
+  background: var(--primary-light);
 }
 
 .transfer-action-btn.cancel-btn {
@@ -631,7 +631,7 @@ td.fixtures-cell {
 
 /* Fixtures panel GW arrows */
 #fixturesPanel button {
-  background: var(--accent);
+  background: var(--primary);
   color: white;
   border: none;
   border-radius: 6px;
@@ -642,7 +642,7 @@ td.fixtures-cell {
 }
 
 #fixturesPanel button:hover {
-  background: var(--accent-hover);
+  background: var(--primary-light);
   transform: translateY(-1px);
 }
 
