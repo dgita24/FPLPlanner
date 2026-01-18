@@ -63,11 +63,13 @@
       </div>
 
       <div id="transferPanel" class="transfer-panel">
-        <div class="transfer-header">
-          <button class="transfer-action-btn add-btn transfer-header-btn" onclick="addSelectedToSquad()" id="addToSquadBtn" style="display: none;">Add to squad</button>
-          <h3>Transfers</h3>
-          <button class="transfer-action-btn cancel-btn transfer-header-btn" onclick="cancelTransfer()" id="cancelTransferBtn" style="display: none;">Cancel transfer</button>
+        <!-- Transfer action buttons above the header -->
+        <div class="transfer-actions">
+          <button class="transfer-action-btn add-btn" onclick="addSelectedToSquad()" id="addToSquadBtn" style="display: none;">Add to squad</button>
+          <button class="transfer-action-btn cancel-btn" onclick="cancelTransfer()" id="cancelTransferBtn" style="display: none;">Cancel transfer</button>
         </div>
+
+        <h3 style="margin-bottom: 10px; text-align: center;">Transfers</h3>
         
         <div class="filters-compact">
           <input type="text" id="searchName" placeholder="Search..." onkeyup="renderTable()" />

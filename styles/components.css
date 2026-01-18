@@ -817,32 +817,18 @@ td.fixtures-cell {
   border: 1px solid var(--border);
 }
 
-.transfer-header {
+/* Transfer action buttons container */
+.transfer-actions {
   display: flex;
-  align-items: center;
   justify-content: space-between;
-  gap: 8px;
+  gap: 10px;
   margin-bottom: 10px;
   flex-shrink: 0;
 }
 
-.transfer-header h3 {
-  color: var(--text);
-  margin: 0;
-  text-align: center;
-  flex: 0 0 auto;
-  font-size: 18px;
-}
-
-.transfer-header-btn {
+.transfer-actions .transfer-action-btn {
   flex: 1;
-  min-width: 0;
-  font-size: 11px;
-  padding: 6px 8px;
-  height: 32px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  max-width: 48%;
 }
 
 .transfer-panel h3 {

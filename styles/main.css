@@ -27,25 +27,17 @@
   padding: 0;
 }
 
-html {
-  overflow-x: hidden;
-  width: 100%;
-}
-
 body {
   font-family: "Segoe UI", sans-serif;
   background: linear-gradient(135deg, #e3e7ed 0%, #d4dae3 100%);
   color: var(--text);
   padding: 20px;
   min-height: 100vh;
-  overflow-x: hidden;
-  width: 100%;
 }
 
 .container {
   max-width: 1400px;
   margin: 0 auto;
-  width: 100%;
 }
 
 /* ===== Header ===== */

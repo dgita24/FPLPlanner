@@ -42,12 +42,6 @@
   .chip-buttons-row {
     margin-top: 8px;
   }
-
-  /* Smaller transfer header buttons on smaller screens */
-  .transfer-header-btn {
-    font-size: 10px;
-    padding: 5px 6px;
-  }
 }
 
 /* Tablet (max-width: 1024px) */
@@ -109,13 +103,10 @@
 @media (max-width: 768px) {
   body {
     padding: 10px;
-    overflow-x: hidden;
   }
 
   .container {
-    width: 100%;
     max-width: 100%;
-    overflow-x: hidden;
   }
 
   .header {
@@ -136,8 +127,6 @@
 
   #plannerMain {
     grid-template-columns: 1fr;
-    width: 100%;
-    overflow-x: hidden;
   }
 
   /* Fix fixtures panel for mobile */
@@ -151,6 +140,17 @@
     min-height: 300px;
     /* Ensure pitch doesn't cause overflow */
     overflow: visible;
+  }
+
+  /* Stack transfer action buttons vertically on mobile */
+  .transfer-actions {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .transfer-actions .transfer-action-btn {
+    max-width: 100%;
+    width: 100%;
   }
 
   .player-card {
@@ -269,22 +269,6 @@
 
   .gw-nav .gw-center {
     order: 1;
-  }
-
-  /* Make transfer header stack on mobile for better space utilization */
-  .transfer-header {
-    flex-direction: column;
-    gap: 10px;
-  }
-
-  .transfer-header h3 {
-    order: -1;
-    width: 100%;
-  }
-
-  .transfer-header-btn {
-    width: 100%;
-    flex: 0 0 auto;
   }
 
   .fixture-row {
