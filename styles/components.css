@@ -667,7 +667,7 @@ td.fixtures-cell {
 
 /* Local Load/Save buttons - smaller size */
 .fixtures-control-btn.local-btn {
-  padding: 6px 6px;
+  padding: 6px;
   font-size: 10px;
 }
 
@@ -677,7 +677,7 @@ td.fixtures-cell {
 }
 
 .fixtures-control-btn.import-save-btn:hover {
-  background: #f57c00;
+  background: var(--warning-hover);
   box-shadow: 0 2px 8px rgba(255, 152, 0, 0.3);
 }
 
