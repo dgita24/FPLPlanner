@@ -55,12 +55,15 @@ export function renderFixtures() {
   panel.innerHTML = `
     <div class="fixtures-controls">
       <div class="fixtures-button-grid">
-        <button class="fixtures-control-btn" onclick="toggleSidebarMenu()">Import/Save</button>
+        <button class="fixtures-control-btn import-save-btn" onclick="toggleSidebarMenu()">Import/Save</button>
+        <button class="fixtures-control-btn donate-btn" onclick="donatePlaceholder()">💝 Donate</button>
+        
         <div class="bank-display">
           <span>Bank</span>
           <input type="number" id="bankInput" value="${state.bank.toFixed(1)}" step="0.1" />
           <span>m</span>
         </div>
+        <button class="fixtures-control-btn local-btn" onclick="localLoad()">📂 Local Load</button>
         
         <div class="price-toggle">
           <span>Prices</span>
@@ -70,13 +73,10 @@ export function renderFixtures() {
             <option value="current" ${state.priceMode === 'current' ? 'selected' : ''}>Current</option>
           </select>
         </div>
-        <button class="fixtures-control-btn" onclick="localSave()">💾 Local Save</button>
-        
-        <button class="fixtures-control-btn" onclick="localLoad()">📂 Local Load</button>
-        <button class="fixtures-control-btn" onclick="toggleHelpModal()">❓ Help</button>
+        <button class="fixtures-control-btn local-btn" onclick="localSave()">💾 Local Save</button>
         
         <button class="fixtures-control-btn" onclick="resetToImportedTeam()">⏮️ Reset</button>
-        <button class="fixtures-control-btn donate-btn" onclick="donatePlaceholder()">💝 Donate</button>
+        <button class="fixtures-control-btn" onclick="toggleHelpModal()">❓ Help</button>
       </div>
     </div>
 

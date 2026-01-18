@@ -643,11 +643,11 @@ td.fixtures-cell {
 }
 
 .fixtures-control-btn {
-  padding: 6px 12px;
+  padding: 6px 8px;
   border: none;
   border-radius: 5px;
   font-weight: bold;
-  font-size: 12px;
+  font-size: 11px;
   cursor: pointer;
   transition: all 0.2s;
   height: 30px;
@@ -665,6 +665,23 @@ td.fixtures-cell {
   box-shadow: 0 2px 8px rgba(56, 0, 60, 0.3);
 }
 
+/* Local Load/Save buttons - smaller size */
+.fixtures-control-btn.local-btn {
+  padding: 6px 6px;
+  font-size: 10px;
+}
+
+/* Import/Save button - orange */
+.fixtures-control-btn.import-save-btn {
+  background: var(--warning);
+}
+
+.fixtures-control-btn.import-save-btn:hover {
+  background: #f57c00;
+  box-shadow: 0 2px 8px rgba(255, 152, 0, 0.3);
+}
+
+/* Donate button - green */
 .fixtures-control-btn.donate-btn {
   background: var(--accent);
 }
