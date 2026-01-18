@@ -52,10 +52,6 @@
             </div>
           </div>
 
-          <!-- Buttons will be moved into pitch by JavaScript -->
-          <button class="transfer-action-btn add-btn pitch-corner-btn pitch-corner-left" onclick="addSelectedToSquad()" id="addToSquadBtn" style="display: none;">Add to squad</button>
-          <button class="transfer-action-btn cancel-btn pitch-corner-btn pitch-corner-right" onclick="cancelTransfer()" id="cancelTransferBtn" style="display: none;">Cancel transfer</button>
-
           <div id="pitch" class="pitch"></div>
         </div>
 
@@ -67,7 +63,11 @@
       </div>
 
       <div id="transferPanel" class="transfer-panel">
-        <h3 style="margin-bottom: 10px; text-align: center;">Transfers</h3>
+        <div class="transfer-header">
+          <button class="transfer-action-btn add-btn transfer-header-btn" onclick="addSelectedToSquad()" id="addToSquadBtn" style="display: none;">Add to squad</button>
+          <h3>Transfers</h3>
+          <button class="transfer-action-btn cancel-btn transfer-header-btn" onclick="cancelTransfer()" id="cancelTransferBtn" style="display: none;">Cancel transfer</button>
+        </div>
         
         <div class="filters-compact">
           <input type="text" id="searchName" placeholder="Search..." onkeyup="renderTable()" />

@@ -38,15 +38,15 @@
     gap: 10px;
   }
 
-  /* Fix button overlay issue on initial load */
-  .pitch-corner-btn {
-    top: 50px;
-    z-index: 100;
-  }
-
   /* Ensure chip buttons have proper spacing */
   .chip-buttons-row {
     margin-top: 8px;
+  }
+
+  /* Smaller transfer header buttons on smaller screens */
+  .transfer-header-btn {
+    font-size: 10px;
+    padding: 5px 6px;
   }
 }
 
@@ -103,24 +103,19 @@
   .formation-line {
     gap: 9px;
   }
-
-  /* Adjust button positioning for tablets */
-  .pitch-corner-btn {
-    top: 40px;
-  }
 }
 
 /* Mobile (max-width: 768px) */
 @media (max-width: 768px) {
   body {
     padding: 10px;
-    /* Enable pinch-to-zoom and panning */
-    touch-action: pan-x pan-y;
+    overflow-x: hidden;
   }
 
   .container {
-    /* Enable horizontal scrolling if content overflows viewport */
-    overflow-x: auto;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
   }
 
   .header {
@@ -141,6 +136,8 @@
 
   #plannerMain {
     grid-template-columns: 1fr;
+    width: 100%;
+    overflow-x: hidden;
   }
 
   /* Fix fixtures panel for mobile */
@@ -274,19 +271,20 @@
     order: 1;
   }
 
-  /* Position transfer action buttons below GW nav to avoid overlap */
-  .pitch-corner-btn {
-    position: relative;
-    display: inline-block;
-    margin: 5px;
-    font-size: 11px;
-    padding: 6px 10px;
+  /* Make transfer header stack on mobile for better space utilization */
+  .transfer-header {
+    flex-direction: column;
+    gap: 10px;
   }
 
-  /* Override absolute positioning for action buttons on mobile */
-  .pitch-corner-left,
-  .pitch-corner-right {
-    position: static;
+  .transfer-header h3 {
+    order: -1;
+    width: 100%;
+  }
+
+  .transfer-header-btn {
+    width: 100%;
+    flex: 0 0 auto;
   }
 
   .fixture-row {
@@ -500,12 +498,5 @@
     max-height: 450px;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
-  }
-
-  /* Ensure buttons don't overlap on small mobile */
-  .pitch-corner-btn {
-    font-size: 10px;
-    padding: 5px 8px;
-    height: auto;
   }
 }
