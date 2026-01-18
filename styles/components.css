@@ -159,7 +159,7 @@
 
 .player-card {
   width: 145px;
-  background: rgba(255, 255, 255, 0.95);
+  background: #f2f2f2;
   border-radius: 7px;
   padding: 5px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
@@ -181,7 +181,7 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  background: #eee;
+  background: #e0e0e0;
   padding: 2px 3px;
   border-radius: 3px;
   margin: 2px 0;
@@ -452,7 +452,7 @@
 /* ===== Player Table ===== */
 
 .player-table {
-  background: #fff;
+  background: #f2f2f2;
   color: #000;
   border-radius: 5px;
   overflow: hidden;
@@ -508,12 +508,18 @@ td[style*="text-align:center"][style*="width:30px"] {
 }
 
 tr:hover {
-  background: #f0f0f0;
+  background: #e8e8e8;
   cursor: pointer;
+  transition: background-color 0.2s ease;
 }
 
 tr.selected {
-  background: #e6fffa;
+  background: #fffacd;
+  font-weight: 600;
+}
+
+tr.selected:hover {
+  background: #fff4b3;
 }
 
 td.status-cell {
@@ -757,7 +763,7 @@ td.fixtures-cell {
 }
 
 .player-table-compact {
-  background: #fff;
+  background: #f2f2f2;
   color: #000;
   border-radius: 5px;
   overflow: hidden;
@@ -801,12 +807,18 @@ td.fixtures-cell {
 }
 
 .player-table-compact tr:hover {
-  background: #f0f0f0;
+  background: #e8e8e8;
   cursor: pointer;
+  transition: background-color 0.2s ease;
 }
 
 .player-table-compact tr.selected {
-  background: #e6fffa;
+  background: #fffacd;
+  font-weight: 600;
+}
+
+.player-table-compact tr.selected:hover {
+  background: #fff4b3;
 }
 
 .player-table-compact .th-info {
