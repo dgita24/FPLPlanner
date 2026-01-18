@@ -60,12 +60,12 @@
 }
 
 .transfer-action-btn.add-btn {
-  background: var(--primary);
+  background: var(--warning);
   color: white;
 }
 
 .transfer-action-btn.add-btn:hover:not(:disabled) {
-  background: var(--primary-light);
+  background: #f57c00;
 }
 
 .transfer-action-btn.cancel-btn {
@@ -744,7 +744,7 @@ td.fixtures-cell {
 }
 
 .fixture-date-banner {
-  margin: 12px 0 6px;
+  margin: 12px 8px 6px;
   padding: 6px 10px;
   background: var(--bg-dark);
   color: var(--text);
