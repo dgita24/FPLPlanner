@@ -264,15 +264,16 @@ export function renderPitch() {
   `;
 
   // Add corner buttons after rendering pitch content
-  const addToSquadBtn = document.getElementById('addToSquadBtn');
-  const cancelTransferBtn = document.getElementById('cancelTransferBtn');
-  if (addToSquadBtn && !pitch.contains(addToSquadBtn)) {
-    addToSquadBtn.style.display = '';
-    pitch.appendChild(addToSquadBtn);
-  }
-  if (cancelTransferBtn && !pitch.contains(cancelTransferBtn)) {
-    cancelTransferBtn.style.display = '';
-    pitch.appendChild(cancelTransferBtn);
+  appendPitchButton('addToSquadBtn', pitch);
+  appendPitchButton('cancelTransferBtn', pitch);
+}
+
+// Helper function to append buttons to pitch
+function appendPitchButton(buttonId, pitchElement) {
+  const button = document.getElementById(buttonId);
+  if (button && !pitchElement.contains(button)) {
+    button.style.removeProperty('display');
+    pitchElement.appendChild(button);
   }
 }
 
