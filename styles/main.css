@@ -130,6 +130,19 @@ body {
   flex: 1;
 }
 
+.header h1 {
+  font-size: 24px;
+  font-weight: 900;
+  color: var(--primary);
+  text-align: center;
+  letter-spacing: 1px;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  margin: 0;
+}
+
 .team-meta {
   padding: 6px 12px;
   border-radius: 8px;
