@@ -7,7 +7,7 @@
 }
 
 .pitch {
-  background: linear-gradient(to bottom, #2d5016 0%, #1a3d0a 100%);
+  background: linear-gradient(to bottom, #4a7c2c 0%, #3a6622 100%);
   padding: 21px 17px;
   border-radius: 10px;
   max-width: 935px;
@@ -48,7 +48,7 @@
   position: absolute;
   top: 10px;
   height: 36px;
-  z-index: 10;
+  z-index: 100;
 }
 
 .pitch-corner-left {
@@ -439,7 +439,7 @@
 /* ===== Bench ===== */
 
 .bench {
-  background: var(--bg-light);
+  background: linear-gradient(to bottom, #4a7c2c 0%, #3a6622 100%);
   padding: 13px;
   border-radius: 10px;
   max-width: 935px;
@@ -450,7 +450,7 @@
 
 .bench h3 {
   text-align: center;
-  color: var(--text);
+  color: #fff;
   margin-bottom: 12px;
 }
 
@@ -624,7 +624,7 @@ td.fixtures-cell {
   border-radius: 10px;
   padding: 10px;
   color: var(--text);
-  margin-top: 48px;
+  margin-top: 0;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   border: 1px solid var(--border);
 }
@@ -761,7 +761,8 @@ td.fixtures-cell {
   background: var(--bg-light);
   padding: 15px;
   border-radius: 10px;
-  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
   max-height: calc(100vh - 150px);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   border: 1px solid var(--border);
@@ -770,6 +771,7 @@ td.fixtures-cell {
 .transfer-panel h3 {
   color: var(--text);
   margin: 0 0 10px 0;
+  flex-shrink: 0;
 }
 
 .filters-compact {
@@ -777,6 +779,7 @@ td.fixtures-cell {
   flex-direction: column;
   gap: 8px;
   margin-bottom: 12px;
+  flex-shrink: 0;
 }
 
 .filters-compact input,
@@ -795,8 +798,9 @@ td.fixtures-cell {
   color: #000;
   border-radius: 5px;
   overflow: hidden;
-  max-height: calc(100vh - 350px);
+  flex: 1;
   overflow-y: auto;
+  min-height: 0;
 }
 
 .player-table-compact table {
