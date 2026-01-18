@@ -159,7 +159,7 @@
 
 .player-card {
   width: 145px;
-  background: #e3e7ed;
+  background: var(--bg);
   border-radius: 7px;
   padding: 5px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
@@ -424,7 +424,7 @@
 /* ===== Bench ===== */
 
 .bench {
-  background: #f8f9fb;
+  background: var(--bg-light);
   padding: 13px;
   border-radius: 10px;
   max-width: 935px;
@@ -454,7 +454,7 @@
 /* ===== Player Table ===== */
 
 .player-table {
-  background: #e3e7ed;
+  background: var(--bg);
   color: #000;
   border-radius: 5px;
   overflow: hidden;
@@ -510,7 +510,7 @@ td[style*="text-align:center"][style*="width:30px"] {
 }
 
 tr:hover {
-  background: #d4dae3;
+  background: var(--bg-dark);
   cursor: pointer;
   transition: background-color 0.2s ease;
 }
@@ -605,7 +605,7 @@ td.fixtures-cell {
 /* ===== Fixtures Panel ===== */
 
 #fixturesPanel {
-  background: #f8f9fb;
+  background: var(--bg-light);
   border-radius: 10px;
   padding: 10px;
   color: var(--text);
@@ -743,7 +743,7 @@ td.fixtures-cell {
 /* ===== Transfer Panel (Right Side) ===== */
 
 .transfer-panel {
-  background: #f8f9fb;
+  background: var(--bg-light);
   padding: 15px;
   border-radius: 10px;
   overflow-y: auto;
@@ -776,7 +776,7 @@ td.fixtures-cell {
 }
 
 .player-table-compact {
-  background: #e3e7ed;
+  background: var(--bg);
   color: #000;
   border-radius: 5px;
   overflow: hidden;
@@ -820,7 +820,7 @@ td.fixtures-cell {
 }
 
 .player-table-compact tr:hover {
-  background: #d4dae3;
+  background: var(--bg-dark);
   cursor: pointer;
   transition: background-color 0.2s ease;
 }
@@ -929,7 +929,7 @@ td.fixtures-cell {
 }
 
 .player-info-content {
-  background: #f8f9fb;
+  background: var(--bg-light);
   border-radius: 10px;
   max-width: 800px;
   width: 100%;

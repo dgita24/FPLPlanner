@@ -6,6 +6,7 @@
   --accent: #00d084;
   --accent-hover: #00b874;
   --bg: #e3e7ed;
+  --bg-light: #f8f9fb;
   --bg-dark: #d4dae3;
   --bg-darker: #bfc7d3;
   --text: #1a1a1a;
@@ -47,7 +48,7 @@ body {
   gap: 15px;
   margin-bottom: 10px;
   padding: 8px 12px;
-  background: #f8f9fb;
+  background: var(--bg-light);
   border-radius: 10px;
   height: 50px;
   max-width: 100%;
@@ -202,7 +203,7 @@ body {
   top: 0;
   width: 320px;
   height: 100vh;
-  background: #f8f9fb;
+  background: var(--bg-light);
   padding: 70px 20px 20px;
   box-shadow: -5px 0 15px rgba(0, 0, 0, 0.15);
   transform: translateX(100%);
@@ -319,7 +320,7 @@ body {
 /* ===== Transfer Section ===== */
 
 .transfer-section {
-  background: #f8f9fb;
+  background: var(--bg-light);
   padding: 20px;
   border-radius: 10px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
@@ -341,7 +342,7 @@ body {
   flex: 1;
   min-width: 150px;
   text-align: center;
-  background: #f8f9fb;
+  background: var(--bg-light);
   color: var(--text);
 }
 
@@ -395,7 +396,7 @@ body {
 }
 
 .help-modal-content {
-  background: #f8f9fb;
+  background: var(--bg-light);
   border-radius: 10px;
   max-width: 700px;
   width: 100%;
