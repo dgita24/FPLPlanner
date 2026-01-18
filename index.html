@@ -70,16 +70,17 @@
 
         <div class="pitch-stack">
           <div class="gw-nav">
-            <button class="transfer-action-btn add-btn" onclick="addSelectedToSquad()" id="addToSquadBtn">Add to squad</button>
             <div class="gw-center">
               <button onclick="changeGW(-1)" id="prevGW">← GW</button>
               <h2>Gameweek <span id="currentGWDisplay">1</span></h2>
               <button onclick="changeGW(1)" id="nextGW">GW →</button>
             </div>
-            <button class="transfer-action-btn cancel-btn" onclick="cancelTransfer()" id="cancelTransferBtn">Cancel transfer</button>
           </div>
 
-          <div id="pitch" class="pitch"></div>
+          <div id="pitch" class="pitch">
+            <button class="transfer-action-btn add-btn pitch-corner-btn pitch-corner-left" onclick="addSelectedToSquad()" id="addToSquadBtn">Add to squad</button>
+            <button class="transfer-action-btn cancel-btn pitch-corner-btn pitch-corner-right" onclick="cancelTransfer()" id="cancelTransferBtn">Cancel transfer</button>
+          </div>
         </div>
 
         <div class="bench">
