@@ -360,8 +360,8 @@
 
   /* Ensure price is always visible */
   .player-card .info .price {
-    display: inline-block !important;
-    visibility: visible !important;
+    display: inline-block;
+    visibility: visible;
   }
 
   /* Contain fixtures within card */
