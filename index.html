@@ -158,58 +158,47 @@
       
       <h2>📘 FPL Team Planner - User Guide</h2>
       
-      <h3>🎯 Getting Started</h3>
-      <p>The FPL Team Planner helps you plan your Fantasy Premier League team transfers across multiple gameweeks. You can import your current team, plan changes, and see how your budget evolves.</p>
+      <h3>Import Team via the Menu/Login Button</h3>
+      <p>Enter your team ID—found by navigating to the points tab of the official FPL site. Your URL will look like: <code>https://fantasy.premierleague.com/entry/[your id]/event/01</code> (where <code>01</code> at the end is GW1). Paste your ID into the 'Import' box and press <strong>Import from FPL</strong>.</p>
       
-      <h3>💰 How Banking Works</h3>
+      <h3>Key Features</h3>
       <ul>
-        <li><strong>Bank:</strong> Shows your current available funds (starts at 100.0m for a new team)</li>
-        <li><strong>Transfers:</strong> When you remove a player, their <em>selling price</em> goes to your bank</li>
-        <li><strong>Adding Players:</strong> When you add a player, their <em>purchase price</em> is deducted from your bank</li>
-        <li><strong>Price Modes:</strong> Use the "Show" dropdown to toggle between Selling, Purchase, and Current prices</li>
+        <li><strong>Player Filtering:</strong> Filter players by DEFCON points earned season to date (unlike the total CBITr figure available on the official FPL site).</li>
+        <li><strong>Draft Teams:</strong> Save up to 5 draft teams — useful in preseason, or during Wildcard/Free Hit weeks.</li>
+        <li><strong>Sync:</strong> Sync saved drafts across multiple devices.</li>
       </ul>
       
-      <h3>🔧 Key Functions</h3>
+      <h3>Local Save and Local Load</h3>
+      <p>Save and restore your planning session directly in your browser — no account or login required. Data is stored locally using <code>localStorage</code> (no external server or account needed). Each local save overrides the previous one. Useful for saving progress before page refresh or closing your browser.</p>
+      <p><strong>Limitations:</strong></p>
       <ul>
-        <li><strong>Import from FPL:</strong> Enter your FPL Team ID in the Menu to load your current team</li>
-        <li><strong>Add to Squad:</strong> Click on a player in the Transfers table, then click "Add to squad"</li>
-        <li><strong>Remove Player:</strong> Click the red ✕ button on any player card</li>
-        <li><strong>Swap Players:</strong> Click the blue ⇄ button to swap a player with the bench</li>
-        <li><strong>Gameweeks:</strong> Use ← GW and GW → buttons to plan across multiple weeks</li>
-        <li><strong>Reset:</strong> Use Reset to return to your imported team</li>
+        <li>Local saves are specific to your browser and device.</li>
+        <li>Your saved data will persist after closing or restarting your browser.</li>
+        <li>However if you clear your browser's cache, cookies, or site data (via "Clear browsing data" or similar), your saved session will be permanently deleted.</li>
+        <li>Local saves cannot be accessed on other browsers or devices.</li>
       </ul>
       
-      <h3>💾 Local Save & Local Load</h3>
-      <p>Save and restore your planning session directly in your browser—no account or login required.</p>
+      <h3>Cloud Save + Cloud Load</h3>
+      <p>Save drafts to the cloud (Supabase backend) via Menu/Login.</p>
       <ul>
-        <li><strong>💾 Local Save:</strong> Click to save your current planning session to browser storage. This includes your team, bank balance, current gameweek, chip selections, and price mode settings.</li>
-        <li><strong>📂 Local Load:</strong> Click to restore your last saved session with the latest data. All your transfers, chip choices, and settings will be restored exactly as you saved them.</li>
-        <li><strong>Browser Storage:</strong> Data is stored locally in your browser using localStorage—no external server or account needed.</li>
-        <li><strong>Quick Save:</strong> Useful for quickly saving your progress before refreshing the page or closing your browser.</li>
-        <li><strong>No Save Found:</strong> If you click Local Load without saving first, you'll see a message and no changes will be made.</li>
-        <li><strong>Success Messages:</strong> You'll always see a confirmation message when saving or loading succeeds or fails.</li>
+        <li>Name your draft file and create a password to save.</li>
+        <li>To reload, enter these same details in the <strong>Cloud Load</strong> boxes.</li>
+        <li>Drafts can be synced across devices using this feature.</li>
+        <li>Note: Cloud saving may become a donator-only feature if hosting/database costs require it.</li>
       </ul>
       
-      <h3>📱 Mobile Usage</h3>
-      <ul>
-        <li><strong>Landscape Mode:</strong> For the best mobile experience, use landscape (horizontal) orientation</li>
-        <li><strong>Formation:</strong> The pitch maintains proper formation structure (1-3-5-2) on all devices</li>
-        <li><strong>Scrolling:</strong> The transfers table scrolls horizontally on mobile - swipe left/right to see all columns</li>
-        <li><strong>Touch Targets:</strong> All buttons are optimized for touch on mobile devices</li>
-      </ul>
+      <h3>Bank Balance Discrepancies</h3>
+      <p>Your "bank" figure may differ from the official game because your imported team is a snapshot as of the last deadline. If a player's price changes after that point, your calculated bank on this planner might be inaccurate.</p>
+      <p>If your balance is off (e.g., lower by £0.1m due to price rises), you can manually enter the correct value in the provided field. The planner will use your edited value instead of the automatic calculation.</p>
       
-      <h3>💡 Tips</h3>
+      <h3>About</h3>
+      <p><strong>PlanFPLTeam</strong> is a free Fantasy Premier League transfer planner with no paywalls or premium tiers—unlike other tools that lock features behind subscriptions.</p>
       <ul>
-        <li>Plan your transfers across multiple gameweeks to maximize value</li>
-        <li>Consider fixture difficulty when selecting players</li>
-        <li>Use filters (Position, Team, Max Price) to find the right players quickly</li>
-        <li>Sort columns by clicking on column headers (Price, Points, Stats)</li>
-        <li>Check player status indicators (🚑 injured, ⚠️ doubt, ⛔ suspended)</li>
+        <li>Import your squad instantly using your FPL User ID</li>
+        <li>Filter by DEFCON points</li>
+        <li>Save multiple draft teams for easy comparison</li>
       </ul>
-      
-      <p style="margin-top: 30px; padding-top: 20px; border-top: 1px solid var(--border); text-align: center; font-size: 14px; color: var(--text-light);">
-        Need more help? Check the project repository or reach out to the developer.
-      </p>
+      <p>Questions or feedback? Reach out at <a href="mailto:contact@planfplteam.com">contact@planfplteam.com</a> and I'll do my best to help!</p>
     </div>
   </div>
 
