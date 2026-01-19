@@ -224,6 +224,13 @@
   .pitch-stack {
     overflow-x: hidden;
     width: 100%;
+    max-width: 100%;
+  }
+
+  .bench {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
   }
 
   /* Stack transfer action buttons vertically on mobile */
@@ -391,8 +398,8 @@
   }
 }
 
-/* Small Mobile (max-width: 480px) */
-@media (max-width: 480px) {
+/* Small Mobile Portrait (max-width: 480px) */
+@media (max-width: 480px) and (orientation: portrait) {
   .header h1 {
     font-size: 18px;
   }
