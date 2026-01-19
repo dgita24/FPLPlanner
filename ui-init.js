@@ -3,7 +3,7 @@
 import { state, history, loadTeamEntry } from './data.js';
 import { setupSidebarHandlers, closeSidebar } from './ui-sidebar.js';
 import { showMessage, renderPitch, renderBench, ensureFixturesForView } from './ui-render.js';
-import { renderFixtures } from './fixtures.js';
+import { renderFixtures, setFixturesGW, isFixturesSyncEnabled } from './fixtures.js';
 import { cancelTransfer, substitutePlayer, addSelectedToSquad, removePlayer, resetTransferState, isPendingTransfer, getBatchTransferInfo, reinstatePlayer, selectChip } from './team-operations.js';
 import { setPendingSwap } from './ui-render.js';
 import { setDefaultSort } from './table.js';
@@ -25,6 +25,18 @@ function updateUI() {
   const nextBtn = document.getElementById('nextGW');
   if (prevBtn) prevBtn.disabled = state.viewingGW <= state.currentGW;
   if (nextBtn) nextBtn.disabled = state.viewingGW >= 38;
+
+  // Update sync toggle visual state
+  const syncToggle = document.getElementById('fixturesSyncToggle');
+  if (syncToggle) {
+    if (isFixturesSyncEnabled()) {
+      syncToggle.classList.add('active');
+      syncToggle.title = 'Sync ON: Fixtures follow gameweek';
+    } else {
+      syncToggle.classList.remove('active');
+      syncToggle.title = 'Sync OFF: Independent navigation';
+    }
+  }
 
   const bankInput = document.getElementById('bankInput');
   if (bankInput) bankInput.value = Number(state.bank).toFixed(1);
@@ -63,6 +75,36 @@ function changeGW(delta) {
   const maxGW = 38;
 
   let next = state.viewingGW + delta;
+  if (next < minGW) next = minGW;
+  if (next > maxGW) next = maxGW;
+
+  state.viewingGW = next;
+
+  // cancel any in-progress swap when changing GW
+  setPendingSwap(null);
+
+  // If fixtures sync is enabled, update fixtures GW to match
+  if (isFixturesSyncEnabled()) {
+    setFixturesGW(next);
+  }
+
+  updateUI();
+  renderFixtures();
+}
+
+// Function to sync pitch GW from fixtures navigation (called when sync is ON)
+function syncPitchGWFromFixtures(newGW) {
+  if (isPendingTransfer()) {
+    showMessage('Finish the pending transfer (Add) or Cancel it first.', 'info');
+    // Revert fixtures GW back to match pitch
+    setFixturesGW(state.viewingGW);
+    return;
+  }
+
+  const minGW = state.currentGW;
+  const maxGW = 38;
+
+  let next = newGW;
   if (next < minGW) next = minGW;
   if (next > maxGW) next = maxGW;
 
@@ -664,6 +706,7 @@ export function initUI() {
 
   // Expose nav + actions used by inline onclicks in index.html
   window.changeGW = changeGW;
+  window.syncPitchGWFromFixtures = syncPitchGWFromFixtures;
   window.removePlayer = (playerId, source) => removePlayer(playerId, source, updateUI);
   window.reinstatePlayer = (playerId) => reinstatePlayer(playerId, updateUI);
   window.substitutePlayer = (playerId) => substitutePlayer(playerId, updateUI);
