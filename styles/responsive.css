@@ -99,14 +99,80 @@
   }
 }
 
+/* Mobile Landscape (max-width: 900px AND landscape) - Show transfer table side-by-side */
+@media (max-width: 900px) and (max-height: 600px) and (orientation: landscape) {
+  body {
+    padding: 10px 15px;
+  }
+
+  #plannerMain {
+    grid-template-columns: 1fr 350px;
+    gap: 15px;
+  }
+
+  #fixturesPanel {
+    display: none;
+  }
+
+  #mainColumn {
+    order: 1;
+  }
+
+  .transfer-panel {
+    order: 2;
+    max-height: calc(100vh - 120px);
+  }
+
+  .pitch {
+    padding: 12px 8px;
+  }
+
+  .player-card {
+    width: 65px;
+    min-width: 65px;
+  }
+
+  .formation-line {
+    gap: 6px;
+  }
+
+  .bench-slots {
+    gap: 10px;
+  }
+
+  .player-card .info {
+    font-size: 7px;
+  }
+
+  .player-card .future-fixtures {
+    font-size: 6px;
+    gap: 1px;
+  }
+
+  .player-card .fixture {
+    font-size: 6px;
+  }
+
+  .player-card .name {
+    font-size: 9px;
+  }
+}
+
 /* Mobile (max-width: 768px) */
 @media (max-width: 768px) {
   body {
     padding: 10px;
+    overflow-x: hidden;
   }
 
   .container {
     max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  #plannerMain {
+    grid-template-columns: 1fr;
+    overflow-x: hidden;
   }
 
   .header {
@@ -125,10 +191,6 @@
     width: 260px;
   }
 
-  #plannerMain {
-    grid-template-columns: 1fr;
-  }
-
   /* Fix fixtures panel for mobile */
   #fixturesPanel {
     max-height: 400px;
@@ -140,6 +202,13 @@
     min-height: 300px;
     /* Ensure pitch doesn't cause overflow */
     overflow: visible;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .pitch-stack {
+    overflow-x: hidden;
+    width: 100%;
   }
 
   /* Stack transfer action buttons vertically on mobile */
@@ -165,21 +234,34 @@
     font-size: 8px;
     text-overflow: ellipsis;
     padding: 0 2px;
+    gap: 1px;
+  }
+
+  .player-card .info .team {
+    flex: 0 0 auto;
+    max-width: 35%;
+  }
+
+  .player-card .info .next-fixture {
+    flex: 0 1 auto;
+    max-width: 40%;
   }
 
   /* Ensure price is visible */
   .player-card .info .price {
     display: inline-block;
+    flex: 0 0 auto;
     flex-shrink: 0;
   }
 
   /* Contain fixtures within card boundaries */
-  .player-card .fixtures {
+  .player-card .future-fixtures {
     font-size: 7px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 100%;
+    gap: 2px;
+  }
+
+  .player-card .fixture {
+    font-size: 7px;
   }
 
   .captain-selector,
@@ -320,11 +402,24 @@
   /* Further reduce sizes for very small screens */
   .player-card .info {
     font-size: 7px;
-    gap: 2px;
+    gap: 1px;
+  }
+
+  .player-card .info .team {
+    max-width: 30%;
+  }
+
+  .player-card .info .next-fixture {
+    max-width: 35%;
   }
 
   /* Adjust fixtures size for very small screens */
-  .player-card .fixtures {
+  .player-card .future-fixtures {
+    font-size: 6px;
+    gap: 1px;
+  }
+
+  .player-card .fixture {
     font-size: 6px;
   }
 
