@@ -137,14 +137,6 @@
     min-width: 58px;
   }
 
-  /* Truncate player names on mobile landscape */
-  .player-card .name {
-    font-size: 8px;
-    max-width: 100%;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
   /* On mobile landscape, make next fixture bold */
   .player-card .info .next-fixture {
     font-weight: 700;
@@ -178,8 +170,12 @@
     font-size: 5px;
   }
 
+  /* Truncate player names on mobile landscape */
   .player-card .name {
     font-size: 8px;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .card-btn {
@@ -425,10 +421,6 @@
     font-size: 8px;
   }
 
-  .player-card .name {
-    font-size: 10px;
-  }
-
   .formation-line {
     gap: 5px;
     justify-content: center;
@@ -604,10 +596,6 @@
   .status-flag-canvas {
     width: 34px;
     height: 26px;
-  }
-
-  .player-card .name {
-    font-size: 9px;
   }
 
   .formation-line {
