@@ -240,10 +240,23 @@
     grid-template-columns: 1fr;
   }
 
-  /* Fix fixtures panel for mobile */
+  /* Hide fixture list on mobile portrait, but keep control buttons visible */
   #fixturesPanel {
-    max-height: 400px;
+    max-height: none; /* Remove height restriction */
     -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Hide fixtures header and fixture rows on mobile */
+  #fixturesPanel .fixtures-header,
+  #fixturesPanel .fixture-date,
+  #fixturesPanel .fixture-row,
+  #fixturesPanel .fixture-date-banner {
+    display: none;
+  }
+  
+  /* Keep fixtures controls visible */
+  #fixturesPanel .fixtures-controls {
+    display: block;
   }
 
   .pitch {
@@ -400,10 +413,15 @@
     padding: 2px 4px;
   }
 
-  /* Ensure transfer panel is scrollable */
+  /* Ensure transfer panel is scrollable and doesn't prevent page scrolling */
   .transfer-panel {
-    max-height: 600px;
+    max-height: 70vh; /* Use viewport height instead of fixed px */
     overflow-y: auto;
+  }
+  
+  /* Ensure main container allows scrolling */
+  #plannerMain {
+    min-height: auto;
   }
 }
 
@@ -590,7 +608,7 @@
   }
 
   .transfer-panel {
-    max-height: 600px;
+    max-height: 70vh; /* Use viewport height for better adaptability */
   }
 
   .player-table-compact {
