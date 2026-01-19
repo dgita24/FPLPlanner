@@ -36,7 +36,7 @@ export async function loadFixturesData() {
     fixturesGW = next || current || state.currentGW;
     
     // If sync is enabled and viewingGW is set, use the pitch's viewing GW
-    if (fixturesSyncEnabled && state.viewingGW != null) {
+    if (fixturesSyncEnabled && state.viewingGW !== null && state.viewingGW !== undefined) {
       fixturesGW = state.viewingGW;
     }
     
@@ -47,8 +47,11 @@ export async function loadFixturesData() {
   }
 }
 
+const MIN_GAMEWEEK = 1;
+const MAX_GAMEWEEK = 38;
+
 window.changeFixturesGW = function (delta) {
-  const newGW = Math.max(1, Math.min(38, fixturesGW + delta));
+  const newGW = Math.max(MIN_GAMEWEEK, Math.min(MAX_GAMEWEEK, fixturesGW + delta));
   fixturesGW = newGW;
   
   // If sync is enabled, also update the pitch GW

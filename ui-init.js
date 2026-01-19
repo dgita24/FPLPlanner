@@ -65,10 +65,14 @@ function updateUI() {
   renderBench();
 }
 
+// Constants for gameweek bounds
+const MIN_GAMEWEEK = state.currentGW; // Set dynamically from current GW
+const MAX_GAMEWEEK = 38;
+
 // Helper function to change GW with validation
 function setViewingGW(newGW) {
   const minGW = state.currentGW;
-  const maxGW = 38;
+  const maxGW = MAX_GAMEWEEK;
 
   let validGW = newGW;
   if (validGW < minGW) validGW = minGW;
