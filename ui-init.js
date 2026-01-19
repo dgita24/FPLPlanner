@@ -88,11 +88,17 @@ function setViewingGW(newGW) {
   renderFixtures();
 }
 
-function changeGW(delta) {
+// Helper to check for pending transfers and show message
+function checkAndWarnPendingTransfer() {
   if (isPendingTransfer()) {
     showMessage('Finish the pending transfer (Add) or Cancel it first.', 'info');
-    return;
+    return true;
   }
+  return false;
+}
+
+function changeGW(delta) {
+  if (checkAndWarnPendingTransfer()) return;
 
   const next = state.viewingGW + delta;
   setViewingGW(next);
@@ -106,8 +112,7 @@ function changeGW(delta) {
 // Function to sync pitch GW from fixtures navigation (called when sync is ON)
 // Export for use by fixtures module
 export function syncPitchGWFromFixtures(newGW) {
-  if (isPendingTransfer()) {
-    showMessage('Finish the pending transfer (Add) or Cancel it first.', 'info');
+  if (checkAndWarnPendingTransfer()) {
     // Revert fixtures GW back to match pitch
     setFixturesGW(state.viewingGW);
     return;
