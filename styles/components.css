@@ -904,7 +904,6 @@ td.fixtures-cell {
 
 .player-table-compact table {
   width: 100%;
-  min-width: 400px; /* Ensure table doesn't get too cramped */
   border-collapse: collapse;
   font-size: 12px;
 }

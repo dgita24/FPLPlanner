@@ -616,4 +616,9 @@
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
   }
+  
+  /* On mobile, add min-width to enable horizontal scrolling */
+  .player-table-compact table {
+    min-width: 600px;
+  }
 }
