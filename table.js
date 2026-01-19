@@ -1,4 +1,4 @@
-// table.js - Player table render/filter
+// table.js - Player table render/filter - adding this to force a new deploy
 
 import { state, loadFixtures } from './data.js';
 import { shouldShowPlayerFlag } from './player-status-utils.js';
