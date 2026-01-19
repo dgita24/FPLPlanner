@@ -201,6 +201,33 @@
   min-height: 12px;
 }
 
+.player-card .info > * {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+
+.player-card .future-fixtures {
+  display: flex;
+  gap: 3px;
+  margin-top: 3px;
+  padding: 0 3px;
+  justify-content: space-between;
+}
+
+.player-card .fixture {
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 8px;
+  font-weight: 600;
+  color: #333;
+  text-align: center;
+}
+
 .card-btn {
   position: absolute;
   width: 15px;
