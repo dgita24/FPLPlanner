@@ -99,15 +99,15 @@
   }
 }
 
-/* Mobile Landscape (max-width: 900px AND landscape) - Show transfer table side-by-side */
-@media (max-width: 900px) and (max-height: 600px) and (orientation: landscape) {
+/* Mobile Landscape - Show transfer table side-by-side when screen is wider than tall */
+@media (max-width: 900px) and (orientation: landscape) {
   body {
     padding: 10px 15px;
   }
 
   #plannerMain {
-    grid-template-columns: 1fr 350px;
-    gap: 15px;
+    grid-template-columns: 1fr 320px;
+    gap: 12px;
   }
 
   #fixturesPanel {
@@ -120,46 +120,61 @@
 
   .transfer-panel {
     order: 2;
-    max-height: calc(100vh - 120px);
+    max-height: calc(100vh - 100px);
   }
 
   .pitch {
-    padding: 12px 8px;
+    padding: 10px 6px;
+    min-height: 200px;
+  }
+
+  .bench {
+    padding: 8px;
   }
 
   .player-card {
-    width: 65px;
-    min-width: 65px;
+    width: 58px;
+    min-width: 58px;
   }
 
   .formation-line {
-    gap: 6px;
+    gap: 5px;
   }
 
   .bench-slots {
-    gap: 10px;
+    gap: 8px;
   }
 
   .player-card .info {
-    font-size: 7px;
-  }
-
-  .player-card .future-fixtures {
     font-size: 6px;
     gap: 1px;
   }
 
+  .player-card .future-fixtures {
+    font-size: 5px;
+    gap: 1px;
+  }
+
   .player-card .fixture {
-    font-size: 6px;
+    font-size: 5px;
   }
 
   .player-card .name {
-    font-size: 9px;
+    font-size: 8px;
+  }
+
+  .gw-nav h2 {
+    font-size: 16px;
+  }
+
+  .gw-nav button {
+    padding: 6px 10px;
+    font-size: 12px;
   }
 }
 
-/* Mobile (max-width: 768px) */
-@media (max-width: 768px) {
+/* Mobile (max-width: 768px) - Stack everything vertically except when in landscape */
+@media (max-width: 768px) and (orientation: portrait) {
   body {
     padding: 10px;
     overflow-x: hidden;
