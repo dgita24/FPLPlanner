@@ -1,5 +1,10 @@
 import { state } from './data.js';
 
+// Note: We can't import updateUI and syncPitchGWFromFixtures here directly due to circular dependencies
+// (ui-init imports from fixtures, and fixtures would import from ui-init)
+// Instead, we use the window object for these cross-module callbacks
+// This is acceptable for UI event handlers that need to coordinate between modules
+
 const fixturesByGW = new Map();
 let fixturesGW = null;
 let fixturesSyncEnabled = false; // Sync fixtures GW with pitch GW

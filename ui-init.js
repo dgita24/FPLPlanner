@@ -13,7 +13,8 @@ function pluralize(word, count) {
   return count === 1 ? word : word + 's';
 }
 
-function updateUI() {
+// Export updateUI for use in other modules
+export function updateUI() {
   // kick off fixture loads for current viewing window (async)
   ensureFixturesForView();
 
@@ -65,12 +66,12 @@ function updateUI() {
   renderBench();
 }
 
-// Constants for gameweek bounds
-const MIN_GAMEWEEK = state.currentGW; // Set dynamically from current GW
+// Constant for max gameweek
 const MAX_GAMEWEEK = 38;
 
 // Helper function to change GW with validation
 function setViewingGW(newGW) {
+  // Always use current value of state.currentGW as minimum
   const minGW = state.currentGW;
   const maxGW = MAX_GAMEWEEK;
 
@@ -103,7 +104,8 @@ function changeGW(delta) {
 }
 
 // Function to sync pitch GW from fixtures navigation (called when sync is ON)
-function syncPitchGWFromFixtures(newGW) {
+// Export for use by fixtures module
+export function syncPitchGWFromFixtures(newGW) {
   if (isPendingTransfer()) {
     showMessage('Finish the pending transfer (Add) or Cancel it first.', 'info');
     // Revert fixtures GW back to match pitch
