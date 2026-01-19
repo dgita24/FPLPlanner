@@ -140,15 +140,16 @@
   }
 
   .captain-selector {
-    left: -32px;
+    left: -26px; /* Adjusted for tablet sizing */
   }
 
   .captain-badge {
-    left: -32px;
+    left: -26px; /* Adjusted for tablet sizing */
   }
 
   .formation-line {
     gap: 9px;
+    padding: 0 35px; /* Reduce padding on tablet */
   }
 }
 
@@ -294,16 +295,16 @@
 
   .captain-selector,
   .captain-badge {
-    left: -32px;
-    width: 20px;
-    height: 20px;
-    font-size: 8px;
+    left: -24px; /* Adjusted for mobile positioning */
+    width: 18px;
+    height: 18px;
+    font-size: 7px;
   }
 
   .captain-btn {
-    width: 20px;
-    height: 20px;
-    font-size: 8px;
+    width: 18px;
+    height: 18px;
+    font-size: 7px;
   }
 
   .badge-container {
@@ -336,6 +337,7 @@
     /* Enable horizontal scrolling when formation line content overflows */
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
+    padding: 0 30px; /* Reduced padding for mobile */
   }
 
   .bench-slots {
@@ -344,6 +346,7 @@
     /* Allow horizontal scrolling if needed */
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
+    padding: 0 30px; /* Reduced padding for mobile */
   }
 
   .filters {
@@ -440,16 +443,16 @@
 
   .captain-selector,
   .captain-badge {
-    left: -28px;
-    width: 18px;
-    height: 18px;
-    font-size: 7px;
+    left: -22px; /* Further adjusted for small mobile */
+    width: 16px;
+    height: 16px;
+    font-size: 6px;
   }
 
   .captain-btn {
-    width: 18px;
-    height: 18px;
-    font-size: 7px;
+    width: 16px;
+    height: 16px;
+    font-size: 6px;
   }
 
   .badge-container {
@@ -481,6 +484,7 @@
     flex-wrap: nowrap;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
+    padding: 0 25px; /* Minimal padding for very small mobile */
   }
 
   .bench-slots {
@@ -488,6 +492,7 @@
     flex-wrap: nowrap;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
+    padding: 0 25px; /* Minimal padding for very small mobile */
   }
 
   .card-btn {

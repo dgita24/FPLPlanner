@@ -151,6 +151,7 @@
   margin-bottom: 0.4375rem; /* 7px to rem */
   min-height: 85px;
   flex-wrap: nowrap;
+  padding: 0 45px; /* Add horizontal padding to prevent captain/status badge overflow */
 }
 
 #plannerMain .pitch {
@@ -286,16 +287,16 @@
 .badge-container::before {
   content: '';
   position: absolute;
-  left: -50px;
+  left: -40px; /* Adjusted for new positioning */
   top: 0;
-  width: 50px;
+  width: 40px;
   height: 100%;
   z-index: 19;
 }
 
 .captain-selector {
   position: absolute;
-  left: -37px;
+  left: -28px; /* Better positioning to prevent overflow */
   top: 50%;
   transform: translateY(-50%);
   display: none;
@@ -346,7 +347,7 @@
 
 .captain-badge {
   position: absolute;
-  left: -37px;
+  left: -28px; /* Better positioning to prevent overflow */
   top: 50%;
   transform: translateY(-50%);
   width: 20px;
@@ -376,7 +377,7 @@
 
 .status-flag-badge {
   position: absolute;
-  right: -37px;
+  right: -28px; /* Centered between badge right edge and card right edge */
   top: 50%;
   transform: translateY(-50%);
   width: 20px;
@@ -469,6 +470,7 @@
   justify-content: center;
   gap: 1.3125rem; /* 21px to rem */
   flex-wrap: wrap; /* Allow wrapping on very small screens */
+  padding: 0 45px; /* Add horizontal padding to prevent captain/status badge overflow */
 }
 
 #plannerMain .bench {
