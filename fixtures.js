@@ -110,7 +110,7 @@ export function isFixturesSyncEnabled() {
 function loadSyncState() {
   try {
     const saved = localStorage.getItem('fplplanner-fixtures-sync');
-    if (saved !== null) {
+    if (saved != null) {
       fixturesSyncEnabled = JSON.parse(saved);
     }
   } catch (e) {
