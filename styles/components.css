@@ -10,7 +10,7 @@
   background: linear-gradient(to bottom, #4a7c2c 0%, #3a6622 100%);
   padding: 1.3125rem 1.0625rem; /* 21px 17px to rem */
   border-radius: 10px;
-  max-width: 100%; /* Changed from fixed 935px */
+  max-width: 935px; /* Fixed width for proper grid layout */
   margin: 0 auto 0.625rem; /* 10px to rem */
   position: relative;
   min-height: 323px;
@@ -452,7 +452,7 @@
   background: linear-gradient(to bottom, #4a7c2c 0%, #3a6622 100%);
   padding: 0.8125rem; /* 13px to rem */
   border-radius: 10px;
-  max-width: 100%; /* Changed from fixed 935px */
+  max-width: 935px; /* Fixed width for proper grid layout */
   margin: 0 auto 1.5625rem; /* 25px to rem */
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   border: 1px solid var(--border);
@@ -469,7 +469,7 @@
   display: flex;
   justify-content: center;
   gap: 1.3125rem; /* 21px to rem */
-  flex-wrap: wrap; /* Allow wrapping on very small screens */
+  flex-wrap: nowrap; /* Keep bench players in a single line */
   padding: 0 45px; /* Add horizontal padding to prevent captain/status badge overflow */
 }
 
