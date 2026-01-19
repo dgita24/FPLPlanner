@@ -35,8 +35,8 @@ export async function loadFixturesData() {
     const current = events.find(e => e.is_current)?.id;
     fixturesGW = next || current || state.currentGW;
     
-    // If sync is enabled, use the pitch's viewing GW
-    if (fixturesSyncEnabled && state.viewingGW) {
+    // If sync is enabled and viewingGW is set, use the pitch's viewing GW
+    if (fixturesSyncEnabled && state.viewingGW != null) {
       fixturesGW = state.viewingGW;
     }
     

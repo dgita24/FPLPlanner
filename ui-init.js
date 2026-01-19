@@ -65,31 +65,37 @@ function updateUI() {
   renderBench();
 }
 
+// Helper function to change GW with validation
+function setViewingGW(newGW) {
+  const minGW = state.currentGW;
+  const maxGW = 38;
+
+  let validGW = newGW;
+  if (validGW < minGW) validGW = minGW;
+  if (validGW > maxGW) validGW = maxGW;
+
+  state.viewingGW = validGW;
+
+  // cancel any in-progress swap when changing GW
+  setPendingSwap(null);
+
+  updateUI();
+  renderFixtures();
+}
+
 function changeGW(delta) {
   if (isPendingTransfer()) {
     showMessage('Finish the pending transfer (Add) or Cancel it first.', 'info');
     return;
   }
 
-  const minGW = state.currentGW;
-  const maxGW = 38;
-
-  let next = state.viewingGW + delta;
-  if (next < minGW) next = minGW;
-  if (next > maxGW) next = maxGW;
-
-  state.viewingGW = next;
-
-  // cancel any in-progress swap when changing GW
-  setPendingSwap(null);
+  const next = state.viewingGW + delta;
+  setViewingGW(next);
 
   // If fixtures sync is enabled, update fixtures GW to match
   if (isFixturesSyncEnabled()) {
     setFixturesGW(next);
   }
-
-  updateUI();
-  renderFixtures();
 }
 
 // Function to sync pitch GW from fixtures navigation (called when sync is ON)
@@ -101,20 +107,7 @@ function syncPitchGWFromFixtures(newGW) {
     return;
   }
 
-  const minGW = state.currentGW;
-  const maxGW = 38;
-
-  let next = newGW;
-  if (next < minGW) next = minGW;
-  if (next > maxGW) next = maxGW;
-
-  state.viewingGW = next;
-
-  // cancel any in-progress swap when changing GW
-  setPendingSwap(null);
-
-  updateUI();
-  renderFixtures();
+  setViewingGW(newGW);
 }
 
 // Import team from FPL
