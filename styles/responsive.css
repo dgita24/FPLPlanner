@@ -137,6 +137,25 @@
     min-width: 58px;
   }
 
+  /* Truncate player names on mobile landscape */
+  .player-card .name {
+    font-size: 8px;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* On mobile landscape, make next fixture bold */
+  .player-card .info .next-fixture {
+    font-weight: 700;
+  }
+
+  /* Hide last two fixtures from bottom row on mobile landscape */
+  .player-card .future-fixtures .fixture:nth-child(2),
+  .player-card .future-fixtures .fixture:last-child {
+    display: none;
+  }
+
   .formation-line {
     gap: 5px;
   }
@@ -299,6 +318,24 @@
     flex-shrink: 0;
   }
 
+  /* Truncate player names on mobile - show only first 4 letters */
+  .player-card .name {
+    font-size: 10px;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* On mobile, make next fixture bold and reduce other info */
+  .player-card .info .next-fixture {
+    font-weight: 700;
+  }
+
+  /* Hide last fixture from bottom row on mobile (show only 2 fixtures instead of 3) */
+  .player-card .future-fixtures .fixture:last-child {
+    display: none;
+  }
+
   /* Adjust player card info for mobile */
   .player-card .info {
     font-size: 8px;
@@ -393,7 +430,7 @@
   }
 
   .formation-line {
-    gap: 4px;
+    gap: 5px;
     justify-content: center;
     flex-wrap: nowrap;
     /* Enable horizontal scrolling when formation line content overflows */
@@ -402,7 +439,7 @@
   }
 
   .bench-slots {
-    gap: 8px;
+    gap: 10px;
     flex-wrap: nowrap;
     /* Allow horizontal scrolling if needed */
     overflow-x: auto;
@@ -490,6 +527,24 @@
     flex-shrink: 0;
   }
 
+  /* Truncate player names on small mobile */
+  .player-card .name {
+    font-size: 9px;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* On small mobile, make next fixture bold */
+  .player-card .info .next-fixture {
+    font-weight: 700;
+  }
+
+  /* Hide last fixture from bottom row on small mobile */
+  .player-card .future-fixtures .fixture:last-child {
+    display: none;
+  }
+
   /* Further reduce sizes for very small screens */
   .player-card .info {
     font-size: 7px;
@@ -556,7 +611,7 @@
   }
 
   .formation-line {
-    gap: 3px;
+    gap: 4px;
     min-height: 80px;
     flex-wrap: nowrap;
     overflow-x: auto;
@@ -564,7 +619,7 @@
   }
 
   .bench-slots {
-    gap: 6px;
+    gap: 8px;
     flex-wrap: nowrap;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
