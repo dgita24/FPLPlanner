@@ -229,10 +229,9 @@
 
 .card-btn {
   position: absolute;
-  width: 24px; /* Increased from 15px for better touch target */
-  height: 24px;
-  min-width: 24px;
-  min-height: 24px;
+  /* Increased from 15px for better touch target - using min-width/height for flexibility */
+  min-width: 32px;
+  min-height: 32px;
   border-radius: 50%;
   border: none;
   color: white;

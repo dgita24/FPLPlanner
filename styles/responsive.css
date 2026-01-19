@@ -154,8 +154,10 @@
 
 /* Progressive Disclosure: Hide 3rd fixture on mobile (max-width: 767px) */
 @media (max-width: 767px) {
-  /* Hide the 3rd fixture from the bottom panel (future-fixtures shows fx2, fx3, fx4) */
-  /* We want to show only 2 next fixtures instead of 3 */
+  /* Hide the 3rd fixture (fx3) from the player cards
+   * Structure: future-fixtures contains [fx2, fx3, fx4]
+   * :nth-child(2) targets fx3, which is the 2nd element but the 3rd overall fixture
+   * Result: Show only fx2 and fx4 (2 fixtures instead of 3) */
   .future-fixtures .fixture:nth-child(2) {
     display: none;
   }
@@ -188,7 +190,12 @@
     padding: 12px;
   }
   
-  /* Exception: Keep player card buttons at their designed size but ensure spacing */
+  /* Card buttons: Contextual exception at 32x32px
+   * These small circular buttons on player cards are acceptable below 48px because:
+   * 1. They are positioned at card corners with clear spacing from other elements
+   * 2. The entire player card (145px wide) acts as a larger hit area
+   * 3. Users typically interact with the card itself, not just the buttons
+   * 4. 32px is still reasonably tappable and maintains visual balance */
   .card-btn {
     min-width: 32px;
     min-height: 32px;
