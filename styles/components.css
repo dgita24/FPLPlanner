@@ -195,28 +195,26 @@
 }
 
 .player-card .info {
-  font-size: 0.5625rem; /* 9px to rem */
+  font-size: 9px;
   color: #333;
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  padding: 0 0.1875rem; /* 3px to rem */
+  padding: 0 3px;
   font-weight: 600;
   white-space: nowrap;
   overflow: hidden;
   min-height: 12px;
-  gap: 0.25rem; /* Add gap between items */
 }
 
 /* Future fixtures container */
 .player-card .future-fixtures {
-  font-size: 0.5rem; /* 8px to rem */
+  font-size: 8px;
   color: #333;
   display: flex;
   justify-content: space-around;
-  padding: 0.125rem 0.1875rem; /* 2px 3px to rem */
+  padding: 2px 3px;
   font-weight: 600;
-  gap: 0.25rem;
+  gap: 2px;
 }
 
 .player-card .future-fixtures .fixture {
@@ -229,9 +227,8 @@
 
 .card-btn {
   position: absolute;
-  /* Increased from 15px for better touch target - using min-width/height for flexibility */
-  min-width: 32px;
-  min-height: 32px;
+  width: 15px;
+  height: 15px;
   border-radius: 50%;
   border: none;
   color: white;
@@ -240,7 +237,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.75rem; /* 12px to rem */
+  font-size: 12px;
   transition: transform 0.1s;
 }
 
@@ -249,16 +246,16 @@
 }
 
 .btn-remove {
-  top: -8px; /* Adjusted for larger button */
-  left: -8px;
+  top: -5px;
+  left: -5px;
   background: #ff4444;
 }
 
 .btn-swap {
-  top: -8px; /* Adjusted for larger button */
-  right: -8px;
+  top: -5px;
+  right: -5px;
   background: #4444ff;
-  font-size: 0.5625rem; /* 9px to rem */
+  font-size: 9px;
 }
 
 /* ===== Badge Container ===== */

@@ -177,29 +177,18 @@
     display: inline !important;
   }
   
-  /* Ensure all interactive elements meet 48x48px touch target minimum */
-  button,
-  .card-btn,
+  /* Ensure primary interactive elements meet touch target minimum on mobile
+   * Note: Some elements like card buttons and table info buttons are excluded
+   * as they maintain their original sizes for proper UI balance */
+  .gw-nav button,
+  .transfer-action-btn,
+  .chip-btn-small,
   .header-btn,
   .sidebar-toggle,
   .donate-btn,
-  .fixtures-control-btn,
-  .info-btn {
+  .fixtures-control-btn {
     min-width: 48px;
     min-height: 48px;
-    padding: 12px;
-  }
-  
-  /* Card buttons: Contextual exception at 32x32px
-   * These small circular buttons on player cards are acceptable below 48px because:
-   * 1. They are positioned at card corners with clear spacing from other elements
-   * 2. The entire player card (145px wide) acts as a larger hit area
-   * 3. Users typically interact with the card itself, not just the buttons
-   * 4. 32px is still reasonably tappable and maintains visual balance */
-  .card-btn {
-    min-width: 32px;
-    min-height: 32px;
-    padding: 8px;
   }
   
   /* Ensure proper spacing between touch targets (8-10px minimum) */
