@@ -25,8 +25,8 @@ export function updateUI() {
 
   const prevBtn = document.getElementById('prevGW');
   const nextBtn = document.getElementById('nextGW');
-  if (prevBtn) prevBtn.disabled = state.viewingGW <= state.currentGW;
-  if (nextBtn) nextBtn.disabled = state.viewingGW >= 38;
+  if (prevBtn) prevBtn.disabled = state.viewingGW <= state.minNavigableGW;
+  if (nextBtn) nextBtn.disabled = state.viewingGW >= MAX_GAMEWEEK;
 
   // Update sync toggle visual state
   const syncToggle = document.getElementById('fixturesSyncToggle');
@@ -69,8 +69,8 @@ export function updateUI() {
 
 // Helper function to change GW with validation
 function setViewingGW(newGW) {
-  // Always use current value of state.currentGW as minimum
-  const minGW = state.currentGW;
+  // Use minNavigableGW as the minimum boundary (set after team import)
+  const minGW = state.minNavigableGW;
   const maxGW = MAX_GAMEWEEK;
 
   let validGW = newGW;
@@ -151,6 +151,9 @@ async function importTeam() {
   const next = events.find(e => e.is_next)?.id;
   const current = events.find(e => e.is_current)?.id;
   state.viewingGW = next || current || state.currentGW;
+  
+  // Set minimum navigable GW to prevent going back before imported team
+  state.minNavigableGW = state.viewingGW;
 
   // reset transient UI state
   resetTransferState();
@@ -171,6 +174,7 @@ function localSave() {
       plan: state.plan,
       bank: state.bank,
       viewingGW: state.viewingGW,
+      minNavigableGW: state.minNavigableGW,
       priceMode: state.priceMode
     };
     localStorage.setItem('fplplanner-state', JSON.stringify(data));
@@ -191,6 +195,7 @@ function localLoad() {
     state.plan = data.plan;
     state.bank = data.bank;
     state.viewingGW = data.viewingGW;
+    state.minNavigableGW = data.minNavigableGW || state.viewingGW; // fallback for old saves
     state.priceMode = data.priceMode;
     updateUI();
     showMessage('Team loaded locally', 'success');
@@ -218,6 +223,7 @@ async function saveTeam() {
       plan: state.plan,
       bank: state.bank,
       viewingGW: state.viewingGW,
+      minNavigableGW: state.minNavigableGW,
       priceMode: state.priceMode
     };
 
@@ -270,6 +276,7 @@ async function loadTeam() {
       state.plan = data.payload.plan;
       state.bank = data.payload.bank;
       state.viewingGW = data.payload.viewingGW;
+      state.minNavigableGW = data.payload.minNavigableGW || state.viewingGW; // fallback for old saves
       state.priceMode = data.payload.priceMode;
 
       updateUI();
