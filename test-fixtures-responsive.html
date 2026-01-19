@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fixture Hiding Test - FPL Planner</title>
+  <link rel="stylesheet" href="styles/main.css" />
+  <link rel="stylesheet" href="styles/components.css" />
+  <link rel="stylesheet" href="styles/responsive.css" />
+  <style>
+    body {
+      padding: 20px;
+    }
+    .test-container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .test-section {
+      margin-bottom: 40px;
+      padding: 20px;
+      background: var(--bg-light);
+      border-radius: 10px;
+      border: 1px solid var(--border);
+    }
+    .test-section h2 {
+      color: var(--primary);
+      margin-bottom: 20px;
+    }
+    .viewport-info {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      padding: 10px 15px;
+      background: var(--primary);
+      color: white;
+      border-radius: 5px;
+      font-weight: bold;
+      z-index: 1000;
+      font-size: 14px;
+    }
+    .demo-pitch {
+      background: linear-gradient(to bottom, #4a7c2c 0%, #3a6622 100%);
+      padding: 20px;
+      border-radius: 10px;
+      border: 2px solid rgba(255, 255, 255, 0.1);
+    }
+    .demo-formation-line {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    .info-box {
+      background: rgba(0, 208, 132, 0.1);
+      border: 2px solid var(--accent);
+      padding: 15px;
+      border-radius: 8px;
+      margin-top: 20px;
+    }
+    .info-box h3 {
+      color: var(--accent);
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="viewport-info" id="viewportInfo">Viewport: <span id="viewportWidth"></span>px</div>
+  
+  <div class="test-container">
+    <h1 style="text-align: center; color: var(--accent); margin-bottom: 30px;">
+      📱 Responsive Fixture Hiding Demonstration
+    </h1>
+    
+    <div class="info-box">
+      <h3>🎯 Test Instructions</h3>
+      <p><strong>Resize your browser window to see the responsive behavior:</strong></p>
+      <ul>
+        <li><strong>Above 767px:</strong> All 3 future fixtures visible (fx2, fx3, fx4)</li>
+        <li><strong>At or below 767px:</strong> Only 2 future fixtures visible (fx2 and fx4 - fx3 is hidden)</li>
+        <li><strong>Team abbreviation:</strong> Hidden on mobile for better spacing</li>
+      </ul>
+    </div>
+
+    <div class="test-section">
+      <h2>Player Card Examples</h2>
+      <div class="demo-pitch">
+        <div class="demo-formation-line">
+          <!-- Sample Player Card 1 -->
+          <div class="player-card">
+            <button class="card-btn btn-remove" title="Transfer out">×</button>
+            <button class="card-btn btn-swap" title="Swap">⇅</button>
+            
+            <div class="badge-container">
+              <img src="https://resources.premierleague.com/premierleague/badges/70/t3.png"
+                   class="badge" alt="ARS">
+            </div>
+            
+            <div class="name">Saka</div>
+            
+            <div class="info">
+              <span class="team">ARS</span>
+              <span class="next-fixture fixture-next">WHU (H)</span>
+              <span class="price">Sell 9.5</span>
+            </div>
+            
+            <div class="future-fixtures">
+              <span class="fixture">BHA (A)</span>
+              <span class="fixture">TOT (H)</span>
+              <span class="fixture">MUN (A)</span>
+            </div>
+          </div>
+
+          <!-- Sample Player Card 2 -->
+          <div class="player-card">
+            <button class="card-btn btn-remove" title="Transfer out">×</button>
+            <button class="card-btn btn-swap" title="Swap">⇅</button>
+            
+            <div class="badge-container">
+              <img src="https://resources.premierleague.com/premierleague/badges/70/t11.png"
+                   class="badge" alt="LIV">
+            </div>
+            
+            <div class="name">Salah</div>
+            
+            <div class="info">
+              <span class="team">LIV</span>
+              <span class="next-fixture fixture-next">CHE (A)</span>
+              <span class="price">Sell 13.0</span>
+            </div>
+            
+            <div class="future-fixtures">
+              <span class="fixture">NEW (H)</span>
+              <span class="fixture">MCI (A)</span>
+              <span class="fixture">EVE (H)</span>
+            </div>
+          </div>
+
+          <!-- Sample Player Card 3 -->
+          <div class="player-card">
+            <button class="card-btn btn-remove" title="Transfer out">×</button>
+            <button class="card-btn btn-swap" title="Swap">⇅</button>
+            
+            <div class="badge-container">
+              <img src="https://resources.premierleague.com/premierleague/badges/70/t1.png"
+                   class="badge" alt="MCI">
+            </div>
+            
+            <div class="name">Haaland</div>
+            
+            <div class="info">
+              <span class="team">MCI</span>
+              <span class="next-fixture fixture-next">BUR (H)</span>
+              <span class="price">Sell 14.5</span>
+            </div>
+            
+            <div class="future-fixtures">
+              <span class="fixture">LIV (A)</span>
+              <span class="fixture">SHU (H)</span>
+              <span class="fixture">FUL (A)</span>
+            </div>
+          </div>
+
+          <!-- Sample Player Card 4 -->
+          <div class="player-card">
+            <button class="card-btn btn-remove" title="Transfer out">×</button>
+            <button class="card-btn btn-swap" title="Swap">⇅</button>
+            
+            <div class="badge-container">
+              <img src="https://resources.premierleague.com/premierleague/badges/70/t6.png"
+                   class="badge" alt="CHE">
+            </div>
+            
+            <div class="name">Palmer</div>
+            
+            <div class="info">
+              <span class="team">CHE</span>
+              <span class="next-fixture fixture-next">LIV (H)</span>
+              <span class="price">Sell 11.0</span>
+            </div>
+            
+            <div class="future-fixtures">
+              <span class="fixture">AVL (A)</span>
+              <span class="fixture">ARS (H)</span>
+              <span class="fixture">WHU (A)</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="test-section">
+      <h2>✅ What to Check</h2>
+      <ul style="line-height: 2;">
+        <li><strong>Desktop (>767px):</strong> Look at the player cards - you should see the team abbreviation (e.g., "ARS", "LIV") and ALL THREE future fixtures below the card</li>
+        <li><strong>Mobile (≤767px):</strong> The team abbreviation should disappear, and only TWO fixtures should be visible (the middle one is hidden)</li>
+        <li><strong>Touch Targets:</strong> On mobile, all buttons should be easily tappable (48x48px minimum)</li>
+        <li><strong>Layout:</strong> Cards should adjust size appropriately at each breakpoint</li>
+      </ul>
+    </div>
+
+    <div class="test-section">
+      <h2>🔍 CSS Rules Applied</h2>
+      <pre style="background: #f5f5f5; padding: 15px; border-radius: 5px; overflow-x: auto;">
+@media (max-width: 767px) {
+  /* Hide the 3rd fixture (middle child in future-fixtures) */
+  .future-fixtures .fixture:nth-child(2) {
+    display: none;
+  }
+  
+  /* Hide team abbreviation for better spacing */
+  .player-card .info .team {
+    display: none;
+  }
+  
+  /* Apply utility classes */
+  .hide-mobile,
+  .desktop-only {
+    display: none !important;
+  }
+}</pre>
+    </div>
+  </div>
+
+  <script>
+    // Update viewport width display
+    function updateViewportInfo() {
+      const width = window.innerWidth;
+      document.getElementById('viewportWidth').textContent = width;
+      
+      // Add visual indicator
+      const info = document.getElementById('viewportInfo');
+      if (width <= 767) {
+        info.style.background = '#d50000';
+        info.innerHTML = `📱 Mobile: ${width}px - Fixture HIDDEN`;
+      } else if (width <= 1024) {
+        info.style.background = '#ff9800';
+        info.innerHTML = `📱 Tablet: ${width}px - All fixtures visible`;
+      } else {
+        info.style.background = '#38003c';
+        info.innerHTML = `🖥️ Desktop: ${width}px - All fixtures visible`;
+      }
+    }
+    
+    window.addEventListener('resize', updateViewportInfo);
+    updateViewportInfo();
+  </script>
+</body>
+</html>
