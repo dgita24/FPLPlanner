@@ -195,7 +195,7 @@ function localLoad() {
     state.plan = data.plan;
     state.bank = data.bank;
     state.viewingGW = data.viewingGW;
-    state.minNavigableGW = data.minNavigableGW || state.viewingGW; // fallback for old saves
+    state.minNavigableGW = data.minNavigableGW ?? state.viewingGW; // fallback for old saves
     state.priceMode = data.priceMode;
     updateUI();
     showMessage('Team loaded locally', 'success');
@@ -276,7 +276,7 @@ async function loadTeam() {
       state.plan = data.payload.plan;
       state.bank = data.payload.bank;
       state.viewingGW = data.payload.viewingGW;
-      state.minNavigableGW = data.payload.minNavigableGW || state.viewingGW; // fallback for old saves
+      state.minNavigableGW = data.payload.minNavigableGW ?? state.viewingGW; // fallback for old saves
       state.priceMode = data.payload.priceMode;
 
       updateUI();
