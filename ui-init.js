@@ -7,6 +7,7 @@ import { renderFixtures, setFixturesGW, isFixturesSyncEnabled } from './fixtures
 import { cancelTransfer, substitutePlayer, addSelectedToSquad, removePlayer, resetTransferState, isPendingTransfer, getBatchTransferInfo, reinstatePlayer, selectChip } from './team-operations.js';
 import { setPendingSwap } from './ui-render.js';
 import { setDefaultSort } from './table.js';
+import { MAX_GAMEWEEK } from './constants.js';
 
 // Helper function for pluralization
 function pluralize(word, count) {
@@ -65,9 +66,6 @@ export function updateUI() {
   renderPitch();
   renderBench();
 }
-
-// Constant for max gameweek
-const MAX_GAMEWEEK = 38;
 
 // Helper function to change GW with validation
 function setViewingGW(newGW) {

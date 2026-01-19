@@ -1,4 +1,5 @@
 import { state } from './data.js';
+import { MIN_GAMEWEEK, MAX_GAMEWEEK } from './constants.js';
 
 // Note: We can't import updateUI and syncPitchGWFromFixtures here directly due to circular dependencies
 // (ui-init imports from fixtures, and fixtures would import from ui-init)
@@ -41,7 +42,7 @@ export async function loadFixturesData() {
     fixturesGW = next || current || state.currentGW;
     
     // If sync is enabled and viewingGW is set, use the pitch's viewing GW
-    if (fixturesSyncEnabled && state.viewingGW != null) {
+    if (fixturesSyncEnabled && state.viewingGW !== null && state.viewingGW !== undefined) {
       fixturesGW = state.viewingGW;
     }
     
@@ -51,9 +52,6 @@ export async function loadFixturesData() {
     renderFixturesError('Unable to load fixtures. Please check your connection.');
   }
 }
-
-const MIN_GAMEWEEK = 1;
-const MAX_GAMEWEEK = 38;
 
 window.changeFixturesGW = function (delta) {
   const newGW = Math.max(MIN_GAMEWEEK, Math.min(MAX_GAMEWEEK, fixturesGW + delta));
@@ -110,7 +108,7 @@ export function isFixturesSyncEnabled() {
 function loadSyncState() {
   try {
     const saved = localStorage.getItem('fplplanner-fixtures-sync');
-    if (saved != null) {
+    if (saved !== null) {
       fixturesSyncEnabled = JSON.parse(saved);
     }
   } catch (e) {
