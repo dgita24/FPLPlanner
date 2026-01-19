@@ -31,13 +31,14 @@ body {
   font-family: "Segoe UI", sans-serif;
   background: linear-gradient(135deg, #e3e7ed 0%, #d4dae3 100%);
   color: var(--text);
-  padding: 20px;
+  padding: 1.25rem; /* 20px converted to rem for better scaling */
   min-height: 100vh;
 }
 
 .container {
   max-width: 1400px;
   margin: 0 auto;
+  width: 100%; /* Ensure container is flexible */
 }
 
 /* ===== Header ===== */
@@ -46,18 +47,20 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 10px;
-  padding: 8px 12px;
+  margin-bottom: 0.625rem; /* 10px to rem */
+  padding: 0.5rem 0.75rem; /* 8px 12px to rem */
   background: var(--bg-light);
   border-radius: 10px;
-  height: 50px;
+  min-height: 50px; /* Changed from fixed height to min-height */
   max-width: 100%;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   border: 1px solid var(--border);
+  flex-wrap: wrap; /* Allow wrapping on smaller screens */
+  gap: 0.5rem;
 }
 
 .header h1 {
-  font-size: 24px;
+  font-size: clamp(1.125rem, 3vw, 1.5rem); /* Responsive font size: 18px-24px */
   font-weight: 900;
   color: var(--accent);
   text-align: center;
@@ -295,8 +298,8 @@ body {
 
 #plannerMain {
   display: grid;
-  grid-template-columns: 280px 1fr 370px;
-  gap: 12px;
+  grid-template-columns: minmax(260px, 280px) 1fr minmax(350px, 370px); /* More flexible columns */
+  gap: 0.75rem; /* 12px to rem */
   justify-content: center;
   width: 100%;
   box-sizing: border-box;
@@ -306,12 +309,13 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 12px;
-  margin-bottom: 16px;
+  gap: 0.75rem; /* 12px to rem */
+  margin-bottom: 1rem; /* 16px to rem */
+  flex-wrap: wrap; /* Allow wrapping on smaller screens */
 }
 
 .gw-nav button {
-  padding: 8px 16px;
+  padding: 0.5rem 1rem; /* 8px 16px to rem */
   background: var(--primary);
   color: white;
   border: none;
@@ -319,6 +323,8 @@ body {
   cursor: pointer;
   font-weight: bold;
   transition: all 0.2s;
+  min-width: 48px; /* Touch target minimum */
+  min-height: 48px;
 }
 
 .gw-nav button:hover:not(:disabled) {
@@ -337,13 +343,15 @@ body {
 .gw-nav .gw-center {
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: 1.25rem; /* 20px to rem */
+  flex-wrap: wrap;
+  justify-content: center;
 }
 
 #mainColumn {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 0.75rem; /* 12px to rem */
 }
 
 /* ===== Transfer Section ===== */

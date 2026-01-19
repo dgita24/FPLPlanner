@@ -1,5 +1,58 @@
 /* ===== Responsive Design for Tablets and Mobile ===== */
 
+/* ===== Utility Classes for Progressive Disclosure ===== */
+
+/* Desktop-only content (hidden on mobile) */
+.desktop-only {
+  display: inline;
+}
+
+/* Hide on mobile devices */
+.hide-mobile {
+  display: inline;
+}
+
+/* Show only on mobile */
+.mobile-only {
+  display: none;
+}
+
+/* Large Desktop (min-width: 1920px) - Optimized for large monitors */
+@media (min-width: 1920px) {
+  .container {
+    max-width: 1800px;
+  }
+  
+  #plannerMain {
+    grid-template-columns: 300px 1fr 400px;
+    gap: 20px;
+  }
+  
+  .player-card {
+    width: 160px;
+  }
+  
+  .formation-line {
+    gap: 16px;
+  }
+  
+  .bench-slots {
+    gap: 24px;
+  }
+}
+
+/* Desktop (max-width: 1440px) */
+@media (max-width: 1440px) {
+  .container {
+    max-width: 100%;
+  }
+  
+  #plannerMain {
+    grid-template-columns: 280px 1fr 380px;
+    gap: 12px;
+  }
+}
+
 /* Small Laptop/Large Tablet (max-width: 1280px) */
 @media (max-width: 1280px) {
   .container {
@@ -96,6 +149,67 @@
 
   .formation-line {
     gap: 9px;
+  }
+}
+
+/* Progressive Disclosure: Hide 3rd fixture on mobile (max-width: 767px) */
+@media (max-width: 767px) {
+  /* Hide the 3rd fixture from the bottom panel (future-fixtures shows fx2, fx3, fx4) */
+  /* We want to show only 2 next fixtures instead of 3 */
+  .future-fixtures .fixture:nth-child(2) {
+    display: none;
+  }
+  
+  /* Optional: Hide team abbreviation on mobile for better spacing */
+  .player-card .info .team {
+    display: none;
+  }
+  
+  /* Apply utility classes for progressive disclosure */
+  .hide-mobile,
+  .desktop-only {
+    display: none !important;
+  }
+  
+  .mobile-only {
+    display: inline !important;
+  }
+  
+  /* Ensure all interactive elements meet 48x48px touch target minimum */
+  button,
+  .card-btn,
+  .header-btn,
+  .sidebar-toggle,
+  .donate-btn,
+  .fixtures-control-btn,
+  .info-btn {
+    min-width: 48px;
+    min-height: 48px;
+    padding: 12px;
+  }
+  
+  /* Exception: Keep player card buttons at their designed size but ensure spacing */
+  .card-btn {
+    min-width: 32px;
+    min-height: 32px;
+    padding: 8px;
+  }
+  
+  /* Ensure proper spacing between touch targets (8-10px minimum) */
+  .chip-buttons-row {
+    gap: 10px;
+  }
+  
+  .transfer-actions {
+    gap: 10px;
+  }
+  
+  .header-actions {
+    gap: 10px;
+  }
+  
+  .gw-nav {
+    gap: 10px;
   }
 }
 
