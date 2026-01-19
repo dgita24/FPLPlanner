@@ -14,6 +14,9 @@ export let state = {
   // The GW the user is viewing/planning (starts at currentGW)
   viewingGW: 1,
 
+  // The minimum GW that user can navigate back to (set after team import)
+  minNavigableGW: 1,
+
   // The GW we successfully fetched picks from (often currentGW-1 while current is in progress)
   importedGW: null,
 
@@ -95,6 +98,9 @@ export async function loadBootstrap() {
     // For planning purposes, default to viewing the next GW
     // This allows users to plan for the upcoming gameweek
     state.viewingGW = next || current || 1;
+    
+    // Set initial minimum navigable GW at bootstrap (before any team import)
+    state.minNavigableGW = state.viewingGW;
 
     initEmptyPlan();
     
@@ -290,6 +296,9 @@ export async function loadTeamEntry(managerId, gwRequested) {
       const events = state.bootstrap?.events || [];
       const next = events.find(e => e.is_next)?.id;
       state.viewingGW = next || state.currentGW;
+      
+      // Set minimum navigable GW after successful team import to prevent going back before imported GW
+      state.minNavigableGW = state.viewingGW;
 
       // Save baseline state for Reset
       history.baseline = JSON.parse(JSON.stringify(state));

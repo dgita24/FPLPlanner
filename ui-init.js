@@ -3,17 +3,19 @@
 import { state, history, loadTeamEntry } from './data.js';
 import { setupSidebarHandlers, closeSidebar } from './ui-sidebar.js';
 import { showMessage, renderPitch, renderBench, ensureFixturesForView } from './ui-render.js';
-import { renderFixtures } from './fixtures.js';
+import { renderFixtures, setFixturesGW, isFixturesSyncEnabled } from './fixtures.js';
 import { cancelTransfer, substitutePlayer, addSelectedToSquad, removePlayer, resetTransferState, isPendingTransfer, getBatchTransferInfo, reinstatePlayer, selectChip } from './team-operations.js';
 import { setPendingSwap } from './ui-render.js';
 import { setDefaultSort } from './table.js';
+import { MAX_GAMEWEEK } from './constants.js';
 
 // Helper function for pluralization
 function pluralize(word, count) {
   return count === 1 ? word : word + 's';
 }
 
-function updateUI() {
+// Export updateUI for use in other modules
+export function updateUI() {
   // kick off fixture loads for current viewing window (async)
   ensureFixturesForView();
 
@@ -23,8 +25,20 @@ function updateUI() {
 
   const prevBtn = document.getElementById('prevGW');
   const nextBtn = document.getElementById('nextGW');
-  if (prevBtn) prevBtn.disabled = state.viewingGW <= state.currentGW;
-  if (nextBtn) nextBtn.disabled = state.viewingGW >= 38;
+  if (prevBtn) prevBtn.disabled = state.viewingGW <= state.minNavigableGW;
+  if (nextBtn) nextBtn.disabled = state.viewingGW >= MAX_GAMEWEEK;
+
+  // Update sync toggle visual state
+  const syncToggle = document.getElementById('fixturesSyncToggle');
+  if (syncToggle) {
+    if (isFixturesSyncEnabled()) {
+      syncToggle.classList.add('active');
+      syncToggle.title = 'Sync ON: Fixtures follow gameweek';
+    } else {
+      syncToggle.classList.remove('active');
+      syncToggle.title = 'Sync OFF: Independent navigation';
+    }
+  }
 
   const bankInput = document.getElementById('bankInput');
   if (bankInput) bankInput.value = Number(state.bank).toFixed(1);
@@ -53,26 +67,56 @@ function updateUI() {
   renderBench();
 }
 
-function changeGW(delta) {
-  if (isPendingTransfer()) {
-    showMessage('Finish the pending transfer (Add) or Cancel it first.', 'info');
-    return;
-  }
+// Helper function to change GW with validation
+function setViewingGW(newGW) {
+  // Use minNavigableGW as the minimum boundary (set after team import)
+  const minGW = state.minNavigableGW;
+  const maxGW = MAX_GAMEWEEK;
 
-  const minGW = state.currentGW;
-  const maxGW = 38;
+  let validGW = newGW;
+  if (validGW < minGW) validGW = minGW;
+  if (validGW > maxGW) validGW = maxGW;
 
-  let next = state.viewingGW + delta;
-  if (next < minGW) next = minGW;
-  if (next > maxGW) next = maxGW;
-
-  state.viewingGW = next;
+  state.viewingGW = validGW;
 
   // cancel any in-progress swap when changing GW
   setPendingSwap(null);
 
   updateUI();
   renderFixtures();
+}
+
+// Helper to check for pending transfers and show message
+function checkAndWarnPendingTransfer() {
+  if (isPendingTransfer()) {
+    showMessage('Finish the pending transfer (Add) or Cancel it first.', 'info');
+    return true;
+  }
+  return false;
+}
+
+function changeGW(delta) {
+  if (checkAndWarnPendingTransfer()) return;
+
+  const next = state.viewingGW + delta;
+  setViewingGW(next);
+
+  // If fixtures sync is enabled, update fixtures GW to match
+  if (isFixturesSyncEnabled()) {
+    setFixturesGW(next);
+  }
+}
+
+// Function to sync pitch GW from fixtures navigation (called when sync is ON)
+// Export for use by fixtures module
+export function syncPitchGWFromFixtures(newGW) {
+  if (checkAndWarnPendingTransfer()) {
+    // Revert fixtures GW back to match pitch
+    setFixturesGW(state.viewingGW);
+    return;
+  }
+
+  setViewingGW(newGW);
 }
 
 // Import team from FPL
@@ -107,6 +151,9 @@ async function importTeam() {
   const next = events.find(e => e.is_next)?.id;
   const current = events.find(e => e.is_current)?.id;
   state.viewingGW = next || current || state.currentGW;
+  
+  // Set minimum navigable GW to prevent going back before imported team
+  state.minNavigableGW = state.viewingGW;
 
   // reset transient UI state
   resetTransferState();
@@ -127,6 +174,7 @@ function localSave() {
       plan: state.plan,
       bank: state.bank,
       viewingGW: state.viewingGW,
+      minNavigableGW: state.minNavigableGW,
       priceMode: state.priceMode
     };
     localStorage.setItem('fplplanner-state', JSON.stringify(data));
@@ -147,6 +195,7 @@ function localLoad() {
     state.plan = data.plan;
     state.bank = data.bank;
     state.viewingGW = data.viewingGW;
+    state.minNavigableGW = data.minNavigableGW ?? state.viewingGW; // fallback for old saves
     state.priceMode = data.priceMode;
     updateUI();
     showMessage('Team loaded locally', 'success');
@@ -174,6 +223,7 @@ async function saveTeam() {
       plan: state.plan,
       bank: state.bank,
       viewingGW: state.viewingGW,
+      minNavigableGW: state.minNavigableGW,
       priceMode: state.priceMode
     };
 
@@ -226,6 +276,7 @@ async function loadTeam() {
       state.plan = data.payload.plan;
       state.bank = data.payload.bank;
       state.viewingGW = data.payload.viewingGW;
+      state.minNavigableGW = data.payload.minNavigableGW ?? state.viewingGW; // fallback for old saves
       state.priceMode = data.payload.priceMode;
 
       updateUI();
@@ -664,6 +715,7 @@ export function initUI() {
 
   // Expose nav + actions used by inline onclicks in index.html
   window.changeGW = changeGW;
+  window.syncPitchGWFromFixtures = syncPitchGWFromFixtures;
   window.removePlayer = (playerId, source) => removePlayer(playerId, source, updateUI);
   window.reinstatePlayer = (playerId) => reinstatePlayer(playerId, updateUI);
   window.substitutePlayer = (playerId) => substitutePlayer(playerId, updateUI);

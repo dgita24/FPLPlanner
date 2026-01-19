@@ -271,6 +271,12 @@
     order: 1;
   }
 
+  /* Sync toggle button on mobile */
+  .sync-toggle-btn {
+    order: 0;
+    align-self: center;
+  }
+
   .fixture-row {
     grid-template-columns: minmax(100px, 1fr) 50px minmax(100px, 1fr);
     font-size: 12px;

@@ -1,10 +1,20 @@
 import { state } from './data.js';
+import { MIN_GAMEWEEK, MAX_GAMEWEEK } from './constants.js';
+
+// Note: We can't import updateUI and syncPitchGWFromFixtures here directly due to circular dependencies
+// (ui-init imports from fixtures, and fixtures would import from ui-init)
+// Instead, we use the window object for these cross-module callbacks
+// This is acceptable for UI event handlers that need to coordinate between modules
 
 const fixturesByGW = new Map();
 let fixturesGW = null;
+let fixturesSyncEnabled = false; // Sync fixtures GW with pitch GW
 
 export async function loadFixturesData() {
   try {
+    // Load sync state from localStorage
+    loadSyncState();
+    
     const res = await fetch('/api/fpl/fixtures');
     
     if (!res.ok) {
@@ -30,6 +40,12 @@ export async function loadFixturesData() {
     const next = events.find(e => e.is_next)?.id;
     const current = events.find(e => e.is_current)?.id;
     fixturesGW = next || current || state.currentGW;
+    
+    // If sync is enabled and viewingGW is set, use the pitch's viewing GW
+    if (fixturesSyncEnabled && state.viewingGW !== null && state.viewingGW !== undefined) {
+      fixturesGW = state.viewingGW;
+    }
+    
     renderFixtures();
   } catch (error) {
     console.error('Error loading fixtures:', error);
@@ -38,9 +54,67 @@ export async function loadFixturesData() {
 }
 
 window.changeFixturesGW = function (delta) {
-  fixturesGW = Math.max(1, Math.min(38, fixturesGW + delta));
-  renderFixtures();
+  const newGW = Math.max(MIN_GAMEWEEK, Math.min(MAX_GAMEWEEK, fixturesGW + delta));
+  fixturesGW = newGW;
+  
+  // If sync is enabled, also update the pitch GW
+  if (fixturesSyncEnabled && window.syncPitchGWFromFixtures) {
+    window.syncPitchGWFromFixtures(newGW);
+  } else {
+    renderFixtures();
+  }
 };
+
+window.toggleFixturesSync = function () {
+  fixturesSyncEnabled = !fixturesSyncEnabled;
+  
+  // Persist to localStorage
+  try {
+    localStorage.setItem('fplplanner-fixtures-sync', JSON.stringify(fixturesSyncEnabled));
+  } catch (e) {
+    console.error('Failed to save fixtures sync state:', e);
+  }
+  
+  // If sync is turned ON, sync fixtures GW to current pitch GW
+  if (fixturesSyncEnabled) {
+    fixturesGW = state.viewingGW;
+  }
+  
+  renderFixtures();
+  
+  // Update the pitch UI to reflect sync state
+  if (window.updateUI) {
+    window.updateUI();
+  }
+};
+
+// Function to get current fixtures GW (for sync purposes)
+export function getFixturesGW() {
+  return fixturesGW;
+}
+
+// Function to set fixtures GW from external sources (e.g., pitch navigation)
+export function setFixturesGW(gw) {
+  fixturesGW = gw;
+  renderFixtures();
+}
+
+// Function to check if sync is enabled
+export function isFixturesSyncEnabled() {
+  return fixturesSyncEnabled;
+}
+
+// Load sync state from localStorage on module init
+function loadSyncState() {
+  try {
+    const saved = localStorage.getItem('fplplanner-fixtures-sync');
+    if (saved !== null) {
+      fixturesSyncEnabled = JSON.parse(saved);
+    }
+  } catch (e) {
+    console.error('Failed to load fixtures sync state:', e);
+  }
+}
 
 export function renderFixtures() {
   const panel = document.getElementById('fixturesPanel');
