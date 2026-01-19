@@ -15,6 +15,7 @@
   position: relative;
   min-height: 323px;
   border: 2px solid rgba(255, 255, 255, 0.1);
+  overflow: visible;
 }
 
 /* Pitch top controls container - contains chip UI centered at top */
@@ -148,6 +149,7 @@
   margin-bottom: 7px;
   min-height: 85px;
   flex-wrap: nowrap;
+  overflow: visible;
 }
 
 #plannerMain .pitch {
@@ -166,6 +168,7 @@
   position: relative;
   transition: all 0.2s;
   cursor: pointer;
+  overflow: visible;
 }
 
 .player-card:hover {
@@ -242,6 +245,7 @@
   justify-content: center;
   font-size: 12px;
   transition: transform 0.1s;
+  z-index: 25;
 }
 
 .card-btn:hover {
