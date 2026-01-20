@@ -213,9 +213,22 @@
 
       // Click handler for badge containers to toggle captain selector
       document.addEventListener('click', (e) => {
+        // Check if click is on badge-container, player name, or club crest (badge)
         const badgeContainer = e.target.closest('.badge-container');
+        const playerCard = e.target.closest('.player-card');
         
-        if (badgeContainer) {
+        // Allow triggering from badge-container, player name (.name), or club badge (.badge)
+        const nameElement = e.target.closest('.player-card .name');
+        const badgeElement = e.target.closest('.badge-container .badge');
+        
+        if (badgeContainer || (playerCard && (nameElement || badgeElement))) {
+          // Get the badge container - either directly or from the player card
+          const targetBadgeContainer = badgeContainer || (playerCard ? playerCard.querySelector('.badge-container') : null);
+          
+          if (!targetBadgeContainer) {
+            return;
+          }
+          
           // Check if click is on a captain button - if so, let it execute normally
           const isCaptainBtn = e.target.closest('.captain-btn');
           if (isCaptainBtn) {
@@ -233,13 +246,13 @@
           
           // First, close any other open captain selectors
           document.querySelectorAll('.badge-container.show-captain-options').forEach(el => {
-            if (el !== badgeContainer) {
+            if (el !== targetBadgeContainer) {
               el.classList.remove('show-captain-options');
             }
           });
           
           // Toggle this one
-          badgeContainer.classList.toggle('show-captain-options');
+          targetBadgeContainer.classList.toggle('show-captain-options');
         } else {
           // Click outside - close all captain selectors
           document.querySelectorAll('.badge-container.show-captain-options').forEach(el => {
