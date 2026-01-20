@@ -201,6 +201,24 @@
   min-height: 12px;
 }
 
+/* Phase 4: Default desktop behavior - show long labels, hide short labels */
+.player-card .info .price .price-label-short {
+  display: none;
+}
+
+.player-card .info .price .price-label-long {
+  display: inline;
+}
+
+/* Phase 4: Default desktop behavior - show full fixtures, hide compact fixtures */
+.player-card .future-fixtures .fixture .fixture-full {
+  display: inline;
+}
+
+.player-card .future-fixtures .fixture .fixture-compact {
+  display: none;
+}
+
 .card-btn {
   position: absolute;
   width: 15px;

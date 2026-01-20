@@ -77,6 +77,16 @@ function formatOpponent(teamId, fixture) {
   return `${opp} (${isHome ? 'H' : 'A'})`;
 }
 
+function formatOpponentCompact(teamId, fixture) {
+  if (!fixture) return '--';
+
+  const isHome = fixture.team_h === teamId;
+  const oppId = isHome ? fixture.team_a : fixture.team_h;
+  const opp = getTeamShortName(oppId) || '???';
+  // Home fixtures: UPPERCASE, Away fixtures: lowercase
+  return isHome ? opp.toUpperCase() : opp.toLowerCase();
+}
+
 function getNextFixturesForTeam(teamId, startGW, count = 4) {
   const out = [];
   for (let i = 0; i < count; i++) {
@@ -90,6 +100,23 @@ function getNextFixturesForTeam(teamId, startGW, count = 4) {
     const list = fixturesByGW.get(gw);
     const fx = bestFixtureForTeamInGW(teamId, list);
     out.push(formatOpponent(teamId, fx));
+  }
+  return out;
+}
+
+function getNextFixturesCompact(teamId, startGW, count = 4) {
+  const out = [];
+  for (let i = 0; i < count; i++) {
+    const gw = startGW + i;
+
+    if (!fixturesByGW.has(gw)) {
+      out.push('--');
+      continue;
+    }
+
+    const list = fixturesByGW.get(gw);
+    const fx = bestFixtureForTeamInGW(teamId, list);
+    out.push(formatOpponentCompact(teamId, fx));
   }
   return out;
 }
@@ -305,12 +332,23 @@ function playerCard(entry, source) {
       : state.priceMode === 'purchase'
         ? 'Buy'
         : 'Sell';
+  
+  const shortLabel =
+    state.priceMode === 'current'
+      ? 'C'
+      : state.priceMode === 'purchase'
+        ? 'P'
+        : 'S';
 
   const fx = getNextFixturesForTeam(teamId, state.viewingGW, 4);
+  const fxCompact = getNextFixturesCompact(teamId, state.viewingGW, 4);
   const fx1 = fx[0] || '--';
   const fx2 = fx[1] || '--';
   const fx3 = fx[2] || '--';
   const fx4 = fx[3] || '--';
+  const fx2Compact = fxCompact[1] || '--';
+  const fx3Compact = fxCompact[2] || '--';
+  const fx4Compact = fxCompact[3] || '--';
 
   const removeFn = `removePlayer(${entry.id}, '${source}')`;
   const subFn = `substitutePlayer(${entry.id})`;
@@ -408,13 +446,13 @@ function playerCard(entry, source) {
       <div class="info">
         <span class="team">${teamShort}</span>
         <span class="next-fixture fixture-next">${fx1}</span>
-        <span class="price">${label} ${price}</span>
+        <span class="price"><span class="price-label price-label-long">${label}</span><span class="price-label price-label-short">${shortLabel}</span> ${price}</span>
       </div>
 
       <div class="future-fixtures">
-        <span class="fixture">${fx2}</span>
-        <span class="fixture">${fx3}</span>
-        <span class="fixture">${fx4}</span>
+        <span class="fixture"><span class="fixture-full">${fx2}</span><span class="fixture-compact">${fx2Compact}</span></span>
+        <span class="fixture"><span class="fixture-full">${fx3}</span><span class="fixture-compact">${fx3Compact}</span></span>
+        <span class="fixture"><span class="fixture-full">${fx4}</span><span class="fixture-compact">${fx4Compact}</span></span>
       </div>
     </div>
   `;
@@ -450,13 +488,13 @@ function placeholderCard(removedPlayer, source) {
       <div class="info">
         <span class="team">${teamShort}</span>
         <span class="next-fixture fixture-next">--</span>
-        <span class="price">Sell ${price}</span>
+        <span class="price"><span class="price-label price-label-long">Sell</span><span class="price-label price-label-short">S</span> ${price}</span>
       </div>
 
       <div class="future-fixtures">
-        <span class="fixture">--</span>
-        <span class="fixture">--</span>
-        <span class="fixture">--</span>
+        <span class="fixture"><span class="fixture-full">--</span><span class="fixture-compact">--</span></span>
+        <span class="fixture"><span class="fixture-full">--</span><span class="fixture-compact">--</span></span>
+        <span class="fixture"><span class="fixture-full">--</span><span class="fixture-compact">--</span></span>
       </div>
     </div>
   `;

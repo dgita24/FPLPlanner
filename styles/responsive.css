@@ -136,6 +136,20 @@
     max-width: 100%;
   }
 
+  /* Phase 4: Hide club short name on mobile/tablet */
+  .player-card .info .team {
+    display: none;
+  }
+
+  /* Phase 4: Show short price labels (S/P/C) and hide long labels (Sell/Buy/Cur) */
+  .player-card .info .price .price-label-long {
+    display: none;
+  }
+
+  .player-card .info .price .price-label-short {
+    display: inline;
+  }
+
   .player-card .info .price {
     font-size: 8px;
     white-space: nowrap;
@@ -162,6 +176,15 @@
     font-size: 8px;
     gap: 3px;
     row-gap: 2px;
+  }
+
+  /* Phase 4: Show compact fixture text and hide full fixture text */
+  .player-card .future-fixtures .fixture .fixture-full {
+    display: none;
+  }
+
+  .player-card .future-fixtures .fixture .fixture-compact {
+    display: inline;
   }
 
   /* B. Bottom Fixture Row: Add min/max-width for fixture boxes with ellipsis */
