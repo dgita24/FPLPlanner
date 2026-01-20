@@ -1492,7 +1492,8 @@
   }
 
   /* Adjust formation line gap and min-height for better spacing */
-  /* Gap sized to fit 5 cards: (65*5) + (5*4) = 345px fits in 360px */
+  /* Gap sized to fit 5 cards: (65*5) + (5*4) = 325px + 20px = 345px fits in 360px */
+  /* Note: 65px width includes padding (box-sizing: border-box) */
   .formation-line {
     gap: 5px;
     min-height: 85px;
