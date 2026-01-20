@@ -1523,23 +1523,24 @@
   }
 
   /* Adjust captain/status badges for smaller cards */
+  /* Badges are 16px (same as 600px breakpoint), so use same 6px font */
   .captain-badge {
     left: -26px;
     width: 16px;
     height: 16px;
-    font-size: 7px;
+    font-size: 6px;
   }
 
   .captain-btn {
     width: 16px;
     height: 16px;
-    font-size: 7px;
+    font-size: 6px;
   }
 
   .status-flag-badge {
     right: -26px;
     width: 16px;
     height: 16px;
-    font-size: 7px;
+    font-size: 6px;
   }
 }
