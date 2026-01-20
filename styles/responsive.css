@@ -302,7 +302,6 @@
   }
 
   .header {
-    padding: 8px;
     width: 100%;
     height: auto;
     flex-direction: column;
@@ -794,7 +793,6 @@
   }
 
   .header {
-    padding: 6px 10px;
     margin-bottom: 8px;
   }
 
@@ -896,7 +894,6 @@
   }
 
   .header {
-    padding: 4px 8px;
     margin-bottom: 6px;
   }
 
