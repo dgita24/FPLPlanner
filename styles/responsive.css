@@ -217,13 +217,13 @@
   }
 
   .btn-remove {
-    top: -4px;
-    left: -4px;
+    top: 2px;
+    left: 2px;
   }
 
   .btn-swap {
-    top: -4px;
-    right: -4px;
+    top: 2px;
+    right: 2px;
   }
 
   /* Formation line - ensure no wrap but allow overflow scroll */
@@ -643,13 +643,13 @@
   }
 
   .btn-remove {
-    top: -3px;
-    left: -3px;
+    top: 2px;
+    left: 2px;
   }
 
   .btn-swap {
-    top: -3px;
-    right: -3px;
+    top: 2px;
+    right: 2px;
   }
 
   /* Formation and bench - tighter gaps with better spacing */
@@ -1171,13 +1171,13 @@
   }
 
   .btn-remove {
-    top: -4px;
-    left: -4px;
+    top: 2px;
+    left: 2px;
   }
 
   .btn-swap {
-    top: -4px;
-    right: -4px;
+    top: 2px;
+    right: 2px;
   }
 
   /* Formation and bench spacing */
@@ -1414,6 +1414,35 @@
   }
 }
 
+/* ===== Tablet Portrait Overrides (Better spacing for tablets) ===== */
+/* Tablets in portrait have much more room than phones - give them better spacing */
+/* This targets tablets (481-900px) in portrait ONLY, falling between: */
+/* - The 900px breakpoint (which applies to both portrait and landscape) */
+/* - The 480px mobile portrait breakpoint (which only applies to small phones) */
+/* This ensures tablets get comfortable 12px gaps without affecting desktop or phone layouts */
+@media (min-width: 481px) and (max-width: 900px) and (orientation: portrait) {
+  /* Increase card spacing for tablets - they have plenty of room */
+  /* Combined formation-line rules and removed !important */
+  .formation-line {
+    gap: 12px;
+    overflow-x: hidden;
+  }
+
+  .bench-slots {
+    gap: 12px;
+    overflow-x: hidden;
+  }
+
+  /* Ensure no horizontal scrolling on tablets */
+  .pitch {
+    overflow-x: hidden;
+  }
+
+  .bench {
+    overflow-x: hidden;
+  }
+}
+
 /* ===== Mobile Portrait Pitch Overrides (DO NOT AFFECT DESKTOP) ===== */
 /* Phase 1: CSS-only fix for mobile portrait to eliminate gutters and horizontal scrolling */
 @media (max-width: 480px) and (orientation: portrait) {
@@ -1463,5 +1492,98 @@
 
   .bench-slots {
     overflow-x: hidden;
+  }
+
+  /* ===== Phase 2: Card sizing and spacing to prevent overlap ===== */
+  
+  /* Tune player card width and padding for 360-430px portrait phones */
+  /* Must fit 5 cards for 3-5-2 and 5-3-2 formations in 360px viewport */
+  /* Note: 65px is larger than 480px breakpoint (52px) because portrait mode */
+  /* has more vertical space, allowing us to use larger cards for better UX */
+  /* while still preventing horizontal overlap in 5-card formations */
+  .player-card {
+    width: 65px;
+    min-width: 65px;
+    padding: 2px;
+  }
+
+  /* Adjust text sizes proportionally for 65px cards (vs 52px at 480px) */
+  .player-card .name {
+    font-size: 8px;
+  }
+
+  .player-card .info {
+    font-size: 7px;
+  }
+
+  .player-card .fixtures {
+    font-size: 6px;
+  }
+
+  /* Adjust formation line gap and min-height for better spacing */
+  /* Gap sized to fit 5 cards: (65*5) + (5*4) = 325px + 20px = 345px fits in 360px */
+  /* Note: 65px width includes padding (box-sizing: border-box) */
+  .formation-line {
+    gap: 5px;
+    min-height: 85px;
+    padding-top: 8px;
+    padding-bottom: 5px;
+  }
+
+  /* Adjust bench slots gap */
+  .bench-slots {
+    gap: 5px;
+  }
+
+  /* Reduce badge container size to match smaller cards */
+  .badge-container {
+    width: 26px;
+    height: 26px;
+  }
+
+  .badge-container .badge {
+    width: 26px;
+    height: 26px;
+  }
+
+  /* Adjust card button positioning to prevent overlap on smaller cards */
+  /* Buttons positioned INSIDE card corners to prevent overlap with adjacent cards */
+  /* Mobile portrait has 5px gap (tight for 5-card formations); buttons inside prevent overlap */
+  .card-btn {
+    width: 12px;
+    height: 12px;
+    font-size: 9px;
+  }
+
+  .btn-remove {
+    top: 2px;
+    left: 2px;
+  }
+
+  .btn-swap {
+    top: 2px;
+    right: 2px;
+  }
+
+  /* Adjust captain/status badges for smaller cards */
+  /* Badges are 16px (same as 600px breakpoint), so use same 6px font */
+  .captain-badge {
+    left: -26px;
+    width: 16px;
+    height: 16px;
+    font-size: 6px;
+  }
+
+  .captain-btn {
+    width: 16px;
+    height: 16px;
+    font-size: 6px;
+  }
+
+  .status-flag-badge {
+    right: -26px;
+    width: 16px;
+    height: 16px;
+    font-size: 6px;
   }
 }

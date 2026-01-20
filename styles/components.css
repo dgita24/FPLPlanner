@@ -222,14 +222,14 @@
 }
 
 .btn-remove {
-  top: -5px;
-  left: -5px;
+  top: 2px;
+  left: 2px;
   background: #ff4444;
 }
 
 .btn-swap {
-  top: -5px;
-  right: -5px;
+  top: 2px;
+  right: 2px;
   background: #4444ff;
   font-size: 9px;
 }
