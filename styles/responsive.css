@@ -1478,6 +1478,19 @@
     padding: 2px;
   }
 
+  /* Adjust text sizes proportionally for 65px cards (vs 52px at 480px) */
+  .player-card .name {
+    font-size: 8px;
+  }
+
+  .player-card .info {
+    font-size: 7px;
+  }
+
+  .player-card .fixtures {
+    font-size: 6px;
+  }
+
   /* Adjust formation line gap and min-height for better spacing */
   /* Gap sized to fit 5 cards: (65*5) + (5*4) = 345px fits in 360px */
   .formation-line {
