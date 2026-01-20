@@ -1464,4 +1464,77 @@
   .bench-slots {
     overflow-x: hidden;
   }
+
+  /* ===== Phase 2: Card sizing and spacing to prevent overlap ===== */
+  
+  /* Tune player card width and padding for 360-430px portrait phones */
+  /* Must fit 5 cards for 3-5-2 and 5-3-2 formations in 360px viewport */
+  .player-card {
+    width: 65px;
+    min-width: 65px;
+    padding: 3px;
+  }
+
+  /* Adjust formation line gap and min-height for better spacing */
+  /* Gap sized to fit 5 cards: (65*5) + (5*4) = 345px fits in 360px */
+  .formation-line {
+    gap: 5px;
+    min-height: 85px;
+    padding-top: 8px;
+    padding-bottom: 5px;
+  }
+
+  /* Adjust bench slots gap */
+  .bench-slots {
+    gap: 5px;
+  }
+
+  /* Reduce badge container size to match smaller cards */
+  .badge-container {
+    width: 26px;
+    height: 26px;
+  }
+
+  .badge-container .badge {
+    width: 26px;
+    height: 26px;
+  }
+
+  /* Adjust card button positioning to prevent overlap on smaller cards */
+  .card-btn {
+    width: 13px;
+    height: 13px;
+    font-size: 9px;
+  }
+
+  .btn-remove {
+    top: -4px;
+    left: -4px;
+  }
+
+  .btn-swap {
+    top: -4px;
+    right: -4px;
+  }
+
+  /* Adjust captain/status badges for smaller cards */
+  .captain-badge {
+    left: -26px;
+    width: 16px;
+    height: 16px;
+    font-size: 7px;
+  }
+
+  .captain-btn {
+    width: 16px;
+    height: 16px;
+    font-size: 7px;
+  }
+
+  .status-flag-badge {
+    right: -26px;
+    width: 16px;
+    height: 16px;
+    font-size: 7px;
+  }
 }
