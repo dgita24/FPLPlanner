@@ -1171,7 +1171,6 @@
     gap: 1px;
     padding: 0 1px;
     display: flex;
-    justify-content: space-between;
     max-width: 100%;
     overflow: hidden;
   }
