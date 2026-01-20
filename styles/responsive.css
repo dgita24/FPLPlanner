@@ -1416,6 +1416,10 @@
 
 /* ===== Tablet Portrait Overrides (Better spacing for tablets) ===== */
 /* Tablets in portrait have much more room than phones - give them better spacing */
+/* This targets tablets (481-900px) in portrait ONLY, falling between: */
+/* - The 900px breakpoint (which applies to both portrait and landscape) */
+/* - The 480px mobile portrait breakpoint (which only applies to small phones) */
+/* This ensures tablets get comfortable 12px gaps without affecting desktop or phone layouts */
 @media (min-width: 481px) and (max-width: 900px) and (orientation: portrait) {
   /* Increase card spacing for tablets - they have plenty of room */
   /* Combined formation-line rules and removed !important */
@@ -1544,7 +1548,7 @@
 
   /* Adjust card button positioning to prevent overlap on smaller cards */
   /* Buttons positioned INSIDE card corners to prevent overlap with adjacent cards */
-  /* With 5px gap and buttons outside cards, they would overlap */
+  /* Mobile portrait has 5px gap (tight for 5-card formations); buttons inside prevent overlap */
   .card-btn {
     width: 12px;
     height: 12px;
