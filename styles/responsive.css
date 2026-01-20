@@ -136,27 +136,33 @@
     white-space: nowrap;
   }
 
-  /* A. Font size & wrap: Shrink next-fixture font */
+  /* A. Font size & wrap: Shrink next-fixture font with ellipsis */
   .player-card .info .next-fixture {
     font-size: 8px;
     white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 35px;
   }
 
-  /* B. Bottom Fixture Row: Set display flex with space-between and allow wrapping */
+  /* B. Bottom Fixture Row: Set display flex with center and allow wrapping */
   .player-card .future-fixtures {
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     flex-wrap: wrap;
     font-size: 8px;
     gap: 3px;
     row-gap: 2px;
   }
 
-  /* B. Bottom Fixture Row: Add min-width for fixture boxes */
+  /* B. Bottom Fixture Row: Add min/max-width for fixture boxes with ellipsis */
   .player-card .future-fixtures .fixture {
     font-size: 8px;
     min-width: 20px;
+    max-width: 30px;
     white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   /* Badge size reduction */
@@ -552,27 +558,33 @@
     white-space: nowrap;
   }
 
-  /* A. Font size & wrap: Shrink next-fixture font */
+  /* A. Font size & wrap: Shrink next-fixture font with ellipsis */
   .player-card .info .next-fixture {
     font-size: 6px;
     white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 30px;
   }
 
-  /* B. Bottom Fixture Row: Set display flex with space-between and allow wrapping */
+  /* B. Bottom Fixture Row: Set display flex with center and allow wrapping */
   .player-card .future-fixtures {
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     flex-wrap: wrap;
     font-size: 6px;
     gap: 2px;
     row-gap: 1px;
   }
 
-  /* B. Bottom Fixture Row: Add min-width for fixture boxes */
+  /* B. Bottom Fixture Row: Add min/max-width for fixture boxes with ellipsis */
   .player-card .future-fixtures .fixture {
     font-size: 6px;
     min-width: 15px;
+    max-width: 22px;
     white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .player-card .fixtures {
