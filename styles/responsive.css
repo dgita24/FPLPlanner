@@ -130,10 +130,9 @@
   .player-card .info {
     font-size: 8px;
     padding: 0 2px;
-    display: grid;
-    grid-template-columns: 1fr auto;
+    display: flex;
     align-items: center;
-    column-gap: 4px;
+    gap: 4px;
     max-width: 100%;
   }
 
@@ -153,28 +152,30 @@
 
   /* Phase 4: Price should be right-aligned, larger, and not truncated */
   .player-card .info .price {
-    font-size: 10px;
     font-weight: 700;
     white-space: nowrap;
-    justify-self: end;
+    flex: 0 0 auto;
+    margin-left: auto;
+    text-align: right;
   }
 
   /* Phase 4: Next fixture takes remaining space, bold, with ellipsis for overflow */
   .player-card .info .next-fixture {
-    font-size: 8px;
     font-weight: 700;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    flex: 1 1 auto;
     min-width: 0;
+    text-align: left;
   }
 
-  /* B. Bottom Fixture Row: Set display grid with 3 columns for tight spacing */
+  /* B. Bottom Fixture Row: Set display flex with tight spacing */
   .player-card .future-fixtures {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    display: flex;
+    justify-content: center;
     gap: 2px;
-    justify-items: center;
+    flex-wrap: nowrap;
     font-size: 8px;
   }
 
@@ -195,9 +196,8 @@
     display: inline;
   }
 
-  /* Phase 4: Future fixtures should display fully without truncation */
   .player-card .future-fixtures .fixture {
-    font-size: 8px;
+    flex: 0 0 auto;
     white-space: nowrap;
   }
 
@@ -407,32 +407,17 @@
     font-weight: 800;
   }
 
-  /* Adjust player card info for mobile */
+  /* Keep ≤900 layout model; only adjust sizing here */
   .player-card .info {
     font-size: 7px;
-    padding: 0 2px;
-    display: flex;
-    align-items: center;
-    gap: 3px;
-    max-width: 100%;
   }
 
-  /* Ensure price is visible, right-aligned, and larger */
   .player-card .info .price {
     font-size: 9px;
-    font-weight: 700;
-    white-space: nowrap;
-    flex-shrink: 0;
-    margin-left: auto;
   }
 
-  /* Next fixture takes remaining space, bold */
   .player-card .info .next-fixture {
     font-size: 7px;
-    font-weight: 700;
-    white-space: nowrap;
-    flex-grow: 1;
-    min-width: 0;
   }
 
   /* Contain fixtures within card boundaries */
@@ -452,7 +437,9 @@
   }
 
   .captain-badge {
-    left: -28px;
+    left: 2px;
+    top: 2px;
+    transform: none;
     width: 18px;
     height: 18px;
     font-size: 7px;
@@ -476,7 +463,9 @@
 
   /* Status flag badge adjustments */
   .status-flag-badge {
-    right: -28px;
+    right: 2px;
+    top: 2px;
+    transform: none;
     width: 16px;
     height: 16px;
     font-size: 7px;
@@ -607,48 +596,25 @@
     font-weight: 800;
   }
 
-  /* A. Font size & wrap: Shrink info and price font */
+  /* Keep ≤900 layout model; only adjust sizing here */
   .player-card .info {
     font-size: 6px;
     padding: 0 1px;
-    display: flex;
-    align-items: center;
-    gap: 2px;
-    max-width: 100%;
   }
 
-  /* Price should be right-aligned and larger */
   .player-card .info .price {
     font-size: 8px;
-    font-weight: 700;
-    white-space: nowrap;
-    flex-shrink: 0;
-    margin-left: auto;
   }
 
-  /* Next fixture takes remaining space, bold */
   .player-card .info .next-fixture {
     font-size: 6px;
-    font-weight: 700;
-    white-space: nowrap;
-    flex-grow: 1;
-    min-width: 0;
   }
 
-  /* B. Bottom Fixture Row: Set display flex with center and allow wrapping */
+  /* Keep 3 fixtures on one row */
   .player-card .future-fixtures {
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-    font-size: 6px;
+    flex-wrap: nowrap;
     gap: 1px;
-    row-gap: 1px;
-  }
-
-  /* Future fixtures should display fully */
-  .player-card .future-fixtures .fixture {
     font-size: 6px;
-    white-space: nowrap;
   }
 
   .player-card .fixtures {
@@ -676,9 +642,11 @@
     font-size: 6px;
   }
 
-  /* Captain badge - keep on left side but adjust size */
+  /* Captain badge - keep inside card */
   .captain-badge {
-    left: -26px;
+    left: 2px;
+    top: 2px;
+    transform: none;
     width: 16px;
     height: 16px;
     font-size: 6px;
@@ -692,7 +660,9 @@
 
   /* Status flag badge adjustments */
   .status-flag-badge {
-    right: -26px;
+    right: 2px;
+    top: 2px;
+    transform: none;
     width: 16px;
     height: 16px;
     font-size: 6px;
@@ -1178,28 +1148,11 @@
     font-weight: 800;
   }
 
+  /* Keep ≤900 layout model; only adjust sizing here */
   .player-card .info {
     font-size: 6px;
-    gap: 1px;
+    gap: 2px;
     padding: 0 1px;
-    display: flex;
-    max-width: 100%;
-    overflow: hidden;
-  }
-
-  .player-card .info .next-fixture {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 18px;
-  }
-
-  .player-card .info .price {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 22px;
-    flex-shrink: 0;
   }
 
   .player-card .fixtures {
@@ -1218,9 +1171,19 @@
   }
 
   /* Captain/VC badges */
-  .captain-selector,
+  .captain-selector {
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: auto;
+    height: auto;
+    font-size: 6px;
+  }
+
   .captain-badge {
-    left: -24px;
+    left: 2px;
+    top: 2px;
+    transform: none;
     width: 14px;
     height: 14px;
     font-size: 6px;
@@ -1234,7 +1197,9 @@
 
   /* Status flags */
   .status-flag-badge {
-    right: -24px;
+    right: 2px;
+    top: 2px;
+    transform: none;
     width: 14px;
     height: 14px;
     font-size: 6px;
@@ -1678,7 +1643,9 @@
   /* Adjust captain/status badges for smaller cards */
   /* Badges are 16px (same as 600px breakpoint), so use same 6px font */
   .captain-badge {
-    left: -26px;
+    left: 2px;
+    top: 2px;
+    transform: none;
     width: 16px;
     height: 16px;
     font-size: 6px;
@@ -1691,7 +1658,9 @@
   }
 
   .status-flag-badge {
-    right: -26px;
+    right: 2px;
+    top: 2px;
+    transform: none;
     width: 16px;
     height: 16px;
     font-size: 6px;
