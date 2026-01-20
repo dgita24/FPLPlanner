@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+  <title>Mobile Captain Selector Demo</title>
+  <link rel="stylesheet" href="styles/main.css" />
+  <link rel="stylesheet" href="styles/components.css" />
+  <link rel="stylesheet" href="styles/responsive.css" />
+  <style>
+    body {
+      padding: 20px;
+      background: #37003c;
+    }
+    
+    .demo-container {
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    
+    h1 {
+      color: #00ff87;
+      text-align: center;
+      margin-bottom: 10px;
+    }
+    
+    .instructions {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      color: #fff;
+      font-size: 14px;
+    }
+    
+    .demo-pitch {
+      background: linear-gradient(to bottom, #4a7c2c 0%, #3a6622 100%);
+      padding: 30px 20px;
+      border-radius: 10px;
+      border: 2px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .demo-formation-line {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+    
+    .status-indicator {
+      margin-top: 20px;
+      padding: 15px;
+      background: rgba(0, 255, 135, 0.1);
+      border: 2px solid #00ff87;
+      border-radius: 8px;
+      color: #00ff87;
+      text-align: center;
+      font-weight: bold;
+      min-height: 50px;
+    }
+  </style>
+</head>
+<body>
+  <div class="demo-container">
+    <h1>📱 Mobile Captain Selector Demo</h1>
+    
+    <div class="instructions">
+      <strong>Instructions:</strong>
+      <ul>
+        <li><strong>Desktop/Mouse:</strong> Hover over the badge area to see captain options</li>
+        <li><strong>Mobile/Touch:</strong> Tap on the badge area to show/hide captain options</li>
+        <li>Click "C" to set as Captain, "VC" to set as Vice-Captain</li>
+        <li>Tap outside to close the selector</li>
+      </ul>
+    </div>
+    
+    <div class="demo-pitch">
+      <div class="demo-formation-line">
+        <!-- Player 1 -->
+        <div class="player-card">
+          <div class="badge-container" data-player="1">
+            <div class="captain-badge c" id="badge-1" style="display: none;">C</div>
+            <div class="captain-selector">
+              <button class="captain-btn" onclick="setCaptain(1)" title="Set as Captain">C</button>
+              <button class="captain-btn" onclick="setViceCaptain(1)" title="Set as Vice-Captain">VC</button>
+            </div>
+            <img src="https://resources.premierleague.com/premierleague/badges/70/t3.png"
+                 class="badge" alt="Arsenal">
+          </div>
+          <div class="name">Player One</div>
+          <div class="info">
+            <span class="team">ARS</span>
+            <span class="fixture">CHE (H)</span>
+            <span class="price">£10.0</span>
+          </div>
+        </div>
+
+        <!-- Player 2 -->
+        <div class="player-card">
+          <div class="badge-container" data-player="2">
+            <div class="captain-badge vc" id="badge-2" style="display: none;">VC</div>
+            <div class="captain-selector">
+              <button class="captain-btn" onclick="setCaptain(2)" title="Set as Captain">C</button>
+              <button class="captain-btn" onclick="setViceCaptain(2)" title="Set as Vice-Captain">VC</button>
+            </div>
+            <img src="https://resources.premierleague.com/premierleague/badges/70/t1.png"
+                 class="badge" alt="Liverpool">
+          </div>
+          <div class="name">Player Two</div>
+          <div class="info">
+            <span class="team">LIV</span>
+            <span class="fixture">MUN (A)</span>
+            <span class="price">£12.5</span>
+          </div>
+        </div>
+
+        <!-- Player 3 -->
+        <div class="player-card">
+          <div class="badge-container" data-player="3">
+            <div class="captain-badge" id="badge-3" style="display: none;"></div>
+            <div class="captain-selector">
+              <button class="captain-btn" onclick="setCaptain(3)" title="Set as Captain">C</button>
+              <button class="captain-btn" onclick="setViceCaptain(3)" title="Set as Vice-Captain">VC</button>
+            </div>
+            <img src="https://resources.premierleague.com/premierleague/badges/70/t43.png"
+                 class="badge" alt="Man City">
+          </div>
+          <div class="name">Player Three</div>
+          <div class="info">
+            <span class="team">MCI</span>
+            <span class="fixture">TOT (H)</span>
+            <span class="price">£11.0</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="status-indicator" id="status">
+      No captain/vice-captain selected
+    </div>
+  </div>
+
+  <script type="module">
+    // Mock captain selection state
+    let captain = null;
+    let viceCaptain = null;
+
+    function updateStatus() {
+      const statusEl = document.getElementById('status');
+      const captainText = captain ? `Captain: Player ${captain}` : 'No captain';
+      const vcText = viceCaptain ? `Vice-Captain: Player ${viceCaptain}` : 'No vice-captain';
+      statusEl.textContent = `${captainText} | ${vcText}`;
+      
+      // Update badges
+      for (let i = 1; i <= 3; i++) {
+        const badge = document.getElementById(`badge-${i}`);
+        if (captain === i) {
+          badge.style.display = 'flex';
+          badge.textContent = 'C';
+          badge.classList.add('c');
+          badge.classList.remove('vc');
+        } else if (viceCaptain === i) {
+          badge.style.display = 'flex';
+          badge.textContent = 'VC';
+          badge.classList.add('vc');
+          badge.classList.remove('c');
+        } else {
+          badge.style.display = 'none';
+        }
+      }
+    }
+
+    window.setCaptain = (playerId) => {
+      captain = playerId;
+      updateStatus();
+      // Close selectors
+      setTimeout(() => {
+        document.querySelectorAll('.badge-container.show-captain-options').forEach(el => {
+          el.classList.remove('show-captain-options');
+        });
+      }, 100);
+    };
+
+    window.setViceCaptain = (playerId) => {
+      viceCaptain = playerId;
+      updateStatus();
+      // Close selectors
+      setTimeout(() => {
+        document.querySelectorAll('.badge-container.show-captain-options').forEach(el => {
+          el.classList.remove('show-captain-options');
+        });
+      }, 100);
+    };
+
+    // Touch/click handler for captain selector
+    function setupCaptainSelectorTouchHandlers() {
+      // Detect if device is touch-capable
+      function isTouchDevice() {
+        return ('ontouchstart' in window) || 
+               (navigator.maxTouchPoints > 0) || 
+               (navigator.msMaxTouchPoints > 0) ||
+               window.matchMedia('(pointer: coarse)').matches ||
+               window.matchMedia('(max-width: 900px)').matches;
+      }
+
+      // Only add touch handlers on touch devices
+      if (!isTouchDevice()) {
+        console.log('Desktop mode - using hover interactions');
+        return;
+      }
+
+      console.log('Touch mode - using tap interactions');
+
+      // Click handler for badge containers to toggle captain selector
+      document.addEventListener('click', (e) => {
+        const badgeContainer = e.target.closest('.badge-container');
+        
+        if (badgeContainer) {
+          // Check if click is on a captain button - if so, let it execute normally
+          const isCaptainBtn = e.target.closest('.captain-btn');
+          if (isCaptainBtn) {
+            // After the button click, remove all show-captain-options classes
+            setTimeout(() => {
+              document.querySelectorAll('.badge-container.show-captain-options').forEach(el => {
+                el.classList.remove('show-captain-options');
+              });
+            }, 50);
+            return;
+          }
+
+          // Toggle the captain selector for this badge container
+          e.stopPropagation();
+          
+          // First, close any other open captain selectors
+          document.querySelectorAll('.badge-container.show-captain-options').forEach(el => {
+            if (el !== badgeContainer) {
+              el.classList.remove('show-captain-options');
+            }
+          });
+          
+          // Toggle this one
+          badgeContainer.classList.toggle('show-captain-options');
+        } else {
+          // Click outside - close all captain selectors
+          document.querySelectorAll('.badge-container.show-captain-options').forEach(el => {
+            el.classList.remove('show-captain-options');
+          });
+        }
+      });
+    }
+
+    // Initialize
+    setupCaptainSelectorTouchHandlers();
+    updateStatus();
+  </script>
+</body>
+</html>
