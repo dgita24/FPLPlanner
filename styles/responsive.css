@@ -1414,6 +1414,36 @@
   }
 }
 
+/* ===== Tablet Portrait Overrides (Better spacing for tablets) ===== */
+/* Tablets in portrait have much more room than phones - give them better spacing */
+@media (min-width: 481px) and (max-width: 900px) and (orientation: portrait) {
+  /* Increase card spacing for tablets - they have plenty of room */
+  .formation-line {
+    gap: 12px !important;
+  }
+
+  .bench-slots {
+    gap: 12px;
+  }
+
+  /* Ensure no horizontal scrolling on tablets */
+  .pitch {
+    overflow-x: hidden;
+  }
+
+  .formation-line {
+    overflow-x: hidden;
+  }
+
+  .bench {
+    overflow-x: hidden;
+  }
+
+  .bench-slots {
+    overflow-x: hidden;
+  }
+}
+
 /* ===== Mobile Portrait Pitch Overrides (DO NOT AFFECT DESKTOP) ===== */
 /* Phase 1: CSS-only fix for mobile portrait to eliminate gutters and horizontal scrolling */
 @media (max-width: 480px) and (orientation: portrait) {
