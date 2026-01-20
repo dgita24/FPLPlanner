@@ -99,6 +99,140 @@
   }
 }
 
+/* Tablet/Mobile (max-width: 900px) - Step 1 requirement */
+@media (max-width: 900px) {
+  body {
+    padding: 12px;
+  }
+
+  .container {
+    max-width: 100%;
+  }
+
+  /* Player card adjustments for 900px */
+  .player-card {
+    width: 100px;
+    padding: 4px;
+  }
+
+  .player-card .name {
+    font-size: 9px;
+    padding: 1px 2px;
+  }
+
+  .player-card .info {
+    font-size: 8px;
+    padding: 0 2px;
+  }
+
+  /* Badge size reduction */
+  .badge-container {
+    width: 30px;
+    height: 30px;
+  }
+
+  .badge-container .badge {
+    width: 30px;
+    height: 30px;
+  }
+
+  /* Captain/VC badge adjustments */
+  .captain-selector,
+  .captain-badge {
+    left: -30px;
+    width: 18px;
+    height: 18px;
+    font-size: 7px;
+  }
+
+  .captain-btn {
+    width: 18px;
+    height: 18px;
+    font-size: 7px;
+  }
+
+  /* Status flag badge adjustments */
+  .status-flag-badge {
+    right: -30px;
+    width: 18px;
+    height: 18px;
+    font-size: 7px;
+  }
+
+  /* Card buttons */
+  .card-btn {
+    width: 14px;
+    height: 14px;
+    font-size: 11px;
+  }
+
+  /* Formation line - ensure no wrap but allow overflow scroll */
+  .formation-line {
+    gap: 6px;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 5px;
+  }
+
+  /* Bench slots - ensure no wrap but allow overflow scroll */
+  .bench-slots {
+    gap: 10px;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 5px;
+  }
+
+  .pitch {
+    padding: 14px 8px;
+    overflow-x: auto;
+  }
+
+  .bench {
+    overflow-x: auto;
+  }
+
+  /* Button adjustments */
+  .gw-nav button {
+    padding: 7px 14px;
+    font-size: 13px;
+  }
+
+  .header-btn {
+    padding: 5px 10px;
+    font-size: 11px;
+    height: 28px;
+  }
+
+  .transfer-action-btn {
+    padding: 7px 14px;
+    font-size: 12px;
+    height: 34px;
+  }
+
+  .chip-btn-small {
+    padding: 7px 12px;
+    font-size: 12px;
+    height: 34px;
+  }
+
+  /* Info button adjustments */
+  .info-btn {
+    width: 18px;
+    height: 18px;
+    min-width: 18px;
+    font-size: 10px;
+  }
+
+  /* Fixtures controls */
+  .fixtures-control-btn {
+    padding: 5px 7px;
+    font-size: 10px;
+    height: 28px;
+  }
+}
+
 /* Mobile (max-width: 768px) */
 @media (max-width: 768px) {
   body {
@@ -138,8 +272,7 @@
   .pitch {
     padding: 15px 5px;
     min-height: 300px;
-    /* Ensure pitch doesn't cause overflow */
-    overflow: visible;
+    overflow-x: auto;
   }
 
   /* Stack transfer action buttons vertically on mobile */
@@ -155,14 +288,19 @@
 
   .player-card {
     width: 68px;
-    /* Prevent squashing */
     min-width: 68px;
     flex-shrink: 0;
+    padding: 3px;
+  }
+
+  .player-card .name {
+    font-size: 9px;
+    padding: 1px 2px;
   }
 
   /* Adjust player card info for mobile */
   .player-card .info {
-    font-size: 8px;
+    font-size: 7px;
     text-overflow: ellipsis;
     padding: 0 2px;
   }
@@ -175,7 +313,7 @@
 
   /* Contain fixtures within card boundaries */
   .player-card .fixtures {
-    font-size: 7px;
+    font-size: 6px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -184,38 +322,48 @@
 
   .captain-selector,
   .captain-badge {
-    left: -32px;
-    width: 20px;
-    height: 20px;
-    font-size: 8px;
+    left: -28px;
+    width: 18px;
+    height: 18px;
+    font-size: 7px;
   }
 
   .captain-btn {
-    width: 20px;
-    height: 20px;
-    font-size: 8px;
+    width: 18px;
+    height: 18px;
+    font-size: 7px;
   }
 
   .badge-container {
-    width: 32px;
-    height: 32px;
+    width: 28px;
+    height: 28px;
   }
 
   .badge-container .badge {
-    width: 32px;
-    height: 32px;
+    width: 28px;
+    height: 28px;
+  }
+
+  /* Status flag badge adjustments */
+  .status-flag-badge {
+    right: -28px;
+    width: 16px;
+    height: 16px;
+    font-size: 7px;
   }
 
   .status-flag.right {
-    right: -56px;
+    right: -50px;
   }
 
   .status-flag-canvas {
-    width: 38px;
-    height: 29px;
+    width: 36px;
+    height: 27px;
   }
 
-  .player-card .name {
+  .card-btn {
+    width: 14px;
+    height: 14px;
     font-size: 10px;
   }
 
@@ -223,17 +371,17 @@
     gap: 4px;
     justify-content: center;
     flex-wrap: nowrap;
-    /* Enable horizontal scrolling when formation line content overflows */
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
+    padding-bottom: 5px;
   }
 
   .bench-slots {
     gap: 8px;
     flex-wrap: nowrap;
-    /* Allow horizontal scrolling if needed */
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
+    padding-bottom: 5px;
   }
 
   .filters {
@@ -300,107 +448,175 @@
   }
 }
 
-/* Small Mobile (max-width: 480px) */
-@media (max-width: 480px) {
+/* Mobile (max-width: 600px) - Step 1 requirement */
+@media (max-width: 600px) {
+  body {
+    padding: 8px;
+  }
+
   .header h1 {
     font-size: 18px;
   }
 
-  .sidebar {
-    width: 100%;
-    /* Extra top padding to account for fixed header */
-    padding: 60px 15px 15px;
-  }
-
-  .pitch {
-    padding: 10px 3px;
-    min-height: 250px;
-  }
-
+  /* Further reduce player card size */
   .player-card {
-    width: 62px;
-    min-width: 62px;
-    flex-shrink: 0;
+    width: 58px;
+    min-width: 58px;
+    padding: 3px;
   }
 
-  /* Further reduce sizes for very small screens */
+  .player-card .name {
+    font-size: 8px;
+    padding: 1px 2px;
+  }
+
   .player-card .info {
     font-size: 7px;
-    gap: 2px;
+    padding: 0 1px;
   }
 
-  /* Adjust fixtures size for very small screens */
   .player-card .fixtures {
     font-size: 6px;
   }
 
-  .captain-selector,
-  .captain-badge {
-    left: -28px;
-    width: 18px;
-    height: 18px;
-    font-size: 7px;
-  }
-
-  .captain-btn {
-    width: 18px;
-    height: 18px;
-    font-size: 7px;
-  }
-
+  /* Badge size further reduction */
   .badge-container {
-    width: 28px;
-    height: 28px;
-  }
-
-  .badge-container .badge {
-    width: 28px;
-    height: 28px;
-  }
-
-  .status-flag.right {
-    right: -52px;
-  }
-
-  .status-flag-canvas {
-    width: 34px;
+    width: 26px;
     height: 26px;
   }
 
-  .player-card .name {
+  .badge-container .badge {
+    width: 26px;
+    height: 26px;
+  }
+
+  /* Captain/VC badge adjustments */
+  .captain-selector,
+  .captain-badge {
+    left: -26px;
+    width: 16px;
+    height: 16px;
+    font-size: 6px;
+  }
+
+  .captain-btn {
+    width: 16px;
+    height: 16px;
+    font-size: 6px;
+  }
+
+  /* Status flag badge adjustments */
+  .status-flag-badge {
+    right: -26px;
+    width: 16px;
+    height: 16px;
+    font-size: 6px;
+  }
+
+  /* Card buttons */
+  .card-btn {
+    width: 13px;
+    height: 13px;
     font-size: 9px;
   }
 
+  /* Formation and bench - tighter gaps */
   .formation-line {
     gap: 3px;
-    min-height: 80px;
-    flex-wrap: nowrap;
+    min-height: 75px;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
+    padding-bottom: 5px;
   }
 
   .bench-slots {
     gap: 6px;
-    flex-wrap: nowrap;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
+    padding-bottom: 5px;
   }
 
-  .card-btn {
-    width: 16px;
-    height: 16px;
+  .pitch {
+    padding: 12px 4px;
+    min-height: 280px;
+  }
+
+  .bench h3 {
+    font-size: 14px;
+    margin-bottom: 10px;
+  }
+
+  /* Button size reductions */
+  .gw-nav button {
+    padding: 6px 12px;
     font-size: 12px;
   }
 
-  .gw-nav button {
-    padding: 6px 12px;
-    font-size: 13px;
-  }
-
   .gw-nav h2 {
-    font-size: 18px;
+    font-size: 16px;
   }
 
+  .header-btn {
+    padding: 4px 8px;
+    font-size: 10px;
+    height: 26px;
+  }
+
+  .transfer-action-btn {
+    padding: 6px 12px;
+    font-size: 11px;
+    height: 32px;
+  }
+
+  .chip-btn-small {
+    padding: 6px 10px;
+    font-size: 11px;
+    height: 32px;
+  }
+
+  .info-btn {
+    width: 16px;
+    height: 16px;
+    min-width: 16px;
+    font-size: 9px;
+  }
+
+  .fixtures-control-btn {
+    padding: 4px 6px;
+    font-size: 9px;
+    height: 26px;
+  }
+
+  /* Bank display and price toggle */
+  .bank-display,
+  .price-toggle {
+    font-size: 11px;
+    padding: 3px 8px;
+    height: 26px;
+  }
+
+  .bank-display input {
+    width: 50px;
+    font-size: 11px;
+  }
+
+  .price-toggle select {
+    font-size: 11px;
+  }
+
+  .donate-btn {
+    font-size: 11px;
+    padding: 3px 8px;
+    height: 26px;
+  }
+
+  .sidebar-toggle {
+    font-size: 11px;
+    padding: 5px 10px;
+    height: 26px;
+  }
+
+  /* Table adjustments */
   table {
     font-size: 11px;
   }
@@ -409,12 +625,9 @@
     padding: 4px 2px;
   }
 
+  /* Fixture adjustments */
   .fixture-row {
     grid-template-columns: minmax(80px, 1fr) 45px minmax(80px, 1fr);
-    font-size: 11px;
-  }
-
-  .team-name {
     font-size: 11px;
   }
 
@@ -423,17 +636,282 @@
     height: 16px;
   }
 
-  .fixture-date-banner {
-    font-size: 12px;
+  .club-badge {
+    width: 18px;
+    height: 18px;
+  }
+}
+
+/* Small Mobile (max-width: 480px) */
+@media (max-width: 480px) {
+  body {
+    padding: 6px;
+  }
+
+  .header h1 {
+    font-size: 16px;
+  }
+
+  .sidebar {
+    width: 100%;
+    padding: 60px 15px 15px;
+  }
+
+  .pitch {
+    padding: 10px 2px;
+    min-height: 240px;
+  }
+
+  /* Ultra-compact player cards */
+  .player-card {
+    width: 52px;
+    min-width: 52px;
+    flex-shrink: 0;
+    padding: 2px;
+  }
+
+  .player-card .name {
+    font-size: 7px;
+    padding: 1px;
+  }
+
+  .player-card .info {
+    font-size: 6px;
+    gap: 1px;
+    padding: 0 1px;
+  }
+
+  .player-card .fixtures {
+    font-size: 5px;
+  }
+
+  /* Ultra-compact badges */
+  .badge-container {
+    width: 24px;
+    height: 24px;
+  }
+
+  .badge-container .badge {
+    width: 24px;
+    height: 24px;
+  }
+
+  /* Captain/VC badges */
+  .captain-selector,
+  .captain-badge {
+    left: -24px;
+    width: 14px;
+    height: 14px;
+    font-size: 6px;
+  }
+
+  .captain-btn {
+    width: 14px;
+    height: 14px;
+    font-size: 6px;
+  }
+
+  /* Status flags */
+  .status-flag-badge {
+    right: -24px;
+    width: 14px;
+    height: 14px;
+    font-size: 6px;
+  }
+
+  .status-flag.right {
+    right: -48px;
+  }
+
+  .status-flag-canvas {
+    width: 32px;
+    height: 24px;
+  }
+
+  /* Card buttons */
+  .card-btn {
+    width: 12px;
+    height: 12px;
+    font-size: 9px;
+  }
+
+  .btn-remove {
+    top: -4px;
+    left: -4px;
+  }
+
+  .btn-swap {
+    top: -4px;
+    right: -4px;
+  }
+
+  /* Formation and bench spacing */
+  .formation-line {
+    gap: 2px;
+    min-height: 70px;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 5px;
+  }
+
+  .bench-slots {
+    gap: 4px;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 5px;
+  }
+
+  .bench h3 {
+    font-size: 13px;
+    margin-bottom: 8px;
+  }
+
+  /* Button size reductions */
+  .gw-nav button {
+    padding: 5px 10px;
+    font-size: 11px;
+  }
+
+  .gw-nav h2 {
+    font-size: 15px;
+  }
+
+  .sync-toggle-btn {
+    padding: 6px 10px !important;
+    font-size: 14px;
+  }
+
+  .header-btn {
+    padding: 4px 7px;
+    font-size: 10px;
+    height: 24px;
+  }
+
+  .transfer-action-btn {
+    padding: 5px 10px;
+    font-size: 10px;
+    height: 30px;
+  }
+
+  .chip-btn-small {
+    padding: 5px 9px;
+    font-size: 10px;
+    height: 30px;
+  }
+
+  .info-btn {
+    width: 15px;
+    height: 15px;
+    min-width: 15px;
+    font-size: 8px;
+  }
+
+  .fixtures-control-btn {
+    padding: 4px 5px;
+    font-size: 9px;
+    height: 24px;
+  }
+
+  /* Bank display and controls */
+  .bank-display,
+  .price-toggle {
+    font-size: 10px;
+    padding: 3px 6px;
+    height: 24px;
+    gap: 4px;
+  }
+
+  .bank-display input {
+    width: 45px;
+    font-size: 10px;
+    height: 18px;
+  }
+
+  .price-toggle select {
+    font-size: 10px;
+    height: 18px;
+  }
+
+  .donate-btn {
+    font-size: 10px;
+    padding: 3px 6px;
+    height: 24px;
+  }
+
+  .sidebar-toggle {
+    font-size: 10px;
+    padding: 4px 8px;
+    height: 24px;
+  }
+
+  .team-meta {
+    font-size: 11px;
     padding: 4px 8px;
   }
 
+  /* Table adjustments */
+  table {
+    font-size: 10px;
+  }
+
+  th, td {
+    padding: 3px 2px;
+  }
+
+  /* Chip UI adjustments */
+  .chip-indicator {
+    padding: 3px 8px;
+    font-size: 10px;
+    gap: 4px;
+  }
+
+  .chip-icon {
+    font-size: 12px;
+  }
+
+  .chip-gw {
+    font-size: 9px;
+  }
+
+  /* Fixture adjustments */
+  .fixture-row {
+    grid-template-columns: minmax(70px, 1fr) 40px minmax(70px, 1fr);
+    font-size: 10px;
+  }
+
+  .team-name {
+    font-size: 10px;
+  }
+
+  .team-badge {
+    width: 14px;
+    height: 14px;
+  }
+
+  .club-badge {
+    width: 16px;
+    height: 16px;
+  }
+
+  .fixture-date-banner {
+    font-size: 11px;
+    padding: 3px 6px;
+  }
+
+  .fixture-time {
+    font-size: 9px;
+    padding: 2px 3px;
+  }
+
+  /* Message and modal adjustments */
   .message {
     bottom: 10px;
     right: 10px;
     left: 10px;
     padding: 10px 15px;
-    font-size: 13px;
+    font-size: 12px;
   }
 
   .help-modal-content {
@@ -442,15 +920,15 @@
   }
 
   .help-modal h2 {
-    font-size: 20px;
+    font-size: 18px;
   }
 
   .help-modal h3 {
-    font-size: 16px;
+    font-size: 15px;
   }
 
   .help-modal p, .help-modal li {
-    font-size: 14px;
+    font-size: 13px;
   }
 
   .player-info-modal {
@@ -468,16 +946,20 @@
   }
 
   .player-info-stats {
-    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-    gap: 10px;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 8px;
   }
 
   .player-stat-item {
-    padding: 10px;
+    padding: 8px;
   }
 
   .player-stat-value {
-    font-size: 18px;
+    font-size: 16px;
+  }
+
+  .player-stat-label {
+    font-size: 10px;
   }
 
   .transfer-panel {
@@ -488,5 +970,11 @@
     max-height: 450px;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
+  }
+
+  .filters-compact input,
+  .filters-compact select {
+    font-size: 11px;
+    padding: 5px;
   }
 }
