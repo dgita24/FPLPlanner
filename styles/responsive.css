@@ -771,7 +771,9 @@
   }
 
   #fixturesPanel {
-    display: none; /* Hide fixtures panel in mobile landscape to save space */
+    max-height: 200px; /* Compact fixtures panel in mobile landscape */
+    overflow-y: auto;
+    order: 3; /* Move to bottom */
   }
 
   .header {
