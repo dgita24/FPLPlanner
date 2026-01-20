@@ -379,7 +379,13 @@
     max-width: 100%;
   }
 
-  .captain-selector,
+  /* Keep captain-selector centered as set in 900px media query */
+  .captain-selector {
+    width: auto;
+    height: auto;
+    font-size: 7px;
+  }
+
   .captain-badge {
     left: -28px;
     width: 18px;
