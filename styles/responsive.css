@@ -1469,6 +1469,9 @@
   
   /* Tune player card width and padding for 360-430px portrait phones */
   /* Must fit 5 cards for 3-5-2 and 5-3-2 formations in 360px viewport */
+  /* Note: 65px is larger than 480px breakpoint (52px) because portrait mode */
+  /* has more vertical space, allowing us to use larger cards for better UX */
+  /* while still preventing horizontal overlap in 5-card formations */
   .player-card {
     width: 65px;
     min-width: 65px;
@@ -1501,6 +1504,8 @@
   }
 
   /* Adjust card button positioning to prevent overlap on smaller cards */
+  /* Touch target is 12px×12px which matches 480px/600px breakpoints */
+  /* Font size 9px is for icon display, not the clickable area */
   .card-btn {
     width: 12px;
     height: 12px;
