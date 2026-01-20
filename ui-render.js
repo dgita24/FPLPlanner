@@ -346,6 +346,7 @@ function playerCard(entry, source) {
   const fx2 = fx[1] || '--';
   const fx3 = fx[2] || '--';
   const fx4 = fx[3] || '--';
+  const fx1Compact = fxCompact[0] || '--';
   const fx2Compact = fxCompact[1] || '--';
   const fx3Compact = fxCompact[2] || '--';
   const fx4Compact = fxCompact[3] || '--';
@@ -445,7 +446,7 @@ function playerCard(entry, source) {
 
       <div class="info">
         <span class="team">${teamShort}</span>
-        <span class="next-fixture fixture-next">${fx1}</span>
+        <span class="next-fixture"><span class="fixture-full">${fx1}</span><span class="fixture-compact">${fx1Compact}</span></span>
         <span class="price"><span class="price-label price-label-long">${label}</span><span class="price-label price-label-short">${shortLabel}</span> ${price}</span>
       </div>
 
@@ -487,7 +488,7 @@ function placeholderCard(removedPlayer, source) {
 
       <div class="info">
         <span class="team">${teamShort}</span>
-        <span class="next-fixture fixture-next">--</span>
+        <span class="next-fixture"><span class="fixture-full">--</span><span class="fixture-compact">--</span></span>
         <span class="price"><span class="price-label price-label-long">Sell</span><span class="price-label price-label-short">S</span> ${price}</span>
       </div>
 

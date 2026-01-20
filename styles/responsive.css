@@ -130,9 +130,10 @@
   .player-card .info {
     font-size: 8px;
     padding: 0 2px;
-    display: flex;
+    display: grid;
+    grid-template-columns: 1fr auto;
     align-items: center;
-    gap: 3px;
+    column-gap: 4px;
     max-width: 100%;
   }
 
@@ -155,30 +156,37 @@
     font-size: 10px;
     font-weight: 700;
     white-space: nowrap;
-    flex-shrink: 0;
-    margin-left: auto;
+    justify-self: end;
   }
 
-  /* Phase 4: Next fixture takes remaining space, bold, no truncation */
+  /* Phase 4: Next fixture takes remaining space, bold, with ellipsis for overflow */
   .player-card .info .next-fixture {
     font-size: 8px;
     font-weight: 700;
     white-space: nowrap;
-    flex-grow: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
     min-width: 0;
   }
 
-  /* B. Bottom Fixture Row: Set display flex with center and allow wrapping */
+  /* B. Bottom Fixture Row: Set display grid with 3 columns for tight spacing */
   .player-card .future-fixtures {
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+    justify-items: center;
     font-size: 8px;
-    gap: 1px;
-    row-gap: 2px;
   }
 
   /* Phase 4: Show compact fixture text and hide full fixture text */
+  .player-card .info .next-fixture .fixture-full {
+    display: none;
+  }
+
+  .player-card .info .next-fixture .fixture-compact {
+    display: inline;
+  }
+
   .player-card .future-fixtures .fixture .fixture-full {
     display: none;
   }
@@ -214,9 +222,11 @@
     font-size: 7px;
   }
 
-  /* Captain badge - keep on left side but adjust size */
+  /* Captain badge - keep inside card boundary on mobile/tablet */
   .captain-badge {
-    left: -30px;
+    left: 2px;
+    top: 2px;
+    transform: none;
     width: 18px;
     height: 18px;
     font-size: 7px;
@@ -228,9 +238,11 @@
     font-size: 7px;
   }
 
-  /* Status flag badge adjustments */
+  /* Status flag badge - keep inside card boundary on mobile/tablet */
   .status-flag-badge {
-    right: -30px;
+    right: 2px;
+    top: 2px;
+    transform: none;
     width: 18px;
     height: 18px;
     font-size: 7px;

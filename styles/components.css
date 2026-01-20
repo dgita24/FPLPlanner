@@ -208,6 +208,14 @@
 }
 
 /* Phase 4: Default desktop behavior - show full fixtures, hide compact fixtures */
+.player-card .info .next-fixture .fixture-full {
+  display: inline;
+}
+
+.player-card .info .next-fixture .fixture-compact {
+  display: none;
+}
+
 .player-card .future-fixtures .fixture .fixture-full {
   display: inline;
 }
