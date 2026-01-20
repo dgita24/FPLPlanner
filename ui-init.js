@@ -404,10 +404,10 @@ function setupCaptainSelectorTouchHandlers() {
     const playerCard = e.target.closest('.player-card');
     
     // Allow triggering from badge-container, player name (.name), or club badge (.badge)
-    const isNameClick = e.target.closest('.player-card .name');
-    const isBadgeClick = e.target.closest('.badge-container .badge');
+    const nameElement = e.target.closest('.player-card .name');
+    const badgeElement = e.target.closest('.badge-container .badge');
     
-    if (badgeContainer || (playerCard && (isNameClick || isBadgeClick))) {
+    if (badgeContainer || (playerCard && (nameElement || badgeElement))) {
       // Get the badge container - either directly or from the player card
       const targetBadgeContainer = badgeContainer || (playerCard ? playerCard.querySelector('.badge-container') : null);
       
