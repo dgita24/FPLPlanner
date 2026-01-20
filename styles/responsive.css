@@ -1472,7 +1472,7 @@
   .player-card {
     width: 65px;
     min-width: 65px;
-    padding: 3px;
+    padding: 2px;
   }
 
   /* Adjust formation line gap and min-height for better spacing */
@@ -1502,8 +1502,8 @@
 
   /* Adjust card button positioning to prevent overlap on smaller cards */
   .card-btn {
-    width: 13px;
-    height: 13px;
+    width: 12px;
+    height: 12px;
     font-size: 9px;
   }
 
