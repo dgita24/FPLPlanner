@@ -272,6 +272,7 @@
   .pitch {
     padding: 15px 5px;
     min-height: 300px;
+    /* Enable horizontal scrolling to prevent content overflow on mobile */
     overflow-x: auto;
   }
 
@@ -288,6 +289,7 @@
 
   .player-card {
     width: 68px;
+    /* Prevent card from shrinking below minimum width */
     min-width: 68px;
     flex-shrink: 0;
     padding: 3px;
@@ -356,6 +358,7 @@
     right: -50px;
   }
 
+  /* Waving flag canvas scaled proportionally to badge size */
   .status-flag-canvas {
     width: 36px;
     height: 27px;
