@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Phase 4 Demo - Mobile Card Layout</title>
+  <link rel="stylesheet" href="styles/main.css" />
+  <link rel="stylesheet" href="styles/components.css" />
+  <link rel="stylesheet" href="styles/responsive.css" />
+  <style>
+    body {
+      padding: 20px;
+      background: #f5f5f5;
+    }
+    .demo-section {
+      margin-bottom: 30px;
+      padding: 20px;
+      background: white;
+      border-radius: 8px;
+    }
+    .demo-title {
+      font-size: 18px;
+      font-weight: bold;
+      margin-bottom: 15px;
+      color: #38003c;
+    }
+    .demo-note {
+      font-size: 14px;
+      color: #666;
+      margin-bottom: 10px;
+    }
+    .demo-cards {
+      display: flex;
+      gap: 15px;
+      justify-content: center;
+      flex-wrap: wrap;
+      background: linear-gradient(to bottom, #4a7c2c 0%, #3a6622 100%);
+      padding: 20px;
+      border-radius: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1 style="text-align: center; color: #38003c;">Phase 4: Mobile Card Layout Demo</h1>
+  
+  <div class="demo-section">
+    <div class="demo-title">Desktop View (>900px)</div>
+    <div class="demo-note">Shows: Club name, Next fixture with (H)/(A), Full price label (Sell/Buy/Cur), Full future fixtures</div>
+    <div class="demo-note" style="font-weight: bold; color: #00d084;">Resize browser to ≤900px to see mobile layout changes</div>
+  </div>
+
+  <div class="demo-section">
+    <div class="demo-title">Mobile/Tablet View (≤900px)</div>
+    <div class="demo-note">Expected changes:</div>
+    <ul style="font-size: 14px; color: #666;">
+      <li>✓ Club short name hidden</li>
+      <li>✓ Next fixture visible (with H/A indicator)</li>
+      <li>✓ Price label shows single letter: S (Sell), P (Purchase), C (Current)</li>
+      <li>✓ Future fixtures compact: UPPERCASE for home (e.g. WOL), lowercase for away (e.g. wol)</li>
+    </ul>
+  </div>
+
+  <div class="demo-section">
+    <div class="demo-title">Sample Player Cards</div>
+    <div class="demo-cards">
+      <!-- Player Card 1 - Selling Price Mode -->
+      <div class="player-card">
+        <button class="card-btn btn-remove" onclick="alert('Remove player')" title="Transfer out">×</button>
+        <button class="card-btn btn-swap" onclick="alert('Swap player')" title="Swap">⇅</button>
+
+        <div class="badge-container">
+          <img src="https://resources.premierleague.com/premierleague/badges/70/t3.png" 
+               class="badge" alt="ARS">
+        </div>
+
+        <div class="name">Saka</div>
+
+        <div class="info">
+          <span class="team">ARS</span>
+          <span class="next-fixture fixture-next">WOL (H)</span>
+          <span class="price"><span class="price-label price-label-long">Sell</span><span class="price-label price-label-short">S</span> 10.1</span>
+        </div>
+
+        <div class="future-fixtures">
+          <span class="fixture"><span class="fixture-full">MCI (A)</span><span class="fixture-compact">mci</span></span>
+          <span class="fixture"><span class="fixture-full">BHA (H)</span><span class="fixture-compact">BHA</span></span>
+          <span class="fixture"><span class="fixture-full">TOT (A)</span><span class="fixture-compact">tot</span></span>
+        </div>
+      </div>
+
+      <!-- Player Card 2 - Purchase Price Mode -->
+      <div class="player-card">
+        <button class="card-btn btn-remove" onclick="alert('Remove player')" title="Transfer out">×</button>
+        <button class="card-btn btn-swap" onclick="alert('Swap player')" title="Swap">⇅</button>
+
+        <div class="badge-container">
+          <img src="https://resources.premierleague.com/premierleague/badges/70/t14.png" 
+               class="badge" alt="LIV">
+        </div>
+
+        <div class="name">Salah</div>
+
+        <div class="info">
+          <span class="team">LIV</span>
+          <span class="next-fixture fixture-next">CHE (A)</span>
+          <span class="price"><span class="price-label price-label-long">Buy</span><span class="price-label price-label-short">P</span> 13.5</span>
+        </div>
+
+        <div class="future-fixtures">
+          <span class="fixture"><span class="fixture-full">EVE (H)</span><span class="fixture-compact">EVE</span></span>
+          <span class="fixture"><span class="fixture-full">NEW (A)</span><span class="fixture-compact">new</span></span>
+          <span class="fixture"><span class="fixture-full">MUN (H)</span><span class="fixture-compact">MUN</span></span>
+        </div>
+      </div>
+
+      <!-- Player Card 3 - Current Price Mode -->
+      <div class="player-card">
+        <button class="card-btn btn-remove" onclick="alert('Remove player')" title="Transfer out">×</button>
+        <button class="card-btn btn-swap" onclick="alert('Swap player')" title="Swap">⇅</button>
+
+        <div class="badge-container">
+          <div class="captain-badge c">C</div>
+          <img src="https://resources.premierleague.com/premierleague/badges/70/t1.png" 
+               class="badge" alt="MCI">
+        </div>
+
+        <div class="name">Haaland</div>
+
+        <div class="info">
+          <span class="team">MCI</span>
+          <span class="next-fixture fixture-next">BOU (H)</span>
+          <span class="price"><span class="price-label price-label-long">Cur</span><span class="price-label price-label-short">C</span> 15.0</span>
+        </div>
+
+        <div class="future-fixtures">
+          <span class="fixture"><span class="fixture-full">ARS (H)</span><span class="fixture-compact">ARS</span></span>
+          <span class="fixture"><span class="fixture-full">CHE (A)</span><span class="fixture-compact">che</span></span>
+          <span class="fixture"><span class="fixture-full">LEI (H)</span><span class="fixture-compact">LEI</span></span>
+        </div>
+      </div>
+
+      <!-- Player Card 4 - With Status Badge -->
+      <div class="player-card">
+        <button class="card-btn btn-remove" onclick="alert('Remove player')" title="Transfer out">×</button>
+        <button class="card-btn btn-swap" onclick="alert('Swap player')" title="Swap">⇅</button>
+
+        <div class="badge-container">
+          <div class="status-flag-badge yellow" title="Doubtful - 75% chance">75</div>
+          <img src="https://resources.premierleague.com/premierleague/badges/70/t4.png" 
+               class="badge" alt="CHE">
+        </div>
+
+        <div class="name">Palmer</div>
+
+        <div class="info">
+          <span class="team">CHE</span>
+          <span class="next-fixture fixture-next">FUL (A)</span>
+          <span class="price"><span class="price-label price-label-long">Sell</span><span class="price-label price-label-short">S</span> 11.2</span>
+        </div>
+
+        <div class="future-fixtures">
+          <span class="fixture"><span class="fixture-full">LIV (H)</span><span class="fixture-compact">LIV</span></span>
+          <span class="fixture"><span class="fixture-full">MCI (H)</span><span class="fixture-compact">MCI</span></span>
+          <span class="fixture"><span class="fixture-full">WHU (A)</span><span class="fixture-compact">whu</span></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="demo-section">
+    <div class="demo-title">Testing Instructions</div>
+    <ol style="font-size: 14px; color: #666;">
+      <li>View this page on desktop (>900px width) - should show full layout with club names, full price labels, and full fixture format</li>
+      <li>Resize browser to ≤900px (or use mobile device) - observe these changes:
+        <ul>
+          <li>Club short name (ARS, LIV, MCI, CHE) disappears</li>
+          <li>Price labels change: "Sell" → "S", "Buy" → "P", "Cur" → "C"</li>
+          <li>Future fixtures become compact: "MCI (A)" → "mci", "BHA (H)" → "BHA"</li>
+        </ul>
+      </li>
+      <li>Desktop layout should remain completely unchanged at >900px</li>
+    </ol>
+  </div>
+</body>
+</html>
