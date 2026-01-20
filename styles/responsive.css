@@ -1413,3 +1413,55 @@
     padding: 5px;
   }
 }
+
+/* ===== Mobile Portrait Pitch Overrides (DO NOT AFFECT DESKTOP) ===== */
+/* Phase 1: CSS-only fix for mobile portrait to eliminate gutters and horizontal scrolling */
+@media (max-width: 480px) and (orientation: portrait) {
+  /* 1. Remove mobile portrait gutters - override body padding */
+  body {
+    padding-left: 0;
+    padding-right: 0;
+    /* Keep vertical padding as-is */
+  }
+
+  /* 2. Ensure container is full width and remove padding */
+  .container {
+    max-width: 100%;
+    margin-left: 0;
+    margin-right: 0;
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  /* 3. Make pitch-stack and pitch full width - remove horizontal centering */
+  .pitch-stack {
+    width: 100%;
+    max-width: none;
+    margin-left: 0;
+    margin-right: 0;
+  }
+
+  .pitch {
+    width: 100%;
+    max-width: none;
+    margin-left: 0;
+    margin-right: 0;
+    /* 4. Disable horizontal scrolling on pitch - override overflow-x: auto from 900px/768px breakpoints */
+    overflow-x: hidden;
+  }
+
+  /* 5. Ensure formation rows expand to pitch width and are not scroll containers */
+  .formation-line {
+    width: 100%;
+    overflow-x: hidden;
+  }
+
+  /* Also disable overflow on bench to match */
+  .bench {
+    overflow-x: hidden;
+  }
+
+  .bench-slots {
+    overflow-x: hidden;
+  }
+}
