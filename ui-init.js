@@ -399,9 +399,22 @@ function setupCaptainSelectorTouchHandlers() {
 
   // Click handler for badge containers to toggle captain selector
   document.addEventListener('click', (e) => {
+    // Check if click is on badge-container, player name, or club crest (badge)
     const badgeContainer = e.target.closest('.badge-container');
+    const playerCard = e.target.closest('.player-card');
     
-    if (badgeContainer) {
+    // Allow triggering from badge-container, player name (.name), or club badge (.badge)
+    const isNameClick = e.target.closest('.player-card .name');
+    const isBadgeClick = e.target.closest('.badge-container .badge');
+    
+    if (badgeContainer || (playerCard && (isNameClick || isBadgeClick))) {
+      // Get the badge container - either directly or from the player card
+      const targetBadgeContainer = badgeContainer || (playerCard ? playerCard.querySelector('.badge-container') : null);
+      
+      if (!targetBadgeContainer) {
+        return;
+      }
+      
       // Check if click is on a captain button - if so, let it execute normally
       const isCaptainBtn = e.target.closest('.captain-btn');
       if (isCaptainBtn) {
@@ -419,13 +432,13 @@ function setupCaptainSelectorTouchHandlers() {
       
       // First, close any other open captain selectors
       document.querySelectorAll('.badge-container.show-captain-options').forEach(el => {
-        if (el !== badgeContainer) {
+        if (el !== targetBadgeContainer) {
           el.classList.remove('show-captain-options');
         }
       });
       
       // Toggle this one
-      badgeContainer.classList.toggle('show-captain-options');
+      targetBadgeContainer.classList.toggle('show-captain-options');
     } else {
       // Click outside - close all captain selectors
       document.querySelectorAll('.badge-container.show-captain-options').forEach(el => {
@@ -568,6 +581,39 @@ export function initUI() {
         font-size: 10px;
         font-weight: 600;
         opacity: 0.95;
+      }
+
+      /* Mobile/tablet fixture text size reductions and wrapping */
+      @media (max-width: 900px) {
+        .player-card .info .next-fixture {
+          font-size: 9px;
+        }
+
+        .player-card .future-fixtures {
+          flex-wrap: wrap;
+          gap: 4px;
+          row-gap: 2px;
+        }
+
+        .player-card .future-fixtures .fixture {
+          font-size: 8px;
+        }
+      }
+
+      @media (max-width: 600px) {
+        .player-card .info .next-fixture {
+          font-size: 8px;
+        }
+
+        .player-card .future-fixtures {
+          flex-wrap: wrap;
+          gap: 3px;
+          row-gap: 1px;
+        }
+
+        .player-card .future-fixtures .fixture {
+          font-size: 7px;
+        }
       }
 
       /* Chip container - positioned at top center of pitch */

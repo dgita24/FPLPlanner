@@ -136,8 +136,17 @@
     height: 30px;
   }
 
-  /* Captain/VC badge adjustments */
-  .captain-selector,
+  /* Captain/VC selector - centered absolutely inside player-card on mobile/tablet */
+  .captain-selector {
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: auto;
+    height: auto;
+    font-size: 7px;
+  }
+
+  /* Captain badge - keep on left side but adjust size */
   .captain-badge {
     left: -30px;
     width: 18px;
@@ -168,16 +177,18 @@
 
   /* Formation line - ensure no wrap but allow overflow scroll */
   .formation-line {
-    gap: 6px;
+    gap: 8px;
     flex-wrap: nowrap;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
     padding-bottom: 5px;
+    padding-top: 8px;
+    margin-bottom: 10px;
   }
 
   /* Bench slots - ensure no wrap but allow overflow scroll */
   .bench-slots {
-    gap: 10px;
+    gap: 12px;
     flex-wrap: nowrap;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
@@ -185,12 +196,13 @@
   }
 
   .pitch {
-    padding: 14px 8px;
+    padding: 16px 10px;
     overflow-x: auto;
   }
 
   .bench {
     overflow-x: auto;
+    padding: 15px 10px;
   }
 
   /* Button adjustments */
@@ -493,8 +505,17 @@
     height: 26px;
   }
 
-  /* Captain/VC badge adjustments */
-  .captain-selector,
+  /* Captain/VC selector - centered absolutely inside player-card on mobile */
+  .captain-selector {
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: auto;
+    height: auto;
+    font-size: 6px;
+  }
+
+  /* Captain badge - keep on left side but adjust size */
   .captain-badge {
     left: -26px;
     width: 16px;
@@ -523,25 +544,31 @@
     font-size: 9px;
   }
 
-  /* Formation and bench - tighter gaps */
+  /* Formation and bench - tighter gaps with better spacing */
   .formation-line {
-    gap: 3px;
+    gap: 5px;
     min-height: 75px;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
     padding-bottom: 5px;
+    padding-top: 8px;
+    margin-bottom: 8px;
   }
 
   .bench-slots {
-    gap: 6px;
+    gap: 8px;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
     padding-bottom: 5px;
   }
 
   .pitch {
-    padding: 12px 4px;
+    padding: 14px 6px;
     min-height: 280px;
+  }
+
+  .bench {
+    padding: 13px 6px;
   }
 
   .bench h3 {
