@@ -123,17 +123,26 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    font-weight: 800;
   }
 
   /* A. Font size & wrap: Shrink info and price font */
   .player-card .info {
     font-size: 8px;
     padding: 0 2px;
+    display: flex;
+    justify-content: space-between;
+    gap: 2px;
+    max-width: 100%;
   }
 
   .player-card .info .price {
     font-size: 8px;
     white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 35px;
+    flex-shrink: 0;
   }
 
   /* A. Font size & wrap: Shrink next-fixture font with ellipsis */
@@ -361,6 +370,10 @@
   .player-card .name {
     font-size: 9px;
     padding: 1px 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-weight: 800;
   }
 
   /* Adjust player card info for mobile */
@@ -368,12 +381,28 @@
     font-size: 7px;
     text-overflow: ellipsis;
     padding: 0 2px;
+    display: flex;
+    justify-content: space-between;
+    gap: 2px;
+    max-width: 100%;
+    overflow: hidden;
   }
 
   /* Ensure price is visible */
   .player-card .info .price {
     display: inline-block;
     flex-shrink: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 30px;
+  }
+
+  .player-card .info .next-fixture {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 25px;
   }
 
   /* Contain fixtures within card boundaries */
@@ -545,17 +574,27 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    font-weight: 800;
   }
 
   /* A. Font size & wrap: Shrink info and price font */
   .player-card .info {
     font-size: 6px;
     padding: 0 1px;
+    display: flex;
+    justify-content: space-between;
+    gap: 1px;
+    max-width: 100%;
+    overflow: hidden;
   }
 
   .player-card .info .price {
     font-size: 6px;
     white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 25px;
+    flex-shrink: 0;
   }
 
   /* A. Font size & wrap: Shrink next-fixture font with ellipsis */
@@ -564,7 +603,7 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 30px;
+    max-width: 20px;
   }
 
   /* B. Bottom Fixture Row: Set display flex with center and allow wrapping */
@@ -1108,12 +1147,35 @@
   .player-card .name {
     font-size: 7px;
     padding: 1px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-weight: 800;
   }
 
   .player-card .info {
     font-size: 6px;
     gap: 1px;
     padding: 0 1px;
+    display: flex;
+    justify-content: space-between;
+    max-width: 100%;
+    overflow: hidden;
+  }
+
+  .player-card .info .next-fixture {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 18px;
+  }
+
+  .player-card .info .price {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 22px;
+    flex-shrink: 0;
   }
 
   .player-card .fixtures {
@@ -1510,10 +1572,34 @@
   /* Adjust text sizes proportionally for 65px cards (vs 52px at 480px) */
   .player-card .name {
     font-size: 8px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-weight: 800;
   }
 
   .player-card .info {
     font-size: 7px;
+    display: flex;
+    justify-content: space-between;
+    gap: 1px;
+    max-width: 100%;
+    overflow: hidden;
+  }
+
+  .player-card .info .next-fixture {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 22px;
+  }
+
+  .player-card .info .price {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 28px;
+    flex-shrink: 0;
   }
 
   .player-card .fixtures {
