@@ -381,6 +381,60 @@ function setViceCaptain(playerId) {
   updateUI();
 }
 
+// Touch/click handler for captain selector on mobile/tablet
+function setupCaptainSelectorTouchHandlers() {
+  // Detect if device is touch-capable
+  function isTouchDevice() {
+    return ('ontouchstart' in window) || 
+           (navigator.maxTouchPoints > 0) || 
+           (navigator.msMaxTouchPoints > 0) ||
+           window.matchMedia('(pointer: coarse)').matches ||
+           window.matchMedia('(max-width: 900px)').matches;
+  }
+
+  // Only add touch handlers on touch devices
+  if (!isTouchDevice()) {
+    return;
+  }
+
+  // Click handler for badge containers to toggle captain selector
+  document.addEventListener('click', (e) => {
+    const badgeContainer = e.target.closest('.badge-container');
+    
+    if (badgeContainer) {
+      // Check if click is on a captain button - if so, let it execute normally
+      const isCaptainBtn = e.target.closest('.captain-btn');
+      if (isCaptainBtn) {
+        // After the button click, remove all show-captain-options classes
+        setTimeout(() => {
+          document.querySelectorAll('.badge-container.show-captain-options').forEach(el => {
+            el.classList.remove('show-captain-options');
+          });
+        }, 50);
+        return;
+      }
+
+      // Toggle the captain selector for this badge container
+      e.stopPropagation();
+      
+      // First, close any other open captain selectors
+      document.querySelectorAll('.badge-container.show-captain-options').forEach(el => {
+        if (el !== badgeContainer) {
+          el.classList.remove('show-captain-options');
+        }
+      });
+      
+      // Toggle this one
+      badgeContainer.classList.toggle('show-captain-options');
+    } else {
+      // Click outside - close all captain selectors
+      document.querySelectorAll('.badge-container.show-captain-options').forEach(el => {
+        el.classList.remove('show-captain-options');
+      });
+    }
+  });
+}
+
 export function initUI() {
   // Inject CSS for two-click swap highlight + fixture UI + placeholder cards + chip UI
   if (!document.getElementById('plannerInjectedStyle')) {
@@ -740,6 +794,9 @@ export function initUI() {
 
   // Setup sidebar event handlers
   setupSidebarHandlers();
+
+  // Setup touch/click handlers for captain selector on mobile
+  setupCaptainSelectorTouchHandlers();
 
   updateUI();
 }

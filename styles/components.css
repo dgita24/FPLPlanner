@@ -281,14 +281,27 @@
   pointer-events: auto;
 }
 
-/* Show selector when hovering over badge-container OR the selector itself */
-.badge-container:hover .captain-selector,
-.captain-selector:hover {
+/* Show selector when hovering over badge-container OR the selector itself (desktop) */
+/* On touch devices (coarse pointer), use tap-to-toggle via .show-captain-options class */
+@media (hover: hover) and (pointer: fine) {
+  .badge-container:hover .captain-selector,
+  .captain-selector:hover {
+    display: flex;
+  }
+
+  /* Hide badge when hovering to show selector */
+  .badge-container:hover .captain-badge {
+    display: none;
+  }
+}
+
+/* Touch device support: show selector when .show-captain-options is added */
+.badge-container.show-captain-options .captain-selector {
   display: flex;
 }
 
-/* Hide badge when hovering to show selector */
-.badge-container:hover .captain-badge {
+/* Hide badge when showing selector on touch */
+.badge-container.show-captain-options .captain-badge {
   display: none;
 }
 
