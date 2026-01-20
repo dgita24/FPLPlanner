@@ -583,48 +583,7 @@ export function initUI() {
         opacity: 0.95;
       }
 
-      /* Mobile/tablet fixture text size reductions and wrapping */
-      @media (max-width: 900px) {
-        .player-card .info .next-fixture {
-          font-size: 8px;
-          white-space: nowrap;
-        }
-
-        .player-card .future-fixtures {
-          display: flex;
-          justify-content: space-between;
-          flex-wrap: wrap;
-          gap: 3px;
-          row-gap: 2px;
-        }
-
-        .player-card .future-fixtures .fixture {
-          font-size: 8px;
-          min-width: 20px;
-          white-space: nowrap;
-        }
-      }
-
-      @media (max-width: 600px) {
-        .player-card .info .next-fixture {
-          font-size: 6px;
-          white-space: nowrap;
-        }
-
-        .player-card .future-fixtures {
-          display: flex;
-          justify-content: space-between;
-          flex-wrap: wrap;
-          gap: 2px;
-          row-gap: 1px;
-        }
-
-        .player-card .future-fixtures .fixture {
-          font-size: 6px;
-          min-width: 15px;
-          white-space: nowrap;
-        }
-      }
+      /* Note: Mobile/tablet responsive styles are handled in responsive.css */
 
       /* Chip container - positioned at top center of pitch */
       .chip-container {
