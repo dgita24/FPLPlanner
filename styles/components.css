@@ -193,12 +193,36 @@
   font-size: 9px;
   color: #333;
   display: flex;
-  justify-content: space-between;
   padding: 0 3px;
   font-weight: 600;
-  white-space: nowrap;
-  overflow: hidden;
   min-height: 12px;
+}
+
+/* Phase 4: Default desktop behavior - show long labels, hide short labels */
+.player-card .info .price .price-label-short {
+  display: none;
+}
+
+.player-card .info .price .price-label-long {
+  display: inline;
+}
+
+/* Phase 4: Default desktop behavior - show full fixtures, hide compact fixtures */
+.player-card .future-fixtures .fixture .fixture-full {
+  display: inline;
+}
+
+.player-card .future-fixtures .fixture .fixture-compact {
+  display: none;
+}
+
+/* Desktop-only: Apply justify-content and overflow to info row */
+@media (min-width: 901px) {
+  .player-card .info {
+    justify-content: space-between;
+    white-space: nowrap;
+    overflow: hidden;
+  }
 }
 
 .card-btn {

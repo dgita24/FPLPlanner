@@ -131,27 +131,41 @@
     font-size: 8px;
     padding: 0 2px;
     display: flex;
-    justify-content: space-between;
-    gap: 2px;
+    align-items: center;
+    gap: 3px;
     max-width: 100%;
   }
 
-  .player-card .info .price {
-    font-size: 8px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 35px;
-    flex-shrink: 0;
+  /* Phase 4: Hide club short name on mobile/tablet */
+  .player-card .info .team {
+    display: none;
   }
 
-  /* A. Font size & wrap: Shrink next-fixture font with ellipsis */
+  /* Phase 4: Show short price labels (S/P/C) and hide long labels (Sell/Buy/Cur) */
+  .player-card .info .price .price-label-long {
+    display: none;
+  }
+
+  .player-card .info .price .price-label-short {
+    display: inline;
+  }
+
+  /* Phase 4: Price should be right-aligned, larger, and not truncated */
+  .player-card .info .price {
+    font-size: 10px;
+    font-weight: 700;
+    white-space: nowrap;
+    flex-shrink: 0;
+    margin-left: auto;
+  }
+
+  /* Phase 4: Next fixture takes remaining space, bold, no truncation */
   .player-card .info .next-fixture {
     font-size: 8px;
+    font-weight: 700;
     white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 35px;
+    flex-grow: 1;
+    min-width: 0;
   }
 
   /* B. Bottom Fixture Row: Set display flex with center and allow wrapping */
@@ -160,18 +174,23 @@
     justify-content: center;
     flex-wrap: wrap;
     font-size: 8px;
-    gap: 3px;
+    gap: 1px;
     row-gap: 2px;
   }
 
-  /* B. Bottom Fixture Row: Add min/max-width for fixture boxes with ellipsis */
+  /* Phase 4: Show compact fixture text and hide full fixture text */
+  .player-card .future-fixtures .fixture .fixture-full {
+    display: none;
+  }
+
+  .player-card .future-fixtures .fixture .fixture-compact {
+    display: inline;
+  }
+
+  /* Phase 4: Future fixtures should display fully without truncation */
   .player-card .future-fixtures .fixture {
     font-size: 8px;
-    min-width: 20px;
-    max-width: 30px;
     white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
   }
 
   /* Badge size reduction */
@@ -379,30 +398,29 @@
   /* Adjust player card info for mobile */
   .player-card .info {
     font-size: 7px;
-    text-overflow: ellipsis;
     padding: 0 2px;
     display: flex;
-    justify-content: space-between;
-    gap: 2px;
+    align-items: center;
+    gap: 3px;
     max-width: 100%;
-    overflow: hidden;
   }
 
-  /* Ensure price is visible */
+  /* Ensure price is visible, right-aligned, and larger */
   .player-card .info .price {
-    display: inline-block;
-    flex-shrink: 0;
+    font-size: 9px;
+    font-weight: 700;
     white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 30px;
+    flex-shrink: 0;
+    margin-left: auto;
   }
 
+  /* Next fixture takes remaining space, bold */
   .player-card .info .next-fixture {
+    font-size: 7px;
+    font-weight: 700;
     white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 25px;
+    flex-grow: 1;
+    min-width: 0;
   }
 
   /* Contain fixtures within card boundaries */
@@ -582,28 +600,27 @@
     font-size: 6px;
     padding: 0 1px;
     display: flex;
-    justify-content: space-between;
-    gap: 1px;
+    align-items: center;
+    gap: 2px;
     max-width: 100%;
-    overflow: hidden;
   }
 
+  /* Price should be right-aligned and larger */
   .player-card .info .price {
-    font-size: 6px;
+    font-size: 8px;
+    font-weight: 700;
     white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 25px;
     flex-shrink: 0;
+    margin-left: auto;
   }
 
-  /* A. Font size & wrap: Shrink next-fixture font with ellipsis */
+  /* Next fixture takes remaining space, bold */
   .player-card .info .next-fixture {
     font-size: 6px;
+    font-weight: 700;
     white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 20px;
+    flex-grow: 1;
+    min-width: 0;
   }
 
   /* B. Bottom Fixture Row: Set display flex with center and allow wrapping */
@@ -612,18 +629,14 @@
     justify-content: center;
     flex-wrap: wrap;
     font-size: 6px;
-    gap: 2px;
+    gap: 1px;
     row-gap: 1px;
   }
 
-  /* B. Bottom Fixture Row: Add min/max-width for fixture boxes with ellipsis */
+  /* Future fixtures should display fully */
   .player-card .future-fixtures .fixture {
     font-size: 6px;
-    min-width: 15px;
-    max-width: 22px;
     white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
   }
 
   .player-card .fixtures {
@@ -1158,7 +1171,6 @@
     gap: 1px;
     padding: 0 1px;
     display: flex;
-    justify-content: space-between;
     max-width: 100%;
     overflow: hidden;
   }
@@ -1581,25 +1593,25 @@
   .player-card .info {
     font-size: 7px;
     display: flex;
-    justify-content: space-between;
-    gap: 1px;
+    align-items: center;
+    gap: 2px;
     max-width: 100%;
-    overflow: hidden;
   }
 
   .player-card .info .next-fixture {
+    font-size: 7px;
+    font-weight: 700;
     white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 22px;
+    flex-grow: 1;
+    min-width: 0;
   }
 
   .player-card .info .price {
+    font-size: 9px;
+    font-weight: 700;
     white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 28px;
     flex-shrink: 0;
+    margin-left: auto;
   }
 
   .player-card .fixtures {
