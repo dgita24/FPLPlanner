@@ -1424,11 +1424,13 @@
     /* Keep vertical padding as-is */
   }
 
-  /* 2. Ensure container is full width */
+  /* 2. Ensure container is full width and remove padding */
   .container {
     max-width: 100%;
     margin-left: 0;
     margin-right: 0;
+    padding-left: 0;
+    padding-right: 0;
   }
 
   /* 3. Make pitch-stack and pitch full width - remove horizontal centering */
