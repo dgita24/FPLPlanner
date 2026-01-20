@@ -110,13 +110,11 @@
   }
 
   /* Player card adjustments for 900px */
-  /* C. Card Padding/Margin: Reduce padding but ensure small gap to prevent button overlap */
   .player-card {
     width: 100px;
     padding: 3px;
   }
 
-  /* A. Font size & wrap: Shrink name font on player cards */
   .player-card .name {
     font-size: 9px;
     padding: 1px 2px;
@@ -126,22 +124,20 @@
     font-weight: 800;
   }
 
-  /* A. Font size & wrap: Shrink info and price font */
+  /* IMPORTANT: use !important to beat legacy inline <style> rules */
   .player-card .info {
     font-size: 8px;
     padding: 0 2px;
-    display: flex;
-    align-items: center;
-    gap: 4px;
+    display: flex !important;
+    align-items: center !important;
+    gap: 4px !important;
     max-width: 100%;
   }
 
-  /* Phase 4: Hide club short name on mobile/tablet */
   .player-card .info .team {
     display: none;
   }
 
-  /* Phase 4: Show short price labels (S/P/C) and hide long labels (Sell/Buy/Cur) */
   .player-card .info .price .price-label-long {
     display: none;
   }
@@ -150,40 +146,38 @@
     display: inline;
   }
 
-  /* Phase 4: Price should be right-aligned, larger, and not truncated */
   .player-card .info .price {
     font-weight: 700;
-    white-space: nowrap;
-    flex: 0 0 auto;
-    margin-left: auto;
-    text-align: right;
+    white-space: nowrap !important;
+    flex: 0 0 auto !important;
+    margin-left: auto !important;
+    text-align: right !important;
   }
 
-  /* Phase 4: Next fixture takes remaining space, bold, with ellipsis for overflow */
   .player-card .info .next-fixture {
     font-weight: 700;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    flex: 1 1 auto;
-    min-width: 0;
-    text-align: left;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+    text-align: left !important;
   }
 
-  /* B. Bottom Fixture Row: Set display flex with tight spacing */
+  /* IMPORTANT: explicitly override row/column-gap because computed showed 8px */
   .player-card .future-fixtures {
-    display: flex;
-    justify-content: center;
-    gap: 2px;
-    flex-wrap: nowrap;
+    display: flex !important;
+    justify-content: center !important;
+    gap: 2px !important;
+    row-gap: 2px !important;
+    column-gap: 2px !important;
+    flex-wrap: nowrap !important;
     font-size: 8px;
   }
 
-  /* Phase 4: Show compact fixture text and hide full fixture text */
   .player-card .info .next-fixture .fixture-full {
     display: none;
   }
-
   .player-card .info .next-fixture .fixture-compact {
     display: inline;
   }
@@ -191,14 +185,15 @@
   .player-card .future-fixtures .fixture .fixture-full {
     display: none;
   }
-
   .player-card .future-fixtures .fixture .fixture-compact {
     display: inline;
   }
 
   .player-card .future-fixtures .fixture {
-    flex: 0 0 auto;
-    white-space: nowrap;
+    flex: 0 0 auto !important;
+    min-width: 0 !important;
+    white-space: nowrap !important;
+    margin: 0 !important;
   }
 
   /* Badge size reduction */
@@ -206,7 +201,6 @@
     width: 30px;
     height: 30px;
   }
-
   .badge-container .badge {
     width: 30px;
     height: 30px;
@@ -249,7 +243,6 @@
   }
 
   /* Card buttons */
-  /* D. Button Layout: Adjust positioning to prevent overlap */
   .card-btn {
     width: 14px;
     height: 14px;
@@ -267,7 +260,6 @@
   }
 
   /* Formation line - ensure no wrap but allow overflow scroll */
-  /* C. Card Padding/Margin: Increase horizontal gap between cards */
   .formation-line {
     gap: 4px !important;
     flex-wrap: nowrap;
