@@ -1518,8 +1518,8 @@
   }
 
   /* Adjust card button positioning to prevent overlap on smaller cards */
-  /* Touch target is 12px×12px which matches 480px/600px breakpoints */
-  /* Font size 9px is for icon display, not the clickable area */
+  /* Buttons positioned INSIDE card corners to prevent overlap with adjacent cards */
+  /* With 5px gap and buttons outside cards, they would overlap */
   .card-btn {
     width: 12px;
     height: 12px;
@@ -1527,13 +1527,13 @@
   }
 
   .btn-remove {
-    top: -4px;
-    left: -4px;
+    top: 2px;
+    left: 2px;
   }
 
   .btn-swap {
-    top: -4px;
-    right: -4px;
+    top: 2px;
+    right: 2px;
   }
 
   /* Adjust captain/status badges for smaller cards */
