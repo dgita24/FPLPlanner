@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fixture Time Format Demo</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 30px;
+      background: #37003c;
+      color: #fff;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    h1 {
+      color: #00ff87;
+      text-align: center;
+    }
+    .comparison {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-top: 30px;
+    }
+    .box {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 20px;
+      border-radius: 10px;
+      border: 2px solid rgba(255, 255, 255, 0.2);
+    }
+    .box h2 {
+      margin-top: 0;
+      color: #00ff87;
+      font-size: 18px;
+    }
+    .time-display {
+      font-size: 32px;
+      font-weight: bold;
+      text-align: center;
+      padding: 20px;
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 8px;
+      margin: 15px 0;
+    }
+    .wrong {
+      border: 3px solid #ff4444;
+    }
+    .correct {
+      border: 3px solid #00ff87;
+    }
+    .label {
+      text-align: center;
+      font-size: 14px;
+      opacity: 0.8;
+      margin-top: 10px;
+    }
+    code {
+      background: rgba(0, 0, 0, 0.4);
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-size: 12px;
+    }
+    .fixture-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px;
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 6px;
+      margin: 10px 0;
+    }
+    .team {
+      font-size: 14px;
+    }
+    .ko {
+      font-weight: bold;
+      font-size: 16px;
+      padding: 5px 10px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+  <h1>⏰ Fixture Time Format Fix</h1>
+  
+  <div class="comparison">
+    <div class="box">
+      <h2>❌ Before (12-hour format)</h2>
+      <div class="time-display wrong" id="before"></div>
+      <div class="label">Without <code>hour12: false</code></div>
+      <div style="margin-top: 20px;">
+        <div class="fixture-row">
+          <span class="team">Arsenal</span>
+          <span class="ko" id="fixture-before"></span>
+          <span class="team">Chelsea</span>
+        </div>
+      </div>
+    </div>
+    
+    <div class="box">
+      <h2>✅ After (24-hour format)</h2>
+      <div class="time-display correct" id="after"></div>
+      <div class="label">With <code>hour12: false</code></div>
+      <div style="margin-top: 20px;">
+        <div class="fixture-row">
+          <span class="team">Arsenal</span>
+          <span class="ko" id="fixture-after"></span>
+          <span class="team">Chelsea</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Sample kickoff time: 2:30 PM / 14:30
+    const kickoffTime = new Date('2024-01-20T14:30:00Z');
+
+    // Before: Without hour12 (locale-dependent, usually shows 12-hour)
+    const beforeFormat = kickoffTime.toLocaleTimeString([], {
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+
+    // After: With hour12: false (always 24-hour)
+    const afterFormat = kickoffTime.toLocaleTimeString([], {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false
+    });
+
+    document.getElementById('before').textContent = beforeFormat;
+    document.getElementById('after').textContent = afterFormat;
+    document.getElementById('fixture-before').textContent = beforeFormat;
+    document.getElementById('fixture-after').textContent = afterFormat;
+  </script>
+</body>
+</html>

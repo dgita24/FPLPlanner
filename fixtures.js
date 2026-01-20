@@ -229,7 +229,8 @@ function renderFixtureRow(f) {
     centreDisplay = f.kickoff_time
       ? new Date(f.kickoff_time).toLocaleTimeString([], {
           hour: '2-digit',
-          minute: '2-digit'
+          minute: '2-digit',
+          hour12: false
         })
       : '';
   }
