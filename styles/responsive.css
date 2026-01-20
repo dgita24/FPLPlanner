@@ -217,13 +217,13 @@
   }
 
   .btn-remove {
-    top: -4px;
-    left: -4px;
+    top: 2px;
+    left: 2px;
   }
 
   .btn-swap {
-    top: -4px;
-    right: -4px;
+    top: 2px;
+    right: 2px;
   }
 
   /* Formation line - ensure no wrap but allow overflow scroll */
@@ -643,13 +643,13 @@
   }
 
   .btn-remove {
-    top: -3px;
-    left: -3px;
+    top: 2px;
+    left: 2px;
   }
 
   .btn-swap {
-    top: -3px;
-    right: -3px;
+    top: 2px;
+    right: 2px;
   }
 
   /* Formation and bench - tighter gaps with better spacing */
@@ -1171,13 +1171,13 @@
   }
 
   .btn-remove {
-    top: -4px;
-    left: -4px;
+    top: 2px;
+    left: 2px;
   }
 
   .btn-swap {
-    top: -4px;
-    right: -4px;
+    top: 2px;
+    right: 2px;
   }
 
   /* Formation and bench spacing */
@@ -1418,12 +1418,15 @@
 /* Tablets in portrait have much more room than phones - give them better spacing */
 @media (min-width: 481px) and (max-width: 900px) and (orientation: portrait) {
   /* Increase card spacing for tablets - they have plenty of room */
+  /* Combined formation-line rules and removed !important */
   .formation-line {
-    gap: 12px !important;
+    gap: 12px;
+    overflow-x: hidden;
   }
 
   .bench-slots {
     gap: 12px;
+    overflow-x: hidden;
   }
 
   /* Ensure no horizontal scrolling on tablets */
@@ -1431,15 +1434,7 @@
     overflow-x: hidden;
   }
 
-  .formation-line {
-    overflow-x: hidden;
-  }
-
   .bench {
-    overflow-x: hidden;
-  }
-
-  .bench-slots {
     overflow-x: hidden;
   }
 }
