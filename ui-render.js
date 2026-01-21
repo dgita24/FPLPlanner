@@ -597,9 +597,9 @@ window.showSquadPlayerInfo = function (playerId, source) {
     availabilityFlagHtml = `
       <div class="player-info-section">
         <h3>Availability</h3>
-        <div style="display: flex; align-items: center; gap: 10px; margin-top: 10px;">
+        <div style="display: flex; align-items: center; gap: 8px; margin-top: 6px;">
           <div class="table-status-flag-badge ${badgeClass}">${badgeText}</div>
-          <p style="color: rgba(255, 255, 255, 0.9); margin: 0; line-height: 1.6;">${newsEscaped}</p>
+          <p style="color: rgba(255, 255, 255, 0.9); margin: 0; line-height: 1.4; font-size: 13px;">${newsEscaped}</p>
         </div>
       </div>
     `;
@@ -694,7 +694,7 @@ window.showSquadPlayerInfo = function (playerId, source) {
     captainSelectorHtml = `
       <div class="player-info-section">
         <h3>Captain Selection</h3>
-        <div style="display: flex; gap: 10px; margin-top: 10px;">
+        <div style="display: flex; gap: 8px; margin-top: 6px;">
           <button 
             class="modal-action-btn ${isCaptain ? 'active' : ''}" 
             onclick="setCaptain(${playerId}); closeSquadPlayerInfo();"
@@ -716,7 +716,7 @@ window.showSquadPlayerInfo = function (playerId, source) {
   const actionButtonsHtml = `
     <div class="player-info-section">
       <h3>Actions</h3>
-      <div style="display: flex; gap: 10px; margin-top: 10px;">
+      <div style="display: flex; gap: 8px; margin-top: 6px;">
         <button 
           class="modal-action-btn" 
           onclick="removePlayer(${playerId}, '${source}'); closeSquadPlayerInfo();"
