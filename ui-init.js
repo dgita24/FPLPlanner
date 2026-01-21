@@ -7,7 +7,7 @@ import { renderFixtures, setFixturesGW, isFixturesSyncEnabled } from './fixtures
 import { cancelTransfer, substitutePlayer, addSelectedToSquad, removePlayer, resetTransferState, isPendingTransfer, getBatchTransferInfo, reinstatePlayer, selectChip } from './team-operations.js';
 import { setPendingSwap } from './ui-render.js';
 import { setDefaultSort } from './table.js';
-import { MAX_GAMEWEEK } from './constants.js';
+import { MAX_GAMEWEEK, MAX_DRAFTS_PER_MANAGER } from './constants.js';
 
 // Helper function for pluralization
 function pluralize(word, count) {
@@ -173,6 +173,44 @@ async function importTeam() {
   setDefaultSort();
 }
 
+// Delete a saved draft
+async function deleteDraft(teamid) {
+  if (!state.managerId) {
+    showMessage('No manager ID available. Import a team first.', 'error');
+    return;
+  }
+
+  // Confirmation dialog
+  const confirmed = confirm(`Are you sure you want to delete "${teamid}"?\n\nThis action cannot be undone.`);
+  if (!confirmed) {
+    return;
+  }
+
+  try {
+    const response = await fetch('/api/delete-draft', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ 
+        teamid: teamid,
+        managerid: state.managerId
+      })
+    });
+
+    const result = await response.json();
+
+    if (response.ok && result.success) {
+      showMessage(`Draft "${teamid}" deleted successfully`, 'success');
+      
+      // Refresh the saved teams list
+      await populateSavedTeamsDropdown();
+    } else {
+      throw new Error(result.error || 'Delete failed');
+    }
+  } catch (err) {
+    showMessage(`Delete error: ${err.message}`, 'error');
+  }
+}
+
 // Local Save/Load
 function localSave() {
   try {
@@ -216,14 +254,18 @@ function refreshSavedTeamsDropdown() {
 }
 
 async function populateSavedTeamsDropdown() {
-  const dropdown = document.getElementById('savedTeamsList');
-  if (!dropdown) return;
+  const container = document.getElementById('savedDraftsContainer');
+  if (!container) {
+    console.warn('Saved drafts container not found');
+    return;
+  }
   
-  // Clear existing options except the first one
-  dropdown.innerHTML = '<option value="">Select a saved draft...</option>';
+  // Clear existing content
+  container.innerHTML = '<p style="opacity: 0.7; font-size: 0.9em;">Loading...</p>';
   
   // Only populate if we have a manager ID
   if (!state.managerId) {
+    container.innerHTML = '<p style="opacity: 0.7; font-size: 0.9em;">Import a team to see saved drafts</p>';
     return;
   }
   
@@ -237,38 +279,62 @@ async function populateSavedTeamsDropdown() {
     
     if (!response.ok) {
       console.error('Failed to fetch saved drafts');
+      container.innerHTML = '<p style="color: #ff6b6b;">Failed to load drafts</p>';
       return;
     }
     
     const result = await response.json();
     
-    if (result.success && result.drafts) {
+    if (result.success && result.drafts && result.drafts.length > 0) {
       const draftCount = result.drafts.length;
-      const MAX_DRAFTS_PER_MANAGER = 5; // Match constant in functions/api/save.js
       
-      // Update draft counter display if element exists
-      const draftCounter = document.getElementById('draftCounter');
-      if (draftCounter) {
-        draftCounter.textContent = `(${draftCount}/${MAX_DRAFTS_PER_MANAGER})`;
-      }
+      let html = `<p style="font-weight: 600; margin-bottom: 8px;">Your Saved Drafts (${draftCount}/${MAX_DRAFTS_PER_MANAGER})</p>`;
+      html += '<ul style="list-style: none; padding: 0; margin: 0;">';
       
       result.drafts.forEach(draft => {
-        const option = document.createElement('option');
-        option.value = draft.teamid;
-        option.textContent = draft.teamid;
-        dropdown.appendChild(option);
+        // Use JSON.stringify for safe JavaScript context escaping
+        const jsEscaped = JSON.stringify(draft.teamid).slice(1, -1); // Remove surrounding quotes
+        
+        // Escape for HTML context (display text)
+        const htmlEscaped = draft.teamid
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#39;');
+        
+        html += `
+          <li style="display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.1);">
+            <span style="cursor: pointer; flex: 1;" onclick="loadDraftByName('${jsEscaped}')">
+              • ${htmlEscaped}
+            </span>
+            <button 
+              onclick="deleteDraft('${jsEscaped}')" 
+              style="background: none; border: none; cursor: pointer; font-size: 1.2em; padding: 4px 8px;"
+              title="Delete ${htmlEscaped}"
+            >
+              🗑️
+            </button>
+          </li>
+        `;
       });
+      
+      html += '</ul>';
+      container.innerHTML = html;
+    } else {
+      container.innerHTML = '<p style="opacity: 0.7; font-size: 0.9em;">No saved drafts yet (0/5)</p>';
     }
   } catch (e) {
     console.error('Failed to load saved teams list:', e);
+    container.innerHTML = '<p style="color: #ff6b6b;">Error loading drafts</p>';
   }
 }
 
-function populateLoadTeamId() {
-  const dropdown = document.getElementById('savedTeamsList');
+// Helper function to load draft when clicked from the list
+function loadDraftByName(teamid) {
   const input = document.getElementById('loadTeamId');
-  if (dropdown && input) {
-    input.value = dropdown.value;
+  if (input) {
+    input.value = teamid;
   }
 }
 
@@ -882,7 +948,8 @@ export function initUI() {
   window.localLoad = localLoad;
   window.saveTeam = saveTeam;
   window.loadTeam = loadTeam;
-  window.populateLoadTeamId = populateLoadTeamId;
+  window.deleteDraft = deleteDraft;
+  window.loadDraftByName = loadDraftByName;
   window.undoLastAction = undoLastAction;
   window.resetToImportedTeam = resetToImportedTeam;
   window.setCaptain = setCaptain;
