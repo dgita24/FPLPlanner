@@ -261,11 +261,11 @@ async function populateSavedTeamsDropdown() {
   }
   
   // Clear existing content
-  container.innerHTML = '<p style="opacity: 0.7; font-size: 0.9em;">Loading...</p>';
+  container.innerHTML = '<p class="drafts-placeholder">Loading...</p>';
   
   // Only populate if we have a manager ID
   if (!state.managerId) {
-    container.innerHTML = '<p style="opacity: 0.7; font-size: 0.9em;">Import a team to see saved drafts</p>';
+    container.innerHTML = '<p class="drafts-placeholder">Import a team to see saved drafts</p>';
     return;
   }
   
@@ -279,7 +279,7 @@ async function populateSavedTeamsDropdown() {
     
     if (!response.ok) {
       console.error('Failed to fetch saved drafts');
-      container.innerHTML = '<p style="color: #ff6b6b;">Failed to load drafts</p>';
+      container.innerHTML = '<p class="drafts-error">Failed to load drafts</p>';
       return;
     }
     
@@ -287,9 +287,10 @@ async function populateSavedTeamsDropdown() {
     
     if (result.success && result.drafts && result.drafts.length > 0) {
       const draftCount = result.drafts.length;
+      const maxDrafts = MAX_DRAFTS_PER_MANAGER;
       
-      let html = `<p style="font-weight: 600; margin-bottom: 8px;">Your Saved Drafts (${draftCount}/${MAX_DRAFTS_PER_MANAGER})</p>`;
-      html += '<ul style="list-style: none; padding: 0; margin: 0;">';
+      let html = `<p class="draft-count">${draftCount}/${maxDrafts} drafts used</p>`;
+      html += '<ul class="drafts-list">';
       
       result.drafts.forEach(draft => {
         // Use JSON.stringify for safe JavaScript context escaping
@@ -304,14 +305,13 @@ async function populateSavedTeamsDropdown() {
           .replace(/'/g, '&#39;');
         
         html += `
-          <li style="display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.1);">
-            <span style="cursor: pointer; flex: 1;" onclick="loadDraftByName('${jsEscaped}')">
+          <li>
+            <span onclick="loadDraftByName('${jsEscaped}')">
               • ${htmlEscaped}
             </span>
             <button 
               onclick="deleteDraft('${jsEscaped}')" 
-              style="background: none; border: none; cursor: pointer; font-size: 1.2em; padding: 4px 8px;"
-              title="Delete ${htmlEscaped}"
+              aria-label="Delete ${htmlEscaped}"
             >
               🗑️
             </button>
@@ -322,11 +322,11 @@ async function populateSavedTeamsDropdown() {
       html += '</ul>';
       container.innerHTML = html;
     } else {
-      container.innerHTML = '<p style="opacity: 0.7; font-size: 0.9em;">No saved drafts yet (0/5)</p>';
+      container.innerHTML = '<p class="drafts-placeholder">No saved drafts yet (0/5)</p>';
     }
   } catch (e) {
     console.error('Failed to load saved teams list:', e);
-    container.innerHTML = '<p style="color: #ff6b6b;">Error loading drafts</p>';
+    container.innerHTML = '<p class="drafts-error">Error loading drafts</p>';
   }
 }
 
@@ -955,6 +955,7 @@ export function initUI() {
   window.setCaptain = setCaptain;
   window.setViceCaptain = setViceCaptain;
   window.donatePlaceholder = () => showMessage('Donate feature coming soon! This is a placeholder for now.', 'info');
+  window.closeSidebar = closeSidebar;
 
   // Expose updateUI so it can be called from fixtures.js
   window.updateUI = updateUI;
