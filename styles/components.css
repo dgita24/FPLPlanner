@@ -749,10 +749,12 @@ td.fixtures-cell {
 
 .fixtures-view-toggle-container {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
-  gap: 4px;
+  justify-content: center;
+  gap: 6px;
   flex: 1;
+  flex-wrap: wrap;
 }
 
 .fixtures-team-view-container {
@@ -764,10 +766,31 @@ td.fixtures-cell {
 }
 
 .fixtures-view-toggle-btn {
-  padding: 6px 16px;
+  padding: 6px 12px;
   background: var(--bg-dark);
   border: 1px solid var(--border);
   border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* Sync toggle in fixtures panel - smaller size */
+.fixtures-view-toggle-container .sync-toggle-btn {
+  padding: 6px 10px !important;
+  font-size: 12px !important;
+  height: auto !important;
+  opacity: 0.6;
+  flex-shrink: 0;
+}
+
+.fixtures-view-toggle-container .sync-toggle-btn.active {
+  opacity: 1;
+}
   font-size: 13px;
   font-weight: 600;
   color: var(--text);
