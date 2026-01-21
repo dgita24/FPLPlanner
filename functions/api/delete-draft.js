@@ -26,8 +26,10 @@ export async function onRequestPost({ request, env }) {
     };
 
     // Delete the draft - only if it belongs to this manager (security)
+    const encodedTeamId = encodeURIComponent(teamid);
+    const encodedManagerId = encodeURIComponent(managerid);
     const response = await fetch(
-      `${supabaseUrl}/rest/v1/team_saves?teamid=eq.${teamid}&managerid=eq.${managerid}`,
+      `${supabaseUrl}/rest/v1/team_saves?teamid=eq.${encodedTeamId}&managerid=eq.${encodedManagerId}`,
       {
         method: 'DELETE',
         headers

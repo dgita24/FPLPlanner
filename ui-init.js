@@ -174,14 +174,14 @@ async function importTeam() {
 }
 
 // Delete a saved draft
-async function deleteDraft(teamid, draftName) {
+async function deleteDraft(teamid) {
   if (!state.managerId) {
     showMessage('No manager ID available. Import a team first.', 'error');
     return;
   }
 
   // Confirmation dialog
-  const confirmed = confirm(`Are you sure you want to delete "${draftName}"?\n\nThis action cannot be undone.`);
+  const confirmed = confirm(`Are you sure you want to delete "${teamid}"?\n\nThis action cannot be undone.`);
   if (!confirmed) {
     return;
   }
@@ -199,7 +199,7 @@ async function deleteDraft(teamid, draftName) {
     const result = await response.json();
 
     if (response.ok && result.success) {
-      showMessage(`Draft "${draftName}" deleted successfully`, 'success');
+      showMessage(`Draft "${teamid}" deleted successfully`, 'success');
       
       // Refresh the saved teams list
       await populateSavedTeamsDropdown();
@@ -299,7 +299,7 @@ async function populateSavedTeamsDropdown() {
               • ${draft.teamid}
             </span>
             <button 
-              onclick="deleteDraft('${draft.teamid}', '${draft.teamid}')" 
+              onclick="deleteDraft('${draft.teamid}')" 
               style="background: none; border: none; cursor: pointer; font-size: 1.2em; padding: 4px 8px;"
               title="Delete ${draft.teamid}"
             >
