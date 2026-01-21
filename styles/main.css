@@ -289,7 +289,7 @@ body {
 
 #plannerMain {
   display: grid;
-  grid-template-columns: 280px 1fr 370px;
+  grid-template-columns: 370px 1fr 370px;
   gap: 12px;
   justify-content: center;
   width: 100%;
