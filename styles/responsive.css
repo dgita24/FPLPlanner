@@ -1702,8 +1702,8 @@
   }
   
   .team-fixture-row {
-    grid-template-columns: 50px 24px 1fr 50px;
-    gap: 6px;
+    grid-template-columns: 48px 24px 1fr 36px;
+    gap: 5px;
     padding: 6px 8px;
     font-size: 11px;
   }

@@ -202,7 +202,7 @@ export function renderFixtures() {
         <button onclick="changeFixturesGW(-1)">←</button>
         <div class="fixtures-view-toggle-container">
           <button class="fixtures-view-toggle-btn" onclick="toggleFixturesViewMode()">
-            View by: Gameweek
+            View by: Team
           </button>
           <strong>GW ${fixturesGW}</strong>
         </div>
@@ -220,7 +220,7 @@ export function renderFixtures() {
       <div class="fixtures-header">
         <div class="fixtures-team-view-container">
           <button class="fixtures-view-toggle-btn" onclick="toggleFixturesViewMode()">
-            View by: Team
+            View by: Gameweek
           </button>
           <select class="fixtures-team-select" onchange="changeSelectedTeam(this.value)">
             ${teamOptions}
@@ -409,14 +409,14 @@ function renderTeamFixtureRow(f, teamId) {
   const isHome = f.team_h === teamId;
   const opponentId = isHome ? f.team_a : f.team_h;
   const opponent = getTeam(opponentId);
-  const venue = isHome ? 'Home' : 'Away';
+  const venue = isHome ? 'H' : 'A';
   
   return `
     <div class="team-fixture-row" data-gw="${f.event || ''}">
       <div class="team-fixture-gw">GW${f.event || '?'}</div>
       <img class="team-fixture-badge" src="${opponent.badge}" alt="${opponent.name}" />
       <div class="team-fixture-opponent">${opponent.name}</div>
-      <div class="team-fixture-venue ${venue.toLowerCase()}">${venue}</div>
+      <div class="team-fixture-venue ${isHome ? 'home' : 'away'}">${venue}</div>
     </div>
   `;
 }

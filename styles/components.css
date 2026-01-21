@@ -951,11 +951,11 @@ td.fixtures-cell {
 /* Compact team fixture row for team view */
 .team-fixture-row {
   display: grid;
-  grid-template-columns: 60px 30px 1fr 60px;
+  grid-template-columns: 55px 28px 1fr 40px;
   align-items: center;
   padding: 8px 10px;
   border-bottom: 1px solid var(--border);
-  gap: 10px;
+  gap: 6px;
   font-size: 12px;
 }
 
@@ -986,7 +986,7 @@ td.fixtures-cell {
 .team-fixture-venue {
   text-align: right;
   font-size: 11px;
-  font-weight: 600;
+  font-weight: 700;
   text-transform: uppercase;
 }
 
