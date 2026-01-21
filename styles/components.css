@@ -742,7 +742,78 @@ td.fixtures-cell {
 .fixtures-header {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   margin-bottom: 8px;
+  gap: 8px;
+}
+
+.fixtures-view-toggle-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  flex: 1;
+}
+
+.fixtures-team-view-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+
+.fixtures-view-toggle-btn {
+  padding: 4px 12px;
+  background: var(--bg-dark);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.fixtures-view-toggle-btn:hover {
+  background: var(--bg-darker);
+  border-color: var(--accent);
+  transform: translateY(-1px);
+}
+
+.fixtures-team-select {
+  width: 100%;
+  max-width: 200px;
+  padding: 6px 10px;
+  background: var(--bg-dark);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.fixtures-team-select:hover {
+  border-color: var(--accent);
+}
+
+.fixtures-team-select:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.fixture-gw-badge {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 2px 6px;
+  background: var(--accent);
+  color: white;
+  font-size: 10px;
+  font-weight: 700;
+  border-radius: 3px;
 }
 
 .fixture-date {
