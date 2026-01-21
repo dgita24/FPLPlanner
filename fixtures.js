@@ -432,15 +432,17 @@ function getFixturesForTeam(teamId) {
   for (const [gw, fixtures] of fixturesByGW) {
     for (const fixture of fixtures) {
       if (fixture.team_h === teamId || fixture.team_a === teamId) {
-        // Cache date parsing for sorting efficiency
-        fixture._sortDate = fixture.kickoff_time ? new Date(fixture.kickoff_time).getTime() : Infinity;
         teamFixtures.push(fixture);
       }
     }
   }
   
-  // Sort by cached timestamp
-  teamFixtures.sort((a, b) => a._sortDate - b._sortDate);
+  // Sort by kickoff time without mutating original objects
+  teamFixtures.sort((a, b) => {
+    const aTime = a.kickoff_time ? new Date(a.kickoff_time).getTime() : Infinity;
+    const bTime = b.kickoff_time ? new Date(b.kickoff_time).getTime() : Infinity;
+    return aTime - bTime;
+  });
   
   return teamFixtures;
 }
