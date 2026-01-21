@@ -210,14 +210,8 @@ function localLoad() {
   }
 }
 
-// Saved teams list management
-function getSavedTeamsList() {
-  // No longer used - saved teams now fetched from server
-  return [];
-}
-
-function addToSavedTeamsList(teamId) {
-  // Refresh the dropdown after saving
+// Saved teams list management - now fetches from cloud based on manager ID
+function refreshSavedTeamsDropdown() {
   populateSavedTeamsDropdown();
 }
 
@@ -311,7 +305,7 @@ async function saveTeam() {
       if (sideMsg) sideMsg.textContent = `✓ Saved as: ${teamId}`;
       
       // Refresh saved teams list
-      addToSavedTeamsList(teamId);
+      refreshSavedTeamsDropdown();
       
       // Close sidebar after successful save
       closeSidebar();
