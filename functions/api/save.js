@@ -51,7 +51,7 @@ export async function onRequestPost({ request, env, context }) {
 
     const saveData = {
       teamid,
-      label: label || 'My Team',
+      label: label || teamid,
       passwordhash,
       payload,
       managerid: managerid || null

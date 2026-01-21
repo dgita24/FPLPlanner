@@ -246,7 +246,7 @@ async function populateSavedTeamsDropdown() {
       result.drafts.forEach(draft => {
         const option = document.createElement('option');
         option.value = draft.teamid;
-        option.textContent = draft.label || draft.teamid;
+        option.textContent = draft.teamid;
         dropdown.appendChild(option);
       });
     }
