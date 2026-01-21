@@ -250,12 +250,20 @@ export function renderTable() {
   const search = foldForSearch(document.getElementById('searchName')?.value || '');
   const posFilter = document.getElementById('filterPos')?.value || '';
   const teamFilter = document.getElementById('filterTeam')?.value || '';
+  const minPrice = document.getElementById('filterMinPrice')?.value || '';
+  const maxPrice = document.getElementById('filterMaxPrice')?.value || '';
 
   let filtered = state.elements.filter((player) => {
     const matchesSearch = foldForSearch(player.web_name || '').includes(search);
     const matchesPos = !posFilter || posNames[player.element_type] === posFilter;
     const matchesTeam = !teamFilter || String(player.team) === teamFilter;
-    return matchesSearch && matchesPos && matchesTeam;
+    
+    // Price filtering
+    const playerPrice = player.now_cost / 10;
+    const matchesMinPrice = !minPrice || playerPrice >= parseFloat(minPrice);
+    const matchesMaxPrice = !maxPrice || playerPrice <= parseFloat(maxPrice);
+    
+    return matchesSearch && matchesPos && matchesTeam && matchesMinPrice && matchesMaxPrice;
   });
 
   // -------- SORTING --------
