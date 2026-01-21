@@ -31,10 +31,12 @@
       <p style="font-size: 0.85em; opacity: 0.8; margin-top: 5px;">Maximum 5 drafts per manager. Update existing drafts to stay within limit.</p>
 
       <h3>Cloud Load</h3>
-      <select id="savedTeamsList" onchange="populateLoadTeamId()">
-        <option value="">Select a saved draft...</option>
-      </select>
-      <input type="text" id="loadTeamId" placeholder="Or enter draft team name" />
+      <!-- Replace the <select> dropdown with a container for the list -->
+      <div id="savedDraftsContainer" style="margin-bottom: 12px;">
+        <p style="opacity: 0.7; font-size: 0.9em;">Import a team to see saved drafts</p>
+      </div>
+
+      <input type="text" id="loadTeamId" placeholder="Or enter draft name manually" />
       <input type="password" id="loadPassword" placeholder="Password" />
       <button onclick="loadTeam()">Load Team</button>
 

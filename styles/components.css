@@ -1385,3 +1385,15 @@ td.fixtures-cell {
   background: var(--accent);
   border: 2px solid var(--accent);
 }
+
+/* ===== Saved Drafts Container ===== */
+
+#savedDraftsContainer ul li:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
+}
+
+#savedDraftsContainer button:hover {
+  transform: scale(1.1);
+  filter: brightness(1.2);
+}
