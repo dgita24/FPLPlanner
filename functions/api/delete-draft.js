@@ -46,8 +46,8 @@ export async function onRequestPost({ request, env }) {
     }
 
     // Check if any rows were deleted
-    const deletedRows = await response.json();
-    if (!deletedRows || deletedRows.length === 0) {
+    const deletedRecords = await response.json();
+    if (!deletedRecords || deletedRecords.length === 0) {
       return new Response(JSON.stringify({ error: 'Draft not found or already deleted' }), {
         status: 404,
         headers: { 'Content-Type': 'application/json' }

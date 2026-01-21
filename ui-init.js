@@ -7,7 +7,7 @@ import { renderFixtures, setFixturesGW, isFixturesSyncEnabled } from './fixtures
 import { cancelTransfer, substitutePlayer, addSelectedToSquad, removePlayer, resetTransferState, isPendingTransfer, getBatchTransferInfo, reinstatePlayer, selectChip } from './team-operations.js';
 import { setPendingSwap } from './ui-render.js';
 import { setDefaultSort } from './table.js';
-import { MAX_GAMEWEEK } from './constants.js';
+import { MAX_GAMEWEEK, MAX_DRAFTS_PER_MANAGER } from './constants.js';
 
 // Helper function for pluralization
 function pluralize(word, count) {
@@ -287,19 +287,13 @@ async function populateSavedTeamsDropdown() {
     
     if (result.success && result.drafts && result.drafts.length > 0) {
       const draftCount = result.drafts.length;
-      const maxDrafts = 5;
       
-      let html = `<p style="font-weight: 600; margin-bottom: 8px;">Your Saved Drafts (${draftCount}/${maxDrafts})</p>`;
+      let html = `<p style="font-weight: 600; margin-bottom: 8px;">Your Saved Drafts (${draftCount}/${MAX_DRAFTS_PER_MANAGER})</p>`;
       html += '<ul style="list-style: none; padding: 0; margin: 0;">';
       
       result.drafts.forEach(draft => {
-        // Escape for JavaScript string context (onclick attributes)
-        const jsEscaped = draft.teamid
-          .replace(/\\/g, '\\\\')
-          .replace(/'/g, "\\'")
-          .replace(/"/g, '\\"')
-          .replace(/\n/g, '\\n')
-          .replace(/\r/g, '\\r');
+        // Use JSON.stringify for safe JavaScript context escaping
+        const jsEscaped = JSON.stringify(draft.teamid).slice(1, -1); // Remove surrounding quotes
         
         // Escape for HTML context (display text)
         const htmlEscaped = draft.teamid
