@@ -18,29 +18,36 @@
     </div>
 
     <div class="sidebar" id="sidebar">
-      <h2>Manage Team</h2>
+      <h2>
+        TEAM MANAGER
+        <button class="sidebar-close" onclick="closeSidebar()" aria-label="Close menu">×</button>
+      </h2>
 
-      <h3>Import</h3>
-      <input type="text" id="importTeamId" placeholder="FPL Team ID e.g. 123456" />
-      <button onclick="importTeam()">Import from FPL</button>
-
-      <h3>Cloud Save <span id="draftCounter" style="font-size: 0.8em; opacity: 0.7;"></span></h3>
-      <input type="text" id="saveTeamId" placeholder="Save name (e.g., 'WC_GW20')" />
-      <input type="password" id="savePassword" placeholder="Create Password" />
-      <button onclick="saveTeam()">Save Team</button>
-      <p style="font-size: 0.85em; opacity: 0.8; margin-top: 5px;">Maximum 5 drafts per manager. Update existing drafts to stay within limit.</p>
-
-      <h3>Cloud Load</h3>
-      <!-- Replace the <select> dropdown with a container for the list -->
-      <div id="savedDraftsContainer" style="margin-bottom: 12px;">
-        <p style="opacity: 0.7; font-size: 0.9em;">Import a team to see saved drafts</p>
+      <div class="sidebar-section">
+        <h3>📥 Import Team</h3>
+        <input type="text" id="importTeamId" placeholder="FPL Team ID (e.g., 123456)" />
+        <button onclick="importTeam()">Import from FPL</button>
       </div>
 
-      <input type="text" id="loadTeamId" placeholder="Or enter draft name manually" />
-      <input type="password" id="loadPassword" placeholder="Password" />
-      <button onclick="loadTeam()">Load Team</button>
+      <div class="sidebar-section">
+        <h3>💾 Save New Draft</h3>
+        <input type="text" id="saveTeamId" placeholder="Save name (e.g., 'WC_GW20')" />
+        <input type="password" id="savePassword" placeholder="Create Password" />
+        <button onclick="saveTeam()">Save Team</button>
+        <p class="draft-limit-info">Maximum 5 drafts per manager</p>
+      </div>
 
-      <div id="sideMsg" style="margin-top: 10px; font-size: 12px"></div>
+      <div class="sidebar-section">
+        <h3>📂 Your Saved Drafts</h3>
+        <div id="savedDraftsContainer">
+          <p style="opacity: 0.7; font-size: 0.9em;">Import a team to see saved drafts</p>
+        </div>
+        <input type="text" id="loadTeamId" placeholder="Enter draft name" />
+        <input type="password" id="loadPassword" placeholder="Password" />
+        <button onclick="loadTeam()">Load Team</button>
+      </div>
+
+      <div id="sideMsg"></div>
     </div>
 
     <!-- MAIN PLANNER -->
