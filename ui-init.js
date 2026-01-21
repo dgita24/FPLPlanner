@@ -24,17 +24,12 @@ function toggleCard(cardId) {
   const allActionCards = document.querySelectorAll('.action-card');
   const allExpandableCards = document.querySelectorAll('.expandable-card');
   
-  // Don't toggle the drafts card - it's always visible
-  if (cardId === 'draftsCard') return;
-  
   // Check if card is currently visible
   const isVisible = card.style.display === 'block';
   
-  // Hide all expandable cards except drafts
+  // Hide all expandable cards
   allExpandableCards.forEach(c => {
-    if (c.id !== 'draftsCard') {
-      c.style.display = 'none';
-    }
+    c.style.display = 'none';
   });
   
   // Remove active state from all action cards

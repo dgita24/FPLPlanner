@@ -30,7 +30,7 @@
         </div>
         <div class="action-card" onclick="toggleCard('saveCard')">
           <div class="card-icon">💾</div>
-          <div class="card-label">SAVE</div>
+          <div class="card-label">CLOUD SAVE</div>
         </div>
         <div class="action-card" onclick="toggleCard('draftsCard')">
           <div class="card-icon">📂</div>
@@ -54,8 +54,8 @@
         <p class="helper-text">Max 5 drafts per manager</p>
       </div>
 
-      <!-- Drafts Card (always visible) -->
-      <div class="expandable-card" id="draftsCard">
+      <!-- Drafts Card (hidden by default) -->
+      <div class="expandable-card" id="draftsCard" style="display: none;">
         <h4>Your Saved Drafts <span id="draftCount">(0/5)</span></h4>
         <div id="savedDraftsContainer">
           <p class="helper-text">Import a team to see saved drafts</p>
