@@ -10,6 +10,9 @@ let tableSort = {
 
 const posNames = { 1: 'GK', 2: 'DEF', 3: 'MID', 4: 'FWD' };
 
+// Price conversion factor (FPL API stores prices in tenths)
+const PRICE_CONVERSION_FACTOR = 10;
+
 // Team badge URL template
 const TEAM_BADGE_URL_TEMPLATE = 'https://resources.premierleague.com/premierleague/badges/70/t{code}.png';
 
@@ -259,7 +262,7 @@ export function renderTable() {
     const matchesTeam = !teamFilter || String(player.team) === teamFilter;
     
     // Price filtering
-    const playerPrice = player.now_cost / 10;
+    const playerPrice = player.now_cost / PRICE_CONVERSION_FACTOR;
     const matchesMinPrice = !minPrice || playerPrice >= parseFloat(minPrice);
     const matchesMaxPrice = !maxPrice || playerPrice <= parseFloat(maxPrice);
     

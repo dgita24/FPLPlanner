@@ -218,14 +218,14 @@ function getSavedTeamsList() {
 function addToSavedTeamsList(teamId) {
   try {
     let teams = getSavedTeamsList();
-    // Add to the beginning if not already present
-    if (!teams.includes(teamId)) {
-      teams.unshift(teamId);
-      // Keep only the last 10 saved teams
-      teams = teams.slice(0, 10);
-      localStorage.setItem('fplplanner-saved-teams', JSON.stringify(teams));
-      populateSavedTeamsDropdown();
-    }
+    // Remove team ID if it already exists to avoid duplicates
+    teams = teams.filter(id => id !== teamId);
+    // Add to the beginning
+    teams.unshift(teamId);
+    // Keep only the last 10 saved teams
+    teams = teams.slice(0, 10);
+    localStorage.setItem('fplplanner-saved-teams', JSON.stringify(teams));
+    populateSavedTeamsDropdown();
   } catch (e) {
     console.error('Failed to save team to list:', e);
   }
