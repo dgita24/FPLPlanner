@@ -52,8 +52,7 @@ export async function loadFixturesData() {
     
     // If no team selected for team view, default to first team alphabetically
     if (fixturesViewMode === 'team' && !selectedTeamId && state.teams.length > 0) {
-      const sortedTeams = [...state.teams].sort((a, b) => a.name.localeCompare(b.name));
-      selectedTeamId = sortedTeams[0].id;
+      selectedTeamId = getDefaultTeamId();
     }
     
     renderFixtures();
@@ -142,6 +141,13 @@ function loadViewPreferences() {
   }
 }
 
+// Helper function to get default team ID (first alphabetically)
+function getDefaultTeamId() {
+  if (state.teams.length === 0) return null;
+  const sortedTeams = [...state.teams].sort((a, b) => a.name.localeCompare(b.name));
+  return sortedTeams[0].id;
+}
+
 // Toggle between gameweek and team view
 window.toggleFixturesViewMode = function() {
   fixturesViewMode = fixturesViewMode === 'gameweek' ? 'team' : 'gameweek';
@@ -155,8 +161,7 @@ window.toggleFixturesViewMode = function() {
   
   // If switching to team view and no team selected, pick first alphabetically
   if (fixturesViewMode === 'team' && !selectedTeamId && state.teams.length > 0) {
-    const sortedTeams = [...state.teams].sort((a, b) => a.name.localeCompare(b.name));
-    selectedTeamId = sortedTeams[0].id;
+    selectedTeamId = getDefaultTeamId();
     try {
       localStorage.setItem('fplplanner-fixtures-selected-team', selectedTeamId.toString());
     } catch (e) {
@@ -383,17 +388,15 @@ function getFixturesForTeam(teamId) {
   for (const [gw, fixtures] of fixturesByGW) {
     for (const fixture of fixtures) {
       if (fixture.team_h === teamId || fixture.team_a === teamId) {
+        // Cache date parsing for sorting efficiency
+        fixture._sortDate = fixture.kickoff_time ? new Date(fixture.kickoff_time).getTime() : Infinity;
         teamFixtures.push(fixture);
       }
     }
   }
   
-  // Sort by kickoff time
-  teamFixtures.sort((a, b) => {
-    if (!a.kickoff_time) return 1;
-    if (!b.kickoff_time) return -1;
-    return new Date(a.kickoff_time) - new Date(b.kickoff_time);
-  });
+  // Sort by cached timestamp
+  teamFixtures.sort((a, b) => a._sortDate - b._sortDate);
   
   return teamFixtures;
 }
