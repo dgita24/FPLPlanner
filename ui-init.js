@@ -293,23 +293,31 @@ async function populateSavedTeamsDropdown() {
       html += '<ul style="list-style: none; padding: 0; margin: 0;">';
       
       result.drafts.forEach(draft => {
-        // Escape special characters to prevent XSS
-        const escapedTeamId = draft.teamid
+        // Escape for JavaScript string context (onclick attributes)
+        const jsEscaped = draft.teamid
           .replace(/\\/g, '\\\\')
           .replace(/'/g, "\\'")
           .replace(/"/g, '\\"')
           .replace(/\n/g, '\\n')
           .replace(/\r/g, '\\r');
         
+        // Escape for HTML context (display text)
+        const htmlEscaped = draft.teamid
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#39;');
+        
         html += `
           <li style="display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.1);">
-            <span style="cursor: pointer; flex: 1;" onclick="loadDraftByName('${escapedTeamId}')">
-              • ${draft.teamid}
+            <span style="cursor: pointer; flex: 1;" onclick="loadDraftByName('${jsEscaped}')">
+              • ${htmlEscaped}
             </span>
             <button 
-              onclick="deleteDraft('${escapedTeamId}')" 
+              onclick="deleteDraft('${jsEscaped}')" 
               style="background: none; border: none; cursor: pointer; font-size: 1.2em; padding: 4px 8px;"
-              title="Delete ${draft.teamid}"
+              title="Delete ${htmlEscaped}"
             >
               🗑️
             </button>

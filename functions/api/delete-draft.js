@@ -22,7 +22,8 @@ export async function onRequestPost({ request, env }) {
     const headers = {
       'apikey': supabaseKey,
       'Authorization': `Bearer ${supabaseKey}`,
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
+      'Prefer': 'return=representation'
     };
 
     // Delete the draft - only if it belongs to this manager (security)
@@ -40,6 +41,15 @@ export async function onRequestPost({ request, env }) {
       console.error('Supabase error deleting draft');
       return new Response(JSON.stringify({ error: 'Failed to delete draft' }), {
         status: 500,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+
+    // Check if any rows were deleted
+    const deletedRows = await response.json();
+    if (!deletedRows || deletedRows.length === 0) {
+      return new Response(JSON.stringify({ error: 'Draft not found or already deleted' }), {
+        status: 404,
         headers: { 'Content-Type': 'application/json' }
       });
     }
