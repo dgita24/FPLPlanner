@@ -92,6 +92,9 @@ export async function onRequestPost({ request, env, context }) {
               headers: { 'Content-Type': 'application/json' }
             });
           }
+        } else {
+          // Log failure but allow save to proceed (fail-safe approach)
+          console.warn('Failed to check draft count, allowing save to proceed');
         }
       }
       

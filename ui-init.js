@@ -244,12 +244,12 @@ async function populateSavedTeamsDropdown() {
     
     if (result.success && result.drafts) {
       const draftCount = result.drafts.length;
-      const maxDrafts = 5;
+      const MAX_DRAFTS_PER_MANAGER = 5; // Match constant in functions/api/save.js
       
       // Update draft counter display if element exists
       const draftCounter = document.getElementById('draftCounter');
       if (draftCounter) {
-        draftCounter.textContent = `(${draftCount}/${maxDrafts})`;
+        draftCounter.textContent = `(${draftCount}/${MAX_DRAFTS_PER_MANAGER})`;
       }
       
       result.drafts.forEach(draft => {
