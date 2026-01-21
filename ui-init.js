@@ -243,6 +243,15 @@ async function populateSavedTeamsDropdown() {
     const result = await response.json();
     
     if (result.success && result.drafts) {
+      const draftCount = result.drafts.length;
+      const MAX_DRAFTS_PER_MANAGER = 5; // Match constant in functions/api/save.js
+      
+      // Update draft counter display if element exists
+      const draftCounter = document.getElementById('draftCounter');
+      if (draftCounter) {
+        draftCounter.textContent = `(${draftCount}/${MAX_DRAFTS_PER_MANAGER})`;
+      }
+      
       result.drafts.forEach(draft => {
         const option = document.createElement('option');
         option.value = draft.teamid;
@@ -313,8 +322,13 @@ async function saveTeam() {
       throw new Error(result.error || 'Save failed');
     }
   } catch (err) {
-    showMessage(`Save error: ${err.message}`, 'error');
-    if (sideMsg) sideMsg.textContent = `Error: ${err.message}`;
+    const errorMsg = err.message || 'Unknown error';
+    if (errorMsg.includes('Maximum draft limit')) {
+      showMessage('⚠️ Draft limit reached (5/5). Update an existing draft or delete one first.', 'error');
+    } else {
+      showMessage(`Save error: ${errorMsg}`, 'error');
+    }
+    if (sideMsg) sideMsg.textContent = `Error: ${errorMsg}`;
   }
 }
 

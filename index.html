@@ -24,10 +24,11 @@
       <input type="text" id="importTeamId" placeholder="FPL Team ID e.g. 123456" />
       <button onclick="importTeam()">Import from FPL</button>
 
-      <h3>Cloud Save</h3>
+      <h3>Cloud Save <span id="draftCounter" style="font-size: 0.8em; opacity: 0.7;"></span></h3>
       <input type="text" id="saveTeamId" placeholder="Save name (e.g., 'WC_GW20')" />
       <input type="password" id="savePassword" placeholder="Create Password" />
       <button onclick="saveTeam()">Save Team</button>
+      <p style="font-size: 0.85em; opacity: 0.8; margin-top: 5px;">Maximum 5 drafts per manager. Update existing drafts to stay within limit.</p>
 
       <h3>Cloud Load</h3>
       <select id="savedTeamsList" onchange="populateLoadTeamId()">
