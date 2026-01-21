@@ -233,6 +233,21 @@ export function renderFixtures() {
     `;
   }
 
+  // Build fixtures content
+  const fixturesContent = hasFixtures 
+    ? Object.entries(groups)
+        .map(([date, games]) => `
+          <div class="fixture-date-banner" ${games.length > 0 && games[0].event ? `data-gw="${games[0].event}"` : ''}>${date}</div>
+          ${games.map(renderFixtureRow).join('')}
+        `)
+        .join('')
+    : '<div style="text-align: center; padding: 20px; opacity: 0.7;">No fixtures available</div>';
+
+  // Wrap fixtures content in scrollable container for team view
+  const fixturesHTML = fixturesViewMode === 'team' 
+    ? `<div class="fixtures-list-scrollable" id="fixturesListScrollable">${fixturesContent}</div>`
+    : fixturesContent;
+
   panel.innerHTML = `
     <div class="fixtures-controls">
       <div class="fixtures-button-grid">
@@ -263,19 +278,16 @@ export function renderFixtures() {
 
     ${headerHTML}
 
-    ${hasFixtures 
-      ? Object.entries(groups)
-          .map(([date, games]) => `
-            <div class="fixture-date-banner">${date}</div>
-            ${games.map(renderFixtureRow).join('')}
-          `)
-          .join('')
-      : '<div style="text-align: center; padding: 20px; opacity: 0.7;">No fixtures available</div>'
-    }
+    ${fixturesHTML}
   `;
 
   // Always reattach event listeners after rendering
   reattachFixturesControls();
+  
+  // If in team view, scroll to current gameweek
+  if (fixturesViewMode === 'team' && hasFixtures) {
+    scrollToCurrentGameweek();
+  }
 }
 
 function reattachFixturesControls() {
@@ -305,6 +317,38 @@ function reattachFixturesControls() {
       }
     });
   }
+}
+
+// Scroll to current gameweek in team view
+function scrollToCurrentGameweek() {
+  // Use a small delay to ensure DOM is fully rendered
+  setTimeout(() => {
+    const scrollContainer = document.getElementById('fixturesListScrollable');
+    if (!scrollContainer) return;
+    
+    // Find the current or next gameweek
+    const events = state.bootstrap?.events || [];
+    const current = events.find(e => e.is_current)?.id;
+    const next = events.find(e => e.is_next)?.id;
+    const targetGW = current || next || state.currentGW;
+    
+    // Find the fixture date banner for the target gameweek
+    const dateBanners = scrollContainer.querySelectorAll('.fixture-date-banner');
+    let targetBanner = null;
+    
+    for (const banner of dateBanners) {
+      const gw = banner.getAttribute('data-gw');
+      if (gw && parseInt(gw) === targetGW) {
+        targetBanner = banner;
+        break;
+      }
+    }
+    
+    // Scroll to the target banner if found
+    if (targetBanner) {
+      targetBanner.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }, 100);
 }
 
 function renderFixturesError(message) {
