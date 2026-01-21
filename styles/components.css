@@ -764,11 +764,11 @@ td.fixtures-cell {
 }
 
 .fixtures-view-toggle-btn {
-  padding: 4px 12px;
+  padding: 6px 16px;
   background: var(--bg-dark);
   border: 1px solid var(--border);
   border-radius: 4px;
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 600;
   color: var(--text);
   cursor: pointer;

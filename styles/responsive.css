@@ -1662,8 +1662,8 @@
 /* Responsive styles for fixtures view toggle */
 @media (max-width: 600px) {
   .fixtures-view-toggle-btn {
-    font-size: 10px;
-    padding: 3px 8px;
+    font-size: 11px;
+    padding: 5px 12px;
   }
 
   .fixtures-team-select {
@@ -1681,8 +1681,8 @@
 
 @media (max-width: 480px) {
   .fixtures-view-toggle-btn {
-    font-size: 9px;
-    padding: 2px 6px;
+    font-size: 10px;
+    padding: 4px 10px;
   }
 
   .fixtures-team-select {

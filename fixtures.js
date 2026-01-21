@@ -9,7 +9,7 @@ import { MIN_GAMEWEEK, MAX_GAMEWEEK } from './constants.js';
 const fixturesByGW = new Map();
 let fixturesGW = null;
 let fixturesSyncEnabled = false; // Sync fixtures GW with pitch GW
-let fixturesViewMode = 'gameweek'; // 'gameweek' or 'team'
+let fixturesViewMode = 'team'; // 'gameweek' or 'team' - default to team view
 let selectedTeamId = null; // Selected team ID for team view
 
 export async function loadFixturesData() {
