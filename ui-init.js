@@ -9,9 +9,56 @@ import { setPendingSwap } from './ui-render.js';
 import { setDefaultSort } from './table.js';
 import { MAX_GAMEWEEK, MAX_DRAFTS_PER_MANAGER } from './constants.js';
 
+// Global selected draft tracker
+let selectedDraft = null;
+
 // Helper function for pluralization
 function pluralize(word, count) {
   return count === 1 ? word : word + 's';
+}
+
+// Toggle expandable cards
+function toggleCard(cardId) {
+  const card = document.getElementById(cardId);
+  const clickedCard = event.currentTarget;
+  const allActionCards = document.querySelectorAll('.action-card');
+  const allExpandableCards = document.querySelectorAll('.expandable-card');
+  
+  // Don't toggle the drafts card - it's always visible
+  if (cardId === 'draftsCard') return;
+  
+  // Check if card is currently visible
+  const isVisible = card.style.display === 'block';
+  
+  // Hide all expandable cards except drafts
+  allExpandableCards.forEach(c => {
+    if (c.id !== 'draftsCard') {
+      c.style.display = 'none';
+    }
+  });
+  
+  // Remove active state from all action cards
+  allActionCards.forEach(ac => ac.classList.remove('active'));
+  
+  // Toggle the clicked card
+  if (!isVisible) {
+    card.style.display = 'block';
+    clickedCard.classList.add('active');
+  }
+}
+
+// Select a draft for loading
+function selectDraft(teamid) {
+  selectedDraft = teamid;
+  
+  // Update visual selection
+  document.querySelectorAll('#savedDraftsContainer li').forEach(li => {
+    if (li.querySelector('span').textContent.trim() === '• ' + teamid) {
+      li.classList.add('selected');
+    } else {
+      li.classList.remove('selected');
+    }
+  });
 }
 
 // Export updateUI for use in other modules
@@ -139,6 +186,12 @@ async function importTeam() {
   // Store manager ID for syncing saved drafts
   state.managerId = teamId;
 
+  // Update team ID display in sidebar header
+  const teamIdDisplay = document.getElementById('currentTeamId');
+  if (teamIdDisplay && state.managerId) {
+    teamIdDisplay.textContent = state.managerId;
+  }
+
   const importedGW = data._imported_gw || state.importedGW;
   if (importedGW && importedGW !== state.currentGW) {
     showMessage(
@@ -255,17 +308,22 @@ function refreshSavedTeamsDropdown() {
 
 async function populateSavedTeamsDropdown() {
   const container = document.getElementById('savedDraftsContainer');
+  const draftCount = document.getElementById('draftCount');
+  const loadSection = document.getElementById('loadSection');
+  
   if (!container) {
     console.warn('Saved drafts container not found');
     return;
   }
   
   // Clear existing content
-  container.innerHTML = '<p class="drafts-placeholder">Loading...</p>';
+  container.innerHTML = '<p class="helper-text">Loading...</p>';
   
   // Only populate if we have a manager ID
   if (!state.managerId) {
-    container.innerHTML = '<p class="drafts-placeholder">Import a team to see saved drafts</p>';
+    container.innerHTML = '<p class="helper-text">Import a team to see saved drafts</p>';
+    if (draftCount) draftCount.textContent = '(0/5)';
+    if (loadSection) loadSection.style.display = 'none';
     return;
   }
   
@@ -279,17 +337,17 @@ async function populateSavedTeamsDropdown() {
     
     if (!response.ok) {
       console.error('Failed to fetch saved drafts');
-      container.innerHTML = '<p class="drafts-error">Failed to load drafts</p>';
+      container.innerHTML = '<p class="helper-text" style="color: #ff6b6b;">Failed to load drafts</p>';
       return;
     }
     
     const result = await response.json();
     
     if (result.success && result.drafts && result.drafts.length > 0) {
-      const draftCount = result.drafts.length;
+      const count = result.drafts.length;
+      if (draftCount) draftCount.textContent = `(${count}/5)`;
       
-      let html = `<p class="draft-count">${draftCount}/${MAX_DRAFTS_PER_MANAGER} drafts used</p>`;
-      html += '<ul class="drafts-list">';
+      let html = '<ul>';
       
       result.drafts.forEach(draft => {
         // Use JSON.stringify for safe JavaScript context escaping
@@ -305,11 +363,10 @@ async function populateSavedTeamsDropdown() {
         
         html += `
           <li>
-            <span onclick="loadDraftByName('${jsEscaped}')">
-              • ${htmlEscaped}
-            </span>
+            <span onclick="selectDraft('${jsEscaped}')">• ${htmlEscaped}</span>
             <button 
               onclick="deleteDraft('${jsEscaped}')" 
+              title="Delete ${htmlEscaped}"
               aria-label="Delete ${htmlEscaped}"
             >
               🗑️
@@ -320,24 +377,73 @@ async function populateSavedTeamsDropdown() {
       
       html += '</ul>';
       container.innerHTML = html;
+      
+      if (loadSection) loadSection.style.display = 'block';
     } else {
-      container.innerHTML = '<p class="drafts-placeholder">No saved drafts yet (0/5)</p>';
+      container.innerHTML = '<p class="helper-text">No saved drafts yet</p>';
+      if (draftCount) draftCount.textContent = '(0/5)';
+      if (loadSection) loadSection.style.display = 'none';
     }
   } catch (e) {
     console.error('Failed to load saved teams list:', e);
-    container.innerHTML = '<p class="drafts-error">Error loading drafts</p>';
+    container.innerHTML = '<p class="helper-text" style="color: #ff6b6b;">Error loading drafts</p>';
   }
 }
 
-// Helper function to load draft when clicked from the list
-function loadDraftByName(teamid) {
-  const input = document.getElementById('loadTeamId');
-  if (input) {
-    input.value = teamid;
+// Cloud Load
+async function loadTeam() {
+  const teamId = selectedDraft; // Use selected draft instead of input field
+  const password = document.getElementById('loadPassword')?.value?.trim();
+
+  if (!teamId) {
+    showMessage('Please select a draft to load', 'error');
+    return;
+  }
+  
+  if (!password) {
+    showMessage('Password required', 'error');
+    return;
+  }
+
+  const sideMsg = document.getElementById('sideMsg');
+  if (sideMsg) sideMsg.textContent = 'Loading...';
+
+  try {
+    const response = await fetch('/api/load', {
+      method: 'POST',
+      headers: { 'Content-Type':  'application/json' },
+      body: JSON.stringify({ teamid: teamId, password })
+    });
+
+    const result = await response.json();
+
+    if (response.ok && result.success) {
+      const data = result. data;
+      state.plan = data.payload.plan;
+      state.bank = data.payload. bank;
+      state.viewingGW = data.payload.viewingGW;
+      state. minNavigableGW = data. payload.minNavigableGW ??  state.viewingGW;
+      state.priceMode = data.payload.priceMode;
+
+      updateUI();
+      showMessage('Team loaded from cloud!', 'success');
+      if (sideMsg) sideMsg.textContent = `✓ Loaded: ${data.label || teamId}`;
+
+      closeSidebar();
+    } else {
+      throw new Error(result.error || 'Load failed');
+    }
+  } catch (err) {
+    // ✅ Better: differentiate between wrong credentials vs other errors
+    const errorMsg = err.message || 'Load failed';
+    if (errorMsg.includes('not found') || errorMsg.includes('Invalid password')) {
+      showMessage('Saved draft name and/or password incorrect', 'error');
+    } else {
+      showMessage(`Load error: ${errorMsg}`, 'error');
+    }
+    if (sideMsg) sideMsg.textContent = `Error: ${errorMsg}`;
   }
 }
-
-// Cloud Save
 async function saveTeam() {
   const teamId = document.getElementById('saveTeamId')?.value?.trim();
   const password = document.getElementById('savePassword')?.value?.trim();
@@ -948,7 +1054,8 @@ export function initUI() {
   window.saveTeam = saveTeam;
   window.loadTeam = loadTeam;
   window.deleteDraft = deleteDraft;
-  window.loadDraftByName = loadDraftByName;
+  window.toggleCard = toggleCard;
+  window.selectDraft = selectDraft;
   window.undoLastAction = undoLastAction;
   window.resetToImportedTeam = resetToImportedTeam;
   window.setCaptain = setCaptain;
