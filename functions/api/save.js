@@ -8,6 +8,11 @@ export async function onRequestPost({ request, env, context }) {
       });
     }
 
+    // Warn if managerid is missing - draft won't appear in dropdown
+    if (!managerid) {
+      console.warn('Warning: Saving draft without managerid - draft will not appear in dropdown');
+    }
+
     // Hash password
     const encoder = new TextEncoder();
     const data = encoder.encode(password);
@@ -26,8 +31,16 @@ export async function onRequestPost({ request, env, context }) {
       'Prefer': 'return=representation'
     };
 
+    // Build query string to check for existing draft with composite key (teamid, managerid)
+    let queryString = `teamid=eq.${teamid}`;
+    if (managerid) {
+      queryString += `&managerid=eq.${managerid}`;
+    } else {
+      queryString += `&managerid=is.null`;
+    }
+
     // Check existing with better response
-    const getResponse = await fetch(`${supabaseUrl}/rest/v1/team_saves?teamid=eq.${teamid}`, {
+    const getResponse = await fetch(`${supabaseUrl}/rest/v1/team_saves?${queryString}`, {
       method: 'GET',
       headers: getHeaders
     });
@@ -43,8 +56,8 @@ export async function onRequestPost({ request, env, context }) {
 
     let saveResponse;
     if (existing.length > 0) {
-      // Update existing
-      saveResponse = await fetch(`${supabaseUrl}/rest/v1/team_saves?teamid=eq.${teamid}`, {
+      // Update existing - use composite key (teamid, managerid) to identify the correct record
+      saveResponse = await fetch(`${supabaseUrl}/rest/v1/team_saves?${queryString}`, {
         method: 'PATCH',
         headers: getHeaders,
         body: JSON.stringify(saveData)
