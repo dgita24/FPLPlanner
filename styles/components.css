@@ -951,7 +951,7 @@ td.fixtures-cell {
 /* Compact team fixture row for team view */
 .team-fixture-row {
   display: grid;
-  grid-template-columns: 55px 28px 1fr 40px;
+  grid-template-columns: 55px 28px 1fr 52px;
   align-items: center;
   padding: 8px 10px;
   border-bottom: 1px solid var(--border);

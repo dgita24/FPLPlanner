@@ -409,7 +409,7 @@ function renderTeamFixtureRow(f, teamId) {
   const isHome = f.team_h === teamId;
   const opponentId = isHome ? f.team_a : f.team_h;
   const opponent = getTeam(opponentId);
-  const venue = isHome ? 'H' : 'A';
+  const venue = isHome ? 'Home' : 'Away';
   
   return `
     <div class="team-fixture-row" data-gw="${f.event || ''}">
