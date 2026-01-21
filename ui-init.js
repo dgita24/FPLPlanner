@@ -336,14 +336,6 @@ function loadDraftByName(teamid) {
   }
 }
 
-function populateLoadTeamId() {
-  const dropdown = document.getElementById('savedTeamsList');
-  const input = document.getElementById('loadTeamId');
-  if (dropdown && input) {
-    input.value = dropdown.value;
-  }
-}
-
 // Cloud Save
 async function saveTeam() {
   const teamId = document.getElementById('saveTeamId')?.value?.trim();
@@ -954,7 +946,6 @@ export function initUI() {
   window.localLoad = localLoad;
   window.saveTeam = saveTeam;
   window.loadTeam = loadTeam;
-  window.populateLoadTeamId = populateLoadTeamId;
   window.deleteDraft = deleteDraft;
   window.loadDraftByName = loadDraftByName;
   window.undoLastAction = undoLastAction;
