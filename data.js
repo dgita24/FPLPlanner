@@ -20,6 +20,9 @@ export let state = {
   // The GW we successfully fetched picks from (often currentGW-1 while current is in progress)
   importedGW: null,
 
+  // Manager ID from imported team (used for syncing saved drafts)
+  managerId: null,
+
   // Bank in £m (editable)
   bank: 0.0,
 

@@ -136,6 +136,9 @@ async function importTeam() {
     return;
   }
 
+  // Store manager ID for syncing saved drafts
+  state.managerId = teamId;
+
   const importedGW = data._imported_gw || state.importedGW;
   if (importedGW && importedGW !== state.currentGW) {
     showMessage(
@@ -157,6 +160,9 @@ async function importTeam() {
 
   // reset transient UI state
   resetTransferState();
+
+  // Populate saved teams dropdown for this manager
+  await populateSavedTeamsDropdown();
 
   // Close the menu after import
   closeSidebar();
@@ -206,47 +212,53 @@ function localLoad() {
 
 // Saved teams list management
 function getSavedTeamsList() {
-  try {
-    const saved = localStorage.getItem('fplplanner-saved-teams');
-    return saved ? JSON.parse(saved) : [];
-  } catch (e) {
-    console.error('Failed to load saved teams list:', e);
-    return [];
-  }
+  // No longer used - saved teams now fetched from server
+  return [];
 }
 
 function addToSavedTeamsList(teamId) {
-  try {
-    let teams = getSavedTeamsList();
-    // Remove team ID if it already exists to avoid duplicates
-    teams = teams.filter(id => id !== teamId);
-    // Add to the beginning
-    teams.unshift(teamId);
-    // Keep only the last 10 saved teams
-    teams = teams.slice(0, 10);
-    localStorage.setItem('fplplanner-saved-teams', JSON.stringify(teams));
-    populateSavedTeamsDropdown();
-  } catch (e) {
-    console.error('Failed to save team to list:', e);
-  }
+  // Refresh the dropdown after saving
+  populateSavedTeamsDropdown();
 }
 
-function populateSavedTeamsDropdown() {
+async function populateSavedTeamsDropdown() {
   const dropdown = document.getElementById('savedTeamsList');
   if (!dropdown) return;
-  
-  const teams = getSavedTeamsList();
   
   // Clear existing options except the first one
   dropdown.innerHTML = '<option value="">Select a saved draft...</option>';
   
-  // Add saved teams
-  teams.forEach(teamId => {
-    const option = document.createElement('option');
-    option.value = teamId;
-    option.textContent = teamId;
-    dropdown.appendChild(option);
-  });
+  // Only populate if we have a manager ID
+  if (!state.managerId) {
+    return;
+  }
+  
+  try {
+    // Fetch saved teams for this manager ID from the server
+    const response = await fetch('/api/list-drafts', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ managerid: state.managerId })
+    });
+    
+    if (!response.ok) {
+      console.error('Failed to fetch saved drafts');
+      return;
+    }
+    
+    const result = await response.json();
+    
+    if (result.success && result.drafts) {
+      result.drafts.forEach(draft => {
+        const option = document.createElement('option');
+        option.value = draft.teamid;
+        option.textContent = draft.label || draft.teamid;
+        dropdown.appendChild(option);
+      });
+    }
+  } catch (e) {
+    console.error('Failed to load saved teams list:', e);
+  }
 }
 
 function populateLoadTeamId() {
@@ -283,7 +295,13 @@ async function saveTeam() {
     const response = await fetch('/api/save', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ teamid: teamId, label, password, payload })
+      body: JSON.stringify({ 
+        teamid: teamId, 
+        label, 
+        password, 
+        payload,
+        managerid: state.managerId || null
+      })
     });
 
     const result = await response.json();
@@ -292,7 +310,7 @@ async function saveTeam() {
       showMessage('Team saved to cloud!', 'success');
       if (sideMsg) sideMsg.textContent = `✓ Saved as: ${teamId}`;
       
-      // Add to saved teams list in localStorage
+      // Refresh saved teams list
       addToSavedTeamsList(teamId);
       
       // Close sidebar after successful save
