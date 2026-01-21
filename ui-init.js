@@ -204,6 +204,59 @@ function localLoad() {
   }
 }
 
+// Saved teams list management
+function getSavedTeamsList() {
+  try {
+    const saved = localStorage.getItem('fplplanner-saved-teams');
+    return saved ? JSON.parse(saved) : [];
+  } catch (e) {
+    console.error('Failed to load saved teams list:', e);
+    return [];
+  }
+}
+
+function addToSavedTeamsList(teamId) {
+  try {
+    let teams = getSavedTeamsList();
+    // Add to the beginning if not already present
+    if (!teams.includes(teamId)) {
+      teams.unshift(teamId);
+      // Keep only the last 10 saved teams
+      teams = teams.slice(0, 10);
+      localStorage.setItem('fplplanner-saved-teams', JSON.stringify(teams));
+      populateSavedTeamsDropdown();
+    }
+  } catch (e) {
+    console.error('Failed to save team to list:', e);
+  }
+}
+
+function populateSavedTeamsDropdown() {
+  const dropdown = document.getElementById('savedTeamsList');
+  if (!dropdown) return;
+  
+  const teams = getSavedTeamsList();
+  
+  // Clear existing options except the first one
+  dropdown.innerHTML = '<option value="">Select a saved draft...</option>';
+  
+  // Add saved teams
+  teams.forEach(teamId => {
+    const option = document.createElement('option');
+    option.value = teamId;
+    option.textContent = teamId;
+    dropdown.appendChild(option);
+  });
+}
+
+function populateLoadTeamId() {
+  const dropdown = document.getElementById('savedTeamsList');
+  const input = document.getElementById('loadTeamId');
+  if (dropdown && input) {
+    input.value = dropdown.value;
+  }
+}
+
 // Cloud Save
 async function saveTeam() {
   const teamId = document.getElementById('saveTeamId')?.value?.trim();
@@ -238,6 +291,10 @@ async function saveTeam() {
     if (response.ok && result.success) {
       showMessage('Team saved to cloud!', 'success');
       if (sideMsg) sideMsg.textContent = `✓ Saved as: ${teamId}`;
+      
+      // Add to saved teams list in localStorage
+      addToSavedTeamsList(teamId);
+      
       // Close sidebar after successful save
       closeSidebar();
     } else {
@@ -795,6 +852,7 @@ export function initUI() {
   window.localLoad = localLoad;
   window.saveTeam = saveTeam;
   window.loadTeam = loadTeam;
+  window.populateLoadTeamId = populateLoadTeamId;
   window.undoLastAction = undoLastAction;
   window.resetToImportedTeam = resetToImportedTeam;
   window.setCaptain = setCaptain;
@@ -812,6 +870,9 @@ export function initUI() {
 
   // Setup touch/click handlers for captain selector on mobile
   setupCaptainSelectorTouchHandlers();
+
+  // Populate saved teams dropdown
+  populateSavedTeamsDropdown();
 
   updateUI();
 }

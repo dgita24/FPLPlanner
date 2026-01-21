@@ -30,7 +30,10 @@
       <button onclick="saveTeam()">Save Team</button>
 
       <h3>Cloud Load</h3>
-      <input type="text" id="loadTeamId" placeholder="Draft team name" />
+      <select id="savedTeamsList" onchange="populateLoadTeamId()">
+        <option value="">Select a saved draft...</option>
+      </select>
+      <input type="text" id="loadTeamId" placeholder="Or enter draft team name" />
       <input type="password" id="loadPassword" placeholder="Password" />
       <button onclick="loadTeam()">Load Team</button>
 
