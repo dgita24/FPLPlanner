@@ -293,13 +293,21 @@ async function populateSavedTeamsDropdown() {
       html += '<ul style="list-style: none; padding: 0; margin: 0;">';
       
       result.drafts.forEach(draft => {
+        // Escape special characters to prevent XSS
+        const escapedTeamId = draft.teamid
+          .replace(/\\/g, '\\\\')
+          .replace(/'/g, "\\'")
+          .replace(/"/g, '\\"')
+          .replace(/\n/g, '\\n')
+          .replace(/\r/g, '\\r');
+        
         html += `
           <li style="display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.1);">
-            <span style="cursor: pointer; flex: 1;" onclick="loadDraftByName('${draft.teamid}')">
+            <span style="cursor: pointer; flex: 1;" onclick="loadDraftByName('${escapedTeamId}')">
               • ${draft.teamid}
             </span>
             <button 
-              onclick="deleteDraft('${draft.teamid}')" 
+              onclick="deleteDraft('${escapedTeamId}')" 
               style="background: none; border: none; cursor: pointer; font-size: 1.2em; padding: 4px 8px;"
               title="Delete ${draft.teamid}"
             >
@@ -326,7 +334,6 @@ function loadDraftByName(teamid) {
   if (input) {
     input.value = teamid;
   }
-  // Could optionally auto-trigger load if password is remembered
 }
 
 function populateLoadTeamId() {
