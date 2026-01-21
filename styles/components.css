@@ -791,13 +791,6 @@ td.fixtures-cell {
 .fixtures-view-toggle-container .sync-toggle-btn.active {
   opacity: 1;
 }
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--text);
-  cursor: pointer;
-  transition: all 0.2s;
-  white-space: nowrap;
-}
 
 .fixtures-view-toggle-btn:hover {
   background: var(--bg-darker);
