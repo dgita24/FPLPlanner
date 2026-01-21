@@ -358,13 +358,6 @@ function playerCard(entry, source) {
   const cardClass = `player-card${armed ? ' pending-swap' : ''}`;
   const swapTitle = armed ? 'Cancel swap' : 'Swap';
 
-  // Simple HTML escape function
-  const escapeHtml = (text) => {
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
-  };
-
   // Injury/suspension status - show circular badges similar to captain badges
   // status: 'a' = available, 'd' = doubtful (yellow), 'i' = injured (red), 's' = suspended (red), 'u' = unavailable (red)
   // news: contains injury details text
@@ -390,15 +383,8 @@ function playerCard(entry, source) {
           ? p.chance_of_playing_next_round 
           : null;
       
-      // Show 25, 50, or 75 based on chance_of_playing
-      if (chanceOfPlaying !== null && chanceOfPlaying !== undefined) {
-        if (chanceOfPlaying <= 25) badgeText = '25';
-        else if (chanceOfPlaying <= 50) badgeText = '50';
-        else if (chanceOfPlaying <= 75) badgeText = '75';
-        else badgeText = '75'; // Default for any value > 75 but < 100
-      } else {
-        badgeText = '50'; // Default if no chance_of_playing data
-      }
+      // Use shared helper to get display value
+      badgeText = getChanceOfPlayingDisplay(p, state.viewingGW, state.currentGW);
     }
     
     const flagTitle = escapeHtml(p.news || (isDoubtful ? 'Doubtful' : 'Unavailable'));
@@ -527,6 +513,29 @@ function escapeHtml(text) {
 // Helper function to get team badge URL
 function getTeamBadgeUrl(teamCode) {
   return teamCode ? `https://resources.premierleague.com/premierleague/badges/70/t${teamCode}.png` : '';
+}
+
+// Helper function to get chance of playing display value
+// Returns the percentage to display for doubtful players
+function getChanceOfPlayingDisplay(player, viewingGW, currentGW) {
+  const isDoubtful = player.status === 'd';
+  if (!isDoubtful) return '0';
+  
+  const chanceOfPlaying = viewingGW === currentGW 
+    ? player.chance_of_playing_this_round 
+    : viewingGW === currentGW + 1 
+      ? player.chance_of_playing_next_round 
+      : null;
+  
+  if (chanceOfPlaying !== null && chanceOfPlaying !== undefined) {
+    // For player cards, show rounded values (25/50/75)
+    if (chanceOfPlaying <= 25) return '25';
+    else if (chanceOfPlaying <= 50) return '50';
+    else if (chanceOfPlaying <= 75) return '75';
+    else return '75';
+  }
+  
+  return '50'; // Default if no data
 }
 
 // Show player info modal for squad players (pitch and bench)
@@ -679,6 +688,7 @@ window.showSquadPlayerInfo = function (playerId, source) {
   `;
   
   // Captain/Vice-Captain selector (starting XI only)
+  // Note: defensive_contribution field stores DEFCON season total (2pts per game with sufficient defensive actions)
   let captainSelectorHtml = '';
   if (isStartingXI) {
     captainSelectorHtml = `
