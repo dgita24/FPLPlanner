@@ -220,6 +220,7 @@ export function renderFixtures() {
           <button class="fixtures-view-toggle-btn" onclick="toggleFixturesViewMode()">
             View by: Team
           </button>
+          <strong class="fixtures-gw-display">GW ${fixturesGW}</strong>
           <button 
             onclick="toggleFixturesSync()" 
             id="fixturesSyncToggle" 
@@ -228,7 +229,6 @@ export function renderFixtures() {
             title="${syncTitle}">
             🔗 Sync
           </button>
-          <strong>GW ${fixturesGW}</strong>
         </div>
         <button onclick="changeFixturesGW(1)">→</button>
       </div>
