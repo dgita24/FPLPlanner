@@ -1418,6 +1418,29 @@
     max-height: 85vh;
   }
 
+  /* Squad player modal - match transfer table modal sizing */
+  #squadPlayerInfoModal .player-info-content {
+    max-width: 95% !important;
+    padding: 15px 12px;
+    max-height: 80vh;
+  }
+
+  /* Reduce spacing in squad modal sections for mobile */
+  #squadPlayerInfoModal .player-info-section {
+    margin-top: 12px;
+  }
+
+  #squadPlayerInfoModal .player-info-section h3 {
+    font-size: 14px;
+    margin-bottom: 6px;
+  }
+
+  /* Make action buttons more compact */
+  #squadPlayerInfoModal .modal-action-btn {
+    padding: 8px 12px;
+    font-size: 12px;
+  }
+
   .player-info-header {
     flex-direction: column;
     text-align: center;
@@ -1483,6 +1506,25 @@
 
   .bench {
     overflow-x: hidden;
+  }
+
+  /* Squad player modal - adjust for tablet */
+  #squadPlayerInfoModal .player-info-content {
+    max-width: 90% !important;
+    padding: 18px 14px;
+  }
+
+  #squadPlayerInfoModal .player-info-section {
+    margin-top: 14px;
+  }
+
+  #squadPlayerInfoModal .player-info-section h3 {
+    font-size: 15px;
+  }
+
+  #squadPlayerInfoModal .modal-action-btn {
+    padding: 9px 14px;
+    font-size: 12px;
   }
 }
 

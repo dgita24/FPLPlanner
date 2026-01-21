@@ -1085,6 +1085,27 @@ td.fixtures-cell {
   font-weight: 600;
 }
 
+.price-filters {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  margin-bottom: 10px;
+  flex-shrink: 0;
+}
+
+.price-filters select {
+  padding: 6px;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+  text-align: center;
+  font-size: 12px;
+  background: var(--primary);
+  color: white;
+  width: 100%;
+  box-sizing: border-box;
+  font-weight: 600;
+}
+
 .player-table-compact {
   background: var(--bg);
   color: #000;

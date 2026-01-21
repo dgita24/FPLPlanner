@@ -1,6 +1,6 @@
 export async function onRequestPost({ request, env, context }) {
   try {
-    const { teamid, label, password, payload } = await request.json();
+    const { teamid, label, password, payload, managerid } = await request.json();
     if (!teamid || !password || !payload) {
       return new Response(JSON.stringify({ error: 'Missing required fields' }), {
         status: 400,
@@ -37,7 +37,8 @@ export async function onRequestPost({ request, env, context }) {
       teamid,
       label: label || 'My Team',
       passwordhash,
-      payload
+      payload,
+      managerid: managerid || null
     };
 
     let saveResponse;
