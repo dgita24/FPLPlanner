@@ -261,11 +261,11 @@ async function populateSavedTeamsDropdown() {
   }
   
   // Clear existing content
-  container.innerHTML = '<p style="opacity: 0.7; font-size: 12px;">Loading...</p>';
+  container.innerHTML = '<p class="drafts-placeholder">Loading...</p>';
   
   // Only populate if we have a manager ID
   if (!state.managerId) {
-    container.innerHTML = '<p style="opacity: 0.7; font-size: 12px;">Import a team to see saved drafts</p>';
+    container.innerHTML = '<p class="drafts-placeholder">Import a team to see saved drafts</p>';
     return;
   }
   
@@ -279,7 +279,7 @@ async function populateSavedTeamsDropdown() {
     
     if (!response.ok) {
       console.error('Failed to fetch saved drafts');
-      container.innerHTML = '<p style="color: #ff6b6b; font-size: 12px;">Failed to load drafts</p>';
+      container.innerHTML = '<p class="drafts-error">Failed to load drafts</p>';
       return;
     }
     
@@ -290,7 +290,7 @@ async function populateSavedTeamsDropdown() {
       const maxDrafts = MAX_DRAFTS_PER_MANAGER;
       
       let html = `<p class="draft-count">${draftCount}/${maxDrafts} drafts used</p>`;
-      html += '<ul>';
+      html += '<ul class="drafts-list">';
       
       result.drafts.forEach(draft => {
         // Use JSON.stringify for safe JavaScript context escaping
@@ -323,11 +323,11 @@ async function populateSavedTeamsDropdown() {
       html += '</ul>';
       container.innerHTML = html;
     } else {
-      container.innerHTML = '<p style="opacity: 0.7; font-size: 12px;">No saved drafts yet (0/5)</p>';
+      container.innerHTML = '<p class="drafts-placeholder">No saved drafts yet (0/5)</p>';
     }
   } catch (e) {
     console.error('Failed to load saved teams list:', e);
-    container.innerHTML = '<p style="color: #ff6b6b; font-size: 12px;">Error loading drafts</p>';
+    container.innerHTML = '<p class="drafts-error">Error loading drafts</p>';
   }
 }
 

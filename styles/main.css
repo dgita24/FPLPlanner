@@ -334,7 +334,19 @@ body {
   color: #fff;
 }
 
-#savedDraftsContainer ul {
+#savedDraftsContainer .drafts-placeholder {
+  opacity: 0.7;
+  font-size: 12px;
+}
+
+#savedDraftsContainer .drafts-error {
+  color: #ff6b6b;
+  font-size: 12px;
+  opacity: 1;
+}
+
+#savedDraftsContainer ul,
+#savedDraftsContainer .drafts-list {
   list-style: none;
   padding: 0;
   margin: 8px 0;
