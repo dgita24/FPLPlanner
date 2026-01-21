@@ -194,9 +194,6 @@ export function renderFixtures() {
     ? (fixturesByGW.get(fixturesGW) || [])
     : getFixturesForTeam(selectedTeamId);
 
-  const groups = groupByDate(fixtures);
-  const hasFixtures = Object.keys(groups).length > 0;
-
   // Build header based on view mode
   let headerHTML = '';
   if (fixturesViewMode === 'gameweek') {
@@ -233,15 +230,31 @@ export function renderFixtures() {
     `;
   }
 
-  // Build fixtures content
-  const fixturesContent = hasFixtures 
-    ? Object.entries(groups)
-        .map(([date, games]) => `
-          <div class="fixture-date-banner" ${games.length > 0 && games[0].event ? `data-gw="${games[0].event}"` : ''}>${date}</div>
-          ${games.map(renderFixtureRow).join('')}
-        `)
-        .join('')
-    : '<div style="text-align: center; padding: 20px; opacity: 0.7;">No fixtures available</div>';
+  // Build fixtures content based on view mode
+  let fixturesContent;
+  let hasFixtures;
+  
+  if (fixturesViewMode === 'gameweek') {
+    // Gameweek view: group by date
+    const groups = groupByDate(fixtures);
+    hasFixtures = Object.keys(groups).length > 0;
+    
+    fixturesContent = hasFixtures 
+      ? Object.entries(groups)
+          .map(([date, games]) => `
+            <div class="fixture-date-banner">${date}</div>
+            ${games.map(renderFixtureRow).join('')}
+          `)
+          .join('')
+      : '<div style="text-align: center; padding: 20px; opacity: 0.7;">No fixtures available</div>';
+  } else {
+    // Team view: compact list format
+    hasFixtures = fixtures.length > 0;
+    
+    fixturesContent = hasFixtures 
+      ? fixtures.map(f => renderTeamFixtureRow(f, selectedTeamId)).join('')
+      : '<div style="text-align: center; padding: 20px; opacity: 0.7;">No fixtures available</div>';
+  }
 
   // Wrap fixtures content in scrollable container for team view
   const fixturesHTML = fixturesViewMode === 'team' 
@@ -332,21 +345,12 @@ function scrollToCurrentGameweek() {
     const next = events.find(e => e.is_next)?.id;
     const targetGW = current || next || state.currentGW;
     
-    // Find the fixture date banner for the target gameweek
-    const dateBanners = scrollContainer.querySelectorAll('.fixture-date-banner');
-    let targetBanner = null;
+    // Find the first fixture row for the target gameweek
+    const targetRow = scrollContainer.querySelector(`[data-gw="${targetGW}"]`);
     
-    for (const banner of dateBanners) {
-      const gw = banner.getAttribute('data-gw');
-      if (gw && parseInt(gw) === targetGW) {
-        targetBanner = banner;
-        break;
-      }
-    }
-    
-    // Scroll to the target banner if found
-    if (targetBanner) {
-      targetBanner.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    // Scroll to the target row if found
+    if (targetRow) {
+      targetRow.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   }, 100);
 }
@@ -382,11 +386,6 @@ function renderFixtureRow(f) {
         })
       : '';
   }
-  
-  // Show GW badge in team view
-  const gwBadge = fixturesViewMode === 'team' && f.event 
-    ? `<span class="fixture-gw-badge">GW${f.event}</span>` 
-    : '';
 
   return `
     <div class="fixture-row">
@@ -395,12 +394,29 @@ function renderFixtureRow(f) {
         <img class="team-badge" src="${home.badge}" />
       </div>
 
-      <div class="ko">${centreDisplay}${gwBadge}</div>
+      <div class="ko">${centreDisplay}</div>
 
       <div class="team away">
         <img class="team-badge" src="${away.badge}" />
         <span class="team-name">${away.name}</span>
       </div>
+    </div>
+  `;
+}
+
+// Render compact fixture row for team view
+function renderTeamFixtureRow(f, teamId) {
+  const isHome = f.team_h === teamId;
+  const opponentId = isHome ? f.team_a : f.team_h;
+  const opponent = getTeam(opponentId);
+  const venue = isHome ? 'Home' : 'Away';
+  
+  return `
+    <div class="team-fixture-row" data-gw="${f.event || ''}">
+      <div class="team-fixture-gw">GW${f.event || '?'}</div>
+      <img class="team-fixture-badge" src="${opponent.badge}" alt="${opponent.name}" />
+      <div class="team-fixture-opponent">${opponent.name}</div>
+      <div class="team-fixture-venue ${venue.toLowerCase()}">${venue}</div>
     </div>
   `;
 }

@@ -948,6 +948,56 @@ td.fixtures-cell {
   letter-spacing: 0.3px;
 }
 
+/* Compact team fixture row for team view */
+.team-fixture-row {
+  display: grid;
+  grid-template-columns: 60px 30px 1fr 60px;
+  align-items: center;
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--border);
+  gap: 10px;
+  font-size: 12px;
+}
+
+.team-fixture-row:hover {
+  background: var(--bg-dark);
+}
+
+.team-fixture-gw {
+  font-weight: 700;
+  color: var(--accent);
+  font-size: 13px;
+}
+
+.team-fixture-badge {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+}
+
+.team-fixture-opponent {
+  font-weight: 600;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.team-fixture-venue {
+  text-align: right;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.team-fixture-venue.home {
+  color: var(--accent);
+}
+
+.team-fixture-venue.away {
+  color: var(--text-light);
+}
+
 /* ===== Transfer Panel (Right Side) ===== */
 
 .transfer-panel {

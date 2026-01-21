@@ -1700,4 +1700,28 @@
     padding: 1px 3px;
     margin-left: 3px;
   }
+  
+  .team-fixture-row {
+    grid-template-columns: 50px 24px 1fr 50px;
+    gap: 6px;
+    padding: 6px 8px;
+    font-size: 11px;
+  }
+  
+  .team-fixture-gw {
+    font-size: 11px;
+  }
+  
+  .team-fixture-badge {
+    width: 20px;
+    height: 20px;
+  }
+  
+  .team-fixture-opponent {
+    font-size: 11px;
+  }
+  
+  .team-fixture-venue {
+    font-size: 10px;
+  }
 }
