@@ -358,13 +358,6 @@ function playerCard(entry, source) {
   const cardClass = `player-card${armed ? ' pending-swap' : ''}`;
   const swapTitle = armed ? 'Cancel swap' : 'Swap';
 
-  // Simple HTML escape function
-  const escapeHtml = (text) => {
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
-  };
-
   // Injury/suspension status - show circular badges similar to captain badges
   // status: 'a' = available, 'd' = doubtful (yellow), 'i' = injured (red), 's' = suspended (red), 'u' = unavailable (red)
   // news: contains injury details text
@@ -390,15 +383,8 @@ function playerCard(entry, source) {
           ? p.chance_of_playing_next_round 
           : null;
       
-      // Show 25, 50, or 75 based on chance_of_playing
-      if (chanceOfPlaying !== null && chanceOfPlaying !== undefined) {
-        if (chanceOfPlaying <= 25) badgeText = '25';
-        else if (chanceOfPlaying <= 50) badgeText = '50';
-        else if (chanceOfPlaying <= 75) badgeText = '75';
-        else badgeText = '75'; // Default for any value > 75 but < 100
-      } else {
-        badgeText = '50'; // Default if no chance_of_playing data
-      }
+      // Use shared helper to get display value
+      badgeText = getChanceOfPlayingDisplay(p, state.viewingGW, state.currentGW);
     }
     
     const flagTitle = escapeHtml(p.news || (isDoubtful ? 'Doubtful' : 'Unavailable'));
@@ -431,9 +417,9 @@ function playerCard(entry, source) {
   }
 
   return `
-    <div class="${cardClass}">
-      <button class="card-btn btn-remove" onclick="${removeFn}" title="Transfer out">×</button>
-      <button class="card-btn btn-swap" onclick="${subFn}" title="${swapTitle}">⇅</button>
+    <div class="${cardClass}" onclick="showSquadPlayerInfo(${entry.id}, '${source}')">
+      <button class="card-btn btn-remove" onclick="event.stopPropagation(); ${removeFn}" title="Transfer out">×</button>
+      <button class="card-btn btn-swap" onclick="event.stopPropagation(); ${subFn}" title="${swapTitle}">⇅</button>
 
       <div class="badge-container">
         ${captainUI}
@@ -510,3 +496,283 @@ export function showMessage(text, type = 'info') {
   toast.style.display = 'block';
   setTimeout(() => (toast.style.display = 'none'), 3000);
 }
+
+/* -------------------------
+   SQUAD PLAYER INFO MODAL
+-------------------------- */
+
+const posNames = { 1: 'GK', 2: 'DEF', 3: 'MID', 4: 'FWD' };
+
+// Helper function to escape HTML
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+// Helper function to get team badge URL
+function getTeamBadgeUrl(teamCode) {
+  return teamCode ? `https://resources.premierleague.com/premierleague/badges/70/t${teamCode}.png` : '';
+}
+
+// Helper function to get chance of playing display value
+// Returns the percentage to display for doubtful players
+function getChanceOfPlayingDisplay(player, viewingGW, currentGW) {
+  const isDoubtful = player.status === 'd';
+  if (!isDoubtful) return '0';
+  
+  const chanceOfPlaying = viewingGW === currentGW 
+    ? player.chance_of_playing_this_round 
+    : viewingGW === currentGW + 1 
+      ? player.chance_of_playing_next_round 
+      : null;
+  
+  if (chanceOfPlaying !== null && chanceOfPlaying !== undefined) {
+    // For player cards, show rounded values (25/50/75)
+    if (chanceOfPlaying <= 25) return '25';
+    else if (chanceOfPlaying <= 50) return '50';
+    else if (chanceOfPlaying <= 75) return '75';
+    else return '75';
+  }
+  
+  return '50'; // Default if no data
+}
+
+// Show player info modal for squad players (pitch and bench)
+window.showSquadPlayerInfo = function (playerId, source) {
+  const player = getPlayer(playerId);
+  if (!player) return;
+  
+  const team = state.teams.find(t => t.id === player.team);
+  const teamName = team ? team.name : 'Unknown';
+  const teamCode = team ? team.code : '';
+  const teamNameEscaped = escapeHtml(teamName);
+  const playerNameEscaped = escapeHtml(player.web_name);
+  
+  // Create modal if it doesn't exist
+  let modal = document.getElementById('squadPlayerInfoModal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'squadPlayerInfoModal';
+    modal.className = 'player-info-modal';
+    document.body.appendChild(modal);
+  }
+  
+  // Check if player is in starting XI
+  const currentTeam = state.plan[state.viewingGW];
+  const isStartingXI = currentTeam && currentTeam.starting.some(p => p.id === playerId);
+  const isCaptain = currentTeam && currentTeam.captain === playerId;
+  const isViceCaptain = currentTeam && currentTeam.viceCaptain === playerId;
+  
+  // Build availability flag section
+  const events = state.bootstrap?.events || [];
+  let availabilityFlagHtml = '';
+  
+  if (shouldShowPlayerFlag(player, state.viewingGW, state.currentGW, events)) {
+    const isDoubtful = player.status === 'd';
+    
+    let badgeText = '0%';
+    let badgeClass = 'red';
+    let statusText = 'Unavailable';
+    
+    if (isDoubtful) {
+      badgeClass = 'yellow';
+      statusText = 'Doubtful';
+      
+      const chanceOfPlaying = state.viewingGW === state.currentGW 
+        ? player.chance_of_playing_this_round 
+        : state.viewingGW === state.currentGW + 1 
+          ? player.chance_of_playing_next_round 
+          : null;
+      
+      if (chanceOfPlaying !== null && chanceOfPlaying !== undefined) {
+        badgeText = `${chanceOfPlaying}%`;
+      } else {
+        badgeText = '50%';
+      }
+    }
+    
+    const newsEscaped = player.news ? escapeHtml(player.news) : statusText;
+    
+    availabilityFlagHtml = `
+      <div class="player-info-section">
+        <h3>Availability</h3>
+        <div style="display: flex; align-items: center; gap: 8px; margin-top: 6px;">
+          <div class="table-status-flag-badge ${badgeClass}">${badgeText}</div>
+          <p style="color: rgba(255, 255, 255, 0.9); margin: 0; line-height: 1.4; font-size: 13px;">${newsEscaped}</p>
+        </div>
+      </div>
+    `;
+  }
+  
+  // Build stats grid including DEFCON points
+  const statsHtml = `
+    <div class="player-info-stats">
+      <div class="player-stat-item">
+        <div class="player-stat-label">Total Points</div>
+        <div class="player-stat-value">${player.total_points || 0}</div>
+      </div>
+      <div class="player-stat-item">
+        <div class="player-stat-label">Price</div>
+        <div class="player-stat-value">£${(player.now_cost / 10).toFixed(1)}m</div>
+      </div>
+      <div class="player-stat-item">
+        <div class="player-stat-label">Form</div>
+        <div class="player-stat-value">${player.form || '0'}</div>
+      </div>
+      <div class="player-stat-item">
+        <div class="player-stat-label">Goals Scored</div>
+        <div class="player-stat-value">${player.goals_scored || 0}</div>
+      </div>
+      <div class="player-stat-item">
+        <div class="player-stat-label">Assists</div>
+        <div class="player-stat-value">${player.assists || 0}</div>
+      </div>
+      <div class="player-stat-item">
+        <div class="player-stat-label">Clean Sheets</div>
+        <div class="player-stat-value">${player.clean_sheets || 0}</div>
+      </div>
+      <div class="player-stat-item">
+        <div class="player-stat-label">Bonus Points</div>
+        <div class="player-stat-value">${player.bonus || 0}</div>
+      </div>
+      <div class="player-stat-item">
+        <div class="player-stat-label">Minutes Played</div>
+        <div class="player-stat-value">${player.minutes || 0}</div>
+      </div>
+      <div class="player-stat-item">
+        <div class="player-stat-label">Goals Conceded</div>
+        <div class="player-stat-value">${player.goals_conceded || 0}</div>
+      </div>
+      <div class="player-stat-item">
+        <div class="player-stat-label">Yellow Cards</div>
+        <div class="player-stat-value">${player.yellow_cards || 0}</div>
+      </div>
+      <div class="player-stat-item">
+        <div class="player-stat-label">Red Cards</div>
+        <div class="player-stat-value">${player.red_cards || 0}</div>
+      </div>
+      <div class="player-stat-item">
+        <div class="player-stat-label">Saves</div>
+        <div class="player-stat-value">${player.saves || 0}</div>
+      </div>
+      <div class="player-stat-item">
+        <div class="player-stat-label">Penalties Saved</div>
+        <div class="player-stat-value">${player.penalties_saved || 0}</div>
+      </div>
+      <div class="player-stat-item">
+        <div class="player-stat-label">Penalties Missed</div>
+        <div class="player-stat-value">${player.penalties_missed || 0}</div>
+      </div>
+      <div class="player-stat-item">
+        <div class="player-stat-label">Owned By</div>
+        <div class="player-stat-value">${parseFloat(player.selected_by_percent || 0).toFixed(1)}%</div>
+      </div>
+      <div class="player-stat-item">
+        <div class="player-stat-label">Transfers In (GW)</div>
+        <div class="player-stat-value">${player.transfers_in_event || 0}</div>
+      </div>
+      <div class="player-stat-item">
+        <div class="player-stat-label">Transfers Out (GW)</div>
+        <div class="player-stat-value">${player.transfers_out_event || 0}</div>
+      </div>
+      <div class="player-stat-item">
+        <div class="player-stat-label">ICT Index</div>
+        <div class="player-stat-value">${parseFloat(player.ict_index || 0).toFixed(1)}</div>
+      </div>
+      <div class="player-stat-item">
+        <div class="player-stat-label">DEFCON Points</div>
+        <div class="player-stat-value">${player.defensive_contribution || 0}</div>
+      </div>
+    </div>
+  `;
+  
+  // Captain/Vice-Captain selector (starting XI only)
+  // Note: defensive_contribution field stores DEFCON season total (2pts per game with sufficient defensive actions)
+  let captainSelectorHtml = '';
+  if (isStartingXI) {
+    captainSelectorHtml = `
+      <div class="player-info-section">
+        <h3>Captain Selection</h3>
+        <div style="display: flex; gap: 8px; margin-top: 6px;">
+          <button 
+            class="modal-action-btn ${isCaptain ? 'active' : ''}" 
+            onclick="setCaptain(${playerId}); closeSquadPlayerInfo();"
+            style="flex: 1;">
+            ${isCaptain ? '✓ Captain' : 'Set as Captain'}
+          </button>
+          <button 
+            class="modal-action-btn ${isViceCaptain ? 'active' : ''}" 
+            onclick="setViceCaptain(${playerId}); closeSquadPlayerInfo();"
+            style="flex: 1;">
+            ${isViceCaptain ? '✓ Vice-Captain' : 'Set as Vice-Captain'}
+          </button>
+        </div>
+      </div>
+    `;
+  }
+  
+  // Action buttons (transfer/substitute)
+  const actionButtonsHtml = `
+    <div class="player-info-section">
+      <h3>Actions</h3>
+      <div style="display: flex; gap: 8px; margin-top: 6px;">
+        <button 
+          class="modal-action-btn" 
+          onclick="removePlayer(${playerId}, '${source}'); closeSquadPlayerInfo();"
+          style="flex: 1; background: #ff4444;">
+          Transfer Out
+        </button>
+        <button 
+          class="modal-action-btn" 
+          onclick="substitutePlayer(${playerId}); closeSquadPlayerInfo();"
+          style="flex: 1; background: #4444ff;">
+          Swap/Substitute
+        </button>
+      </div>
+    </div>
+  `;
+  
+  modal.innerHTML = `
+    <div class="player-info-content" style="max-width: 700px;">
+      <button class="player-info-close" onclick="closeSquadPlayerInfo()">×</button>
+      
+      <div class="player-info-header">
+        <img src="${getTeamBadgeUrl(teamCode)}" 
+             class="player-info-badge" alt="${teamNameEscaped}">
+        <div class="player-info-title">
+          <h2>${playerNameEscaped}</h2>
+          <p>${teamNameEscaped} • ${posNames[player.element_type]}</p>
+        </div>
+      </div>
+      
+      ${availabilityFlagHtml}
+      
+      <div class="player-info-section">
+        <h3>Season Statistics</h3>
+        ${statsHtml}
+      </div>
+      
+      ${captainSelectorHtml}
+      
+      ${actionButtonsHtml}
+    </div>
+  `;
+  
+  modal.classList.add('open');
+  
+  // Close modal when clicking outside
+  modal.onclick = function(e) {
+    if (e.target === modal) {
+      closeSquadPlayerInfo();
+    }
+  };
+};
+
+window.closeSquadPlayerInfo = function () {
+  const modal = document.getElementById('squadPlayerInfoModal');
+  if (modal) {
+    modal.classList.remove('open');
+    modal.onclick = null;
+  }
+};

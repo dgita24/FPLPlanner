@@ -9,7 +9,7 @@ import { MIN_GAMEWEEK, MAX_GAMEWEEK } from './constants.js';
 const fixturesByGW = new Map();
 let fixturesGW = null;
 let fixturesSyncEnabled = false; // Sync fixtures GW with pitch GW
-let fixturesViewMode = 'team'; // 'gameweek' or 'team' - default to team view
+let fixturesViewMode = 'gameweek'; // 'gameweek' or 'team' - default to gameweek view
 let selectedTeamId = null; // Selected team ID for team view
 
 export async function loadFixturesData() {
@@ -84,8 +84,18 @@ window.toggleFixturesSync = function () {
     console.error('Failed to save fixtures sync state:', e);
   }
   
-  // If sync is turned ON, sync fixtures GW to current pitch GW
+  // If sync is turned ON:
+  // 1. Switch to gameweek view if not already there
+  // 2. Sync fixtures GW to current pitch GW
   if (fixturesSyncEnabled) {
+    if (fixturesViewMode !== 'gameweek') {
+      fixturesViewMode = 'gameweek';
+      try {
+        localStorage.setItem('fplplanner-fixtures-view-mode', fixturesViewMode);
+      } catch (e) {
+        console.error('Failed to save view mode:', e);
+      }
+    }
     fixturesGW = state.viewingGW;
   }
   
@@ -197,6 +207,12 @@ export function renderFixtures() {
   // Build header based on view mode
   let headerHTML = '';
   if (fixturesViewMode === 'gameweek') {
+    // Gameweek view with sync toggle
+    const syncActive = isFixturesSyncEnabled() ? 'active' : '';
+    const syncTitle = isFixturesSyncEnabled() 
+      ? 'Sync ON: Fixtures follow gameweek' 
+      : 'Sync OFF: Independent navigation';
+    
     headerHTML = `
       <div class="fixtures-header">
         <button onclick="changeFixturesGW(-1)">←</button>
@@ -204,13 +220,21 @@ export function renderFixtures() {
           <button class="fixtures-view-toggle-btn" onclick="toggleFixturesViewMode()">
             View by: Team
           </button>
-          <strong>GW ${fixturesGW}</strong>
+          <strong class="fixtures-gw-display">GW ${fixturesGW}</strong>
+          <button 
+            onclick="toggleFixturesSync()" 
+            id="fixturesSyncToggle" 
+            class="sync-toggle-btn ${syncActive}" 
+            aria-label="Toggle fixtures sync with gameweek navigation"
+            title="${syncTitle}">
+            🔗 Sync
+          </button>
         </div>
         <button onclick="changeFixturesGW(1)">→</button>
       </div>
     `;
   } else {
-    // Team view mode
+    // Team view mode - no sync toggle needed
     const sortedTeams = [...state.teams].sort((a, b) => a.name.localeCompare(b.name));
     const teamOptions = sortedTeams.map(team => 
       `<option value="${team.id}" ${team.id === selectedTeamId ? 'selected' : ''}>${team.name}</option>`
