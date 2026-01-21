@@ -270,7 +270,7 @@ async function saveTeam() {
   const label = document.getElementById('saveLabel')?.value?.trim();
 
   if (!teamId || !password) {
-    showMessage('Enter Team ID and Password', 'error');
+    showMessage('Draft team name and/or password missing or incorrect.', 'error');
     return;
   }
 
