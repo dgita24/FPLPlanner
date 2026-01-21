@@ -18,36 +18,55 @@
     </div>
 
     <div class="sidebar" id="sidebar">
-      <h2>
-        TEAM MANAGER
+      <div class="sidebar-header">
+        <span class="sidebar-title">TEAM: <span id="currentTeamId">Import team first</span></span>
         <button class="sidebar-close" onclick="closeSidebar()" aria-label="Close menu">×</button>
-      </h2>
-
-      <div class="sidebar-section">
-        <h3>📥 Import Team</h3>
-        <input type="text" id="importTeamId" placeholder="FPL Team ID (e.g., 123456)" />
-        <button onclick="importTeam()">Import from FPL</button>
       </div>
 
-      <div class="sidebar-section">
-        <h3>💾 Save New Draft</h3>
-        <input type="text" id="saveTeamId" placeholder="Save name (e.g., 'WC_GW20')" />
-        <input type="password" id="savePassword" placeholder="Create Password" />
-        <button onclick="saveTeam()">Save Team</button>
-        <p class="draft-limit-info">Maximum 5 drafts per manager</p>
-      </div>
-
-      <div class="sidebar-section">
-        <h3>📂 Your Saved Drafts</h3>
-        <div id="savedDraftsContainer">
-          <p class="drafts-placeholder">Import a team to see saved drafts</p>
+      <div class="sidebar-actions">
+        <div class="action-card" onclick="toggleCard('importCard')">
+          <div class="card-icon">📥</div>
+          <div class="card-label">IMPORT</div>
         </div>
-        <input type="text" id="loadTeamId" placeholder="Enter draft name" />
-        <input type="password" id="loadPassword" placeholder="Password" />
-        <button onclick="loadTeam()">Load Team</button>
+        <div class="action-card" onclick="toggleCard('saveCard')">
+          <div class="card-icon">💾</div>
+          <div class="card-label">CLOUD SAVE</div>
+        </div>
+        <div class="action-card" onclick="toggleCard('draftsCard')">
+          <div class="card-icon">📂</div>
+          <div class="card-label">DRAFTS</div>
+        </div>
       </div>
 
-      <div id="sideMsg"></div>
+      <!-- Import Card (hidden by default) -->
+      <div class="expandable-card" id="importCard" style="display: none;">
+        <h4>Import Your Team</h4>
+        <input type="text" id="importTeamId" placeholder="FPL Team ID (e.g., 717348)" />
+        <button class="btn-primary" onclick="importTeam()">Import from FPL</button>
+      </div>
+
+      <!-- Save Card (hidden by default) -->
+      <div class="expandable-card" id="saveCard" style="display: none;">
+        <h4>Save New Draft</h4>
+        <input type="text" id="saveTeamId" placeholder="Draft name (e.g., 'WC_GW20')" />
+        <input type="password" id="savePassword" placeholder="Create Password" />
+        <button class="btn-primary" onclick="saveTeam()">Save Team</button>
+        <p class="helper-text">Max 5 drafts per manager</p>
+      </div>
+
+      <!-- Drafts Card (hidden by default) -->
+      <div class="expandable-card" id="draftsCard" style="display: none;">
+        <h4>Your Saved Drafts <span id="draftCount">(0/5)</span></h4>
+        <div id="savedDraftsContainer">
+          <p class="helper-text">Import a team to see saved drafts</p>
+        </div>
+        <div id="loadSection" style="display: none;">
+          <input type="password" id="loadPassword" placeholder="Password" />
+          <button class="btn-secondary" onclick="loadTeam()">Load Selected</button>
+        </div>
+      </div>
+
+      <div id="sideMsg" class="sidebar-message"></div>
     </div>
 
     <!-- MAIN PLANNER -->
