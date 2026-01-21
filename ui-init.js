@@ -411,18 +411,18 @@ async function loadTeam() {
   try {
     const response = await fetch('/api/load', {
       method: 'POST',
-      headers: { 'Content-Type':  'application/json' },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ teamid: teamId, password })
     });
 
     const result = await response.json();
 
     if (response.ok && result.success) {
-      const data = result. data;
+      const data = result.data;
       state.plan = data.payload.plan;
-      state.bank = data.payload. bank;
+      state.bank = data.payload.bank;
       state.viewingGW = data.payload.viewingGW;
-      state. minNavigableGW = data. payload.minNavigableGW ??  state.viewingGW;
+      state.minNavigableGW = data.payload.minNavigableGW ?? state.viewingGW;
       state.priceMode = data.payload.priceMode;
 
       updateUI();
