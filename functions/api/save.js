@@ -1,3 +1,6 @@
+// Maximum drafts allowed per manager ID
+const MAX_DRAFTS_PER_MANAGER = 5;
+
 export async function onRequestPost({ request, env, context }) {
   try {
     const { teamid, label, password, payload, managerid } = await request.json();
@@ -66,6 +69,32 @@ export async function onRequestPost({ request, env, context }) {
         body: JSON.stringify(saveData)
       });
     } else {
+      // This is a new insert - check if manager has reached limit
+      if (managerid) {
+        // Count existing drafts for this manager
+        const encodedManagerId = encodeURIComponent(managerid);
+        const countResponse = await fetch(
+          `${supabaseUrl}/rest/v1/team_saves?managerid=eq.${encodedManagerId}&select=id`,
+          {
+            method: 'GET',
+            headers: getHeaders
+          }
+        );
+        
+        if (countResponse.ok) {
+          const existingDrafts = await countResponse.json();
+          
+          if (existingDrafts.length >= MAX_DRAFTS_PER_MANAGER) {
+            return new Response(JSON.stringify({ 
+              error: `Maximum draft limit reached. You can save up to ${MAX_DRAFTS_PER_MANAGER} drafts per manager. Please delete an old draft or update an existing one.` 
+            }), {
+              status: 400,
+              headers: { 'Content-Type': 'application/json' }
+            });
+          }
+        }
+      }
+      
       // Insert new
       saveResponse = await fetch(`${supabaseUrl}/rest/v1/team_saves`, {
         method: 'POST',
