@@ -341,8 +341,8 @@
   width: 20px;
   height: 20px;
   border-radius: 50%;
-  border: 2px solid var(--accent);
-  background: var(--accent);
+  border: 2px solid #000;
+  background: #000;
   color: white;
   font-weight: bold;
   font-size: 8px;
@@ -361,8 +361,8 @@
 }
 
 .captain-btn.active {
-  background: var(--accent-hover);
-  border-color: var(--accent-hover);
+  background: #222;
+  border-color: #222;
 }
 
 .captain-badge {
@@ -373,7 +373,7 @@
   width: 20px;
   height: 20px;
   border-radius: 50%;
-  background: var(--accent);
+  background: #000;
   color: white;
   font-weight: bold;
   font-size: 8px;
@@ -381,7 +381,7 @@
   align-items: center;
   justify-content: center;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-  border: 2px solid var(--accent);
+  border: 2px solid #000;
   z-index: 15;
   pointer-events: auto;
 }
@@ -389,15 +389,15 @@
 /* Both captain and vice-captain badges use the same styling */
 .captain-badge.vc,
 .captain-badge.c {
-  background: var(--accent);
-  border-color: var(--accent);
+  background: #000;
+  border-color: #000;
 }
 
 /* ===== Status Flag Badges (Circular style like captain badges) ===== */
 
 .status-flag-badge {
   position: absolute;
-  right: -37px;
+  right: -30px;
   top: 50%;
   transform: translateY(-50%);
   width: 20px;
@@ -1309,4 +1309,26 @@ td.fixtures-cell {
   color: var(--primary);
   margin-bottom: 10px;
   font-size: 18px;
+}
+
+.modal-action-btn {
+  padding: 12px 20px;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: var(--primary);
+  color: white;
+}
+
+.modal-action-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.modal-action-btn.active {
+  background: var(--accent);
+  border: 2px solid var(--accent);
 }
