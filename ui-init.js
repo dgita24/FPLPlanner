@@ -287,9 +287,8 @@ async function populateSavedTeamsDropdown() {
     
     if (result.success && result.drafts && result.drafts.length > 0) {
       const draftCount = result.drafts.length;
-      const maxDrafts = MAX_DRAFTS_PER_MANAGER;
       
-      let html = `<p class="draft-count">${draftCount}/${maxDrafts} drafts used</p>`;
+      let html = `<p class="draft-count">${draftCount}/${MAX_DRAFTS_PER_MANAGER} drafts used</p>`;
       html += '<ul class="drafts-list">';
       
       result.drafts.forEach(draft => {
