@@ -742,7 +742,106 @@ td.fixtures-cell {
 .fixtures-header {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   margin-bottom: 8px;
+  gap: 8px;
+}
+
+.fixtures-view-toggle-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  flex: 1;
+}
+
+.fixtures-team-view-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+
+.fixtures-view-toggle-btn {
+  padding: 6px 16px;
+  background: var(--bg-dark);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.fixtures-view-toggle-btn:hover {
+  background: var(--bg-darker);
+  border-color: var(--accent);
+  transform: translateY(-1px);
+}
+
+.fixtures-team-select {
+  width: 100%;
+  max-width: 200px;
+  padding: 6px 10px;
+  background: var(--bg-dark);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.fixtures-team-select:hover {
+  border-color: var(--accent);
+}
+
+.fixtures-team-select:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.fixture-gw-badge {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 2px 6px;
+  background: var(--accent);
+  color: white;
+  font-size: 10px;
+  font-weight: 700;
+  border-radius: 3px;
+}
+
+/* Scrollable container for team view fixtures */
+.fixtures-list-scrollable {
+  max-height: 400px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  margin-top: 8px;
+  padding-right: 4px;
+}
+
+/* Scrollbar styling for fixtures list */
+.fixtures-list-scrollable::-webkit-scrollbar {
+  width: 6px;
+}
+
+.fixtures-list-scrollable::-webkit-scrollbar-track {
+  background: var(--bg-dark);
+  border-radius: 3px;
+}
+
+.fixtures-list-scrollable::-webkit-scrollbar-thumb {
+  background: var(--accent);
+  border-radius: 3px;
+}
+
+.fixtures-list-scrollable::-webkit-scrollbar-thumb:hover {
+  background: #00b06f;
 }
 
 .fixture-date {
@@ -847,6 +946,56 @@ td.fixtures-cell {
   text-align: center;
   border-radius: 6px;
   letter-spacing: 0.3px;
+}
+
+/* Compact team fixture row for team view */
+.team-fixture-row {
+  display: grid;
+  grid-template-columns: 55px 28px 1fr 52px;
+  align-items: center;
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--border);
+  gap: 6px;
+  font-size: 12px;
+}
+
+.team-fixture-row:hover {
+  background: var(--bg-dark);
+}
+
+.team-fixture-gw {
+  font-weight: 700;
+  color: var(--accent);
+  font-size: 13px;
+}
+
+.team-fixture-badge {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+}
+
+.team-fixture-opponent {
+  font-weight: 600;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.team-fixture-venue {
+  text-align: right;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.team-fixture-venue.home {
+  color: var(--accent);
+}
+
+.team-fixture-venue.away {
+  color: var(--text-light);
 }
 
 /* ===== Transfer Panel (Right Side) ===== */

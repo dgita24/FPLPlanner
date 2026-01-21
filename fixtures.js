@@ -9,11 +9,15 @@ import { MIN_GAMEWEEK, MAX_GAMEWEEK } from './constants.js';
 const fixturesByGW = new Map();
 let fixturesGW = null;
 let fixturesSyncEnabled = false; // Sync fixtures GW with pitch GW
+let fixturesViewMode = 'team'; // 'gameweek' or 'team' - default to team view
+let selectedTeamId = null; // Selected team ID for team view
 
 export async function loadFixturesData() {
   try {
     // Load sync state from localStorage
     loadSyncState();
+    // Load view preferences from localStorage
+    loadViewPreferences();
     
     const res = await fetch('/api/fpl/fixtures');
     
@@ -44,6 +48,11 @@ export async function loadFixturesData() {
     // If sync is enabled and viewingGW is set, use the pitch's viewing GW
     if (fixturesSyncEnabled && state.viewingGW !== null && state.viewingGW !== undefined) {
       fixturesGW = state.viewingGW;
+    }
+    
+    // If no team selected for team view, default to first team alphabetically
+    if (fixturesViewMode === 'team' && !selectedTeamId && state.teams.length > 0) {
+      selectedTeamId = getDefaultTeamId();
     }
     
     renderFixtures();
@@ -116,14 +125,141 @@ function loadSyncState() {
   }
 }
 
+// Load view preferences from localStorage
+function loadViewPreferences() {
+  try {
+    const savedMode = localStorage.getItem('fplplanner-fixtures-view-mode');
+    if (savedMode !== null) {
+      fixturesViewMode = savedMode;
+    }
+    const savedTeam = localStorage.getItem('fplplanner-fixtures-selected-team');
+    if (savedTeam !== null) {
+      selectedTeamId = parseInt(savedTeam, 10);
+    }
+  } catch (e) {
+    console.error('Failed to load view preferences:', e);
+  }
+}
+
+// Helper function to get default team ID (first alphabetically)
+function getDefaultTeamId() {
+  if (state.teams.length === 0) return null;
+  const sortedTeams = [...state.teams].sort((a, b) => a.name.localeCompare(b.name));
+  return sortedTeams[0].id;
+}
+
+// Toggle between gameweek and team view
+window.toggleFixturesViewMode = function() {
+  fixturesViewMode = fixturesViewMode === 'gameweek' ? 'team' : 'gameweek';
+  
+  // Persist to localStorage
+  try {
+    localStorage.setItem('fplplanner-fixtures-view-mode', fixturesViewMode);
+  } catch (e) {
+    console.error('Failed to save view mode:', e);
+  }
+  
+  // If switching to team view and no team selected, pick first alphabetically
+  if (fixturesViewMode === 'team' && !selectedTeamId && state.teams.length > 0) {
+    selectedTeamId = getDefaultTeamId();
+    try {
+      localStorage.setItem('fplplanner-fixtures-selected-team', selectedTeamId.toString());
+    } catch (e) {
+      console.error('Failed to save selected team:', e);
+    }
+  }
+  
+  renderFixtures();
+};
+
+// Change selected team in team view
+window.changeSelectedTeam = function(teamId) {
+  selectedTeamId = parseInt(teamId, 10);
+  
+  // Persist to localStorage
+  try {
+    localStorage.setItem('fplplanner-fixtures-selected-team', selectedTeamId.toString());
+  } catch (e) {
+    console.error('Failed to save selected team:', e);
+  }
+  
+  renderFixtures();
+};
+
 export function renderFixtures() {
   const panel = document.getElementById('fixturesPanel');
   if (!panel) return;
 
-  const fixtures = fixturesByGW.get(fixturesGW) || [];
+  const fixtures = fixturesViewMode === 'gameweek' 
+    ? (fixturesByGW.get(fixturesGW) || [])
+    : getFixturesForTeam(selectedTeamId);
 
-  const groups = groupByDate(fixtures);
-  const hasFixtures = Object.keys(groups).length > 0;
+  // Build header based on view mode
+  let headerHTML = '';
+  if (fixturesViewMode === 'gameweek') {
+    headerHTML = `
+      <div class="fixtures-header">
+        <button onclick="changeFixturesGW(-1)">←</button>
+        <div class="fixtures-view-toggle-container">
+          <button class="fixtures-view-toggle-btn" onclick="toggleFixturesViewMode()">
+            View by: Team
+          </button>
+          <strong>GW ${fixturesGW}</strong>
+        </div>
+        <button onclick="changeFixturesGW(1)">→</button>
+      </div>
+    `;
+  } else {
+    // Team view mode
+    const sortedTeams = [...state.teams].sort((a, b) => a.name.localeCompare(b.name));
+    const teamOptions = sortedTeams.map(team => 
+      `<option value="${team.id}" ${team.id === selectedTeamId ? 'selected' : ''}>${team.name}</option>`
+    ).join('');
+    
+    headerHTML = `
+      <div class="fixtures-header">
+        <div class="fixtures-team-view-container">
+          <button class="fixtures-view-toggle-btn" onclick="toggleFixturesViewMode()">
+            View by: Gameweek
+          </button>
+          <select class="fixtures-team-select" onchange="changeSelectedTeam(this.value)">
+            ${teamOptions}
+          </select>
+        </div>
+      </div>
+    `;
+  }
+
+  // Build fixtures content based on view mode
+  let fixturesContent;
+  let hasFixtures;
+  
+  if (fixturesViewMode === 'gameweek') {
+    // Gameweek view: group by date
+    const groups = groupByDate(fixtures);
+    hasFixtures = Object.keys(groups).length > 0;
+    
+    fixturesContent = hasFixtures 
+      ? Object.entries(groups)
+          .map(([date, games]) => `
+            <div class="fixture-date-banner">${date}</div>
+            ${games.map(renderFixtureRow).join('')}
+          `)
+          .join('')
+      : '<div style="text-align: center; padding: 20px; opacity: 0.7;">No fixtures available</div>';
+  } else {
+    // Team view: compact list format
+    hasFixtures = fixtures.length > 0;
+    
+    fixturesContent = hasFixtures 
+      ? fixtures.map(f => renderTeamFixtureRow(f, selectedTeamId)).join('')
+      : '<div style="text-align: center; padding: 20px; opacity: 0.7;">No fixtures available</div>';
+  }
+
+  // Wrap fixtures content in scrollable container for team view
+  const fixturesHTML = fixturesViewMode === 'team' 
+    ? `<div class="fixtures-list-scrollable" id="fixturesListScrollable">${fixturesContent}</div>`
+    : fixturesContent;
 
   panel.innerHTML = `
     <div class="fixtures-controls">
@@ -153,25 +289,18 @@ export function renderFixtures() {
       </div>
     </div>
 
-    <div class="fixtures-header">
-      <button onclick="changeFixturesGW(-1)">←</button>
-      <strong>GW ${fixturesGW}</strong>
-      <button onclick="changeFixturesGW(1)">→</button>
-    </div>
+    ${headerHTML}
 
-    ${hasFixtures 
-      ? Object.entries(groups)
-          .map(([date, games]) => `
-            <div class="fixture-date-banner">${date}</div>
-            ${games.map(renderFixtureRow).join('')}
-          `)
-          .join('')
-      : '<div style="text-align: center; padding: 20px; opacity: 0.7;">No fixtures available for this gameweek</div>'
-    }
+    ${fixturesHTML}
   `;
 
   // Always reattach event listeners after rendering
   reattachFixturesControls();
+  
+  // If in team view, scroll to current gameweek
+  if (fixturesViewMode === 'team' && hasFixtures) {
+    scrollToCurrentGameweek();
+  }
 }
 
 function reattachFixturesControls() {
@@ -201,6 +330,29 @@ function reattachFixturesControls() {
       }
     });
   }
+}
+
+// Scroll to current gameweek in team view
+function scrollToCurrentGameweek() {
+  // Use a small delay to ensure DOM is fully rendered
+  setTimeout(() => {
+    const scrollContainer = document.getElementById('fixturesListScrollable');
+    if (!scrollContainer) return;
+    
+    // Find the current or next gameweek
+    const events = state.bootstrap?.events || [];
+    const current = events.find(e => e.is_current)?.id;
+    const next = events.find(e => e.is_next)?.id;
+    const targetGW = current || next || state.currentGW;
+    
+    // Find the first fixture row for the target gameweek
+    const targetRow = scrollContainer.querySelector(`[data-gw="${targetGW}"]`);
+    
+    // Scroll to the target row if found
+    if (targetRow) {
+      targetRow.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }, 100);
 }
 
 function renderFixturesError(message) {
@@ -252,6 +404,23 @@ function renderFixtureRow(f) {
   `;
 }
 
+// Render compact fixture row for team view
+function renderTeamFixtureRow(f, teamId) {
+  const isHome = f.team_h === teamId;
+  const opponentId = isHome ? f.team_a : f.team_h;
+  const opponent = getTeam(opponentId);
+  const venue = isHome ? 'Home' : 'Away';
+  
+  return `
+    <div class="team-fixture-row" data-gw="${f.event || ''}">
+      <div class="team-fixture-gw">GW${f.event || '?'}</div>
+      <img class="team-fixture-badge" src="${opponent.badge}" alt="${opponent.name}" />
+      <div class="team-fixture-opponent">${opponent.name}</div>
+      <div class="team-fixture-venue ${isHome ? 'home' : 'away'}">${venue}</div>
+    </div>
+  `;
+}
+
 function groupByDate(fixtures) {
   const groups = {};
   for (const f of fixtures) {
@@ -269,6 +438,29 @@ function groupByDate(fixtures) {
     groups[label].push(f);
   }
   return groups;
+}
+
+// Get all fixtures for a specific team across all gameweeks
+function getFixturesForTeam(teamId) {
+  if (!teamId) return [];
+  
+  const teamFixtures = [];
+  for (const [gw, fixtures] of fixturesByGW) {
+    for (const fixture of fixtures) {
+      if (fixture.team_h === teamId || fixture.team_a === teamId) {
+        teamFixtures.push(fixture);
+      }
+    }
+  }
+  
+  // Sort by kickoff time without mutating original objects
+  teamFixtures.sort((a, b) => {
+    const aTime = a.kickoff_time ? new Date(a.kickoff_time).getTime() : Infinity;
+    const bTime = b.kickoff_time ? new Date(b.kickoff_time).getTime() : Infinity;
+    return aTime - bTime;
+  });
+  
+  return teamFixtures;
 }
 
 function getTeam(teamId) {

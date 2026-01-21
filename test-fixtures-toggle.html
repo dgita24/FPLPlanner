@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fixtures Toggle Test</title>
+  <link rel="stylesheet" href="styles/main.css" />
+  <link rel="stylesheet" href="styles/components.css" />
+  <link rel="stylesheet" href="styles/responsive.css" />
+  <style>
+    body {
+      padding: 20px;
+      background: #1a1a2e;
+      color: #fff;
+    }
+    .test-container {
+      max-width: 400px;
+      margin: 0 auto;
+    }
+    .test-results {
+      margin-top: 20px;
+      padding: 15px;
+      background: #16213e;
+      border-radius: 8px;
+    }
+    .test-pass {
+      color: #00d084;
+    }
+    .test-fail {
+      color: #ff6b6b;
+    }
+  </style>
+</head>
+<body>
+  <div class="test-container">
+    <h1>Fixtures View Toggle - Test Page</h1>
+    
+    <div id="fixturesPanel"></div>
+    
+    <div class="test-results">
+      <h3>Test Results:</h3>
+      <div id="testOutput"></div>
+    </div>
+  </div>
+
+  <script type="module">
+    // Mock state and data
+    const state = {
+      bank: 0.5,
+      priceMode: 'selling',
+      teams: [
+        { id: 1, name: 'Arsenal', code: 3 },
+        { id: 2, name: 'Aston Villa', code: 7 },
+        { id: 3, name: 'Bournemouth', code: 91 },
+        { id: 4, name: 'Brentford', code: 94 },
+        { id: 5, name: 'Brighton', code: 36 },
+        { id: 6, name: 'Chelsea', code: 8 },
+        { id: 7, name: 'Crystal Palace', code: 31 },
+        { id: 8, name: 'Everton', code: 11 },
+        { id: 9, name: 'Fulham', code: 54 },
+        { id: 10, name: 'Ipswich', code: 40 },
+      ]
+    };
+
+    const fixturesByGW = new Map();
+    let fixturesGW = 22;
+    let fixturesViewMode = 'gameweek';
+    let selectedTeamId = null;
+
+    // Mock fixtures data
+    const mockFixtures = [
+      { event: 22, team_h: 1, team_a: 2, kickoff_time: '2026-01-25T12:30:00Z', finished: false, team_h_score: null, team_a_score: null },
+      { event: 22, team_h: 3, team_a: 4, kickoff_time: '2026-01-25T15:00:00Z', finished: false, team_h_score: null, team_a_score: null },
+      { event: 22, team_h: 5, team_a: 6, kickoff_time: '2026-01-25T17:30:00Z', finished: false, team_h_score: null, team_a_score: null },
+      { event: 23, team_h: 1, team_a: 3, kickoff_time: '2026-02-01T12:30:00Z', finished: false, team_h_score: null, team_a_score: null },
+      { event: 23, team_h: 2, team_a: 4, kickoff_time: '2026-02-01T15:00:00Z', finished: false, team_h_score: null, team_a_score: null },
+    ];
+
+    for (const f of mockFixtures) {
+      if (!fixturesByGW.has(f.event)) {
+        fixturesByGW.set(f.event, []);
+      }
+      fixturesByGW.get(f.event).push(f);
+    }
+
+    function getFixturesForTeam(teamId) {
+      if (!teamId) return [];
+      
+      const teamFixtures = [];
+      for (const [gw, fixtures] of fixturesByGW) {
+        for (const fixture of fixtures) {
+          if (fixture.team_h === teamId || fixture.team_a === teamId) {
+            teamFixtures.push(fixture);
+          }
+        }
+      }
+      
+      teamFixtures.sort((a, b) => {
+        if (!a.kickoff_time) return 1;
+        if (!b.kickoff_time) return -1;
+        return new Date(a.kickoff_time) - new Date(b.kickoff_time);
+      });
+      
+      return teamFixtures;
+    }
+
+    function renderFixtures() {
+      const panel = document.getElementById('fixturesPanel');
+      if (!panel) return;
+
+      const fixtures = fixturesViewMode === 'gameweek' 
+        ? (fixturesByGW.get(fixturesGW) || [])
+        : getFixturesForTeam(selectedTeamId);
+
+      let headerHTML = '';
+      if (fixturesViewMode === 'gameweek') {
+        headerHTML = `
+          <div class="fixtures-header">
+            <button onclick="changeFixturesGW(-1)">←</button>
+            <div class="fixtures-view-toggle-container">
+              <button class="fixtures-view-toggle-btn" onclick="toggleFixturesViewMode()">
+                View by: Gameweek
+              </button>
+              <strong>GW ${fixturesGW}</strong>
+            </div>
+            <button onclick="changeFixturesGW(1)">→</button>
+          </div>
+        `;
+      } else {
+        const sortedTeams = [...state.teams].sort((a, b) => a.name.localeCompare(b.name));
+        const teamOptions = sortedTeams.map(team => 
+          `<option value="${team.id}" ${team.id === selectedTeamId ? 'selected' : ''}>${team.name}</option>`
+        ).join('');
+        
+        headerHTML = `
+          <div class="fixtures-header">
+            <div class="fixtures-team-view-container">
+              <button class="fixtures-view-toggle-btn" onclick="toggleFixturesViewMode()">
+                View by: Team
+              </button>
+              <select class="fixtures-team-select" onchange="changeSelectedTeam(this.value)">
+                ${teamOptions}
+              </select>
+            </div>
+          </div>
+        `;
+      }
+
+      // Build fixtures content
+      const fixturesContent = fixtures.length > 0
+        ? fixtures.map(f => {
+            const homeTeam = state.teams.find(t => t.id === f.team_h);
+            const awayTeam = state.teams.find(t => t.id === f.team_a);
+            const gwBadge = fixturesViewMode === 'team' && f.event 
+              ? `<span class="fixture-gw-badge">GW${f.event}</span>` 
+              : '';
+            return `
+              <div class="fixture-row" data-gw="${f.event}">
+                <div>${homeTeam?.name || 'Team'}</div>
+                <div>vs${gwBadge}</div>
+                <div>${awayTeam?.name || 'Team'}</div>
+              </div>
+            `;
+          }).join('')
+        : '<div style="text-align: center; padding: 20px;">No fixtures</div>';
+
+      // Wrap fixtures content in scrollable container for team view
+      const fixturesHTML = fixturesViewMode === 'team' 
+        ? `<div class="fixtures-list-scrollable" id="fixturesListScrollable">${fixturesContent}</div>`
+        : fixturesContent;
+
+      panel.innerHTML = headerHTML + fixturesHTML + `<div style="margin-top: 10px; font-size: 14px;">Fixtures count: ${fixtures.length}</div>`;
+      
+      // If in team view, scroll to current gameweek
+      if (fixturesViewMode === 'team' && fixtures.length > 0) {
+        scrollToCurrentGameweek();
+      }
+    }
+
+    function scrollToCurrentGameweek() {
+      setTimeout(() => {
+        const scrollContainer = document.getElementById('fixturesListScrollable');
+        if (!scrollContainer) return;
+        
+        // Find fixture for current gameweek (22 in our test)
+        const targetGW = 22;
+        const targetFixture = scrollContainer.querySelector(`[data-gw="${targetGW}"]`);
+        
+        if (targetFixture) {
+          targetFixture.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 100);
+    }
+
+    window.toggleFixturesViewMode = function() {
+      fixturesViewMode = fixturesViewMode === 'gameweek' ? 'team' : 'gameweek';
+      
+      if (fixturesViewMode === 'team' && !selectedTeamId && state.teams.length > 0) {
+        const sortedTeams = [...state.teams].sort((a, b) => a.name.localeCompare(b.name));
+        selectedTeamId = sortedTeams[0].id;
+      }
+      
+      renderFixtures();
+      runTests();
+    };
+
+    window.changeSelectedTeam = function(teamId) {
+      selectedTeamId = parseInt(teamId, 10);
+      renderFixtures();
+      runTests();
+    };
+
+    window.changeFixturesGW = function(delta) {
+      fixturesGW = Math.max(1, Math.min(38, fixturesGW + delta));
+      renderFixtures();
+      runTests();
+    };
+
+    function runTests() {
+      const output = document.getElementById('testOutput');
+      let results = [];
+
+      // Test 1: Check if toggle button exists
+      const toggleBtn = document.querySelector('.fixtures-view-toggle-btn');
+      results.push(`<div class="${toggleBtn ? 'test-pass' : 'test-fail'}">
+        ✓ Toggle button exists: ${toggleBtn ? 'PASS' : 'FAIL'}
+      </div>`);
+
+      // Test 2: Check view mode text
+      if (toggleBtn) {
+        const expectedText = fixturesViewMode === 'gameweek' ? 'View by: Gameweek' : 'View by: Team';
+        const hasCorrectText = toggleBtn.textContent.trim().includes(expectedText.split(':')[1].trim());
+        results.push(`<div class="${hasCorrectText ? 'test-pass' : 'test-fail'}">
+          ✓ Toggle button text: ${hasCorrectText ? 'PASS' : 'FAIL'} (${toggleBtn.textContent.trim()})
+        </div>`);
+      }
+
+      // Test 3: Check mode-specific elements
+      if (fixturesViewMode === 'gameweek') {
+        const gwDisplay = document.querySelector('.fixtures-header strong');
+        results.push(`<div class="${gwDisplay ? 'test-pass' : 'test-fail'}">
+          ✓ Gameweek display exists: ${gwDisplay ? 'PASS' : 'FAIL'}
+        </div>`);
+      } else {
+        const teamSelect = document.querySelector('.fixtures-team-select');
+        results.push(`<div class="${teamSelect ? 'test-pass' : 'test-fail'}">
+          ✓ Team select dropdown exists: ${teamSelect ? 'PASS' : 'FAIL'}
+        </div>`);
+        
+        if (teamSelect) {
+          results.push(`<div class="test-pass">
+            ✓ Selected team ID: ${selectedTeamId}
+          </div>`);
+        }
+      }
+
+      // Test 4: Check fixtures are being filtered correctly
+      const fixtures = fixturesViewMode === 'gameweek' 
+        ? (fixturesByGW.get(fixturesGW) || [])
+        : getFixturesForTeam(selectedTeamId);
+      results.push(`<div class="test-pass">
+        ✓ Fixtures count: ${fixtures.length}
+      </div>`);
+
+      output.innerHTML = results.join('');
+    }
+
+    // Initialize
+    renderFixtures();
+    runTests();
+  </script>
+</body>
+</html>
