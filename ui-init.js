@@ -324,7 +324,7 @@ async function loadTeam() {
   const password = document.getElementById('loadPassword')?.value?.trim();
 
   if (!teamId || !password) {
-    showMessage('Enter Team ID and Password', 'error');
+    showMessage('Saved draft name and password required', 'error');  // ✅ Better:  tells them what's missing
     return;
   }
 
@@ -334,35 +334,39 @@ async function loadTeam() {
   try {
     const response = await fetch('/api/load', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type':  'application/json' },
       body: JSON.stringify({ teamid: teamId, password })
     });
 
     const result = await response.json();
 
     if (response.ok && result.success) {
-      const data = result.data;
+      const data = result. data;
       state.plan = data.payload.plan;
-      state.bank = data.payload.bank;
+      state.bank = data.payload. bank;
       state.viewingGW = data.payload.viewingGW;
-      state.minNavigableGW = data.payload.minNavigableGW ?? state.viewingGW; // fallback for old saves
+      state. minNavigableGW = data. payload.minNavigableGW ??  state.viewingGW;
       state.priceMode = data.payload.priceMode;
 
       updateUI();
       showMessage('Team loaded from cloud!', 'success');
       if (sideMsg) sideMsg.textContent = `✓ Loaded: ${data.label || teamId}`;
 
-      // Close sidebar after load
       closeSidebar();
     } else {
       throw new Error(result.error || 'Load failed');
     }
   } catch (err) {
-    showMessage(`Load error: ${err.message}`, 'error');
-    if (sideMsg) sideMsg.textContent = `Error: ${err.message}`;
+    // ✅ Better: differentiate between wrong credentials vs other errors
+    const errorMsg = err.message || 'Load failed';
+    if (errorMsg.includes('not found') || errorMsg.includes('Invalid password')) {
+      showMessage('Saved draft name and/or password incorrect', 'error');
+    } else {
+      showMessage(`Load error: ${errorMsg}`, 'error');
+    }
+    if (sideMsg) sideMsg.textContent = `Error: ${errorMsg}`;
   }
 }
-
 function undoLastAction() {
   if (!history.undoStack.length) {
     showMessage('Nothing to undo.', 'info');
