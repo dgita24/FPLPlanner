@@ -10,7 +10,7 @@ export async function onRequestPost({ request, env, context }) {
 
     // Warn if managerid is missing - draft won't appear in dropdown
     if (!managerid) {
-      console.warn('Warning: Saving draft without managerid - draft will not appear in dropdown');
+      console.warn(`Warning: Saving draft without managerid for teamid ${teamid} - draft will not appear in dropdown`);
     }
 
     // Hash password
@@ -32,9 +32,12 @@ export async function onRequestPost({ request, env, context }) {
     };
 
     // Build query string to check for existing draft with composite key (teamid, managerid)
-    let queryString = `teamid=eq.${teamid}`;
+    // Use URL encoding to safely include parameters
+    const encodedTeamId = encodeURIComponent(teamid);
+    let queryString = `teamid=eq.${encodedTeamId}`;
     if (managerid) {
-      queryString += `&managerid=eq.${managerid}`;
+      const encodedManagerId = encodeURIComponent(managerid);
+      queryString += `&managerid=eq.${encodedManagerId}`;
     } else {
       queryString += `&managerid=is.null`;
     }
