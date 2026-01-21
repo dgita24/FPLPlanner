@@ -345,7 +345,6 @@ body {
   opacity: 1;
 }
 
-#savedDraftsContainer ul,
 #savedDraftsContainer .drafts-list {
   list-style: none;
   padding: 0;

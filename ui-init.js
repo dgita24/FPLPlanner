@@ -311,7 +311,6 @@ async function populateSavedTeamsDropdown() {
             </span>
             <button 
               onclick="deleteDraft('${jsEscaped}')" 
-              title="Delete ${htmlEscaped}"
               aria-label="Delete ${htmlEscaped}"
             >
               🗑️
