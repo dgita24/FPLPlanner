@@ -7,7 +7,7 @@
 }
 
 .pitch {
-  background: linear-gradient(to bottom, #4a7c2c 0%, #3a6622 100%);
+  background: linear-gradient(to bottom, var(--success) 0%, var(--success-hover) 100%);
   padding: 21px 17px;
   border-radius: 10px;
   max-width: 935px;
@@ -45,17 +45,17 @@
 }
 
 .transfer-action-btn.add-btn {
-  background: var(--warning);
-  color: white;
+  background: var(--primary);
+  color: var(--bg);
 }
 
 .transfer-action-btn.add-btn:hover:not(:disabled) {
-  background: #f57c00;
+  background: var(--primary-light);
 }
 
 .transfer-action-btn.cancel-btn {
   background: var(--error);
-  color: #fff;
+  color: var(--bg-light);
 }
 
 .transfer-action-btn.cancel-btn:hover:not(:disabled) {
@@ -75,8 +75,8 @@
   align-items: center;
   gap: 6px;
   padding: 4px 12px;
-  background: rgba(0, 208, 132, 0.1);
-  border: 2px solid var(--accent);
+  background: rgba(255, 215, 0, 0.15);
+  border: 2px solid var(--primary);
   border-radius: 6px;
   font-size: 12px;
   font-weight: 700;
@@ -84,14 +84,15 @@
 
 .chip-icon {
   font-size: 14px;
+  color: var(--primary);
 }
 
 .chip-name {
-  color: var(--accent);
+  color: var(--primary);
 }
 
 .chip-gw {
-  color: var(--text-light);
+  color: var(--text);
   font-size: 11px;
 }
 
@@ -112,24 +113,24 @@
   transition: all 0.2s;
   white-space: nowrap;
   height: 36px;
-  background: rgba(0, 208, 132, 0.1);
-  color: var(--accent);
-  border: 1px solid var(--accent);
+  background: rgba(255, 215, 0, 0.15);
+  color: var(--primary);
+  border: 1px solid var(--primary);
 }
 
 .chip-btn-small:hover:not(:disabled) {
-  background: rgba(0, 208, 132, 0.2);
+  background: rgba(255, 215, 0, 0.25);
   transform: translateY(-1px);
 }
 
 .chip-btn-small.chip-btn-active {
-  background: var(--accent);
-  color: white;
-  border-color: var(--accent);
+  background: var(--primary);
+  color: var(--bg);
+  border-color: var(--primary);
 }
 
 .chip-btn-small.chip-btn-used {
-  background: var(--bg-darker);
+  background: var(--bg-dark);
   color: var(--text-light);
   border-color: var(--border);
   cursor: not-allowed;
@@ -189,7 +190,7 @@
 
 .player-card {
   width: 145px;
-  background: var(--bg);
+  background: var(--bg-light-darker);
   border-radius: 7px;
   padding: 5px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
@@ -205,13 +206,13 @@
 }
 
 .player-card .name {
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 700;
-  color: #000;
+  color: var(--bg);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  background: #d4dae3;
+  background: var(--bg-light-darker);
   padding: 2px 3px;
   border-radius: 3px;
   margin: 2px 0;
@@ -221,7 +222,7 @@
 
 .player-card .info {
   font-size: 9px;
-  color: #333;
+  color: var(--bg);
   display: flex;
   padding: 0 3px;
   font-weight: 600;
@@ -286,13 +287,13 @@
 .btn-remove {
   top: 2px;
   left: 2px;
-  background: #ff4444;
+  background: var(--error);
 }
 
 .btn-swap {
   top: 2px;
   right: 2px;
-  background: #4444ff;
+  background: var(--accent);
   font-size: 9px;
 }
 
@@ -371,9 +372,9 @@
   width: 20px;
   height: 20px;
   border-radius: 50%;
-  border: 2px solid #000;
-  background: #000;
-  color: white;
+  border: 2px solid var(--captain-badge);
+  background: var(--captain-badge);
+  color: var(--bg-light);
   font-weight: bold;
   font-size: 8px;
   cursor: pointer;
@@ -391,8 +392,8 @@
 }
 
 .captain-btn.active {
-  background: #222;
-  border-color: #222;
+  background: var(--captain-badge-active);
+  border-color: var(--captain-badge-active);
 }
 
 .captain-badge {
@@ -403,15 +404,15 @@
   width: 20px;
   height: 20px;
   border-radius: 50%;
-  background: #000;
-  color: white;
+  background: var(--captain-badge);
+  color: var(--bg-light);
   font-weight: bold;
   font-size: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-  border: 2px solid #000;
+  border: 2px solid var(--captain-badge);
   z-index: 15;
   pointer-events: auto;
 }
@@ -419,8 +420,8 @@
 /* Both captain and vice-captain badges use the same styling */
 .captain-badge.vc,
 .captain-badge.c {
-  background: #000;
-  border-color: #000;
+  background: var(--captain-badge);
+  border-color: var(--captain-badge);
 }
 
 /* ===== Status Flag Badges (Circular style like captain badges) ===== */
@@ -433,7 +434,7 @@
   width: 20px;
   height: 20px;
   border-radius: 50%;
-  color: #000;
+  color: var(--bg);
   font-weight: bold;
   font-size: 8px;
   display: flex;
@@ -444,13 +445,13 @@
 }
 
 .status-flag-badge.red {
-  background: #ff0000;
-  border: 2px solid #ff0000;
+  background: var(--error);
+  border: 2px solid var(--error);
 }
 
 .status-flag-badge.yellow {
-  background: #ffcc00;
-  border: 2px solid #ffcc00;
+  background: var(--warning);
+  border: 2px solid var(--warning);
 }
 
 /* Status flag badges in table */
@@ -461,20 +462,20 @@
   width: 22px;
   height: 22px;
   border-radius: 50%;
-  color: #000;
+  color: var(--bg);
   font-weight: bold;
   font-size: 9px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
 }
 
 .table-status-flag-badge.red {
-  background: #ff0000;
-  border: 2px solid #ff0000;
+  background: var(--error);
+  border: 2px solid var(--error);
 }
 
 .table-status-flag-badge.yellow {
-  background: #ffcc00;
-  border: 2px solid #ffcc00;
+  background: var(--warning);
+  border: 2px solid var(--warning);
 }
 
 /* ===== OLD Waving Status Flags (kept for backwards compatibility) ===== */
@@ -499,7 +500,7 @@
 /* ===== Bench ===== */
 
 .bench {
-  background: linear-gradient(to bottom, #4a7c2c 0%, #3a6622 100%);
+  background: linear-gradient(to bottom, var(--success) 0%, var(--success-hover) 100%);
   padding: 13px;
   border-radius: 10px;
   max-width: 935px;
@@ -510,7 +511,7 @@
 
 .bench h3 {
   text-align: center;
-  color: #fff;
+  color: var(--bg-light);
   margin-bottom: 12px;
 }
 
@@ -530,7 +531,7 @@
 
 .player-table {
   background: var(--bg);
-  color: #000;
+  color: var(--text);
   border-radius: 5px;
   overflow: hidden;
   max-height: 400px;
@@ -540,17 +541,18 @@
 table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 13px;
+  font-size: 14px;
 }
 
 th {
   background: var(--primary);
-  color: #fff;
+  color: var(--bg);
   padding: 10px;
   text-align: center;
   position: sticky;
   top: 0;
-  border-right: 1px solid rgba(255, 255, 255, 0.2);
+  border-right: 1px solid rgba(0, 0, 0, 0.2);
+  font-size: 13px;
 }
 
 th.th-name {
@@ -593,7 +595,7 @@ tr:hover {
 tr.selected {
   background: var(--selected-bg);
   font-weight: 600;
-  border-left: 3px solid var(--accent);
+  border-left: 3px solid var(--primary);
 }
 
 tr.selected:hover {
@@ -680,7 +682,7 @@ td.fixtures-cell {
 /* ===== Fixtures Panel ===== */
 
 #fixturesPanel {
-  background: var(--bg-light);
+  background: var(--bg);
   border-radius: 10px;
   padding: 10px;
   color: var(--text);
@@ -708,7 +710,7 @@ td.fixtures-cell {
   border: none;
   border-radius: 5px;
   font-weight: bold;
-  font-size: 11px;
+  font-size: 13px;
   cursor: pointer;
   transition: all 0.2s;
   height: 30px;
@@ -717,45 +719,56 @@ td.fixtures-cell {
   justify-content: center;
   white-space: nowrap;
   background: var(--primary);
-  color: white;
+  color: var(--bg);
 }
 
 .fixtures-control-btn:hover {
   background: var(--primary-light);
   transform: translateY(-1px);
-  box-shadow: 0 2px 8px rgba(56, 0, 60, 0.3);
+  box-shadow: 0 2px 8px rgba(255, 215, 0, 0.3);
 }
 
 /* Local Load/Save buttons - smaller size */
 .fixtures-control-btn.local-btn {
   padding: 6px;
-  font-size: 10px;
+  font-size: 12px;
 }
 
-/* Import/Save button - orange */
+/* Import/Save button - Blue */
 .fixtures-control-btn.import-save-btn {
-  background: var(--warning) !important;
-}
-
-.fixtures-control-btn.import-save-btn:hover {
-  background: var(--warning-hover) !important;
-  box-shadow: 0 2px 8px rgba(255, 152, 0, 0.3);
-}
-
-/* Donate button - green */
-.fixtures-control-btn.donate-btn {
   background: var(--accent) !important;
 }
 
-.fixtures-control-btn.donate-btn:hover {
+.fixtures-control-btn.import-save-btn:hover {
   background: var(--accent-hover) !important;
-  box-shadow: 0 2px 8px rgba(0, 208, 132, 0.3);
+  box-shadow: 0 2px 8px rgba(0, 127, 255, 0.3);
+}
+
+/* Donate button - Gold (primary) */
+.fixtures-control-btn.donate-btn {
+  background: var(--primary) !important;
+}
+
+.fixtures-control-btn.donate-btn:hover {
+  background: var(--primary-light) !important;
+  box-shadow: 0 2px 8px rgba(255, 215, 0, 0.3);
+}
+
+/* Make button icons more visible with filter */
+.fixtures-control-btn.donate-btn::before,
+.fixtures-control-btn.local-btn::before {
+  filter: brightness(1.2) contrast(1.1);
+}
+
+/* Local buttons get white icon color for better visibility */
+.fixtures-control-btn.local-btn {
+  color: var(--bg-light);
 }
 
 /* Fixtures panel GW arrows */
 #fixturesPanel button {
   background: var(--primary);
-  color: white;
+  color: var(--bg);
   border: none;
   border-radius: 6px;
   padding: 4px 10px;
@@ -839,8 +852,8 @@ td.fixtures-cell {
 }
 
 .fixtures-view-toggle-btn:hover {
-  background: var(--bg-darker);
-  border-color: var(--accent);
+  background: var(--bg);
+  border-color: var(--primary);
   transform: translateY(-1px);
 }
 
@@ -871,8 +884,8 @@ td.fixtures-cell {
   display: inline-block;
   margin-left: 6px;
   padding: 2px 6px;
-  background: var(--accent);
-  color: white;
+  background: var(--primary);
+  color: var(--bg);
   font-size: 10px;
   font-weight: 700;
   border-radius: 3px;
@@ -908,7 +921,7 @@ td.fixtures-cell {
 
 .fixture-date {
   margin: 12px 0 8px;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 700;
   opacity: 0.9;
   text-align: center;
@@ -920,7 +933,7 @@ td.fixtures-cell {
   align-items: center;
   padding: 6px 0;
   border-bottom: 1px solid var(--border);
-  font-size: 12px;
+  font-size: 13px;
 }
 
 .fixture-row .team {
@@ -952,7 +965,7 @@ td.fixtures-cell {
   background: var(--bg-dark);
   border-radius: 4px;
   padding: 2px 6px;
-  font-size: 11px;
+  font-size: 12px;
   color: var(--text);
 }
 
@@ -976,7 +989,8 @@ td.fixtures-cell {
 
 .team-name {
   white-space: nowrap;
-  font-size: 11px;
+  font-size: 12px;
+  font-weight: 600;
 }
 
 .team-badge {
@@ -1027,7 +1041,7 @@ td.fixtures-cell {
 
 .team-fixture-gw {
   font-weight: 700;
-  color: var(--accent);
+  color: var(--primary);
   font-size: 13px;
 }
 
@@ -1053,7 +1067,7 @@ td.fixtures-cell {
 }
 
 .team-fixture-venue.home {
-  color: var(--accent);
+  color: var(--primary);
 }
 
 .team-fixture-venue.away {
@@ -1063,7 +1077,7 @@ td.fixtures-cell {
 /* ===== Transfer Panel (Right Side) ===== */
 
 .transfer-panel {
-  background: var(--bg-light);
+  background: var(--bg);
   padding: 15px;
   border-radius: 10px;
   display: flex;
@@ -1107,12 +1121,17 @@ td.fixtures-cell {
   border-radius: 4px;
   border: 1px solid var(--border);
   text-align: center;
-  font-size: 12px;
-  background: var(--primary);
-  color: white;
+  font-size: 13px;
+  background: var(--accent);
+  color: var(--bg-light);
   width: 100%;
   box-sizing: border-box;
   font-weight: 600;
+}
+
+.filters-compact input::placeholder {
+  color: var(--bg-light);
+  opacity: 0.8;
 }
 
 .price-filters {
@@ -1128,9 +1147,9 @@ td.fixtures-cell {
   border-radius: 4px;
   border: 1px solid var(--border);
   text-align: center;
-  font-size: 12px;
-  background: var(--primary);
-  color: white;
+  font-size: 13px;
+  background: var(--accent);
+  color: var(--bg-light);
   width: 100%;
   box-sizing: border-box;
   font-weight: 600;
@@ -1138,7 +1157,7 @@ td.fixtures-cell {
 
 .player-table-compact {
   background: var(--bg);
-  color: #000;
+  color: var(--text);
   border-radius: 5px;
   overflow: hidden;
   flex: 1;
@@ -1154,12 +1173,12 @@ td.fixtures-cell {
 
 .player-table-compact th {
   background: var(--primary);
-  color: #fff;
+  color: var(--bg);
   padding: 8px 4px;
   text-align: center;
   position: sticky;
   top: 0;
-  border-right: 1px solid rgba(255, 255, 255, 0.2);
+  border-right: 1px solid rgba(0, 0, 0, 0.2);
   font-size: 11px;
 }
 
@@ -1179,6 +1198,8 @@ td.fixtures-cell {
 .player-table-compact td.name-cell {
   text-align: left;
   padding-left: 6px;
+  font-size: 13px;
+  font-weight: 600;
 }
 
 .player-table-compact tr:hover {
@@ -1190,7 +1211,7 @@ td.fixtures-cell {
 .player-table-compact tr.selected {
   background: var(--selected-bg);
   font-weight: 600;
-  border-left: 3px solid var(--accent);
+  border-left: 3px solid var(--primary);
 }
 
 .player-table-compact tr.selected:hover {
@@ -1248,8 +1269,8 @@ td.fixtures-cell {
 }
 
 .info-btn {
-  background: var(--primary);
-  color: white;
+  background: var(--accent);
+  color: var(--bg-light);
   border: none;
   border-radius: 50%;
   width: 20px;
@@ -1266,7 +1287,7 @@ td.fixtures-cell {
 }
 
 .info-btn:hover {
-  background: var(--primary-light);
+  background: var(--accent-hover);
   transform: scale(1.1);
 }
 
@@ -1291,7 +1312,7 @@ td.fixtures-cell {
 }
 
 .player-info-content {
-  background: var(--bg-light);
+  background: var(--bg);
   border-radius: 10px;
   max-width: 800px;
   width: 100%;
@@ -1307,8 +1328,8 @@ td.fixtures-cell {
   position: absolute;
   top: 10px;
   right: 10px;
-  background: var(--accent);
-  color: white;
+  background: var(--primary);
+  color: var(--bg);
   border: none;
   border-radius: 50%;
   width: 30px;
@@ -1324,7 +1345,7 @@ td.fixtures-cell {
 }
 
 .player-info-close:hover {
-  background: var(--accent-hover);
+  background: var(--primary-light);
   transform: scale(1.1);
 }
 
@@ -1363,7 +1384,7 @@ td.fixtures-cell {
 }
 
 .player-stat-item {
-  background: var(--bg);
+  background: var(--bg-dark);
   padding: 8px;
   border-radius: 5px;
   border: 1px solid var(--border);
@@ -1403,7 +1424,7 @@ td.fixtures-cell {
   cursor: pointer;
   transition: all 0.2s;
   background: var(--primary);
-  color: white;
+  color: var(--bg);
 }
 
 .modal-action-btn:hover {

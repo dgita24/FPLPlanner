@@ -332,7 +332,7 @@ async function populateSavedTeamsDropdown() {
     
     if (!response.ok) {
       console.error('Failed to fetch saved drafts');
-      container.innerHTML = '<p class="helper-text" style="color: #ff6b6b;">Failed to load drafts</p>';
+      container.innerHTML = '<p class="helper-text" style="color: var(--error);">Failed to load drafts</p>';
       return;
     }
     
@@ -381,7 +381,7 @@ async function populateSavedTeamsDropdown() {
     }
   } catch (e) {
     console.error('Failed to load saved teams list:', e);
-    container.innerHTML = '<p class="helper-text" style="color: #ff6b6b;">Error loading drafts</p>';
+    container.innerHTML = '<p class="helper-text" style="color: var(--error);">Error loading drafts</p>';
   }
 }
 
@@ -658,8 +658,8 @@ export function initUI() {
     style.id = 'plannerInjectedStyle';
     style.textContent = `
       .player-card.pending-swap {
-        outline: 3px solid #00ff87;
-        box-shadow: 0 0 0 3px rgba(0, 255, 135, 0.25);
+        outline: 3px solid var(--success);
+        box-shadow: 0 0 0 3px var(--success-light);
       }
 
       /* Placeholder card styling for removed players */
@@ -675,7 +675,7 @@ export function initUI() {
         left: 0;
         right: 0;
         bottom: 0;
-        background: rgba(255, 68, 68, 0.85);
+        background: var(--error-transparent);
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -721,7 +721,7 @@ export function initUI() {
       .placeholder-price {
         font-size: 13px;
         font-weight: 700;
-        color: #00ff87;
+        color: var(--success);
         margin-top: 4px;
         text-shadow: 0 1px 2px rgba(0,0,0,0.5);
       }
@@ -737,7 +737,7 @@ export function initUI() {
       /* Next fixture + fixtures strip */
       .player-card .fixture {
         font-size: 11px;
-        color: #6f2dbd; /* purple */
+        color: var(--accent); /* blue */
         text-align: center;
         white-space: nowrap;
       }
@@ -762,7 +762,7 @@ export function initUI() {
         justify-self: center;
         font-size: 11px;
         font-weight: 800;
-        color: #6f2dbd; /* purple */
+        color: var(--accent); /* blue */
         white-space: nowrap;
       }
 
@@ -804,12 +804,12 @@ export function initUI() {
         align-items: center;
         gap: 6px;
         padding: 8px 12px;
-        background: rgba(255, 153, 0, 0.95);
-        border: 2px solid #ff9800;
+        background: rgba(255, 215, 0, 0.95);
+        border: 2px solid var(--primary);
         border-radius: 8px;
         font-weight: bold;
         font-size: 13px;
-        color: white;
+        color: var(--bg);
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
         animation: chipPulse 2s ease-in-out infinite;
       }
@@ -821,6 +821,7 @@ export function initUI() {
 
       .chip-icon {
         font-size: 18px;
+        color: var(--primary);
       }
 
       .chip-name {
@@ -838,9 +839,9 @@ export function initUI() {
       /* Chip button */
       .chip-btn {
         padding: 10px 16px;
-        background: #00ff87;
-        color: #37003c;
-        border: 2px solid #00ff87;
+        background: var(--primary);
+        color: var(--bg);
+        border: 2px solid var(--primary);
         border-radius: 6px;
         font-weight: bold;
         font-size: 13px;
@@ -851,21 +852,21 @@ export function initUI() {
       }
 
       .chip-btn:hover {
-        background: #00e676;
-        border-color: #00e676;
+        background: var(--primary-light);
+        border-color: var(--primary-light);
         transform: translateY(-2px);
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
       }
 
       .chip-btn-active {
-        background: #ff9800;
-        border-color: #f57c00;
-        color: white;
+        background: var(--primary);
+        border-color: var(--primary);
+        color: var(--bg);
       }
 
       .chip-btn-active:hover {
-        background: #f57c00;
-        border-color: #e65100;
+        background: var(--primary-light);
+        border-color: var(--primary-light);
       }
 
       /* Chip buttons row - container for multiple chip buttons */
@@ -879,9 +880,9 @@ export function initUI() {
       /* Smaller chip buttons for multiple chips */
       .chip-btn-small {
         padding: 6px 10px;
-        background: #00ff87;
-        color: #37003c;
-        border: 2px solid #00ff87;
+        background: var(--primary);
+        color: var(--bg);
+        border: 2px solid var(--primary);
         border-radius: 5px;
         font-weight: bold;
         font-size: 11px;
@@ -894,36 +895,36 @@ export function initUI() {
       }
 
       .chip-btn-small:hover {
-        background: #00e676;
-        border-color: #00e676;
+        background: var(--primary-light);
+        border-color: var(--primary-light);
         transform: translateY(-1px);
         box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
       }
 
       .chip-btn-small.chip-btn-active {
-        background: #ff9800;
-        border-color: #f57c00;
-        color: white;
+        background: var(--primary);
+        border-color: var(--primary);
+        color: var(--bg);
       }
 
       .chip-btn-small.chip-btn-active:hover {
-        background: #f57c00;
-        border-color: #e65100;
+        background: var(--primary-light);
+        border-color: var(--primary-light);
       }
 
       /* Used/disabled chip buttons - crossed out appearance */
       .chip-btn-small.chip-btn-used {
-        background: #cccccc;
-        border-color: #999999;
-        color: #666666;
+        background: var(--bg-dark);
+        border-color: var(--border);
+        color: var(--text-light);
         cursor: not-allowed;
         text-decoration: line-through;
         opacity: 0.6;
       }
 
       .chip-btn-small.chip-btn-used:hover {
-        background: #cccccc;
-        border-color: #999999;
+        background: var(--bg-dark);
+        border-color: var(--border);
         transform: none;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
       }
