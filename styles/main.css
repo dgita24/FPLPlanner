@@ -1,24 +1,33 @@
 /* ===== Base Styles and Variables ===== */
 
 :root {
-  --primary: #38003c;
-  --primary-light: #6b1b71;
-  --accent: #00d084;
-  --accent-hover: #00b874;
-  --bg: #e3e7ed;
-  --bg-light: #f8f9fb;
-  --bg-dark: #d4dae3;
-  --bg-darker: #bfc7d3;
-  --text: #1a1a1a;
-  --text-light: #5a5a5a;
-  --border: #b0bac9;
-  --success: #00c853;
-  --warning: #ff9800;
-  --warning-hover: #f57c00;
-  --error: #d50000;
-  --error-hover: #b71c1c;
-  --selected-bg: #fff9e6;
-  --selected-hover-bg: #fff4d1;
+  /* New Color Palette */
+  --pitch-green: #22B455;          /* Turf Green - Pitch Background */
+  --gold: #FFD700;                 /* Gold - Highlights/Buttons */
+  --blue: #007FFF;                 /* Blue - Info/Selection */
+  --red: #E53935;                  /* Red - Error/Warning */
+  --charcoal: #262626;             /* Charcoal - Panels/Backgrounds */
+  --off-white: #F5F5F5;            /* Off-white - Text/Secondary */
+  
+  /* Mapped variables for consistency */
+  --primary: #FFD700;              /* Gold for primary buttons */
+  --primary-light: #FFED4E;        /* Lighter gold for hover */
+  --accent: #007FFF;               /* Blue for accents */
+  --accent-hover: #0066CC;         /* Darker blue for hover */
+  --bg: #262626;                   /* Charcoal for main backgrounds */
+  --bg-light: #333333;             /* Lighter charcoal */
+  --bg-dark: #1a1a1a;              /* Darker charcoal */
+  --bg-darker: #0d0d0d;            /* Even darker charcoal */
+  --text: #F5F5F5;                 /* Off-white for main text */
+  --text-light: #CCCCCC;           /* Lighter off-white for secondary text */
+  --border: #444444;               /* Dark border for charcoal backgrounds */
+  --success: #22B455;              /* Turf green for success */
+  --warning: #E53935;              /* Red for warning */
+  --warning-hover: #C62828;        /* Darker red for warning hover */
+  --error: #E53935;                /* Red for errors */
+  --error-hover: #C62828;          /* Darker red for error hover */
+  --selected-bg: #1a4d6f;          /* Dark blue for selected items */
+  --selected-hover-bg: #0f3a54;    /* Darker blue for selected hover */
 }
 
 * {
@@ -29,7 +38,7 @@
 
 body {
   font-family: "Segoe UI", sans-serif;
-  background: linear-gradient(135deg, #e3e7ed 0%, #d4dae3 100%);
+  background: var(--bg-dark);
   color: var(--text);
   padding: 20px;
   min-height: 100vh;
@@ -53,10 +62,10 @@ body {
 .header h1 {
   font-size: 24px;
   font-weight: 900;
-  color: var(--accent);
+  color: var(--primary);
   text-align: center;
   letter-spacing: 1px;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
   margin: 0;
   white-space: nowrap;
 }
@@ -221,14 +230,14 @@ body {
   left: 20px;
   width: 360px;
   max-height: calc(100vh - 40px);
-  background: #ffffff;
+  background: var(--bg-light);
   border-radius: 12px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
   transform: translateX(-400px);
   transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   z-index: 1000;
   overflow-y: auto;
-  color: #2d2d2d;
+  color: var(--text);
 }
 
 .sidebar.open {
@@ -241,8 +250,8 @@ body {
   justify-content: space-between;
   align-items: center;
   padding: 16px 20px;
-  background: linear-gradient(135deg, #6b2d8f 0%, #3d1451 100%);
-  color: white;
+  background: var(--charcoal);
+  color: var(--text);
   border-radius: 12px 12px 0 0;
   font-weight: 600;
   font-size: 14px;
@@ -255,7 +264,7 @@ body {
 
 #currentTeamId {
   font-weight: 700;
-  color: #00d9a3;
+  color: var(--primary);
 }
 
 .sidebar-close {
@@ -285,29 +294,30 @@ body {
   grid-template-columns: repeat(3, 1fr);
   gap: 12px;
   padding: 16px;
-  background: #f5f5f8;
+  background: var(--bg);
 }
 
 .action-card {
-  background: white;
-  border: 2px solid #e0e0e8;
+  background: var(--bg-light);
+  border: 2px solid var(--border);
   border-radius: 8px;
   padding: 16px 8px;
   text-align: center;
   cursor: pointer;
   transition: all 0.2s;
+  color: var(--text);
 }
 
 .action-card:hover {
-  border-color: #6b2d8f;
+  border-color: var(--primary);
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(107, 45, 143, 0.15);
+  box-shadow: 0 4px 12px rgba(255, 215, 0, 0.3);
 }
 
 .action-card.active {
-  background: linear-gradient(135deg, #6b2d8f 0%, #3d1451 100%);
-  border-color: #3d1451;
-  color: white;
+  background: var(--primary);
+  border-color: var(--primary);
+  color: var(--charcoal);
 }
 
 .card-icon {
@@ -324,7 +334,7 @@ body {
 /* Expandable Cards */
 .expandable-card {
   padding: 16px 20px;
-  border-bottom: 1px solid #e8e8f0;
+  border-bottom: 1px solid var(--border);
   animation: slideDown 0.3s ease;
 }
 
@@ -332,7 +342,7 @@ body {
   font-size: 14px;
   font-weight: 700;
   margin: 0 0 12px 0;
-  color: #3d1451;
+  color: var(--primary);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -340,7 +350,7 @@ body {
 
 #draftCount {
   font-size: 12px;
-  color: #00d9a3;
+  color: var(--accent);
   font-weight: 700;
 }
 
@@ -350,19 +360,19 @@ body {
   width: 100%;
   padding: 10px 12px;
   margin-bottom: 10px;
-  border: 2px solid #e0e0e8;
+  border: 2px solid var(--border);
   border-radius: 6px;
   font-size: 14px;
-  background: #f9f9fb;
-  color: #2d2d2d;
+  background: var(--bg-light);
+  color: var(--text);
   transition: border-color 0.2s;
   box-sizing: border-box;
 }
 
 .sidebar input:focus {
   outline: none;
-  border-color: #6b2d8f;
-  background: white;
+  border-color: var(--accent);
+  background: var(--bg);
 }
 
 .sidebar input::placeholder {
@@ -373,8 +383,8 @@ body {
 .sidebar button.btn-primary {
   width: 100%;
   padding: 12px;
-  background: linear-gradient(135deg, #00d9a3 0%, #00b88a 100%);
-  color: white;
+  background: var(--primary);
+  color: var(--charcoal);
   border: none;
   border-radius: 6px;
   font-size: 14px;
@@ -386,14 +396,15 @@ body {
 
 .sidebar button.btn-primary:hover {
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 217, 163, 0.3);
+  box-shadow: 0 4px 12px rgba(255, 215, 0, 0.4);
+  background: var(--primary-light);
 }
 
 .sidebar button.btn-secondary {
   width: 100%;
   padding: 12px;
-  background: linear-gradient(135deg, #ff8c00 0%, #ff7700 100%);
-  color: white;
+  background: var(--accent);
+  color: var(--text);
   border: none;
   border-radius: 6px;
   font-size: 14px;
@@ -405,7 +416,8 @@ body {
 
 .sidebar button.btn-secondary:hover {
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(255, 140, 0, 0.3);
+  box-shadow: 0 4px 12px rgba(0, 127, 255, 0.4);
+  background: var(--accent-hover);
 }
 
 /* Drafts List */
@@ -424,22 +436,23 @@ body {
   justify-content: space-between;
   align-items: center;
   padding: 6px 10px;
-  background: #f9f9fb;
-  border: 1px solid #e8e8f0;
+  background: var(--bg-light);
+  border: 1px solid var(--border);
   border-radius: 4px;
   margin-bottom: 6px;
   transition: all 0.2s;
   font-size: 13px;
+  color: var(--text);
 }
 
 #savedDraftsContainer li:hover {
-  background: #f0f0f8;
-  border-color: #6b2d8f;
+  background: var(--bg);
+  border-color: var(--primary);
 }
 
 #savedDraftsContainer li.selected {
-  background: #e8e8f0;
-  border-color: #6b2d8f;
+  background: var(--selected-bg);
+  border-color: var(--accent);
   border-width: 2px;
 }
 
@@ -447,7 +460,7 @@ body {
   cursor: pointer;
   flex: 1;
   font-weight: 500;
-  color: #3d1451;
+  color: var(--text);
 }
 
 #savedDraftsContainer li button {
