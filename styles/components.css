@@ -150,6 +150,30 @@
   flex-wrap: nowrap;
 }
 
+/* Desktop only: Dynamic spacing for 4-player lines (DEF/MID) */
+@media (min-width: 1025px) {
+  /* Fixed pitch width to accommodate 5 players */
+  .pitch {
+    width: 935px;
+    max-width: 935px;
+  }
+  
+  .pitch-stack {
+    width: 935px;
+    max-width: 935px;
+  }
+  
+  /* 4-player lines: spread out with more space between cards */
+  .formation-line[data-player-count="4"] {
+    justify-content: space-evenly;
+  }
+  
+  /* 5-player lines: keep normal close spacing */
+  .formation-line[data-player-count="5"] {
+    justify-content: center;
+  }
+}
+
 #plannerMain .pitch {
   margin: 0;
   max-width: none;
