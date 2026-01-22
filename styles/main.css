@@ -10,6 +10,7 @@
   --bg-dark: #1a1a1a;
   --bg-darker: #0d0d0d;
   --text: #F5F5F5;
+  --text-dark: #262626;
   --text-light: #cccccc;
   --border: #444444;
   --success: #22B455;
@@ -22,6 +23,8 @@
   --error-transparent: rgba(227, 57, 53, 0.85);
   --selected-bg: #007FFF;
   --selected-hover-bg: #0066CC;
+  --captain-badge: #000000;
+  --captain-badge-active: #222222;
 }
 
 * {
@@ -88,8 +91,8 @@ body {
   font-size: 12px;
   font-weight: 700;
   text-align: center;
-  background: white;
-  color: var(--bg);
+  background: var(--bg-light);
+  color: var(--text-dark);
 }
 
 .price-toggle {
@@ -118,8 +121,8 @@ body {
   border: 1px solid var(--border);
   font-size: 12px;
   font-weight: 600;
-  background: white;
-  color: var(--bg);
+  background: var(--bg-light);
+  color: var(--text-dark);
 }
 
 .donate-btn {

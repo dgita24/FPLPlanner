@@ -371,8 +371,8 @@
   width: 20px;
   height: 20px;
   border-radius: 50%;
-  border: 2px solid #000;
-  background: #000;
+  border: 2px solid var(--captain-badge);
+  background: var(--captain-badge);
   color: var(--bg-light);
   font-weight: bold;
   font-size: 8px;
@@ -391,8 +391,8 @@
 }
 
 .captain-btn.active {
-  background: #222;
-  border-color: #222;
+  background: var(--captain-badge-active);
+  border-color: var(--captain-badge-active);
 }
 
 .captain-badge {
@@ -403,7 +403,7 @@
   width: 20px;
   height: 20px;
   border-radius: 50%;
-  background: #000;
+  background: var(--captain-badge);
   color: var(--bg-light);
   font-weight: bold;
   font-size: 8px;
@@ -411,7 +411,7 @@
   align-items: center;
   justify-content: center;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-  border: 2px solid #000;
+  border: 2px solid var(--captain-badge);
   z-index: 15;
   pointer-events: auto;
 }
@@ -419,8 +419,8 @@
 /* Both captain and vice-captain badges use the same styling */
 .captain-badge.vc,
 .captain-badge.c {
-  background: #000;
-  border-color: #000;
+  background: var(--captain-badge);
+  border-color: var(--captain-badge);
 }
 
 /* ===== Status Flag Badges (Circular style like captain badges) ===== */
@@ -1144,7 +1144,7 @@ td.fixtures-cell {
 }
 
 .player-table-compact {
-  background: var(--bg-dark);
+  background: var(--bg);
   color: var(--text);
   border-radius: 5px;
   overflow: hidden;
