@@ -150,7 +150,7 @@
   flex-wrap: nowrap;
 }
 
-/* Desktop only: Dynamic spacing for 4-player lines (DEF/MID) */
+/* Desktop only: Formation-specific spacing */
 @media (min-width: 1025px) {
   /* Fixed pitch width to accommodate 5 players */
   .pitch {
@@ -163,14 +163,18 @@
     max-width: 935px;
   }
   
-  /* 4-player lines: use center alignment with slightly wider gap than 5-player */
-  .formation-line[data-player-count="4"] {
+  /* 442, 433, 343 formations: All rows use 16px gap */
+  .pitch[data-formation="442"] .formation-line,
+  .pitch[data-formation="433"] .formation-line,
+  .pitch[data-formation="343"] .formation-line {
     justify-content: center;
     gap: 16px;
   }
   
-  /* 5-player lines: keep normal close spacing */
-  .formation-line[data-player-count="5"] {
+  /* 541, 532, 523 formations (with 5-player rows): All rows use 12px gap */
+  .pitch[data-formation="541"] .formation-line,
+  .pitch[data-formation="532"] .formation-line,
+  .pitch[data-formation="523"] .formation-line {
     justify-content: center;
     gap: 12px;
   }

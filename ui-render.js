@@ -283,6 +283,10 @@ export function renderPitch() {
   // Add chip indicator and button
   const chipUI = renderChipUI();
 
+  // Determine formation for CSS targeting
+  const formation = `${def.length}${mid.length}${fwd.length}`;
+  pitch.setAttribute('data-formation', formation);
+
   pitch.innerHTML = `
     <div class="pitch-top-controls">
       ${chipUI}
