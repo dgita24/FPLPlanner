@@ -1168,7 +1168,8 @@ td.fixtures-cell {
 .player-table-compact table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 13px;
+  font-size: 12px;
+  table-layout: fixed;
 }
 
 .player-table-compact th {
@@ -1193,16 +1194,15 @@ td.fixtures-cell {
   border-right: 1px solid var(--border);
   text-align: center;
   font-size: 12px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .player-table-compact td.name-cell {
   text-align: left;
   padding-left: 6px;
   font-size: 13px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 150px;
 }
 
 .player-table-compact tr:hover {
