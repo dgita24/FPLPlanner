@@ -84,6 +84,7 @@
 
 .chip-icon {
   font-size: 14px;
+  color: var(--primary);
 }
 
 .chip-name {
@@ -753,6 +754,17 @@ td.fixtures-cell {
   box-shadow: 0 2px 8px rgba(255, 215, 0, 0.3);
 }
 
+/* Make button icons more visible with filter */
+.fixtures-control-btn.donate-btn::before,
+.fixtures-control-btn.local-btn::before {
+  filter: brightness(1.2) contrast(1.1);
+}
+
+/* Local buttons get white icon color for better visibility */
+.fixtures-control-btn.local-btn {
+  color: var(--bg-light);
+}
+
 /* Fixtures panel GW arrows */
 #fixturesPanel button {
   background: var(--primary);
@@ -1186,6 +1198,11 @@ td.fixtures-cell {
 .player-table-compact td.name-cell {
   text-align: left;
   padding-left: 6px;
+  font-size: 13px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 150px;
 }
 
 .player-table-compact tr:hover {

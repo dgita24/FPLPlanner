@@ -821,6 +821,7 @@ export function initUI() {
 
       .chip-icon {
         font-size: 18px;
+        color: var(--primary);
       }
 
       .chip-name {
