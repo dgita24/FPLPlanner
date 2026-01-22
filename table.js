@@ -591,7 +591,7 @@ window.showPlayerInfo = function (ev, playerId) {
   const statusInfo = player.news ? `
     <div class="player-info-section">
       <h3>Status</h3>
-      <p style="color: rgba(255, 255, 255, 0.9); line-height: 1.6;">${newsEscaped}</p>
+      <p style="color: var(--text); line-height: 1.6;">${newsEscaped}</p>
     </div>
   ` : '';
   
