@@ -725,7 +725,7 @@ td.fixtures-cell {
 .fixtures-control-btn:hover {
   background: var(--primary-light);
   transform: translateY(-1px);
-  box-shadow: 0 2px 8px rgba(56, 0, 60, 0.3);
+  box-shadow: 0 2px 8px rgba(255, 215, 0, 0.3);
 }
 
 /* Local Load/Save buttons - smaller size */
@@ -741,7 +741,7 @@ td.fixtures-cell {
 
 .fixtures-control-btn.import-save-btn:hover {
   background: var(--warning-hover) !important;
-  box-shadow: 0 2px 8px rgba(255, 152, 0, 0.3);
+  box-shadow: 0 2px 8px rgba(229, 57, 53, 0.3);
 }
 
 /* Donate button - green */
@@ -751,7 +751,7 @@ td.fixtures-cell {
 
 .fixtures-control-btn.donate-btn:hover {
   background: var(--accent-hover) !important;
-  box-shadow: 0 2px 8px rgba(0, 208, 132, 0.3);
+  box-shadow: 0 2px 8px rgba(0, 127, 255, 0.3);
 }
 
 /* Fixtures panel GW arrows */

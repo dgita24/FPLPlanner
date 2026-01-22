@@ -145,7 +145,7 @@ body {
 .donate-btn:hover {
   background: var(--accent-hover);
   transform: translateY(-1px);
-  box-shadow: 0 2px 8px rgba(0, 208, 132, 0.3);
+  box-shadow: 0 2px 8px rgba(0, 127, 255, 0.3);
 }
 
 .header-actions {
@@ -219,7 +219,7 @@ body {
 .sidebar-toggle:hover {
   background: var(--primary-light);
   transform: translateY(-1px);
-  box-shadow: 0 2px 8px rgba(56, 0, 60, 0.3);
+  box-shadow: 0 2px 8px rgba(255, 215, 0, 0.3);
 }
 
 /* ===== Sidebar - Dashboard Style Modal ===== */
@@ -550,7 +550,7 @@ body {
 .gw-nav button:hover:not(:disabled) {
   background: var(--primary-light);
   transform: translateY(-1px);
-  box-shadow: 0 2px 8px rgba(56, 0, 60, 0.3);
+  box-shadow: 0 2px 8px rgba(255, 215, 0, 0.3);
 }
 
 .gw-nav button:disabled {
@@ -581,7 +581,7 @@ body {
 .sync-toggle-btn:hover {
   opacity: 0.75;
   transform: translateY(-1px);
-  box-shadow: 0 2px 8px rgba(56, 0, 60, 0.3);
+  box-shadow: 0 2px 8px rgba(255, 215, 0, 0.3);
 }
 
 .sync-toggle-btn.active {
