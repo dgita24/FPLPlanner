@@ -327,16 +327,16 @@
 .badge-container::before {
   content: '';
   position: absolute;
-  left: -50px;
+  left: -30px;
   top: 0;
-  width: 50px;
+  width: 30px;
   height: 100%;
   z-index: 19;
 }
 
 .captain-selector {
   position: absolute;
-  left: -20px;
+  left: -28px;
   top: 50%;
   transform: translateY(-50%);
   display: none;
