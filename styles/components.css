@@ -163,12 +163,12 @@
     max-width: 935px;
   }
   
-  /* 442, 433, 343 formations: All rows use 16px gap */
+  /* 442, 433, 343 formations: All rows use 24px gap */
   .pitch[data-formation="442"] .formation-line,
   .pitch[data-formation="433"] .formation-line,
   .pitch[data-formation="343"] .formation-line {
     justify-content: center;
-    gap: 16px;
+    gap: 24px;
   }
   
   /* 541, 532, 523 formations (with 5-player rows): All rows use 12px gap */
