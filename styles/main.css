@@ -621,6 +621,13 @@ body {
   text-align: center;
   background: var(--bg-dark);
   color: var(--text);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.filters input::placeholder {
+  color: var(--text-light);
+  opacity: 0.8;
 }
 
 /* Removed - transfer actions now in pitch top controls */
