@@ -190,7 +190,7 @@
 
 .player-card {
   width: 145px;
-  background: var(--bg-light);
+  background: var(--bg-light-darker);
   border-radius: 7px;
   padding: 5px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
@@ -212,7 +212,7 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  background: var(--bg-light);
+  background: var(--bg-light-darker);
   padding: 2px 3px;
   border-radius: 3px;
   margin: 2px 0;
