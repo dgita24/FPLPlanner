@@ -327,9 +327,9 @@
 .badge-container::before {
   content: '';
   position: absolute;
-  left: -14px;
+  left: -37px;
   top: 0;
-  width: 35px;
+  width: 30px;
   height: 100%;
   z-index: 19;
 }
