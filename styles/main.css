@@ -13,10 +13,13 @@
   --text-light: #cccccc;
   --border: #444444;
   --success: #22B455;
+  --success-hover: #1a9044;
+  --success-light: rgba(34, 180, 85, 0.25);
   --warning: #FFD700;
   --warning-hover: #FFED4E;
   --error: #E53935;
   --error-hover: #C62828;
+  --error-transparent: rgba(227, 57, 53, 0.85);
   --selected-bg: #007FFF;
   --selected-hover-bg: #0066CC;
 }

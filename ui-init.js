@@ -659,7 +659,7 @@ export function initUI() {
     style.textContent = `
       .player-card.pending-swap {
         outline: 3px solid var(--success);
-        box-shadow: 0 0 0 3px rgba(34, 180, 85, 0.25);
+        box-shadow: 0 0 0 3px var(--success-light);
       }
 
       /* Placeholder card styling for removed players */
@@ -675,7 +675,7 @@ export function initUI() {
         left: 0;
         right: 0;
         bottom: 0;
-        background: rgba(227, 57, 53, 0.85);
+        background: var(--error-transparent);
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -851,8 +851,8 @@ export function initUI() {
       }
 
       .chip-btn:hover {
-        background: #1a9044;
-        border-color: #1a9044;
+        background: var(--success-hover);
+        border-color: var(--success-hover);
         transform: translateY(-2px);
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
       }
@@ -894,8 +894,8 @@ export function initUI() {
       }
 
       .chip-btn-small:hover {
-        background: #1a9044;
-        border-color: #1a9044;
+        background: var(--success-hover);
+        border-color: var(--success-hover);
         transform: translateY(-1px);
         box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
       }
