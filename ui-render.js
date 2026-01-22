@@ -414,8 +414,8 @@ function playerCard(entry, source) {
     captainUI = `
       ${badge}
       <div class="captain-selector">
-        <button class="captain-btn" onclick="setCaptain(${entry.id})" title="Set as Captain">C</button>
-        <button class="captain-btn" onclick="setViceCaptain(${entry.id})" title="Set as Vice-Captain">VC</button>
+        <button class="captain-btn" onclick="event.stopPropagation(); setCaptain(${entry.id})" title="Set as Captain">C</button>
+        <button class="captain-btn" onclick="event.stopPropagation(); setViceCaptain(${entry.id})" title="Set as Vice-Captain">VC</button>
       </div>
     `;
   }
