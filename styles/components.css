@@ -342,7 +342,7 @@
   display: none;
   flex-direction: column;
   gap: 2px;
-  z-index: 20;
+  z-index: 30;
   pointer-events: auto;
 }
 
@@ -386,6 +386,7 @@
   transition: all 0.2s;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
   pointer-events: auto;
+  z-index: 31;
 }
 
 .captain-btn:hover {
