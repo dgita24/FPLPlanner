@@ -724,13 +724,13 @@ window.showSquadPlayerInfo = function (playerId, source) {
         <button 
           class="modal-action-btn" 
           onclick="removePlayer(${playerId}, '${source}'); closeSquadPlayerInfo();"
-          style="flex: 1; background: #ff4444;">
+          style="flex: 1; background: #E53935;">
           Transfer Out
         </button>
         <button 
           class="modal-action-btn" 
           onclick="substitutePlayer(${playerId}); closeSquadPlayerInfo();"
-          style="flex: 1; background: #4444ff;">
+          style="flex: 1; background: #007FFF;">
           Swap/Substitute
         </button>
       </div>

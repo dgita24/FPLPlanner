@@ -75,7 +75,7 @@
   align-items: center;
   gap: 6px;
   padding: 4px 12px;
-  background: rgba(0, 208, 132, 0.1);
+  background: rgba(0, 127, 255, 0.15);
   border: 2px solid var(--accent);
   border-radius: 6px;
   font-size: 12px;
@@ -112,19 +112,19 @@
   transition: all 0.2s;
   white-space: nowrap;
   height: 36px;
-  background: rgba(0, 208, 132, 0.1);
+  background: rgba(0, 127, 255, 0.15);
   color: var(--accent);
   border: 1px solid var(--accent);
 }
 
 .chip-btn-small:hover:not(:disabled) {
-  background: rgba(0, 208, 132, 0.2);
+  background: rgba(0, 127, 255, 0.3);
   transform: translateY(-1px);
 }
 
 .chip-btn-small.chip-btn-active {
   background: var(--accent);
-  color: white;
+  color: var(--text);
   border-color: var(--accent);
 }
 
@@ -531,8 +531,8 @@
 /* ===== Player Table ===== */
 
 .player-table {
-  background: var(--bg);
-  color: #000;
+  background: var(--bg-light);
+  color: var(--text);
   border-radius: 5px;
   overflow: hidden;
   max-height: 400px;
@@ -547,12 +547,12 @@ table {
 
 th {
   background: var(--primary);
-  color: #fff;
+  color: var(--charcoal);
   padding: 10px;
   text-align: center;
   position: sticky;
   top: 0;
-  border-right: 1px solid rgba(255, 255, 255, 0.2);
+  border-right: 1px solid rgba(0, 0, 0, 0.2);
 }
 
 th.th-name {
@@ -595,7 +595,7 @@ tr:hover {
 tr.selected {
   background: var(--selected-bg);
   font-weight: 600;
-  border-left: 3px solid var(--accent);
+  border-left: 3px solid var(--primary);
 }
 
 tr.selected:hover {
@@ -687,7 +687,7 @@ td.fixtures-cell {
   padding: 10px;
   color: var(--text);
   margin-top: 0;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
   border: 1px solid var(--border);
   overflow: auto;
 }
@@ -874,7 +874,7 @@ td.fixtures-cell {
   margin-left: 6px;
   padding: 2px 6px;
   background: var(--accent);
-  color: white;
+  color: var(--text);
   font-size: 10px;
   font-weight: 700;
   border-radius: 3px;
@@ -905,7 +905,7 @@ td.fixtures-cell {
 }
 
 .fixtures-list-scrollable::-webkit-scrollbar-thumb:hover {
-  background: #00b06f;
+  background: var(--accent-hover);
 }
 
 .fixture-date {
@@ -1071,7 +1071,7 @@ td.fixtures-cell {
   display: flex;
   flex-direction: column;
   max-height: calc(100vh - 150px);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
   border: 1px solid var(--border);
 }
 
@@ -1140,7 +1140,7 @@ td.fixtures-cell {
 
 .player-table-compact {
   background: var(--bg);
-  color: #000;
+  color: var(--text);
   border-radius: 5px;
   overflow: hidden;
   flex: 1;
@@ -1156,12 +1156,12 @@ td.fixtures-cell {
 
 .player-table-compact th {
   background: var(--primary);
-  color: #fff;
+  color: var(--charcoal);
   padding: 8px 4px;
   text-align: center;
   position: sticky;
   top: 0;
-  border-right: 1px solid rgba(255, 255, 255, 0.2);
+  border-right: 1px solid rgba(0, 0, 0, 0.2);
   font-size: 11px;
 }
 
@@ -1192,7 +1192,7 @@ td.fixtures-cell {
 .player-table-compact tr.selected {
   background: var(--selected-bg);
   font-weight: 600;
-  border-left: 3px solid var(--accent);
+  border-left: 3px solid var(--primary);
 }
 
 .player-table-compact tr.selected:hover {
@@ -1310,7 +1310,7 @@ td.fixtures-cell {
   top: 10px;
   right: 10px;
   background: var(--accent);
-  color: white;
+  color: var(--text);
   border: none;
   border-radius: 50%;
   width: 30px;

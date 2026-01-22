@@ -700,7 +700,7 @@ body {
   top: 15px;
   right: 15px;
   background: var(--accent);
-  color: white;
+  color: var(--text);
   border: none;
   border-radius: 50%;
   width: 35px;

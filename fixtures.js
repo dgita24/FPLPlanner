@@ -387,7 +387,7 @@ function renderFixturesError(message) {
     <div class="fixtures-header">
       <strong>Fixtures</strong>
     </div>
-    <div style="text-align: center; padding: 20px; color: #ff6b6b;">
+    <div style="text-align: center; padding: 20px; color: #E53935;">
       ${message}
     </div>
   `;
