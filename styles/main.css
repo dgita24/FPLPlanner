@@ -1,24 +1,31 @@
 /* ===== Base Styles and Variables ===== */
 
 :root {
-  --primary: #38003c;
-  --primary-light: #6b1b71;
-  --accent: #00d084;
-  --accent-hover: #00b874;
-  --bg: #e3e7ed;
-  --bg-light: #f8f9fb;
-  --bg-dark: #d4dae3;
-  --bg-darker: #bfc7d3;
-  --text: #1a1a1a;
-  --text-light: #5a5a5a;
-  --border: #b0bac9;
-  --success: #00c853;
-  --warning: #ff9800;
-  --warning-hover: #f57c00;
-  --error: #d50000;
-  --error-hover: #b71c1c;
-  --selected-bg: #fff9e6;
-  --selected-hover-bg: #fff4d1;
+  --primary: #FFD700;
+  --primary-light: #FFED4E;
+  --accent: #007FFF;
+  --accent-hover: #0066CC;
+  --bg: #262626;
+  --bg-light: #F5F5F5;
+  --bg-light-darker: #DCDCDC;
+  --bg-dark: #1a1a1a;
+  --bg-darker: #0d0d0d;
+  --text: #F5F5F5;
+  --text-dark: #262626;
+  --text-light: #cccccc;
+  --border: #444444;
+  --success: #22B455;
+  --success-hover: #1a9044;
+  --success-light: rgba(34, 180, 85, 0.25);
+  --warning: #FFD700;
+  --warning-hover: #FFED4E;
+  --error: #E53935;
+  --error-hover: #C62828;
+  --error-transparent: rgba(227, 57, 53, 0.85);
+  --selected-bg: #007FFF;
+  --selected-hover-bg: #0066CC;
+  --captain-badge: #000000;
+  --captain-badge-active: #222222;
 }
 
 * {
@@ -29,7 +36,7 @@
 
 body {
   font-family: "Segoe UI", sans-serif;
-  background: linear-gradient(135deg, #e3e7ed 0%, #d4dae3 100%);
+  background: linear-gradient(135deg, #1a1a1a 0%, #0d0d0d 100%);
   color: var(--text);
   padding: 20px;
   min-height: 100vh;
@@ -53,7 +60,7 @@ body {
 .header h1 {
   font-size: 24px;
   font-weight: 900;
-  color: var(--accent);
+  color: var(--primary);
   text-align: center;
   letter-spacing: 1px;
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
@@ -68,12 +75,12 @@ body {
   padding: 4px 10px;
   height: 30px;                 
   border-radius: 6px;
-  background: var(--primary);
+  background: var(--accent);
   font-size: 12px;
   font-weight: 700;
   white-space: nowrap;
-  color: white;
-  border: 1px solid var(--primary);
+  color: var(--bg-light);
+  border: 1px solid var(--accent);
 }
 
 .bank-display input {
@@ -86,7 +93,7 @@ body {
   font-weight: 700;
   text-align: center;
   background: rgba(255, 255, 255, 0.9);
-  color: var(--text);
+  color: var(--text-dark);
 }
 
 .price-toggle {
@@ -96,11 +103,11 @@ body {
   padding: 4px 10px;
   height: 30px;
   border-radius: 6px;
-  background: var(--primary);
+  background: var(--accent);
   font-size: 12px;
   white-space: nowrap;
-  color: white;
-  border: 1px solid var(--primary);
+  color: var(--bg-light);
+  border: 1px solid var(--accent);
 }
 
 .price-toggle span {
@@ -116,15 +123,15 @@ body {
   font-size: 12px;
   font-weight: 600;
   background: white;
-  color: var(--text);
+  color: var(--text-dark);
 }
 
 .donate-btn {
   padding: 4px 10px;
   height: 30px;
   border-radius: 6px;
-  background: var(--accent);
-  color: white;
+  background: var(--primary);
+  color: var(--bg);
   border: none;
   font-size: 12px;
   font-weight: 700;
@@ -134,9 +141,9 @@ body {
 }
 
 .donate-btn:hover {
-  background: var(--accent-hover);
+  background: var(--primary-light);
   transform: translateY(-1px);
-  box-shadow: 0 2px 8px rgba(0, 208, 132, 0.3);
+  box-shadow: 0 2px 8px rgba(255, 215, 0, 0.3);
 }
 
 .header-actions {
@@ -149,7 +156,7 @@ body {
 .team-meta {
   padding: 6px 12px;
   border-radius: 8px;
-  background: var(--bg-dark);
+  background: var(--bg);
   font-size: 13px;
   font-weight: 600;
   color: var(--text);
@@ -174,7 +181,7 @@ body {
 
 .save-btn {
   background: var(--primary);
-  color: white;
+  color: var(--bg);
 }
 
 .save-btn:hover {
@@ -183,7 +190,7 @@ body {
 
 .load-btn {
   background: var(--primary);
-  color: white;
+  color: var(--bg);
 }
 
 .load-btn:hover {
@@ -194,7 +201,7 @@ body {
   padding: 6px 12px;         
   height: 30px;
   background: var(--primary);
-  color: white;
+  color: var(--bg);
   border: none;
   border-radius: 5px;
   cursor: pointer;
@@ -210,7 +217,7 @@ body {
 .sidebar-toggle:hover {
   background: var(--primary-light);
   transform: translateY(-1px);
-  box-shadow: 0 2px 8px rgba(56, 0, 60, 0.3);
+  box-shadow: 0 2px 8px rgba(255, 215, 0, 0.3);
 }
 
 /* ===== Sidebar - Dashboard Style Modal ===== */
@@ -221,28 +228,28 @@ body {
   left: 20px;
   width: 360px;
   max-height: calc(100vh - 40px);
-  background: #ffffff;
+  background: var(--bg);
   border-radius: 12px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
   transform: translateX(-400px);
   transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   z-index: 1000;
   overflow-y: auto;
-  color: #2d2d2d;
+  color: var(--text);
 }
 
 .sidebar.open {
   transform: translateX(0);
 }
 
-/* Header - Purple gradient matching site accent colors */
+/* Header - Gold gradient matching new color palette */
 .sidebar-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 16px 20px;
-  background: linear-gradient(135deg, #6b2d8f 0%, #3d1451 100%);
-  color: white;
+  background: linear-gradient(135deg, #FFD700 0%, #FFED4E 100%);
+  color: var(--bg);
   border-radius: 12px 12px 0 0;
   font-weight: 600;
   font-size: 14px;
@@ -255,13 +262,13 @@ body {
 
 #currentTeamId {
   font-weight: 700;
-  color: #00d9a3;
+  color: var(--accent);
 }
 
 .sidebar-close {
   background: none;
   border: none;
-  color: white;
+  color: var(--bg);
   font-size: 28px;
   cursor: pointer;
   padding: 0;
@@ -285,12 +292,12 @@ body {
   grid-template-columns: repeat(3, 1fr);
   gap: 12px;
   padding: 16px;
-  background: #f5f5f8;
+  background: var(--bg-dark);
 }
 
 .action-card {
-  background: white;
-  border: 2px solid #e0e0e8;
+  background: var(--bg);
+  border: 2px solid var(--border);
   border-radius: 8px;
   padding: 16px 8px;
   text-align: center;
@@ -299,15 +306,15 @@ body {
 }
 
 .action-card:hover {
-  border-color: #6b2d8f;
+  border-color: var(--primary);
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(107, 45, 143, 0.15);
+  box-shadow: 0 4px 12px rgba(255, 215, 0, 0.15);
 }
 
 .action-card.active {
-  background: linear-gradient(135deg, #6b2d8f 0%, #3d1451 100%);
-  border-color: #3d1451;
-  color: white;
+  background: linear-gradient(135deg, #FFD700 0%, #FFED4E 100%);
+  border-color: var(--primary);
+  color: var(--bg);
 }
 
 .card-icon {
@@ -332,7 +339,7 @@ body {
   font-size: 14px;
   font-weight: 700;
   margin: 0 0 12px 0;
-  color: #3d1451;
+  color: var(--primary);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -340,7 +347,7 @@ body {
 
 #draftCount {
   font-size: 12px;
-  color: #00d9a3;
+  color: var(--accent);
   font-weight: 700;
 }
 
@@ -350,31 +357,31 @@ body {
   width: 100%;
   padding: 10px 12px;
   margin-bottom: 10px;
-  border: 2px solid #e0e0e8;
+  border: 2px solid var(--border);
   border-radius: 6px;
   font-size: 14px;
-  background: #f9f9fb;
-  color: #2d2d2d;
+  background: var(--bg-dark);
+  color: var(--text);
   transition: border-color 0.2s;
   box-sizing: border-box;
 }
 
 .sidebar input:focus {
   outline: none;
-  border-color: #6b2d8f;
-  background: white;
+  border-color: var(--primary);
+  background: var(--bg);
 }
 
 .sidebar input::placeholder {
-  color: #9999aa;
+  color: var(--text-light);
 }
 
-/* Buttons - Matching site colors (teal/green and orange) */
+/* Buttons - Matching site colors (Gold primary and Blue secondary) */
 .sidebar button.btn-primary {
   width: 100%;
   padding: 12px;
-  background: linear-gradient(135deg, #00d9a3 0%, #00b88a 100%);
-  color: white;
+  background: linear-gradient(135deg, #FFD700 0%, #FFED4E 100%);
+  color: var(--bg);
   border: none;
   border-radius: 6px;
   font-size: 14px;
@@ -386,14 +393,14 @@ body {
 
 .sidebar button.btn-primary:hover {
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 217, 163, 0.3);
+  box-shadow: 0 4px 12px rgba(255, 215, 0, 0.3);
 }
 
 .sidebar button.btn-secondary {
   width: 100%;
   padding: 12px;
-  background: linear-gradient(135deg, #ff8c00 0%, #ff7700 100%);
-  color: white;
+  background: linear-gradient(135deg, #007FFF 0%, #0066CC 100%);
+  color: var(--bg-light);
   border: none;
   border-radius: 6px;
   font-size: 14px;
@@ -405,7 +412,7 @@ body {
 
 .sidebar button.btn-secondary:hover {
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(255, 140, 0, 0.3);
+  box-shadow: 0 4px 12px rgba(0, 127, 255, 0.3);
 }
 
 /* Drafts List */
@@ -424,8 +431,8 @@ body {
   justify-content: space-between;
   align-items: center;
   padding: 6px 10px;
-  background: #f9f9fb;
-  border: 1px solid #e8e8f0;
+  background: var(--bg-dark);
+  border: 1px solid var(--border);
   border-radius: 4px;
   margin-bottom: 6px;
   transition: all 0.2s;
@@ -433,13 +440,13 @@ body {
 }
 
 #savedDraftsContainer li:hover {
-  background: #f0f0f8;
-  border-color: #6b2d8f;
+  background: var(--bg);
+  border-color: var(--primary);
 }
 
 #savedDraftsContainer li.selected {
-  background: #e8e8f0;
-  border-color: #6b2d8f;
+  background: var(--accent);
+  border-color: var(--accent);
   border-width: 2px;
 }
 
@@ -447,7 +454,7 @@ body {
   cursor: pointer;
   flex: 1;
   font-weight: 500;
-  color: #3d1451;
+  color: var(--text);
 }
 
 #savedDraftsContainer li button {
@@ -468,7 +475,7 @@ body {
 /* Helper Text */
 .helper-text {
   font-size: 11px;
-  color: #7777aa;
+  color: var(--text-light);
   margin: 8px 0 0 0;
   font-style: italic;
 }
@@ -526,7 +533,7 @@ body {
 .gw-nav button {
   padding: 8px 16px;
   background: var(--primary);
-  color: white;
+  color: var(--bg);
   border: none;
   border-radius: 4px;
   cursor: pointer;
@@ -537,11 +544,11 @@ body {
 .gw-nav button:hover:not(:disabled) {
   background: var(--primary-light);
   transform: translateY(-1px);
-  box-shadow: 0 2px 8px rgba(56, 0, 60, 0.3);
+  box-shadow: 0 2px 8px rgba(255, 215, 0, 0.3);
 }
 
 .gw-nav button:disabled {
-  background: var(--bg-darker);
+  background: var(--bg-dark);
   color: var(--text-light);
   cursor: not-allowed;
 }
@@ -549,9 +556,9 @@ body {
 /* Sync toggle button styling */
 .sync-toggle-btn {
   padding: 8px 16px !important;
-  background: var(--primary) !important;
-  color: white !important;
-  border: 2px solid var(--primary) !important;
+  background: var(--accent) !important;
+  color: var(--bg-light) !important;
+  border: 2px solid var(--accent) !important;
   border-radius: 4px;
   cursor: pointer;
   font-weight: bold;
@@ -568,13 +575,13 @@ body {
 .sync-toggle-btn:hover {
   opacity: 0.75;
   transform: translateY(-1px);
-  box-shadow: 0 2px 8px rgba(56, 0, 60, 0.3);
+  box-shadow: 0 2px 8px rgba(0, 127, 255, 0.3);
 }
 
 .sync-toggle-btn.active {
-  background: var(--accent) !important;
-  border-color: var(--accent) !important;
-  color: white !important;
+  background: var(--primary) !important;
+  border-color: var(--primary) !important;
+  color: var(--bg) !important;
   opacity: 1;
 }
 
@@ -594,7 +601,7 @@ body {
 /* ===== Transfer Section ===== */
 
 .transfer-section {
-  background: var(--bg-light);
+  background: var(--bg);
   padding: 20px;
   border-radius: 10px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
@@ -616,8 +623,15 @@ body {
   flex: 1;
   min-width: 150px;
   text-align: center;
-  background: var(--bg-light);
+  background: var(--bg-dark);
   color: var(--text);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.filters input::placeholder {
+  color: var(--text-light);
+  opacity: 0.8;
 }
 
 /* Removed - transfer actions now in pitch top controls */
@@ -630,7 +644,7 @@ body {
   right: 20px;
   padding: 15px 25px;
   border-radius: 8px;
-  color: #fff;
+  color: var(--bg-light);
   font-weight: bold;
   z-index: 3000;
   display: none;
@@ -638,15 +652,15 @@ body {
 }
 
 .msg-success {
-  background: #00c853;
+  background: var(--success);
 }
 
 .msg-error {
-  background: #d50000;
+  background: var(--error);
 }
 
 .msg-info {
-  background: #2962ff;
+  background: var(--accent);
 }
 
 /* ===== Help Modal ===== */
@@ -670,7 +684,7 @@ body {
 }
 
 .help-modal-content {
-  background: var(--bg-light);
+  background: var(--bg);
   border-radius: 10px;
   max-width: 700px;
   width: 100%;
@@ -686,8 +700,8 @@ body {
   position: absolute;
   top: 15px;
   right: 15px;
-  background: var(--accent);
-  color: white;
+  background: var(--primary);
+  color: var(--bg);
   border: none;
   border-radius: 50%;
   width: 35px;
@@ -703,7 +717,7 @@ body {
 }
 
 .help-modal-close:hover {
-  background: var(--accent-hover);
+  background: var(--primary-light);
   transform: scale(1.1);
 }
 

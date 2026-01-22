@@ -283,14 +283,18 @@ export function renderPitch() {
   // Add chip indicator and button
   const chipUI = renderChipUI();
 
+  // Determine formation for CSS targeting
+  const formation = `${def.length}${mid.length}${fwd.length}`;
+  pitch.setAttribute('data-formation', formation);
+
   pitch.innerHTML = `
     <div class="pitch-top-controls">
       ${chipUI}
     </div>
-    <div class="formation-line">${gk.map(renderCard).join('')}</div>
-    <div class="formation-line">${def.map(renderCard).join('')}</div>
-    <div class="formation-line">${mid.map(renderCard).join('')}</div>
-    <div class="formation-line">${fwd.map(renderCard).join('')}</div>
+    <div class="formation-line" data-player-count="${gk.length}">${gk.map(renderCard).join('')}</div>
+    <div class="formation-line" data-player-count="${def.length}">${def.map(renderCard).join('')}</div>
+    <div class="formation-line" data-player-count="${mid.length}">${mid.map(renderCard).join('')}</div>
+    <div class="formation-line" data-player-count="${fwd.length}">${fwd.map(renderCard).join('')}</div>
   `;
 }
 
@@ -599,7 +603,7 @@ window.showSquadPlayerInfo = function (playerId, source) {
         <h3>Availability</h3>
         <div style="display: flex; align-items: center; gap: 8px; margin-top: 6px;">
           <div class="table-status-flag-badge ${badgeClass}">${badgeText}</div>
-          <p style="color: rgba(255, 255, 255, 0.9); margin: 0; line-height: 1.4; font-size: 13px;">${newsEscaped}</p>
+          <p style="color: var(--text); margin: 0; line-height: 1.4; font-size: 13px;">${newsEscaped}</p>
         </div>
       </div>
     `;
@@ -720,13 +724,13 @@ window.showSquadPlayerInfo = function (playerId, source) {
         <button 
           class="modal-action-btn" 
           onclick="removePlayer(${playerId}, '${source}'); closeSquadPlayerInfo();"
-          style="flex: 1; background: #ff4444;">
+          style="flex: 1; background: var(--error);">
           Transfer Out
         </button>
         <button 
           class="modal-action-btn" 
           onclick="substitutePlayer(${playerId}); closeSquadPlayerInfo();"
-          style="flex: 1; background: #4444ff;">
+          style="flex: 1; background: var(--accent);">
           Swap/Substitute
         </button>
       </div>
