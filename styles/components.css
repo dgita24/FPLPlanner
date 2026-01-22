@@ -430,8 +430,8 @@
 
 .status-flag-badge {
   position: absolute;
-  right: -30px;
-  top: 50%;
+  right: -32px;
+  top: 70%;
   transform: translateY(-50%);
   width: 20px;
   height: 20px;
