@@ -1247,8 +1247,8 @@ td.fixtures-cell {
 }
 
 .player-table-compact .th-stat-dynamic {
-  width: 120px;
-  min-width: 120px;
+  width: 60px;
+  min-width: 60px;
 }
 
 .player-table-compact .info-cell {
