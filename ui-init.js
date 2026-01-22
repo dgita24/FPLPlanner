@@ -839,9 +839,9 @@ export function initUI() {
       /* Chip button */
       .chip-btn {
         padding: 10px 16px;
-        background: var(--success);
+        background: var(--primary);
         color: var(--bg);
-        border: 2px solid var(--success);
+        border: 2px solid var(--primary);
         border-radius: 6px;
         font-weight: bold;
         font-size: 13px;
@@ -852,8 +852,8 @@ export function initUI() {
       }
 
       .chip-btn:hover {
-        background: var(--success-hover);
-        border-color: var(--success-hover);
+        background: var(--primary-light);
+        border-color: var(--primary-light);
         transform: translateY(-2px);
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
       }
@@ -880,9 +880,9 @@ export function initUI() {
       /* Smaller chip buttons for multiple chips */
       .chip-btn-small {
         padding: 6px 10px;
-        background: var(--success);
+        background: var(--primary);
         color: var(--bg);
-        border: 2px solid var(--success);
+        border: 2px solid var(--primary);
         border-radius: 5px;
         font-weight: bold;
         font-size: 11px;
@@ -895,8 +895,8 @@ export function initUI() {
       }
 
       .chip-btn-small:hover {
-        background: var(--success-hover);
-        border-color: var(--success-hover);
+        background: var(--primary-light);
+        border-color: var(--primary-light);
         transform: translateY(-1px);
         box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
       }

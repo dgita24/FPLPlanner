@@ -1169,7 +1169,6 @@ td.fixtures-cell {
   width: 100%;
   border-collapse: collapse;
   font-size: 12px;
-  table-layout: fixed;
 }
 
 .player-table-compact th {
@@ -1180,7 +1179,7 @@ td.fixtures-cell {
   position: sticky;
   top: 0;
   border-right: 1px solid rgba(0, 0, 0, 0.2);
-  font-size: 12px;
+  font-size: 11px;
 }
 
 .player-table-compact th.th-name {
@@ -1193,17 +1192,14 @@ td.fixtures-cell {
   border-bottom: 1px solid var(--border);
   border-right: 1px solid var(--border);
   text-align: center;
-  font-size: 12px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  font-size: 11px;
 }
 
 .player-table-compact td.name-cell {
   text-align: left;
   padding-left: 6px;
   font-size: 13px;
-  /* Inherits overflow handling from parent td selector */
+  font-weight: 600;
 }
 
 .player-table-compact tr:hover {
