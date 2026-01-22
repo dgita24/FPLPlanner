@@ -278,6 +278,8 @@
   justify-content: center;
   font-size: 12px;
   transition: transform 0.1s;
+  z-index: 30;  /* ← ADD THIS - ensures button is on top */
+  pointer-events: auto;  /* ← ADD THIS - ensures button is clickable */
 }
 
 .card-btn:hover {
