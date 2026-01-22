@@ -287,10 +287,10 @@ export function renderPitch() {
     <div class="pitch-top-controls">
       ${chipUI}
     </div>
-    <div class="formation-line">${gk.map(renderCard).join('')}</div>
-    <div class="formation-line">${def.map(renderCard).join('')}</div>
-    <div class="formation-line">${mid.map(renderCard).join('')}</div>
-    <div class="formation-line">${fwd.map(renderCard).join('')}</div>
+    <div class="formation-line" data-player-count="${gk.length}">${gk.map(renderCard).join('')}</div>
+    <div class="formation-line" data-player-count="${def.length}">${def.map(renderCard).join('')}</div>
+    <div class="formation-line" data-player-count="${mid.length}">${mid.map(renderCard).join('')}</div>
+    <div class="formation-line" data-player-count="${fwd.length}">${fwd.map(renderCard).join('')}</div>
   `;
 }
 
