@@ -541,11 +541,7 @@
 table {
   width: 100%;
   border-collapse: collapse;
-<<<<<<< HEAD
-  font-size: 13px;
-=======
-  font-size: 14px;
->>>>>>> 329f58061a5784c883798605aa48294a7cbf086c
+  font-size: 12px;
 }
 
 th {
