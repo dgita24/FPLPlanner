@@ -8,6 +8,7 @@ import { cancelTransfer, substitutePlayer, addSelectedToSquad, removePlayer, res
 import { setPendingSwap } from './ui-render.js';
 import { setDefaultSort } from './table.js';
 import { MAX_GAMEWEEK, MAX_DRAFTS_PER_MANAGER } from './constants.js';
+import { resetTransferState } from './team-operations.js';
 
 // Global selected draft tracker
 let selectedDraft = null;
@@ -525,6 +526,9 @@ function resetToImportedTeam() {
 
   // Clear undo history
   history.undoStack = [];
+
+  // Clear batch transfer state, removed/sold cards, and pending swaps (CRUCIAL LINE)
+  resetTransferState();
 
   updateUI();
   showMessage('Team reset to imported state.', 'success');
