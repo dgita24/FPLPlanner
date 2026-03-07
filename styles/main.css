@@ -26,6 +26,13 @@
   --selected-hover-bg: #0066CC;
   --captain-badge: #000000;
   --captain-badge-active: #222222;
+
+  /* FDR (Fixture Difficulty Rating) colours */
+  --fdr-1: #00843e;
+  --fdr-2: #22B455;
+  --fdr-3: #8d8d8d;
+  --fdr-4: #e07800;
+  --fdr-5: #b30000;
 }
 
 * {
@@ -231,7 +238,9 @@ body {
   background: var(--bg);
   border-radius: 12px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-  transform: translateX(-400px);
+  /* Use -100% - 30px so the right edge always lands at left(10) - 30 = -20px off-screen,
+     regardless of the sidebar's actual width. */
+  transform: translateX(calc(-100% - 30px));
   transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   z-index: 1000;
   overflow-y: auto;
@@ -508,6 +517,9 @@ body {
     right: 10px;
     width: calc(100% - 20px);
     max-width: 400px;
+    /* Start below the 50px mobile top bar, end above the 52px bottom tab bar */
+    top: 50px;
+    max-height: calc(100vh - 102px);
   }
 }
 
