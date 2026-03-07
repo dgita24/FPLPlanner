@@ -410,8 +410,6 @@ function playerCard(entry, source) {
   return `
     <div class="${cardClass}" onclick="showSquadPlayerInfo(${entry.id}, '${source}')">
       <span class="card-price">${price}</span>
-      <button class="card-btn btn-remove" onclick="event.stopPropagation(); ${removeFn}" title="Transfer out">×</button>
-      <button class="card-btn btn-swap" onclick="event.stopPropagation(); ${subFn}" title="${swapTitle}">⇅</button>
       ${statusFlags}
 
       <div class="badge-container">

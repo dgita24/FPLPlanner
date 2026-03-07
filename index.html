@@ -20,7 +20,7 @@
       <span class="mobile-gw-label">GW<span id="mobileGWDisplay">1</span></span>
       <button class="mobile-gw-btn" onclick="changeGW(1)" id="nextGWMobile" aria-label="Next gameweek">→</button>
     </div>
-    <div class="mobile-bank-display" id="mobileBankDisplay">£0.0m</div>
+    <div class="mobile-bank-display mobile-bank-editable" id="mobileBankDisplay" onclick="editMobileBank()">£0.0m</div>
   </div>
 
   <div class="container">
@@ -99,7 +99,6 @@
         </div>
 
         <div class="bench">
-          <h3>Bench</h3>
           <div id="benchSlots" class="bench-slots"></div>
         </div>
 

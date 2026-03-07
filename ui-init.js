@@ -56,6 +56,48 @@ function selectDraft(teamid) {
   });
 }
 
+// Editable mobile bank display
+window.editMobileBank = function() {
+  const el = document.getElementById('mobileBankDisplay');
+  if (!el || el.querySelector('input')) return; // already editing
+
+  const currentVal = Number(state.bank).toFixed(1);
+  el.innerHTML = '';
+  el.onclick = null; // prevent re-triggering
+
+  const input = document.createElement('input');
+  input.type = 'number';
+  input.step = '0.1';
+  input.value = currentVal;
+  input.className = 'mobile-bank-input';
+
+  el.appendChild(document.createTextNode('£'));
+  el.appendChild(input);
+  el.appendChild(document.createTextNode('m'));
+
+  input.focus();
+  input.select();
+
+  function finishEdit() {
+    const v = parseFloat(input.value);
+    if (Number.isFinite(v) && v >= 0) {
+      state.bank = v;
+    }
+    el.textContent = '£' + Number(state.bank).toFixed(1) + 'm';
+    el.onclick = function() { window.editMobileBank(); };
+    updateUI();
+  }
+
+  input.addEventListener('blur', finishEdit);
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') { input.blur(); }
+    if (e.key === 'Escape') {
+      input.value = currentVal;
+      input.blur();
+    }
+  });
+};
+
 // Export updateUI for use in other modules
 export function updateUI() {
   // kick off fixture loads for current viewing window (async)
@@ -71,7 +113,10 @@ export function updateUI() {
 
   // Update mobile bank display
   const mobileBankEl = document.getElementById('mobileBankDisplay');
-  if (mobileBankEl) mobileBankEl.textContent = `£${Number(state.bank).toFixed(1)}m`;
+  if (mobileBankEl && !mobileBankEl.querySelector('input')) {
+    mobileBankEl.textContent = `£${Number(state.bank).toFixed(1)}m`;
+    mobileBankEl.onclick = function() { window.editMobileBank(); };
+  }
 
   const prevBtn = document.getElementById('prevGW');
   const nextBtn = document.getElementById('nextGW');

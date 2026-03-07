@@ -119,14 +119,14 @@
 
   .formation-line {
     overflow-x: hidden;
-    padding-bottom: 5px;
-    padding-top: 8px;
-    margin-bottom: 10px;
+    padding-bottom: 2px;
+    padding-top: 14px;
+    margin-bottom: 2px;
   }
 
   .bench-slots {
     overflow-x: hidden;
-    padding-bottom: 5px;
+    padding-bottom: 2px;
   }
 
   .pitch {
@@ -295,8 +295,8 @@
   .formation-line {
     overflow-x: hidden;
     gap: 4px;
-    padding-top: 12px;
-    padding-bottom: 5px;
+    padding-top: 14px;
+    padding-bottom: 2px;
   }
 
   .formation-line[data-player-count="1"] { gap: 0px; }
@@ -308,8 +308,8 @@
   .bench-slots {
     overflow-x: hidden;
     gap: 6px;
-    padding-top: 12px;
-    padding-bottom: 5px;
+    padding-top: 14px;
+    padding-bottom: 2px;
   }
 
   .filters {
@@ -482,9 +482,9 @@
     width: 100%;
     overflow-x: hidden;
     gap: 3px;
-    min-height: 75px;
-    padding-top: 12px;
-    padding-bottom: 5px;
+    min-height: 70px;
+    padding-top: 14px;
+    padding-bottom: 2px;
   }
 
   .formation-line[data-player-count="1"] { gap: 0px; }
@@ -496,8 +496,8 @@
   .bench-slots {
     overflow-x: hidden;
     gap: 4px;
-    padding-top: 12px;
-    padding-bottom: 5px;
+    padding-top: 14px;
+    padding-bottom: 2px;
   }
 
   .badge-container {
@@ -524,8 +524,8 @@
   }
 
   .card-price {
-    font-size: 7px;
-    padding: 2px 4px;
+    font-size: 11px;
+    padding: 3px 6px;
   }
 
   .card-btn {
