@@ -249,7 +249,8 @@
   max-width: 100%;
 }
 
-/* Default: show compact labels (overridden to full labels at min-width: 1025px) */
+/* Base (components.css) shows full labels by default; responsive.css overrides to
+   compact at mobile breakpoints and restores full labels at min-width: 1025px */
 .player-card .info .price .price-label-short {
   display: none;
 }
@@ -258,7 +259,7 @@
   display: inline;
 }
 
-/* Default: show full fixture labels (overridden to compact at mobile base in responsive.css) */
+/* Base shows full fixture labels; responsive.css switches to compact on mobile */
 .player-card .info .next-fixture .fixture-full {
   display: inline;
 }

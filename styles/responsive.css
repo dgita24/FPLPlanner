@@ -43,7 +43,7 @@ body {
   text-align: center;
 }
 
-/* Sidebar: full-width on mobile */
+/* Sidebar: full-width on mobile with proper transform for close animation */
 .sidebar {
   left: 0;
   right: 0;
@@ -52,6 +52,7 @@ body {
   top: 0;
   max-height: 100vh;
   border-radius: 0;
+  transform: translateX(calc(-100% - 30px));
 }
 
 /* Main planner: single column, ordered for readability on small screens */
