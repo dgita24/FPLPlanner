@@ -287,11 +287,6 @@
     font-size: 11px;
   }
 
-  .status-flag-badge {
-    /* below btn-remove (18px at top:2px → bottom:20px) + 4px gap */
-    top: 24px;
-  }
-
   .formation-line {
     overflow-x: hidden;
     gap: 4px;
@@ -524,8 +519,8 @@
   }
 
   .card-price {
-    font-size: 11px;
-    padding: 3px 6px;
+    font-size: 10px;
+    padding: 2px 5px;
   }
 
   .card-btn {
@@ -539,9 +534,9 @@
   }
 
   .captain-badge {
-    width: 14px;
-    height: 14px;
-    font-size: 6px;
+    width: 21px;
+    height: 21px;
+    font-size: 9px;
   }
 
   .captain-btn {
@@ -551,11 +546,9 @@
   }
 
   .status-flag-badge {
-    /* below btn-remove (16px at top:2px → bottom:18px) + 4px gap */
-    top: 22px;
-    width: 14px;
-    height: 14px;
-    font-size: 6px;
+    width: 21px;
+    height: 21px;
+    font-size: 9px;
   }
 
   .gw-nav button {
