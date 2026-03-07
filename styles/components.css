@@ -2,19 +2,21 @@
 
 .pitch-stack {
   width: 100%;
-  max-width: 935px;
+  max-width: 100%;
   margin-top: 0;
 }
 
 .pitch {
   background: linear-gradient(to bottom, var(--success) 0%, var(--success-hover) 100%);
-  padding: 21px 17px;
+  padding: 10px 2px;
   border-radius: 10px;
-  max-width: 935px;
+  width: 100%;
+  max-width: 100%;
   margin: 0 auto 10px;
   position: relative;
-  min-height: 323px;
+  min-height: 240px;
   border: 2px solid rgba(255, 255, 255, 0.1);
+  overflow-x: hidden;
 }
 
 /* Pitch top controls container - contains chip UI centered at top */
@@ -145,10 +147,13 @@
   display: flex;
   justify-content: center;
   align-items: flex-end;
-  gap: 12px;
+  gap: 5px;
   margin-bottom: 7px;
-  min-height: 85px;
+  min-height: 70px;
   flex-wrap: nowrap;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 5px;
 }
 
 /* Desktop only: Formation-specific spacing */
@@ -157,11 +162,21 @@
   .pitch {
     width: 935px;
     max-width: 935px;
+    padding: 21px 17px;
+    min-height: 323px;
+    overflow-x: visible;
   }
   
   .pitch-stack {
     width: 935px;
     max-width: 935px;
+  }
+
+  .formation-line {
+    gap: 12px;
+    min-height: 85px;
+    overflow-x: visible;
+    padding-bottom: 0;
   }
   
   /* 442, 433, 343 formations: All rows use 24px gap */
@@ -189,14 +204,16 @@
 /* ===== Player Cards ===== */
 
 .player-card {
-  width: 145px;
+  width: 65px;
+  min-width: 65px;
   background: var(--bg-light-darker);
   border-radius: 7px;
-  padding: 5px;
+  padding: 2px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
   position: relative;
   transition: all 0.2s;
   cursor: pointer;
+  flex-shrink: 0;
 }
 
 .player-card:hover {
@@ -206,14 +223,14 @@
 }
 
 .player-card .name {
-  font-size: 12px;
+  font-size: 8px;
   font-weight: 700;
   color: var(--bg);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   background: var(--bg-light-darker);
-  padding: 2px 3px;
+  padding: 1px 2px;
   border-radius: 3px;
   margin: 2px 0;
   text-align: center;
@@ -221,15 +238,18 @@
 }
 
 .player-card .info {
-  font-size: 9px;
+  font-size: 7px;
   color: var(--bg);
   display: flex;
-  padding: 0 3px;
+  padding: 0 1px;
   font-weight: 600;
   min-height: 12px;
+  align-items: center;
+  gap: 2px;
+  max-width: 100%;
 }
 
-/* Phase 4: Default desktop behavior - show long labels, hide short labels */
+/* Default: show compact labels (overridden to full labels at min-width: 1025px) */
 .player-card .info .price .price-label-short {
   display: none;
 }
@@ -238,7 +258,7 @@
   display: inline;
 }
 
-/* Phase 4: Default desktop behavior - show full fixtures, hide compact fixtures */
+/* Default: show full fixture labels (overridden to compact at mobile base in responsive.css) */
 .player-card .info .next-fixture .fixture-full {
   display: inline;
 }
@@ -266,8 +286,8 @@
 
 .card-btn {
   position: absolute;
-  width: 15px;
-  height: 15px;
+  width: 12px;
+  height: 12px;
   border-radius: 50%;
   border: none;
   color: white;
@@ -276,7 +296,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 12px;
+  font-size: 9px;
   transition: transform 0.1s;
   z-index: 30;  /* ← ADD THIS - ensures button is on top */
   pointer-events: auto;  /* ← ADD THIS - ensures button is clickable */
@@ -303,8 +323,8 @@
 
 .badge-container {
   position: relative;
-  width: 34px;
-  height: 34px;
+  width: 26px;
+  height: 26px;
   margin: 0 auto 2px;
   display: flex;
   align-items: center;
@@ -312,8 +332,8 @@
 }
 
 .badge-container .badge {
-  width: 34px;
-  height: 34px;
+  width: 26px;
+  height: 26px;
   object-fit: contain;
   display: block;
   margin: 0;
@@ -336,9 +356,9 @@
 
 .captain-selector {
   position: absolute;
-  left: -28px;
+  left: 50%;
   top: 50%;
-  transform: translateY(-50%);
+  transform: translate(-50%, -50%);
   display: none;
   flex-direction: column;
   gap: 2px;
@@ -371,14 +391,14 @@
 }
 
 .captain-btn {
-  width: 20px;
-  height: 20px;
+  width: 16px;
+  height: 16px;
   border-radius: 50%;
   border: 2px solid var(--captain-badge);
   background: var(--captain-badge);
   color: var(--bg-light);
   font-weight: bold;
-  font-size: 8px;
+  font-size: 6px;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -401,16 +421,16 @@
 
 .captain-badge {
   position: absolute;
-  left: -32px;
-  top: 70%;
-  transform: translateY(-50%);
-  width: 20px;
-  height: 20px;
+  left: 2px;
+  top: 2px;
+  transform: none;
+  width: 16px;
+  height: 16px;
   border-radius: 50%;
   background: var(--captain-badge);
   color: var(--bg-light);
   font-weight: bold;
-  font-size: 8px;
+  font-size: 6px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -431,15 +451,15 @@
 
 .status-flag-badge {
   position: absolute;
-  right: -32px;
-  top: 70%;
-  transform: translateY(-50%);
-  width: 20px;
-  height: 20px;
+  right: 2px;
+  top: 2px;
+  transform: none;
+  width: 16px;
+  height: 16px;
   border-radius: 50%;
   color: var(--bg);
   font-weight: bold;
-  font-size: 8px;
+  font-size: 6px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -504,12 +524,13 @@
 
 .bench {
   background: linear-gradient(to bottom, var(--success) 0%, var(--success-hover) 100%);
-  padding: 13px;
+  padding: 8px;
   border-radius: 10px;
-  max-width: 935px;
+  max-width: 100%;
   margin: 0 auto 25px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   border: 1px solid var(--border);
+  overflow-x: hidden;
 }
 
 .bench h3 {
@@ -521,8 +542,10 @@
 .bench-slots {
   display: flex;
   justify-content: center;
-  gap: 21px;
+  gap: 5px;
   flex-wrap: nowrap;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 #plannerMain .bench {
@@ -1085,7 +1108,7 @@ td.fixtures-cell {
   border-radius: 10px;
   display: flex;
   flex-direction: column;
-  max-height: calc(100vh - 150px);
+  max-height: none;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   border: 1px solid var(--border);
 }
@@ -1451,4 +1474,199 @@ td.fixtures-cell {
 #savedDraftsContainer button:hover {
   transform: scale(1.1);
   filter: brightness(1.2);
+}
+
+/* ===== Mobile-First Progressive Enhancement ===== */
+
+/* Tablet Portrait (769px+) */
+@media (min-width: 769px) {
+  .badge-container {
+    width: 30px;
+    height: 30px;
+  }
+
+  .badge-container .badge {
+    width: 30px;
+    height: 30px;
+  }
+
+  .player-card {
+    width: 100px;
+    padding: 3px;
+  }
+
+  .player-card .name {
+    font-size: 9px;
+    padding: 1px 2px;
+  }
+
+  .player-card .info {
+    font-size: 8px;
+    padding: 0 2px;
+  }
+
+  .captain-btn {
+    width: 18px;
+    height: 18px;
+    font-size: 7px;
+  }
+
+  .captain-badge {
+    width: 18px;
+    height: 18px;
+    font-size: 7px;
+  }
+
+  .status-flag-badge {
+    width: 18px;
+    height: 18px;
+    font-size: 7px;
+  }
+
+  .card-btn {
+    width: 14px;
+    height: 14px;
+    font-size: 11px;
+  }
+
+  .formation-line {
+    gap: 8px;
+    min-height: 80px;
+  }
+
+  .bench-slots {
+    gap: 12px;
+  }
+
+  .bench {
+    padding: 13px;
+  }
+}
+
+/* Desktop (1025px+) */
+@media (min-width: 1025px) {
+  .badge-container {
+    width: 34px;
+    height: 34px;
+  }
+
+  .badge-container .badge {
+    width: 34px;
+    height: 34px;
+  }
+
+  .player-card {
+    width: 136px;
+    padding: 5px;
+    min-width: unset;
+  }
+
+  .player-card .name {
+    font-size: 12px;
+    padding: 2px 3px;
+  }
+
+  .player-card .info {
+    font-size: 9px;
+    padding: 0 3px;
+    align-items: unset;
+    gap: unset;
+    max-width: unset;
+  }
+
+  /* Restore long/short label defaults for desktop */
+  .player-card .info .price .price-label-short {
+    display: none;
+  }
+
+  .player-card .info .price .price-label-long {
+    display: inline;
+  }
+
+  .player-card .info .next-fixture .fixture-full {
+    display: inline;
+  }
+
+  .player-card .info .next-fixture .fixture-compact {
+    display: none;
+  }
+
+  .player-card .future-fixtures .fixture .fixture-full {
+    display: inline;
+  }
+
+  .player-card .future-fixtures .fixture .fixture-compact {
+    display: none;
+  }
+
+  .captain-selector {
+    left: -28px;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+
+  .captain-btn {
+    width: 20px;
+    height: 20px;
+    font-size: 8px;
+  }
+
+  .captain-badge {
+    left: -32px;
+    top: 70%;
+    transform: translateY(-50%);
+    width: 20px;
+    height: 20px;
+    font-size: 8px;
+  }
+
+  .status-flag-badge {
+    right: -32px;
+    top: 70%;
+    transform: translateY(-50%);
+    width: 20px;
+    height: 20px;
+    font-size: 8px;
+  }
+
+  .card-btn {
+    width: 15px;
+    height: 15px;
+    font-size: 12px;
+  }
+
+  .btn-remove {
+    top: 2px;
+    left: 2px;
+  }
+
+  .btn-swap {
+    top: 2px;
+    right: 2px;
+  }
+
+  .formation-line {
+    gap: 12px;
+    min-height: 85px;
+    overflow-x: visible;
+    padding-bottom: 0;
+  }
+
+  .bench-slots {
+    gap: 21px;
+    overflow-x: visible;
+  }
+
+  .bench {
+    max-width: none;
+    padding: 13px;
+    overflow-x: visible;
+  }
+}
+
+/* Large Desktop (1281px+) */
+@media (min-width: 1281px) {
+  .player-card {
+    width: 145px;
+  }
 }
