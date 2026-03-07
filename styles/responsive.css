@@ -213,6 +213,14 @@
     gap: 0;
   }
 
+  /* Prevent any overflow in the main column from expanding the layout or
+     shifting the bench — this is the defensive guard against Safari
+     flex minimum-content-size inflating card widths. */
+  #mainColumn {
+    width: 100%;
+    overflow-x: hidden;
+  }
+
   /* Fixtures and transfer panels: fullscreen overlay (hidden by default) */
   #fixturesPanel,
   #transferPanel {
@@ -259,12 +267,15 @@
   }
 
   .player-card .name {
-    font-size: 13px;
+    /* 10px: keeps intrinsic min-width well below the ~63px card-content on narrowest phone (375px, 5-across).
+       At font-weight 800, 12-13px name text caused Safari to refuse shrinking cards below text width,
+       making 5-card rows overflow and pushing bench cards off-screen to the left. */
+    font-size: 10px;
     font-weight: 800;
   }
 
   .card-fixture-next {
-    font-size: 12px;
+    font-size: 10px;
   }
 
   .badge-container {
@@ -402,12 +413,12 @@
   }
 
   .player-card .name {
-    font-size: 12px;
+    font-size: 10px;
     font-weight: 800;
   }
 
   .card-fixture-next {
-    font-size: 11px;
+    font-size: 10px;
   }
 
   .fdr-pill {
@@ -517,7 +528,7 @@
   }
 
   .player-card .name {
-    font-size: 12px;
+    font-size: 10px;
     font-weight: 800;
   }
 
