@@ -1,40 +1,37 @@
 /* ===== Mobile-First Responsive Design ===== */
 /*
  * Base styles (no media query) target the smallest mobile screens (≤480px portrait).
- * Base component sizes are defined in main.css and components.css.
- * This file uses min-width breakpoints for progressive enhancement.
+ * Base component sizes are in main.css and components.css.
+ * This file applies progressive enhancement with min-width breakpoints.
  *
  * Breakpoints:
  *   Base          : ≤480px   (small portrait phones)
- *   min-width: 481px         (medium phones / larger portrait)
+ *   min-width: 481px         (medium phones)
  *   min-width: 601px         (large phones / small tablets)
  *   min-width: 769px         (tablet portrait)
  *   min-width: 901px         (large tablet / small laptop)
- *   min-width: 1025px        (desktop)
- *   min-width: 1281px        (large desktop)
+ *   min-width: 1025px        (laptop / desktop single-column)
+ *   min-width: 1400px        (wide desktop — 3-column layout)
  */
 
-/* ===== Base (mobile ≤480px) ===== */
+/* ===== Base (≤480px) ===== */
 
 body {
-  padding: 6px;
-  padding-left: 0;
-  padding-right: 0;
+  padding: 6px 4px;
 }
 
 .container {
   max-width: 100%;
-  margin-left: 0;
-  margin-right: 0;
-  padding-left: 0;
-  padding-right: 0;
+  padding-left: 4px;
+  padding-right: 4px;
 }
 
 .header {
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 6px;
   height: auto;
   width: 100%;
+  margin-bottom: 8px;
 }
 
 .header h1 {
@@ -43,7 +40,7 @@ body {
   text-align: center;
 }
 
-/* Sidebar: full-width on mobile with proper transform for close animation */
+/* Sidebar: full-width slide-in on mobile */
 .sidebar {
   left: 0;
   right: 0;
@@ -55,29 +52,13 @@ body {
   transform: translateX(calc(-100% - 30px));
 }
 
-/* Main planner: single column, ordered for readability on small screens */
+/* Single column on mobile */
 #plannerMain {
   grid-template-columns: 1fr;
   gap: 10px;
 }
 
-#fixturesPanel {
-  order: 3;
-  max-height: 350px;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-}
-
-#mainColumn {
-  order: 1;
-}
-
-.transfer-panel {
-  order: 2;
-  max-height: none;
-}
-
-/* GW navigation: stack for small screens */
+/* GW navigation: stacked on smallest screens */
 .gw-nav {
   flex-direction: column;
   gap: 6px;
@@ -103,71 +84,62 @@ body {
   font-size: 15px;
 }
 
-/* Player card: compact text on smallest screens */
-.player-card .info .price .price-label-short {
-  display: inline;
+/* ---- Player card: mobile base ---- */
+
+/* Use compact label and compact fixture text everywhere below 1025px */
+.player-card .info .price .price-label-short { display: inline; }
+.player-card .info .price .price-label-long  { display: none; }
+
+.player-card .info .next-fixture .fixture-full    { display: none; }
+.player-card .info .next-fixture .fixture-compact { display: inline; }
+
+.player-card .future-fixtures .fixture .fixture-full    { display: none; }
+.player-card .future-fixtures .fixture .fixture-compact { display: inline; }
+
+/* Hide team shortname — redundant on small cards */
+.player-card .info .team { display: none; }
+
+/* Info row children: centre each line in the column layout */
+.player-card .info .next-fixture {
+  display: block;
+  font-size: 8px;
+  font-weight: 600;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
 }
 
-.player-card .info .price .price-label-long {
-  display: none;
+.player-card .info .price {
+  display: block;
+  font-size: 8px;
+  font-weight: 700;
+  text-align: center;
+  white-space: nowrap;
+  max-width: 100%;
 }
 
-.player-card .info .next-fixture .fixture-full {
-  display: none;
-}
-
-.player-card .info .next-fixture .fixture-compact {
-  display: inline;
-}
-
-.player-card .future-fixtures .fixture .fixture-full {
-  display: none;
-}
-
-.player-card .future-fixtures .fixture .fixture-compact {
-  display: inline;
-}
-
-.player-card .info .team {
-  display: none;
-}
-
+/* Future fixtures: compact flex row */
 .player-card .future-fixtures {
-  display: flex !important;
-  justify-content: center !important;
-  gap: 2px !important;
-  flex-wrap: nowrap !important;
+  display: flex;
+  justify-content: center;
+  gap: 2px;
+  flex-wrap: nowrap;
+  padding: 0 2px 2px;
   font-size: 6px;
 }
 
 .player-card .future-fixtures .fixture {
-  flex: 0 0 auto !important;
-  min-width: 0 !important;
-  white-space: nowrap !important;
-  margin: 0 !important;
+  flex: 1 1 0;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
 }
 
-.player-card .info .next-fixture {
-  font-weight: 700;
-  white-space: nowrap !important;
-  overflow: hidden !important;
-  text-overflow: ellipsis !important;
-  flex: 1 1 auto !important;
-  min-width: 0 !important;
-  text-align: left !important;
-  font-size: 6px;
-}
-
-.player-card .info .price {
-  font-weight: 700;
-  white-space: nowrap !important;
-  flex: 0 0 auto !important;
-  margin-left: auto !important;
-  text-align: right !important;
-  font-size: 8px;
-}
-
-/* Transfer actions: stack vertically */
+/* Transfer actions: stacked on mobile */
 .transfer-actions {
   flex-direction: column;
   gap: 8px;
@@ -178,7 +150,7 @@ body {
   width: 100%;
 }
 
-/* Filters: stack vertically */
+/* Filters */
 .filters {
   flex-direction: column;
 }
@@ -203,7 +175,6 @@ th, td {
   padding: 3px 2px;
 }
 
-/* Transfer panel table */
 .player-table-compact {
   max-height: 350px;
   overflow-x: auto;
@@ -221,7 +192,7 @@ th, td {
   font-size: 10px;
 }
 
-/* Transfer action buttons */
+/* Transfer buttons */
 .transfer-action-btn {
   padding: 5px 10px;
   font-size: 10px;
@@ -234,7 +205,7 @@ th, td {
   height: 30px;
 }
 
-/* Header buttons / controls */
+/* Header controls */
 .header-btn {
   padding: 4px 7px;
   font-size: 10px;
@@ -284,14 +255,6 @@ th, td {
   height: 24px;
 }
 
-/* Info button */
-.info-btn {
-  width: 15px;
-  height: 15px;
-  min-width: 15px;
-  font-size: 8px;
-}
-
 /* Chip UI */
 .chip-indicator {
   padding: 3px 8px;
@@ -299,13 +262,8 @@ th, td {
   gap: 4px;
 }
 
-.chip-icon {
-  font-size: 12px;
-}
-
-.chip-gw {
-  font-size: 9px;
-}
+.chip-icon { font-size: 12px; }
+.chip-gw   { font-size: 9px; }
 
 /* Fixture rows */
 .fixture-row {
@@ -313,19 +271,9 @@ th, td {
   font-size: 10px;
 }
 
-.team-name {
-  font-size: 10px;
-}
-
-.team-badge {
-  width: 14px;
-  height: 14px;
-}
-
-.club-badge {
-  width: 16px;
-  height: 16px;
-}
+.team-name  { font-size: 10px; }
+.team-badge { width: 14px; height: 14px; }
+.club-badge { width: 16px; height: 16px; }
 
 .fixture-date-banner {
   font-size: 11px;
@@ -348,9 +296,7 @@ th, td {
   max-width: 150px;
 }
 
-.fixtures-header {
-  gap: 4px;
-}
+.fixtures-header { gap: 4px; }
 
 .fixture-gw-badge {
   font-size: 8px;
@@ -365,22 +311,10 @@ th, td {
   font-size: 11px;
 }
 
-.team-fixture-gw {
-  font-size: 11px;
-}
-
-.team-fixture-badge {
-  width: 20px;
-  height: 20px;
-}
-
-.team-fixture-opponent {
-  font-size: 11px;
-}
-
-.team-fixture-venue {
-  font-size: 10px;
-}
+.team-fixture-gw       { font-size: 11px; }
+.team-fixture-badge    { width: 20px; height: 20px; }
+.team-fixture-opponent { font-size: 11px; }
+.team-fixture-venue    { font-size: 10px; }
 
 /* Modals */
 .message {
@@ -396,21 +330,11 @@ th, td {
   max-height: 85vh;
 }
 
-.help-modal h2 {
-  font-size: 18px;
-}
+.help-modal h2 { font-size: 18px; }
+.help-modal h3 { font-size: 15px; }
+.help-modal p, .help-modal li { font-size: 13px; }
 
-.help-modal h3 {
-  font-size: 15px;
-}
-
-.help-modal p, .help-modal li {
-  font-size: 13px;
-}
-
-.player-info-modal {
-  padding: 10px;
-}
+.player-info-modal { padding: 10px; }
 
 .player-info-content {
   padding: 20px 15px;
@@ -423,19 +347,9 @@ th, td {
   max-height: 80vh;
 }
 
-#squadPlayerInfoModal .player-info-section {
-  margin-top: 12px;
-}
-
-#squadPlayerInfoModal .player-info-section h3 {
-  font-size: 14px;
-  margin-bottom: 6px;
-}
-
-#squadPlayerInfoModal .modal-action-btn {
-  padding: 8px 12px;
-  font-size: 12px;
-}
+#squadPlayerInfoModal .player-info-section { margin-top: 12px; }
+#squadPlayerInfoModal .player-info-section h3 { font-size: 14px; margin-bottom: 6px; }
+#squadPlayerInfoModal .modal-action-btn { padding: 8px 12px; font-size: 12px; }
 
 .player-info-header {
   flex-direction: column;
@@ -447,24 +361,22 @@ th, td {
   gap: 8px;
 }
 
-.player-stat-item {
-  padding: 8px;
+.player-stat-item   { padding: 8px; }
+.player-stat-value  { font-size: 16px; }
+.player-stat-label  { font-size: 10px; }
+
+/* Info button */
+.info-btn {
+  width: 15px;
+  height: 15px;
+  min-width: 15px;
+  font-size: 8px;
 }
 
-.player-stat-value {
-  font-size: 16px;
-}
-
-.player-stat-label {
-  font-size: 10px;
-}
-
-/* ===== Small Phone Portrait (481px and up) ===== */
+/* ===== Small Phone Portrait (481px+) ===== */
 @media (min-width: 481px) {
   body {
     padding: 6px;
-    padding-left: 6px;
-    padding-right: 6px;
   }
 
   .container {
@@ -474,9 +386,7 @@ th, td {
     margin-right: auto;
   }
 
-  .header h1 {
-    font-size: 18px;
-  }
+  .header h1 { font-size: 18px; }
 
   .sidebar {
     left: 0;
@@ -487,45 +397,27 @@ th, td {
     border-radius: 12px;
   }
 
-  .player-card .future-fixtures {
-    font-size: 7px;
-  }
+  .player-card .future-fixtures { font-size: 6px; }
+  .player-card .info .next-fixture { font-size: 8px; }
+  .player-card .info .price       { font-size: 8px; }
 
-  .player-card .info .next-fixture {
-    font-size: 7px;
-  }
+  .transfer-panel { max-height: 600px; }
 
-  .player-card .info .price {
-    font-size: 8px;
-  }
-
-  .transfer-panel {
-    max-height: 600px;
-  }
-
-  .player-table-compact {
-    max-height: 450px;
-  }
+  .player-table-compact { max-height: 450px; }
 }
 
-/* ===== Large Phone / Small Tablet (601px and up) ===== */
+/* ===== Large Phone / Small Tablet (601px+) ===== */
 @media (min-width: 601px) {
-  body {
-    padding: 8px;
-  }
+  body { padding: 8px; }
 
-  .header h1 {
-    font-size: 20px;
-  }
+  .header h1 { font-size: 20px; }
 
   .gw-nav {
     flex-direction: row;
     gap: 12px;
   }
 
-  .gw-nav .gw-center {
-    order: unset;
-  }
+  .gw-nav .gw-center { order: unset; }
 
   .sync-toggle-btn {
     order: unset;
@@ -538,27 +430,18 @@ th, td {
     font-size: 13px;
   }
 
-  .gw-nav h2 {
-    font-size: 16px;
-  }
+  .gw-nav h2 { font-size: 16px; }
 
-  /* Restore side-by-side transfer action buttons */
-  .transfer-actions {
-    flex-direction: row;
-  }
+  /* Side-by-side transfer action buttons */
+  .transfer-actions { flex-direction: row; }
 
   .transfer-actions .transfer-action-btn {
     width: auto;
     max-width: 48%;
   }
 
-  table {
-    font-size: 11px;
-  }
-
-  th, td {
-    padding: 4px 3px;
-  }
+  table    { font-size: 11px; }
+  th, td   { padding: 4px 3px; }
 
   .filters-compact input,
   .filters-compact select {
@@ -614,15 +497,8 @@ th, td {
     font-size: 11px;
   }
 
-  .team-badge {
-    width: 16px;
-    height: 16px;
-  }
-
-  .club-badge {
-    width: 18px;
-    height: 18px;
-  }
+  .team-badge { width: 16px; height: 16px; }
+  .club-badge { width: 18px; height: 18px; }
 
   .transfer-action-btn {
     padding: 6px 12px;
@@ -636,23 +512,12 @@ th, td {
     height: 32px;
   }
 
-  .info-btn {
-    width: 16px;
-    height: 16px;
-    min-width: 16px;
-    font-size: 9px;
-  }
+  .info-btn { width: 16px; height: 16px; min-width: 16px; font-size: 9px; }
 }
 
-/* ===== Tablet Portrait (769px and up) ===== */
+/* ===== Tablet Portrait (769px+) ===== */
 @media (min-width: 769px) {
-  body {
-    padding: 10px;
-  }
-
-  .container {
-    max-width: 100%;
-  }
+  body { padding: 10px; }
 
   .header {
     flex-wrap: nowrap;
@@ -672,24 +537,9 @@ th, td {
     border-radius: 12px;
   }
 
-  /* Single column still but with better spacing */
   #plannerMain {
     grid-template-columns: 1fr;
-    gap: 20px;
-  }
-
-  #fixturesPanel {
-    order: 1;
-    max-height: 500px;
-  }
-
-  #mainColumn {
-    order: 2;
-  }
-
-  .transfer-panel {
-    order: 3;
-    max-height: 600px;
+    gap: 16px;
   }
 
   .gw-nav {
@@ -698,13 +548,8 @@ th, td {
     margin-bottom: 16px;
   }
 
-  table {
-    font-size: 12px;
-  }
-
-  th, td {
-    padding: 6px 4px;
-  }
+  table  { font-size: 12px; }
+  th, td { padding: 6px 4px; }
 
   .fixture-row {
     grid-template-columns: minmax(100px, 1fr) 50px minmax(100px, 1fr);
@@ -712,15 +557,8 @@ th, td {
     padding: 5px 0;
   }
 
-  .team-badge {
-    width: 18px;
-    height: 18px;
-  }
-
-  .fixture-time {
-    font-size: 10px;
-    padding: 2px 4px;
-  }
+  .team-badge    { width: 18px; height: 18px; }
+  .fixture-time  { font-size: 10px; padding: 2px 4px; }
 
   .header-btn {
     padding: 6px 12px;
@@ -760,15 +598,10 @@ th, td {
     height: 34px;
   }
 
-  .info-btn {
-    width: 18px;
-    height: 18px;
-    min-width: 18px;
-    font-size: 10px;
-  }
+  .info-btn { width: 18px; height: 18px; min-width: 18px; font-size: 10px; }
 }
 
-/* ===== Tablet Portrait (481–900px) portrait only: increase card spacing ===== */
+/* Portrait-mode spacing for cards (481–900px) */
 @media (min-width: 481px) and (max-width: 900px) and (orientation: portrait) {
   .formation-line {
     gap: 12px;
@@ -780,46 +613,22 @@ th, td {
     overflow-x: hidden;
   }
 
-  .pitch {
-    overflow-x: hidden;
-  }
-
-  .bench {
-    overflow-x: hidden;
-  }
+  .pitch { overflow-x: hidden; }
+  .bench { overflow-x: hidden; }
 
   #squadPlayerInfoModal .player-info-content {
     max-width: 90% !important;
     padding: 18px 14px;
   }
 
-  #squadPlayerInfoModal .player-info-section {
-    margin-top: 14px;
-  }
-
-  #squadPlayerInfoModal .player-info-section h3 {
-    font-size: 15px;
-  }
-
-  #squadPlayerInfoModal .modal-action-btn {
-    padding: 9px 14px;
-    font-size: 12px;
-  }
+  #squadPlayerInfoModal .player-info-section    { margin-top: 14px; }
+  #squadPlayerInfoModal .player-info-section h3 { font-size: 15px; }
+  #squadPlayerInfoModal .modal-action-btn       { padding: 9px 14px; font-size: 12px; }
 }
 
-/* ===== Large Tablet / Small Laptop (901px and up) ===== */
+/* ===== Large Tablet / Small Laptop (901px+) ===== */
 @media (min-width: 901px) {
-  body {
-    padding: 12px;
-  }
-
-  .container {
-    max-width: 100%;
-  }
-
-  .header h1 {
-    font-size: 22px;
-  }
+  body { padding: 12px; }
 
   .sidebar {
     left: 20px;
@@ -833,50 +642,8 @@ th, td {
     gap: 20px;
   }
 
-  #fixturesPanel {
-    max-height: calc(100vh - 150px);
-  }
-
-  .player-card .name {
-    font-size: 10px;
-  }
-
-  /* Compact labels shown for sub-1024px screens */
-  .player-card .info .price .price-label-short {
-    display: inline;
-  }
-
-  .player-card .info .price .price-label-long {
-    display: none;
-  }
-
-  .player-card .info .next-fixture .fixture-full {
-    display: none;
-  }
-
-  .player-card .info .next-fixture .fixture-compact {
-    display: inline;
-  }
-
-  .player-card .future-fixtures .fixture .fixture-full {
-    display: none;
-  }
-
-  .player-card .future-fixtures .fixture .fixture-compact {
-    display: inline;
-  }
-
-  .player-card .info .team {
-    display: none;
-  }
-
-  table {
-    font-size: 12px;
-  }
-
-  th, td {
-    padding: 6px 4px;
-  }
+  table  { font-size: 12px; }
+  th, td { padding: 6px 4px; }
 
   .header-btn {
     padding: 6px 12px;
@@ -899,17 +666,13 @@ th, td {
   }
 }
 
-/* ===== Desktop (1025px and up) ===== */
+/* ===== Laptop / Desktop single-column (1025px+) ===== */
 @media (min-width: 1025px) {
-  body {
-    padding: 20px;
-  }
-
   .container {
-    max-width: 1400px;
-    margin: 0 auto;
     padding-left: 0;
     padding-right: 0;
+    margin-left: auto;
+    margin-right: auto;
   }
 
   .header h1 {
@@ -917,26 +680,17 @@ th, td {
     width: auto;
   }
 
-  /* Restore 3-column layout on desktop */
-  #plannerMain {
-    grid-template-columns: 350px 1fr 350px;
-    gap: 12px;
-    justify-content: center;
-  }
+  /* Restore full labels & full fixture text for desktop cards */
+  .player-card .info .price .price-label-short { display: none; }
+  .player-card .info .price .price-label-long  { display: inline; }
 
-  #fixturesPanel {
-    order: unset;
-    max-height: calc(100vh - 150px);
-  }
+  .player-card .info .next-fixture .fixture-full    { display: inline; }
+  .player-card .info .next-fixture .fixture-compact { display: none; }
 
-  #mainColumn {
-    order: unset;
-  }
+  .player-card .future-fixtures .fixture .fixture-full    { display: inline; }
+  .player-card .future-fixtures .fixture .fixture-compact { display: none; }
 
-  .transfer-panel {
-    order: unset;
-    max-height: calc(100vh - 150px);
-  }
+  .player-card .future-fixtures { font-size: 8px; }
 
   .gw-nav {
     flex-direction: row;
@@ -944,46 +698,11 @@ th, td {
     margin-bottom: 16px;
   }
 
-  .sync-toggle-btn {
-    order: unset;
-  }
+  .sync-toggle-btn { order: unset; }
 
-  /* Restore full player card labels on desktop */
-  .player-card .info .price .price-label-short {
-    display: none;
-  }
-
-  .player-card .info .price .price-label-long {
-    display: inline;
-  }
-
-  .player-card .info .next-fixture .fixture-full {
-    display: inline;
-  }
-
-  .player-card .info .next-fixture .fixture-compact {
-    display: none;
-  }
-
-  .player-card .future-fixtures .fixture .fixture-full {
-    display: inline;
-  }
-
-  .player-card .future-fixtures .fixture .fixture-compact {
-    display: none;
-  }
-
-  table {
-    font-size: 13px;
-  }
-
-  th {
-    padding: 10px;
-  }
-
-  td {
-    padding: 8px 10px;
-  }
+  table  { font-size: 13px; }
+  th     { padding: 10px; }
+  td     { padding: 8px 10px; }
 
   .fixture-row {
     grid-template-columns: 1fr auto 1fr;
@@ -991,20 +710,9 @@ th, td {
     padding: 6px 0;
   }
 
-  .team-badge {
-    width: 20px;
-    height: 20px;
-  }
-
-  .club-badge {
-    width: 22px;
-    height: 22px;
-  }
-
-  .fixture-time {
-    font-size: 12px;
-    padding: 2px 6px;
-  }
+  .team-badge    { width: 20px; height: 20px; }
+  .club-badge    { width: 22px; height: 22px; }
+  .fixture-time  { font-size: 12px; padding: 2px 6px; }
 
   .fixtures-view-toggle-btn {
     font-size: 12px;
@@ -1017,9 +725,7 @@ th, td {
     max-width: 200px;
   }
 
-  .fixtures-header {
-    gap: 8px;
-  }
+  .fixtures-header { gap: 8px; }
 
   .fixture-gw-badge {
     font-size: 10px;
@@ -1034,22 +740,10 @@ th, td {
     font-size: 12px;
   }
 
-  .team-fixture-gw {
-    font-size: 13px;
-  }
-
-  .team-fixture-badge {
-    width: 24px;
-    height: 24px;
-  }
-
-  .team-fixture-opponent {
-    font-size: 12px;
-  }
-
-  .team-fixture-venue {
-    font-size: 11px;
-  }
+  .team-fixture-gw       { font-size: 13px; }
+  .team-fixture-badge    { width: 24px; height: 24px; }
+  .team-fixture-opponent { font-size: 12px; }
+  .team-fixture-venue    { font-size: 11px; }
 
   .header-btn {
     padding: 6px 12px;
@@ -1105,12 +799,7 @@ th, td {
     height: 36px;
   }
 
-  .info-btn {
-    width: 20px;
-    height: 20px;
-    min-width: 20px;
-    font-size: 11px;
-  }
+  .info-btn { width: 20px; height: 20px; min-width: 20px; font-size: 11px; }
 
   .transfer-actions {
     flex-direction: row;
@@ -1136,17 +825,9 @@ th, td {
     max-height: 90vh;
   }
 
-  .help-modal h2 {
-    font-size: 22px;
-  }
-
-  .help-modal h3 {
-    font-size: 18px;
-  }
-
-  .help-modal p, .help-modal li {
-    font-size: 14px;
-  }
+  .help-modal h2 { font-size: 22px; }
+  .help-modal h3 { font-size: 18px; }
+  .help-modal p, .help-modal li { font-size: 14px; }
 
   .player-info-content {
     padding: 20px;
@@ -1159,19 +840,9 @@ th, td {
     max-height: 90vh;
   }
 
-  #squadPlayerInfoModal .player-info-section {
-    margin-top: 15px;
-  }
-
-  #squadPlayerInfoModal .player-info-section h3 {
-    font-size: 16px;
-    margin-bottom: 8px;
-  }
-
-  #squadPlayerInfoModal .modal-action-btn {
-    padding: 10px 16px;
-    font-size: 13px;
-  }
+  #squadPlayerInfoModal .player-info-section    { margin-top: 15px; }
+  #squadPlayerInfoModal .player-info-section h3 { font-size: 16px; margin-bottom: 8px; }
+  #squadPlayerInfoModal .modal-action-btn       { padding: 10px 16px; font-size: 13px; }
 
   .player-info-header {
     flex-direction: row;
@@ -1183,13 +854,8 @@ th, td {
     gap: 8px;
   }
 
-  .player-stat-value {
-    font-size: 18px;
-  }
-
-  .player-stat-label {
-    font-size: 10px;
-  }
+  .player-stat-value { font-size: 18px; }
+  .player-stat-label { font-size: 10px; }
 
   .player-table-compact {
     max-height: none;
@@ -1208,57 +874,25 @@ th, td {
   }
 }
 
-/* ===== Large Desktop (1281px and up) ===== */
-@media (min-width: 1281px) {
-  .container {
-    max-width: 1400px;
-  }
-
-  #plannerMain {
-    grid-template-columns: 370px 1fr 370px;
-  }
-
+/* ===== Wide Desktop 3-column (1400px+) — see main.css for grid layout ===== */
+@media (min-width: 1400px) {
   #fixturesPanel {
     max-height: calc(100vh - 150px);
-  }
-}
-
-/* ===== Landscape Mode Optimizations ===== */
-
-/* Tablet Landscape (landscape orientation with limited height) */
-@media (min-width: 601px) and (max-width: 1024px) and (max-height: 768px) and (orientation: landscape) {
-  body {
-    padding: 8px;
-  }
-
-  #plannerMain {
-    grid-template-columns: 280px 1fr 320px;
-    gap: 10px;
-  }
-
-  #fixturesPanel {
-    order: 1;
-    max-height: calc(100vh - 100px);
     overflow-y: auto;
   }
 
-  #mainColumn {
-    order: 2;
-  }
-
   .transfer-panel {
-    order: 3;
-    max-height: calc(100vh - 100px);
+    max-height: calc(100vh - 150px);
+    overflow-y: auto;
   }
+}
 
-  .header {
-    margin-bottom: 8px;
-  }
+/* ===== Landscape Mode: Tablet (601–1024px, limited height) ===== */
+@media (min-width: 601px) and (max-width: 1024px) and (max-height: 768px) and (orientation: landscape) {
+  body { padding: 8px; }
 
-  .header h1 {
-    font-size: 18px;
-    width: auto;
-  }
+  .header h1 { font-size: 18px; width: auto; }
+  .header    { margin-bottom: 8px; }
 
   .pitch {
     padding: 12px 10px;
@@ -1266,14 +900,8 @@ th, td {
     margin-bottom: 8px;
   }
 
-  .bench {
-    padding: 10px;
-  }
-
-  .bench h3 {
-    font-size: 14px;
-    margin-bottom: 8px;
-  }
+  .bench         { padding: 10px; }
+  .bench h3      { font-size: 14px; margin-bottom: 8px; }
 
   .gw-nav {
     margin-bottom: 10px;
@@ -1281,60 +909,31 @@ th, td {
     gap: 10px;
   }
 
-  .gw-nav h2 {
-    font-size: 16px;
-  }
+  .gw-nav h2     { font-size: 16px; }
+  .gw-nav button { padding: 6px 12px; font-size: 12px; }
 
-  .gw-nav button {
-    padding: 6px 12px;
-    font-size: 12px;
-  }
-
-  .filters-compact {
-    gap: 4px;
-    margin-bottom: 8px;
-  }
+  .filters-compact { gap: 4px; margin-bottom: 8px; }
 
   .filters-compact input,
-  .filters-compact select {
-    padding: 5px;
-    font-size: 11px;
-  }
+  .filters-compact select { padding: 5px; font-size: 11px; }
 
   .header-btn,
   .bank-display,
   .price-toggle,
-  .donate-btn {
-    height: 26px;
-    padding: 4px 8px;
-    font-size: 11px;
-  }
+  .donate-btn { height: 26px; padding: 4px 8px; font-size: 11px; }
 }
 
-/* Mobile Landscape (small screens in landscape) */
+/* ===== Landscape Mode: Small phone in landscape ===== */
 @media (max-width: 900px) and (max-height: 500px) and (orientation: landscape) {
-  body {
-    padding: 6px;
-  }
+  body { padding: 6px; }
 
   #plannerMain {
     grid-template-columns: 1fr;
     gap: 8px;
   }
 
-  #fixturesPanel {
-    max-height: 200px;
-    overflow-y: auto;
-    order: 3;
-  }
-
-  .header {
-    margin-bottom: 6px;
-  }
-
-  .header h1 {
-    font-size: 16px;
-  }
+  .header        { margin-bottom: 6px; }
+  .header h1     { font-size: 16px; }
 
   .pitch {
     padding: 8px 6px;
@@ -1342,14 +941,8 @@ th, td {
     margin-bottom: 6px;
   }
 
-  .bench {
-    padding: 8px;
-  }
-
-  .bench h3 {
-    font-size: 12px;
-    margin-bottom: 6px;
-  }
+  .bench         { padding: 8px; }
+  .bench h3      { font-size: 12px; margin-bottom: 6px; }
 
   .gw-nav {
     margin-bottom: 6px;
@@ -1357,73 +950,36 @@ th, td {
     gap: 8px;
   }
 
-  .gw-nav h2 {
-    font-size: 14px;
-  }
+  .gw-nav h2     { font-size: 14px; }
+  .gw-nav button { padding: 4px 10px; font-size: 11px; }
 
-  .gw-nav button {
-    padding: 4px 10px;
-    font-size: 11px;
-  }
-
-  .sync-toggle-btn {
-    padding: 4px 8px !important;
-    font-size: 12px;
-  }
+  .sync-toggle-btn { padding: 4px 8px !important; font-size: 12px; }
 
   .transfer-panel {
     max-height: calc(100vh - 60px);
     padding: 10px;
   }
 
-  .transfer-panel h3 {
-    font-size: 14px;
-    margin-bottom: 6px;
-  }
+  .transfer-panel h3 { font-size: 14px; margin-bottom: 6px; }
 
-  .transfer-actions {
-    gap: 6px;
-    flex-direction: row;
-  }
+  .transfer-actions  { gap: 6px; flex-direction: row; }
 
-  .transfer-action-btn {
-    padding: 5px 10px;
-    font-size: 10px;
-    height: 28px;
-  }
+  .transfer-action-btn { padding: 5px 10px; font-size: 10px; height: 28px; }
 
-  .filters-compact {
-    gap: 4px;
-    margin-bottom: 6px;
-  }
+  .filters-compact { gap: 4px; margin-bottom: 6px; }
 
   .filters-compact input,
-  .filters-compact select {
-    padding: 4px;
-    font-size: 10px;
-  }
+  .filters-compact select { padding: 4px; font-size: 10px; }
 
   .header-btn,
   .bank-display,
   .price-toggle,
   .donate-btn,
-  .sidebar-toggle {
-    height: 24px;
-    padding: 3px 6px;
-    font-size: 10px;
-  }
+  .sidebar-toggle { height: 24px; padding: 3px 6px; font-size: 10px; }
 
   .bank-display input,
-  .price-toggle select {
-    height: 18px;
-    font-size: 10px;
-  }
+  .price-toggle select { height: 18px; font-size: 10px; }
 
-  table {
-    font-size: 10px;
-  }
-
-  th, td {
-    padding: 3px 2px;
-  }
+  table  { font-size: 10px; }
+  th, td { padding: 3px 2px; }
 }

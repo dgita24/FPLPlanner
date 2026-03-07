@@ -1018,6 +1018,21 @@ export function initUI() {
   // Expose chip selection function
   window.selectChip = (chipType) => selectChip(chipType, updateUI);
 
+  // Tab navigation function: show one panel at a time on mobile/tablet,
+  // hidden on wide desktop (all panels shown by CSS at min-width: 1400px)
+  window.switchTab = function(tabName) {
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      const isActive = btn.dataset.tab === tabName;
+      btn.classList.toggle('tab-active', isActive);
+      btn.setAttribute('aria-selected', isActive ? 'true' : 'false');
+    });
+    document.querySelectorAll('.tab-panel').forEach(panel => {
+      const isActive = panel.dataset.tab === tabName;
+      panel.classList.toggle('tab-active', isActive);
+      panel.setAttribute('aria-hidden', isActive ? 'false' : 'true');
+    });
+  };
+
   // Setup sidebar event handlers
   setupSidebarHandlers();
 

@@ -1,31 +1,31 @@
 /* ===== Base Styles and Variables ===== */
 
 :root {
-  --primary: #FFD700;
-  --primary-light: #FFED4E;
-  --accent: #007FFF;
-  --accent-hover: #0066CC;
+  --primary: #C9A84C;
+  --primary-light: #DCBA68;
+  --accent: #4A82C8;
+  --accent-hover: #3870B0;
   --bg: #262626;
-  --bg-light: #F5F5F5;
-  --bg-light-darker: #DCDCDC;
+  --bg-light: #F0F1F3;
+  --bg-light-darker: #D8DAE0;
   --bg-dark: #1a1a1a;
   --bg-darker: #0d0d0d;
-  --text: #F5F5F5;
-  --text-dark: #262626;
-  --text-light: #cccccc;
-  --border: #444444;
-  --success: #22B455;
-  --success-hover: #1a9044;
-  --success-light: rgba(34, 180, 85, 0.25);
-  --warning: #FFD700;
-  --warning-hover: #FFED4E;
-  --error: #E53935;
-  --error-hover: #C62828;
-  --error-transparent: rgba(227, 57, 53, 0.85);
-  --selected-bg: #007FFF;
-  --selected-hover-bg: #0066CC;
-  --captain-badge: #000000;
-  --captain-badge-active: #222222;
+  --text: #E8EAED;
+  --text-dark: #1a1a1a;
+  --text-light: #9DA3AE;
+  --border: #3A3F4A;
+  --success: #2E7A4E;
+  --success-hover: #22593A;
+  --success-light: rgba(46, 122, 78, 0.25);
+  --warning: #C9A84C;
+  --warning-hover: #DCBA68;
+  --error: #C94040;
+  --error-hover: #A83232;
+  --error-transparent: rgba(201, 64, 64, 0.85);
+  --selected-bg: #4A82C8;
+  --selected-hover-bg: #3870B0;
+  --captain-badge: #111111;
+  --captain-badge-active: #2A2A2A;
 }
 
 * {
@@ -743,6 +743,50 @@ body {
   color: var(--primary);
 }
 
+/* ===== Tab Navigation (mobile & tablet, hidden on wide desktop) ===== */
+
+.tab-nav {
+  display: flex;
+  background: var(--bg-dark);
+  border-radius: 8px;
+  padding: 4px;
+  gap: 4px;
+  margin-bottom: 10px;
+}
+
+.tab-btn {
+  flex: 1;
+  padding: 10px 4px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-light);
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  white-space: nowrap;
+}
+
+.tab-btn.tab-active {
+  background: var(--primary);
+  color: var(--bg);
+}
+
+.tab-btn:not(.tab-active):hover {
+  background: rgba(255, 255, 255, 0.07);
+  color: var(--text);
+}
+
+/* Tab panel visibility — single panel at a time on mobile/tablet */
+.tab-panel {
+  display: none;
+}
+
+.tab-panel.tab-active {
+  display: block;
+}
+
 /* ===== Mobile-First Progressive Enhancement ===== */
 
 /* Large Tablet / Small Laptop (901px+) */
@@ -752,7 +796,7 @@ body {
   }
 }
 
-/* Desktop (1025px+) */
+/* Tablet/Desktop padding (1025px+) */
 @media (min-width: 1025px) {
   body {
     padding: 20px;
@@ -765,16 +809,27 @@ body {
   .header h1 {
     font-size: 24px;
   }
+}
+
+/* Wide Desktop: reveal 3-column layout, hide tab nav (1400px+) */
+@media (min-width: 1400px) {
+  .tab-nav {
+    display: none;
+  }
+
+  .tab-panel {
+    display: block !important;
+  }
 
   #plannerMain {
-    grid-template-columns: 350px 1fr 350px;
+    grid-template-columns: 300px 1fr 300px;
+    gap: 16px;
     justify-content: center;
   }
 }
 
-/* Large Desktop (1281px+) */
-@media (min-width: 1281px) {
+@media (min-width: 1600px) {
   #plannerMain {
-    grid-template-columns: 370px 1fr 370px;
+    grid-template-columns: 340px 1fr 340px;
   }
 }

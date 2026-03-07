@@ -69,11 +69,32 @@
       <div id="sideMsg" class="sidebar-message"></div>
     </div>
 
+  <!-- Batch transfer status — always visible across all tabs -->
+  <div id="batchTransferStatus" style="
+    display: none;
+    padding: 10px 16px;
+    margin-bottom: 8px;
+    background: rgba(201, 168, 76, 0.15);
+    border: 2px solid var(--primary);
+    border-radius: 8px;
+    text-align: center;
+    font-weight: bold;
+    font-size: 14px;
+    color: var(--text);
+  "></div>
+
+  <!-- Tab Navigation (hidden on wide desktop via CSS) -->
+  <nav class="tab-nav" id="tabNav" role="tablist" aria-label="Main navigation">
+    <button class="tab-btn tab-active" role="tab" aria-selected="true" aria-controls="mainColumn" id="tab-squad" data-tab="squad" onclick="switchTab('squad')">⚽ Squad</button>
+    <button class="tab-btn" role="tab" aria-selected="false" aria-controls="transferPanel" id="tab-transfers" data-tab="transfers" onclick="switchTab('transfers')">⇄ Transfers</button>
+    <button class="tab-btn" role="tab" aria-selected="false" aria-controls="fixturesPanel" id="tab-fixtures" data-tab="fixtures" onclick="switchTab('fixtures')">📅 Fixtures</button>
+  </nav>
+
     <!-- MAIN PLANNER -->
     <div id="plannerMain">
-      <div id="fixturesPanel"></div>
+      <div id="fixturesPanel" class="tab-panel" role="tabpanel" aria-labelledby="tab-fixtures" data-tab="fixtures"></div>
 
-      <div id="mainColumn">
+      <div id="mainColumn" class="tab-panel tab-active" role="tabpanel" aria-labelledby="tab-squad" data-tab="squad">
 
         <div class="pitch-stack">
           <div class="gw-nav">
@@ -94,7 +115,7 @@
 
       </div>
 
-      <div id="transferPanel" class="transfer-panel">
+      <div id="transferPanel" class="transfer-panel tab-panel" role="tabpanel" aria-labelledby="tab-transfers" data-tab="transfers">
         <h3 style="margin-bottom: 10px; text-align: center;">Transfers</h3>
         
         <!-- Transfer action buttons below the header -->
@@ -234,21 +255,6 @@
       </div>
     </div>
 
-
-
-    <div id="batchTransferStatus" style="
-      display: none;
-      padding: 12px 20px;
-      margin-top: 15px;
-      margin-bottom: 15px;
-      background: rgba(255, 153, 0, 0.2);
-      border: 2px solid #ff9800;
-      border-radius: 8px;
-      text-align: center;
-      font-weight: bold;
-      font-size: 15px;
-      color: #fff;
-    "></div>
   </div>
 
   <div id="toast" class="message"></div>

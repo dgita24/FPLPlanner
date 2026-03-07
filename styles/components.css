@@ -156,11 +156,10 @@
   padding-bottom: 5px;
 }
 
-/* Desktop only: Formation-specific spacing */
+/* Desktop: pitch fills its column, constrained by a max-width */
 @media (min-width: 1025px) {
-  /* Fixed pitch width to accommodate 5 players */
   .pitch {
-    width: 935px;
+    width: 100%;
     max-width: 935px;
     padding: 21px 17px;
     min-height: 323px;
@@ -168,7 +167,7 @@
   }
   
   .pitch-stack {
-    width: 935px;
+    width: 100%;
     max-width: 935px;
   }
 
@@ -238,15 +237,16 @@
 }
 
 .player-card .info {
-  font-size: 7px;
-  color: var(--bg);
   display: flex;
-  padding: 0 1px;
-  font-weight: 600;
-  min-height: 12px;
+  flex-direction: column;
   align-items: center;
-  gap: 2px;
-  max-width: 100%;
+  padding: 1px 2px;
+  gap: 0;
+  font-size: 8px;
+  font-weight: 600;
+  color: var(--bg);
+  line-height: 1.3;
+  overflow: hidden;
 }
 
 /* Base (components.css) shows full labels by default; responsive.css overrides to
@@ -274,15 +274,6 @@
 
 .player-card .future-fixtures .fixture .fixture-compact {
   display: none;
-}
-
-/* Desktop-only: Apply justify-content and overflow to info row */
-@media (min-width: 901px) {
-  .player-card .info {
-    justify-content: space-between;
-    white-space: nowrap;
-    overflow: hidden;
-  }
 }
 
 .card-btn {
@@ -326,7 +317,7 @@
   position: relative;
   width: 26px;
   height: 26px;
-  margin: 0 auto 2px;
+  margin: 0 auto 24px; /* extra bottom space: badge (15px) + offset (17px) - container (26px) = 6px gap, +18px = 24px total */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -422,21 +413,23 @@
 
 .captain-badge {
   position: absolute;
-  left: 2px;
-  top: 2px;
+  /* Sits below-left of the club crest on mobile */
+  left: 0;
+  bottom: -17px;
+  top: auto;
   transform: none;
-  width: 16px;
-  height: 16px;
+  width: 15px;
+  height: 15px;
   border-radius: 50%;
   background: var(--captain-badge);
   color: var(--bg-light);
   font-weight: bold;
-  font-size: 6px;
+  font-size: 7px;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-  border: 2px solid var(--captain-badge);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255,255,255,0.3);
   z-index: 15;
   pointer-events: auto;
 }
@@ -452,19 +445,21 @@
 
 .status-flag-badge {
   position: absolute;
-  right: 2px;
-  top: 2px;
+  /* Sits below-right of the club crest on mobile */
+  right: 0;
+  bottom: -17px;
+  top: auto;
   transform: none;
-  width: 16px;
-  height: 16px;
+  width: 15px;
+  height: 15px;
   border-radius: 50%;
   color: var(--bg);
   font-weight: bold;
-  font-size: 6px;
+  font-size: 7px;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
   z-index: 15;
 }
 
@@ -752,7 +747,7 @@ td.fixtures-cell {
 .fixtures-control-btn:hover {
   background: var(--primary-light);
   transform: translateY(-1px);
-  box-shadow: 0 2px 8px rgba(255, 215, 0, 0.3);
+  box-shadow: 0 2px 8px rgba(201, 168, 76, 0.3);
 }
 
 /* Local Load/Save buttons - smaller size */
@@ -1484,6 +1479,7 @@ td.fixtures-cell {
   .badge-container {
     width: 30px;
     height: 30px;
+    margin: 0 auto 22px; /* extra space for slightly larger badges below */
   }
 
   .badge-container .badge {
@@ -1502,9 +1498,12 @@ td.fixtures-cell {
   }
 
   .player-card .info {
-    font-size: 8px;
+    font-size: 7px;
     padding: 0 2px;
   }
+
+  .player-card .info .next-fixture { font-size: 7px; }
+  .player-card .info .price        { font-size: 7px; }
 
   .captain-btn {
     width: 18px;
@@ -1512,16 +1511,21 @@ td.fixtures-cell {
     font-size: 7px;
   }
 
+  /* Position badges below-left / below-right of the 30px crest */
   .captain-badge {
     width: 18px;
     height: 18px;
-    font-size: 7px;
+    font-size: 6px;
+    bottom: -18px;
+    left: 0;
   }
 
   .status-flag-badge {
     width: 18px;
     height: 18px;
-    font-size: 7px;
+    font-size: 6px;
+    bottom: -18px;
+    right: 0;
   }
 
   .card-btn {
@@ -1549,6 +1553,7 @@ td.fixtures-cell {
   .badge-container {
     width: 34px;
     height: 34px;
+    margin: 0 auto 2px; /* restore compact margin on desktop */
   }
 
   .badge-container .badge {
@@ -1567,12 +1572,35 @@ td.fixtures-cell {
     padding: 2px 3px;
   }
 
+  /* Restore row layout for info on desktop */
   .player-card .info {
-    font-size: 9px;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
     padding: 0 3px;
-    align-items: unset;
-    gap: unset;
-    max-width: unset;
+    gap: 3px;
+    font-size: 9px;
+    overflow: hidden;
+    white-space: nowrap;
+    line-height: unset;
+  }
+
+  .player-card .info .next-fixture {
+    flex: 1 1 auto;
+    text-align: left;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 9px;
+    display: inline;
+  }
+
+  .player-card .info .price {
+    flex: 0 0 auto;
+    text-align: right;
+    font-size: 9px;
+    white-space: nowrap;
+    display: inline;
   }
 
   /* Restore long/short label defaults for desktop */
@@ -1600,6 +1628,7 @@ td.fixtures-cell {
     display: none;
   }
 
+  /* Restore captain selector to left-side panel position on desktop */
   .captain-selector {
     left: -28px;
     top: 50%;
@@ -1612,17 +1641,22 @@ td.fixtures-cell {
     font-size: 8px;
   }
 
+  /* Restore captain badge to outside-left of crest on desktop */
   .captain-badge {
     left: -32px;
+    bottom: auto;
     top: 70%;
     transform: translateY(-50%);
     width: 20px;
     height: 20px;
     font-size: 8px;
+    border: 2px solid var(--captain-badge);
   }
 
+  /* Restore status flag badge to outside-right of crest on desktop */
   .status-flag-badge {
     right: -32px;
+    bottom: auto;
     top: 70%;
     transform: translateY(-50%);
     width: 20px;
