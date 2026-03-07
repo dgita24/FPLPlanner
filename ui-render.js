@@ -390,13 +390,13 @@ function playerCard(entry, source) {
   const isCaptain = team && team.captain === entry.id;
   const isViceCaptain = team && team.viceCaptain === entry.id;
 
-  let captainUI = '';
+  let captainBadge = '';
+  let captainSelector = '';
   if (source === 'starting') {
-    const badge = isCaptain ? `<div class="captain-badge c">C</div>`
-                  : isViceCaptain ? `<div class="captain-badge vc">VC</div>`
-                  : '';
-    captainUI = `
-      ${badge}
+    captainBadge = isCaptain ? `<div class="captain-badge c">C</div>`
+                 : isViceCaptain ? `<div class="captain-badge vc">VC</div>`
+                 : '';
+    captainSelector = `
       <div class="captain-selector">
         <button class="captain-btn" onclick="event.stopPropagation(); setCaptain(${entry.id})" title="Set as Captain">C</button>
         <button class="captain-btn" onclick="event.stopPropagation(); setViceCaptain(${entry.id})" title="Set as Vice-Captain">VC</button>
@@ -410,12 +410,11 @@ function playerCard(entry, source) {
   return `
     <div class="${cardClass}" onclick="showSquadPlayerInfo(${entry.id}, '${source}')">
       <span class="card-price">${price}</span>
-      <button class="card-btn btn-remove" onclick="event.stopPropagation(); ${removeFn}" title="Transfer out">×</button>
-      <button class="card-btn btn-swap" onclick="event.stopPropagation(); ${subFn}" title="${swapTitle}">⇅</button>
+      ${captainBadge}
       ${statusFlags}
 
       <div class="badge-container">
-        ${captainUI}
+        ${captainSelector}
         <img src="https://resources.premierleague.com/premierleague/badges/70/t${teamCode}.png"
              class="badge" alt="${teamShort}">
       </div>

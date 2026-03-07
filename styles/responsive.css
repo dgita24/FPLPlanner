@@ -21,7 +21,7 @@
 
   .pitch {
     max-width: 100%;
-    padding: 17px 13px;
+    padding: 2px 13px 8px;
   }
 
   .pitch-stack {
@@ -71,7 +71,7 @@
   }
 
   .pitch {
-    padding: 17px 13px;
+    padding: 2px 13px 8px;
     overflow-x: hidden;
   }
 }
@@ -106,7 +106,7 @@
   }
 
   .player-card .name {
-    font-size: 9px;
+    font-size: 10px;
   }
 
   .card-fixture-next {
@@ -119,19 +119,19 @@
 
   .formation-line {
     overflow-x: hidden;
-    padding-bottom: 5px;
-    padding-top: 8px;
-    margin-bottom: 10px;
+    padding-bottom: 2px;
+    padding-top: 11px;
+    margin-bottom: 2px;
   }
 
   .bench-slots {
     overflow-x: hidden;
-    padding-bottom: 5px;
+    padding-bottom: 2px;
   }
 
   .pitch {
     overflow-x: hidden;
-    padding: 16px 10px;
+    padding: 2px 10px 8px;
   }
 
   .bench {
@@ -237,7 +237,7 @@
   }
 
   .pitch {
-    padding: 15px 8px;
+    padding: 2px 8px 8px;
     overflow-x: hidden;
     min-height: unset;
   }
@@ -259,7 +259,7 @@
   }
 
   .player-card .name {
-    font-size: 11px;
+    font-size: 12px;
     font-weight: 800;
   }
 
@@ -287,16 +287,11 @@
     font-size: 11px;
   }
 
-  .status-flag-badge {
-    /* below btn-remove (18px at top:2px → bottom:20px) + 4px gap */
-    top: 24px;
-  }
-
   .formation-line {
     overflow-x: hidden;
     gap: 4px;
-    padding-top: 12px;
-    padding-bottom: 5px;
+    padding-top: 11px;
+    padding-bottom: 2px;
   }
 
   .formation-line[data-player-count="1"] { gap: 0px; }
@@ -308,8 +303,8 @@
   .bench-slots {
     overflow-x: hidden;
     gap: 6px;
-    padding-top: 12px;
-    padding-bottom: 5px;
+    padding-top: 14px;
+    padding-bottom: 2px;
   }
 
   .filters {
@@ -397,7 +392,7 @@
   }
 
   .player-card .name {
-    font-size: 10px;
+    font-size: 11px;
     font-weight: 800;
   }
 
@@ -469,7 +464,7 @@
     max-width: none;
     margin-left: 0;
     margin-right: 0;
-    padding: 10px 4px;
+    padding: 2px 4px 8px;
     overflow-x: hidden;
   }
 
@@ -482,9 +477,9 @@
     width: 100%;
     overflow-x: hidden;
     gap: 3px;
-    min-height: 75px;
-    padding-top: 12px;
-    padding-bottom: 5px;
+    min-height: 70px;
+    padding-top: 11px;
+    padding-bottom: 2px;
   }
 
   .formation-line[data-player-count="1"] { gap: 0px; }
@@ -496,8 +491,8 @@
   .bench-slots {
     overflow-x: hidden;
     gap: 4px;
-    padding-top: 12px;
-    padding-bottom: 5px;
+    padding-top: 14px;
+    padding-bottom: 2px;
   }
 
   .badge-container {
@@ -511,7 +506,7 @@
   }
 
   .player-card .name {
-    font-size: 9px;
+    font-size: 10px;
     font-weight: 800;
   }
 
@@ -524,8 +519,8 @@
   }
 
   .card-price {
-    font-size: 7px;
-    padding: 2px 4px;
+    font-size: 10px;
+    padding: 2px 5px;
   }
 
   .card-btn {
@@ -539,9 +534,9 @@
   }
 
   .captain-badge {
-    width: 14px;
-    height: 14px;
-    font-size: 6px;
+    width: 18px;
+    height: 18px;
+    font-size: 8px;
   }
 
   .captain-btn {
@@ -551,11 +546,9 @@
   }
 
   .status-flag-badge {
-    /* below btn-remove (16px at top:2px → bottom:18px) + 4px gap */
-    top: 22px;
-    width: 14px;
-    height: 14px;
-    font-size: 6px;
+    width: 18px;
+    height: 18px;
+    font-size: 8px;
   }
 
   .gw-nav button {
@@ -914,9 +907,9 @@
   }
 
   .pitch {
-    padding: 12px 10px;
+    padding: 2px 10px 8px;
     min-height: 240px;
-    margin-bottom: 8px;
+    margin-bottom: 3px;
     overflow-x: hidden;
   }
 
@@ -1010,9 +1003,9 @@
   }
 
   .pitch {
-    padding: 8px 6px;
+    padding: 2px 6px 8px;
     min-height: 200px;
-    margin-bottom: 6px;
+    margin-bottom: 3px;
     overflow-x: hidden;
   }
 
