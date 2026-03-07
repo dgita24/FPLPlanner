@@ -277,28 +277,22 @@
     height: 28px;
   }
 
+  /* Hide transfer/sub buttons on mobile — accessed via tap-to-open card menu instead */
   .card-btn {
-    width: 22px;
-    height: 22px;
-    font-size: 14px;
-  }
-
-  .btn-swap {
-    font-size: 13px;
+    display: none;
   }
 
   .status-flag-badge {
-    /* below btn-remove (22px at top:2px → bottom:24px) + 4px gap */
-    top: 28px;
+    top: 6px;
     width: 18px;
     height: 18px;
     font-size: 8px;
   }
 
   .card-price {
-    font-size: 15px;
-    padding: 3px 8px;
-    top: -12px;
+    font-size: 12px;
+    padding: 2px 5px;
+    top: -9px;
   }
 
   .formation-line {
@@ -314,7 +308,7 @@
   .formation-line[data-player-count="2"] { gap: 12px; }
   .formation-line[data-player-count="3"] { gap: 8px; }
   .formation-line[data-player-count="4"] { gap: 5px; }
-  .formation-line[data-player-count="5"] { gap: 3px; }
+  .formation-line[data-player-count="5"] { gap: 1px; }
 
   .bench-slots {
     overflow-x: hidden;
@@ -502,8 +496,8 @@
   .formation-line[data-player-count="1"] { gap: 0px; }
   .formation-line[data-player-count="2"] { gap: 10px; }
   .formation-line[data-player-count="3"] { gap: 6px; }
-  .formation-line[data-player-count="4"] { gap: 4px; }
-  .formation-line[data-player-count="5"] { gap: 3px; }
+  .formation-line[data-player-count="4"] { gap: 3px; }
+  .formation-line[data-player-count="5"] { gap: 0px; }
 
   .bench-slots {
     overflow-x: hidden;
@@ -536,19 +530,14 @@
   }
 
   .card-price {
-    font-size: 13px;
-    padding: 2px 6px;
-    top: -11px;
+    font-size: 10px;
+    padding: 2px 4px;
+    top: -9px;
   }
 
+  /* card-btn already hidden at ≤768px; ensure it stays hidden */
   .card-btn {
-    width: 20px;
-    height: 20px;
-    font-size: 12px;
-  }
-
-  .btn-swap {
-    font-size: 11px;
+    display: none;
   }
 
   .captain-badge {
@@ -564,11 +553,10 @@
   }
 
   .status-flag-badge {
-    /* below btn-remove (20px at top:2px → bottom:22px) + 4px gap */
-    top: 26px;
-    width: 16px;
-    height: 16px;
-    font-size: 7px;
+    top: 6px;
+    width: 14px;
+    height: 14px;
+    font-size: 6px;
   }
 
   .gw-nav button {
