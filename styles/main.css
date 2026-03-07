@@ -26,6 +26,13 @@
   --selected-hover-bg: #0066CC;
   --captain-badge: #000000;
   --captain-badge-active: #222222;
+
+  /* FDR (Fixture Difficulty Rating) colours */
+  --fdr-1: #00843e;
+  --fdr-2: #22B455;
+  --fdr-3: #8d8d8d;
+  --fdr-4: #e07800;
+  --fdr-5: #b30000;
 }
 
 * {

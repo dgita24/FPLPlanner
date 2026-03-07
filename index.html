@@ -12,6 +12,17 @@
 </head>
 
 <body>
+  <!-- Mobile top bar: visible only on ≤768px -->
+  <div class="mobile-top-bar" id="mobileTopBar">
+    <button class="mobile-menu-btn" onclick="toggleSidebarMenu()" aria-label="Open menu">☰</button>
+    <div class="mobile-gw-nav">
+      <button class="mobile-gw-btn" onclick="changeGW(-1)" id="prevGWMobile" aria-label="Previous gameweek">←</button>
+      <span class="mobile-gw-label">GW<span id="mobileGWDisplay">1</span></span>
+      <button class="mobile-gw-btn" onclick="changeGW(1)" id="nextGWMobile" aria-label="Next gameweek">→</button>
+    </div>
+    <div class="mobile-bank-display" id="mobileBankDisplay">£0.0m</div>
+  </div>
+
   <div class="container">
     <div class="header">
       <h1>FPL TEAM PLANNER</h1>
@@ -91,6 +102,9 @@
           <h3>Bench</h3>
           <div id="benchSlots" class="bench-slots"></div>
         </div>
+
+        <!-- Chip buttons rendered here (below bench) -->
+        <div id="chipArea" class="chip-area"></div>
 
       </div>
 
@@ -252,6 +266,14 @@
   </div>
 
   <div id="toast" class="message"></div>
+
+  <!-- Mobile bottom tab bar: visible only on ≤768px -->
+  <nav class="bottom-tab-bar" id="bottomTabBar" role="navigation" aria-label="Main navigation">
+    <button class="tab-btn tab-active" id="tabPitch" onclick="switchMobileTab('pitch')" aria-label="Pitch view">⚽<span>Pitch</span></button>
+    <button class="tab-btn" id="tabFixtures" onclick="switchMobileTab('fixtures')" aria-label="Fixtures view">📅<span>Fixtures</span></button>
+    <button class="tab-btn" id="tabTransfers" onclick="switchMobileTab('transfers')" aria-label="Transfers panel">🔄<span>Transfers</span></button>
+    <button class="tab-btn" id="tabMore" onclick="switchMobileTab('more')" aria-label="More options">⚙<span>More</span></button>
+  </nav>
 
   <!-- Help Modal -->
   <div id="helpModal" class="help-modal">

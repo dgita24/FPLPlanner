@@ -1,6 +1,9 @@
-/* ===== Responsive Design for Tablets and Mobile ===== */
+/* ===== Responsive Design ===== */
 
-/* Small Laptop/Large Tablet (max-width: 1280px) */
+/* ----------------------------------------
+   Large Desktop (max-width: 1280px)
+   3-column grid, slightly narrower columns
+---------------------------------------- */
 @media (max-width: 1280px) {
   .container {
     max-width: 100%;
@@ -12,7 +15,6 @@
     gap: 10px;
   }
 
-  /* Fix fixtures panel cutoff and scrolling */
   #fixturesPanel {
     max-height: calc(100vh - 150px);
   }
@@ -29,22 +31,12 @@
   .bench {
     max-width: 100%;
   }
-
-  .player-card {
-    width: 136px;
-  }
-
-  .formation-line {
-    gap: 10px;
-  }
-
-  /* Ensure chip buttons have proper spacing */
-  .chip-buttons-row {
-    margin-top: 8px;
-  }
 }
 
-/* Tablet (max-width: 1024px) */
+/* ----------------------------------------
+   Tablet (max-width: 1024px)
+   Single column, all panels stacked
+---------------------------------------- */
 @media (max-width: 1024px) {
   #plannerMain {
     grid-template-columns: 1fr;
@@ -80,26 +72,14 @@
 
   .pitch {
     padding: 17px 13px;
-  }
-
-  .player-card {
-    width: 128px;
-  }
-
-  .captain-selector {
-    left: -32px;
-  }
-
-  .captain-badge {
-    left: -32px;
-  }
-
-  .formation-line {
-    gap: 9px;
+    overflow-x: hidden;
   }
 }
 
-/* Tablet/Mobile (max-width: 900px) - Step 1 requirement */
+/* ----------------------------------------
+   Tablet/Mobile (max-width: 900px)
+   Card and badge sizing reductions
+---------------------------------------- */
 @media (max-width: 900px) {
   body {
     padding: 12px;
@@ -109,187 +89,56 @@
     max-width: 100%;
   }
 
-  /* Player card adjustments for 900px */
-  .player-card {
-    width: 100px;
-    padding: 3px;
-  }
-
-  .player-card .name {
-    font-size: 9px;
-    padding: 1px 2px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    font-weight: 800;
-  }
-
-  /* IMPORTANT: use !important to beat legacy inline <style> rules */
-  .player-card .info {
-    font-size: 8px;
-    padding: 0 2px;
-    display: flex !important;
-    align-items: center !important;
-    gap: 4px !important;
-    max-width: 100%;
-  }
-
-  .player-card .info .team {
-    display: none;
-  }
-
-  .player-card .info .price .price-label-long {
-    display: none;
-  }
-
-  .player-card .info .price .price-label-short {
-    display: inline;
-  }
-
-  .player-card .info .price {
-    font-weight: 700;
-    white-space: nowrap !important;
-    flex: 0 0 auto !important;
-    margin-left: auto !important;
-    text-align: right !important;
-  }
-
-  .player-card .info .next-fixture {
-    font-weight: 700;
-    white-space: nowrap !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-    flex: 1 1 auto !important;
-    min-width: 0 !important;
-    text-align: left !important;
-  }
-
-  /* IMPORTANT: explicitly override row/column-gap because computed showed 8px */
-  .player-card .future-fixtures {
-    display: flex !important;
-    justify-content: center !important;
-    gap: 2px !important;
-    row-gap: 2px !important;
-    column-gap: 2px !important;
-    flex-wrap: nowrap !important;
-    font-size: 8px;
-  }
-
-  .player-card .info .next-fixture .fixture-full {
-    display: none;
-  }
-  .player-card .info .next-fixture .fixture-compact {
-    display: inline;
-  }
-
-  .player-card .future-fixtures .fixture .fixture-full {
-    display: none;
-  }
-  .player-card .future-fixtures .fixture .fixture-compact {
-    display: inline;
-  }
-
-  .player-card .future-fixtures .fixture {
-    flex: 0 0 auto !important;
-    min-width: 0 !important;
-    white-space: nowrap !important;
-    margin: 0 !important;
-  }
-
-  /* Badge size reduction */
   .badge-container {
     width: 30px;
     height: 30px;
   }
+
   .badge-container .badge {
     width: 30px;
     height: 30px;
   }
 
-  /* Captain/VC selector - centered absolutely inside player-card on mobile/tablet */
-  .captain-selector {
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    width: auto;
-    height: auto;
-    font-size: 7px;
-  }
-
-  /* Captain badge - keep inside card boundary on mobile/tablet */
-  .captain-badge {
-    left: 2px;
-    top: 2px;
-    transform: none;
-    width: 18px;
-    height: 18px;
-    font-size: 7px;
-  }
-
   .captain-btn {
-    width: 18px;
-    height: 18px;
+    width: 16px;
+    height: 16px;
     font-size: 7px;
   }
 
-  /* Status flag badge - keep inside card boundary on mobile/tablet */
-  .status-flag-badge {
-    right: 2px;
-    top: 2px;
-    transform: none;
-    width: 18px;
-    height: 18px;
+  .player-card .name {
+    font-size: 9px;
+  }
+
+  .card-fixture-next {
+    font-size: 9px;
+  }
+
+  .fdr-pill {
     font-size: 7px;
   }
 
-  /* Card buttons */
-  .card-btn {
-    width: 14px;
-    height: 14px;
-    font-size: 11px;
-  }
-
-  .btn-remove {
-    top: 2px;
-    left: 2px;
-  }
-
-  .btn-swap {
-    top: 2px;
-    right: 2px;
-  }
-
-  /* Formation line - ensure no wrap but allow overflow scroll */
   .formation-line {
-    gap: 4px !important;
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
+    overflow-x: hidden;
     padding-bottom: 5px;
     padding-top: 8px;
     margin-bottom: 10px;
   }
 
-  /* Bench slots - ensure no wrap but allow overflow scroll */
   .bench-slots {
-    gap: 12px;
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
+    overflow-x: hidden;
     padding-bottom: 5px;
   }
 
   .pitch {
+    overflow-x: hidden;
     padding: 16px 10px;
-    overflow-x: auto;
   }
 
   .bench {
-    overflow-x: auto;
+    overflow-x: hidden;
     padding: 15px 10px;
   }
 
-  /* Button adjustments */
   .gw-nav button {
     padding: 7px 14px;
     font-size: 13px;
@@ -313,7 +162,6 @@
     height: 34px;
   }
 
-  /* Info button adjustments */
   .info-btn {
     width: 18px;
     height: 18px;
@@ -321,7 +169,6 @@
     font-size: 10px;
   }
 
-  /* Fixtures controls */
   .fixtures-control-btn {
     padding: 5px 7px;
     font-size: 10px;
@@ -329,46 +176,75 @@
   }
 }
 
-/* Mobile (max-width: 768px) */
+/* ----------------------------------------
+   Mobile (max-width: 768px)
+   - Show mobile top bar + bottom tab bar
+   - Panels become fullscreen overlays
+   - Pitch is default visible content
+---------------------------------------- */
 @media (max-width: 768px) {
   body {
-    padding: 10px;
+    padding: 0;
+    padding-top: 50px;  /* space for mobile top bar */
+    padding-bottom: 52px; /* space for bottom tab bar */
   }
 
-  .container {
-    max-width: 100%;
+  /* Show mobile navigation bars */
+  .mobile-top-bar {
+    display: flex;
   }
 
+  .bottom-tab-bar {
+    display: flex;
+  }
+
+  /* Hide desktop header and GW nav on mobile — replaced by mobile top bar */
   .header {
-    width: 100%;
-    height: auto;
-    flex-direction: column;
+    display: none;
   }
 
-  .header h1 {
-    font-size: 20px;
-    margin-bottom: 8px;
+  .gw-nav {
+    display: none;
   }
 
-  .sidebar {
-    width: 260px;
-  }
-
+  /* Single column layout */
   #plannerMain {
     grid-template-columns: 1fr;
+    gap: 0;
   }
 
-  /* Fix fixtures panel for mobile */
-  #fixturesPanel {
-    max-height: 400px;
+  /* Fixtures and transfer panels: fullscreen overlay (hidden by default) */
+  #fixturesPanel,
+  #transferPanel {
+    display: none;
+    position: fixed;
+    top: 50px;  /* below mobile top bar */
+    bottom: 52px; /* above tab bar */
+    left: 0;
+    right: 0;
+    z-index: 200;
+    overflow-y: auto;
     -webkit-overflow-scrolling: touch;
+    border-radius: 0;
+    max-height: none;
+    order: unset;
+  }
+
+  /* Show panels when activated by tab bar */
+  #fixturesPanel.mobile-panel-active,
+  #transferPanel.mobile-panel-active {
+    display: block;
   }
 
   .pitch {
-    padding: 15px 5px;
-    min-height: 300px;
-    /* Enable horizontal scrolling to prevent content overflow on mobile */
-    overflow-x: auto;
+    padding: 15px 8px;
+    overflow-x: hidden;
+    min-height: unset;
+  }
+
+  .bench {
+    overflow-x: hidden;
+    padding: 12px 8px;
   }
 
   /* Stack transfer action buttons vertically on mobile */
@@ -382,65 +258,13 @@
     width: 100%;
   }
 
-  .player-card {
-    width: 68px;
-    /* Prevent card from shrinking below minimum width */
-    min-width: 68px;
-    flex-shrink: 0;
-    padding: 3px;
-  }
-
   .player-card .name {
-    font-size: 9px;
-    padding: 1px 2px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    font-size: 11px;
     font-weight: 800;
   }
 
-  /* Keep ≤900 layout model; only adjust sizing here */
-  .player-card .info {
-    font-size: 7px;
-  }
-
-  .player-card .info .price {
-    font-size: 9px;
-  }
-
-  .player-card .info .next-fixture {
-    font-size: 7px;
-  }
-
-  /* Contain fixtures within card boundaries */
-  .player-card .fixtures {
-    font-size: 6px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 100%;
-  }
-
-  /* Keep captain-selector centered as set in 900px media query */
-  .captain-selector {
-    width: auto;
-    height: auto;
-    font-size: 7px;
-  }
-
-  .captain-badge {
-    left: 2px;
-    top: 2px;
-    transform: none;
-    width: 18px;
-    height: 18px;
-    font-size: 7px;
-  }
-
-  .captain-btn {
-    width: 18px;
-    height: 18px;
-    font-size: 7px;
+  .card-fixture-next {
+    font-size: 10px;
   }
 
   .badge-container {
@@ -453,46 +277,38 @@
     height: 28px;
   }
 
-  /* Status flag badge adjustments */
-  .status-flag-badge {
-    right: 2px;
-    top: 2px;
-    transform: none;
-    width: 16px;
-    height: 16px;
-    font-size: 7px;
-  }
-
-  .status-flag.right {
-    right: -50px;
-  }
-
-  /* Waving flag canvas scaled proportionally to badge size */
-  .status-flag-canvas {
-    width: 36px;
-    height: 27px;
-  }
-
   .card-btn {
-    width: 14px;
-    height: 14px;
-    font-size: 10px;
+    width: 18px;
+    height: 18px;
+    font-size: 11px;
+  }
+
+  .btn-swap {
+    font-size: 11px;
+  }
+
+  .status-flag-badge {
+    /* below btn-remove (18px at top:2px → bottom:20px) + 4px gap */
+    top: 24px;
   }
 
   .formation-line {
+    overflow-x: hidden;
     gap: 4px;
-    justify-content: center;
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
+    padding-top: 12px;
     padding-bottom: 5px;
   }
 
+  .formation-line[data-player-count="1"] { gap: 0px; }
+  .formation-line[data-player-count="2"] { gap: 12px; }
+  .formation-line[data-player-count="3"] { gap: 8px; }
+  .formation-line[data-player-count="4"] { gap: 5px; }
+  .formation-line[data-player-count="5"] { gap: 3px; }
+
   .bench-slots {
-    gap: 8px;
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
+    overflow-x: hidden;
+    gap: 6px;
+    padding-top: 12px;
     padding-bottom: 5px;
   }
 
@@ -520,7 +336,6 @@
     padding: 6px 4px;
   }
 
-  /* Fix button overlap on mobile */
   .gw-nav {
     flex-direction: column;
     gap: 8px;
@@ -531,7 +346,6 @@
     order: 1;
   }
 
-  /* Sync toggle button on mobile */
   .sync-toggle-btn {
     order: 0;
     align-self: center;
@@ -553,560 +367,76 @@
     padding: 2px 4px;
   }
 
-  /* Ensure transfer panel is scrollable */
   .transfer-panel {
-    max-height: 600px;
-    overflow-y: auto;
+    max-height: none;
   }
 }
 
-/* Mobile (max-width: 600px) - Step 1 requirement */
+/* ----------------------------------------
+   Small Mobile (max-width: 600px)
+   Further badge and text reductions
+---------------------------------------- */
 @media (max-width: 600px) {
   body {
-    padding: 8px;
+    padding-top: 50px;
+    padding-bottom: 52px;
   }
 
   .header h1 {
     font-size: 18px;
   }
 
-  /* Further reduce player card size */
-  /* C. Card Padding/Margin: Reduce padding but ensure small gap to prevent button overlap */
-  .player-card {
-    width: 58px;
-    min-width: 58px;
-    padding: 2px;
+  .badge-container {
+    width: 26px;
+    height: 26px;
   }
 
-  /* A. Font size & wrap: Shrink name font on player cards */
+  .badge-container .badge {
+    width: 26px;
+    height: 26px;
+  }
+
   .player-card .name {
-    font-size: 7px;
-    padding: 1px 2px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    font-size: 10px;
     font-weight: 800;
   }
 
-  /* Keep ≤900 layout model; only adjust sizing here */
-  .player-card .info {
-    font-size: 6px;
-    padding: 0 1px;
-  }
-
-  .player-card .info .price {
-    font-size: 8px;
-  }
-
-  .player-card .info .next-fixture {
-    font-size: 6px;
-  }
-
-  /* Keep 3 fixtures on one row */
-  .player-card .future-fixtures {
-    flex-wrap: nowrap;
-    gap: 1px;
-    font-size: 6px;
-  }
-
-  .player-card .fixtures {
-    font-size: 6px;
-  }
-
-  /* Badge size further reduction */
-  .badge-container {
-    width: 26px;
-    height: 26px;
-  }
-
-  .badge-container .badge {
-    width: 26px;
-    height: 26px;
-  }
-
-  /* Captain/VC selector - centered absolutely inside player-card on mobile */
-  .captain-selector {
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    width: auto;
-    height: auto;
-    font-size: 6px;
-  }
-
-  /* Captain badge - keep inside card */
-  .captain-badge {
-    left: 2px;
-    top: 2px;
-    transform: none;
-    width: 16px;
-    height: 16px;
-    font-size: 6px;
-  }
-
-  .captain-btn {
-    width: 16px;
-    height: 16px;
-    font-size: 6px;
-  }
-
-  /* Status flag badge adjustments */
-  .status-flag-badge {
-    right: 2px;
-    top: 2px;
-    transform: none;
-    width: 16px;
-    height: 16px;
-    font-size: 6px;
-  }
-
-  /* Card buttons */
-  /* D. Button Layout: Adjust positioning to prevent overlap */
-  .card-btn {
-    width: 12px;
-    height: 12px;
-    font-size: 8px;
-  }
-
-  .btn-remove {
-    top: 2px;
-    left: 2px;
-  }
-
-  .btn-swap {
-    top: 2px;
-    right: 2px;
-  }
-
-  /* Formation and bench - tighter gaps with better spacing */
-  /* C. Card Padding/Margin: Increase horizontal gap between cards */
-  .formation-line {
-    gap: 4px !important;
-    min-height: 75px;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    padding-bottom: 5px;
-    padding-top: 8px;
-    margin-bottom: 8px;
-  }
-
-  .bench-slots {
-    gap: 8px;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    padding-bottom: 5px;
-  }
-
-  .pitch {
-    padding: 14px 6px;
-    min-height: 280px;
-  }
-
-  .bench {
-    padding: 13px 6px;
-  }
-
-  .bench h3 {
-    font-size: 14px;
-    margin-bottom: 10px;
-  }
-
-  /* Button size reductions */
-  .gw-nav button {
-    padding: 6px 12px;
-    font-size: 12px;
-  }
-
-  .gw-nav h2 {
-    font-size: 16px;
-  }
-
-  .header-btn {
-    padding: 4px 8px;
-    font-size: 10px;
-    height: 26px;
-  }
-
-  .transfer-action-btn {
-    padding: 6px 12px;
-    font-size: 11px;
-    height: 32px;
-  }
-
-  .chip-btn-small {
-    padding: 6px 10px;
-    font-size: 11px;
-    height: 32px;
-  }
-
-  .info-btn {
-    width: 16px;
-    height: 16px;
-    min-width: 16px;
+  .card-fixture-next {
     font-size: 9px;
   }
 
-  .fixtures-control-btn {
-    padding: 4px 6px;
-    font-size: 9px;
-    height: 26px;
-  }
-
-  /* Bank display and price toggle */
-  .bank-display,
-  .price-toggle {
-    font-size: 11px;
-    padding: 3px 8px;
-    height: 26px;
-  }
-
-  .bank-display input {
-    width: 50px;
-    font-size: 11px;
-  }
-
-  .price-toggle select {
-    font-size: 11px;
-  }
-
-  .donate-btn {
-    font-size: 11px;
-    padding: 3px 8px;
-    height: 26px;
-  }
-
-  .sidebar-toggle {
-    font-size: 11px;
-    padding: 5px 10px;
-    height: 26px;
-  }
-
-  /* Table adjustments */
-  table {
-    font-size: 11px;
-  }
-
-  th, td {
-    padding: 4px 2px;
-  }
-
-  /* Fixture adjustments */
-  .fixture-row {
-    grid-template-columns: minmax(80px, 1fr) 45px minmax(80px, 1fr);
-    font-size: 11px;
-  }
-
-  .team-badge {
-    width: 16px;
-    height: 16px;
-  }
-
-  .club-badge {
-    width: 18px;
-    height: 18px;
-  }
-}
-
-/* ===== Landscape Mode Optimizations ===== */
-
-/* Tablet Landscape (landscape orientation with limited height) */
-@media (max-width: 1024px) and (max-height: 768px) and (orientation: landscape) {
-  body {
-    padding: 8px;
-  }
-
-  /* Optimize for horizontal space in landscape */
-  #plannerMain {
-    grid-template-columns: 280px 1fr 320px;
-    gap: 10px;
-  }
-
-  #fixturesPanel {
-    order: 1;
-    max-height: calc(100vh - 100px);
-    overflow-y: auto;
-  }
-
-  #mainColumn {
-    order: 2;
-  }
-
-  .transfer-panel {
-    order: 3;
-    max-height: calc(100vh - 100px);
-  }
-
-  .header {
-    margin-bottom: 8px;
-  }
-
-  .header h1 {
-    font-size: 18px;
-    width: auto;
-  }
-
-  /* Reduce vertical spacing */
-  .pitch {
-    padding: 12px 10px;
-    min-height: 240px;
-    margin-bottom: 8px;
-  }
-
-  .bench {
-    padding: 10px;
-  }
-
-  .bench h3 {
-    font-size: 14px;
-    margin-bottom: 8px;
-  }
-
-  .formation-line {
-    gap: 8px;
-    min-height: 70px;
-  }
-
-  .player-card {
-    width: 90px;
-  }
-
-  .badge-container {
-    width: 28px;
-    height: 28px;
-  }
-
-  .badge-container .badge {
-    width: 28px;
-    height: 28px;
-  }
-
-  /* Compact GW navigation */
-  .gw-nav {
-    margin-bottom: 10px;
-    flex-direction: row;
-    gap: 10px;
-  }
-
-  .gw-nav h2 {
-    font-size: 16px;
-  }
-
-  .gw-nav button {
-    padding: 6px 12px;
-    font-size: 12px;
-  }
-
-  /* Compact filters */
-  .filters-compact {
-    gap: 4px;
-    margin-bottom: 8px;
-  }
-
-  .filters-compact input,
-  .filters-compact select {
-    padding: 5px;
-    font-size: 11px;
-  }
-
-  /* Reduce header height */
-  .header-btn,
-  .bank-display,
-  .price-toggle,
-  .donate-btn {
-    height: 26px;
-    padding: 4px 8px;
-    font-size: 11px;
-  }
-}
-
-/* Mobile Landscape (small screens in landscape) */
-@media (max-width: 900px) and (max-height: 500px) and (orientation: landscape) {
-  body {
-    padding: 6px;
-  }
-
-  /* Single column with horizontal sections in landscape */
-  #plannerMain {
-    grid-template-columns: 1fr;
-    gap: 8px;
-  }
-
-  #fixturesPanel {
-    max-height: 200px; /* Compact fixtures panel in mobile landscape */
-    overflow-y: auto;
-    order: 3; /* Move to bottom */
-  }
-
-  .header {
-    margin-bottom: 6px;
-  }
-
-  .header h1 {
-    font-size: 16px;
-  }
-
-  /* Very compact pitch for landscape mobile */
-  .pitch {
-    padding: 8px 6px;
-    min-height: 200px;
-    margin-bottom: 6px;
-  }
-
-  .bench {
-    padding: 8px;
-  }
-
-  .bench h3 {
-    font-size: 12px;
-    margin-bottom: 6px;
-  }
-
-  .formation-line {
-    gap: 5px;
-    min-height: 60px;
-  }
-
-  .bench-slots {
-    gap: 6px;
-  }
-
-  .player-card {
-    width: 65px;
-    min-width: 65px;
-    padding: 3px;
-  }
-
-  .player-card .name {
-    font-size: 8px;
-    padding: 1px 2px;
-  }
-
-  .player-card .info {
+  .fdr-pill {
     font-size: 7px;
   }
 
-  .badge-container {
-    width: 24px;
-    height: 24px;
-  }
-
-  .badge-container .badge {
-    width: 24px;
-    height: 24px;
-  }
-
-  .captain-selector,
-  .captain-badge {
-    left: -26px;
-    width: 16px;
-    height: 16px;
-    font-size: 6px;
-  }
-
-  .captain-btn {
-    width: 16px;
-    height: 16px;
-    font-size: 6px;
-  }
-
-  .status-flag-badge {
-    right: -22px;
-    width: 14px;
-    height: 14px;
-    font-size: 6px;
-  }
-
-  .card-btn {
-    width: 12px;
-    height: 12px;
-    font-size: 9px;
-  }
-
-  /* Compact GW navigation */
-  .gw-nav {
-    margin-bottom: 6px;
-    flex-direction: row;
-    gap: 8px;
-  }
-
-  .gw-nav h2 {
-    font-size: 14px;
-  }
-
-  .gw-nav button {
-    padding: 4px 10px;
+  .fixtures-view-toggle-btn {
     font-size: 11px;
+    padding: 5px 12px;
   }
 
-  .sync-toggle-btn {
-    padding: 4px 8px !important;
-    font-size: 12px;
+  .fixtures-team-select {
+    font-size: 11px;
+    padding: 5px 8px;
+    max-width: 180px;
   }
 
-  /* Compact transfer panel */
-  .transfer-panel {
-    max-height: calc(100vh - 60px);
-    padding: 10px;
-  }
-
-  .transfer-panel h3 {
-    font-size: 14px;
-    margin-bottom: 6px;
-  }
-
-  .transfer-actions {
-    gap: 6px;
-    flex-direction: row;
-  }
-
-  .transfer-action-btn {
-    padding: 5px 10px;
-    font-size: 10px;
-    height: 28px;
-  }
-
-  .filters-compact {
-    gap: 4px;
-    margin-bottom: 6px;
-  }
-
-  .filters-compact input,
-  .filters-compact select {
-    padding: 4px;
-    font-size: 10px;
-  }
-
-  /* Compact header elements */
-  .header-btn,
-  .bank-display,
-  .price-toggle,
-  .donate-btn,
-  .sidebar-toggle {
-    height: 24px;
-    padding: 3px 6px;
-    font-size: 10px;
-  }
-
-  .bank-display input,
-  .price-toggle select {
-    height: 18px;
-    font-size: 10px;
-  }
-
-  /* Compact tables */
-  table {
-    font-size: 10px;
-  }
-
-  th, td {
-    padding: 3px 2px;
+  .fixture-gw-badge {
+    font-size: 9px;
+    padding: 1px 4px;
+    margin-left: 4px;
   }
 }
 
-/* Small Mobile (max-width: 480px) */
+/* ----------------------------------------
+   Phone (max-width: 480px)
+   Ultra-compact cards, full-width pitch
+---------------------------------------- */
 @media (max-width: 480px) {
   body {
-    padding: 6px;
+    padding-top: 50px;
+    padding-bottom: 52px;
+    padding-left: 0;
+    padding-right: 0;
   }
 
   .header h1 {
@@ -1115,43 +445,61 @@
 
   .sidebar {
     width: 100%;
-    padding: 60px 15px 15px;
+    padding-top: 60px;
+  }
+
+  /* Full-width pitch with no side gutters */
+  .container {
+    max-width: 100%;
+    margin-left: 0;
+    margin-right: 0;
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .pitch-stack {
+    width: 100%;
+    max-width: none;
+    margin-left: 0;
+    margin-right: 0;
   }
 
   .pitch {
-    padding: 10px 2px;
-    min-height: 240px;
+    width: 100%;
+    max-width: none;
+    margin-left: 0;
+    margin-right: 0;
+    padding: 10px 4px;
+    overflow-x: hidden;
   }
 
-  /* Ultra-compact player cards */
-  .player-card {
-    width: 52px;
-    min-width: 52px;
-    flex-shrink: 0;
-    padding: 2px;
+  .bench {
+    overflow-x: hidden;
+    padding: 10px 4px;
   }
 
-  .player-card .name {
-    font-size: 7px;
-    padding: 1px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    font-weight: 800;
+  .formation-line {
+    width: 100%;
+    overflow-x: hidden;
+    gap: 3px;
+    min-height: 75px;
+    padding-top: 12px;
+    padding-bottom: 5px;
   }
 
-  /* Keep ≤900 layout model; only adjust sizing here */
-  .player-card .info {
-    font-size: 6px;
-    gap: 2px;
-    padding: 0 1px;
+  .formation-line[data-player-count="1"] { gap: 0px; }
+  .formation-line[data-player-count="2"] { gap: 10px; }
+  .formation-line[data-player-count="3"] { gap: 6px; }
+  .formation-line[data-player-count="4"] { gap: 4px; }
+  .formation-line[data-player-count="5"] { gap: 3px; }
+
+  .bench-slots {
+    overflow-x: hidden;
+    gap: 4px;
+    padding-top: 12px;
+    padding-bottom: 5px;
   }
 
-  .player-card .fixtures {
-    font-size: 5px;
-  }
-
-  /* Ultra-compact badges */
   .badge-container {
     width: 24px;
     height: 24px;
@@ -1162,20 +510,35 @@
     height: 24px;
   }
 
-  /* Captain/VC badges */
-  .captain-selector {
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    width: auto;
-    height: auto;
-    font-size: 6px;
+  .player-card .name {
+    font-size: 9px;
+    font-weight: 800;
+  }
+
+  .card-fixture-next {
+    font-size: 8px;
+  }
+
+  .fdr-pill {
+    font-size: 7px;
+  }
+
+  .card-price {
+    font-size: 7px;
+    padding: 2px 4px;
+  }
+
+  .card-btn {
+    width: 16px;
+    height: 16px;
+    font-size: 10px;
+  }
+
+  .btn-swap {
+    font-size: 10px;
   }
 
   .captain-badge {
-    left: 2px;
-    top: 2px;
-    transform: none;
     width: 14px;
     height: 14px;
     font-size: 6px;
@@ -1187,66 +550,14 @@
     font-size: 6px;
   }
 
-  /* Status flags */
   .status-flag-badge {
-    right: 2px;
-    top: 2px;
-    transform: none;
+    /* below btn-remove (16px at top:2px → bottom:18px) + 4px gap */
+    top: 22px;
     width: 14px;
     height: 14px;
     font-size: 6px;
   }
 
-  .status-flag.right {
-    right: -48px;
-  }
-
-  .status-flag-canvas {
-    width: 32px;
-    height: 24px;
-  }
-
-  /* Card buttons */
-  .card-btn {
-    width: 12px;
-    height: 12px;
-    font-size: 9px;
-  }
-
-  .btn-remove {
-    top: 2px;
-    left: 2px;
-  }
-
-  .btn-swap {
-    top: 2px;
-    right: 2px;
-  }
-
-  /* Formation and bench spacing */
-  .formation-line {
-    gap: 2px;
-    min-height: 70px;
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    padding-bottom: 5px;
-  }
-
-  .bench-slots {
-    gap: 4px;
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    padding-bottom: 5px;
-  }
-
-  .bench h3 {
-    font-size: 13px;
-    margin-bottom: 8px;
-  }
-
-  /* Button size reductions */
   .gw-nav button {
     padding: 5px 10px;
     font-size: 11px;
@@ -1292,7 +603,6 @@
     height: 24px;
   }
 
-  /* Bank display and controls */
   .bank-display,
   .price-toggle {
     font-size: 10px;
@@ -1329,7 +639,6 @@
     padding: 4px 8px;
   }
 
-  /* Table adjustments */
   table {
     font-size: 10px;
   }
@@ -1338,7 +647,6 @@
     padding: 3px 2px;
   }
 
-  /* Chip UI adjustments */
   .chip-indicator {
     padding: 3px 8px;
     font-size: 10px;
@@ -1353,7 +661,6 @@
     font-size: 9px;
   }
 
-  /* Fixture adjustments */
   .fixture-row {
     grid-template-columns: minmax(70px, 1fr) 40px minmax(70px, 1fr);
     font-size: 10px;
@@ -1383,9 +690,8 @@
     padding: 2px 3px;
   }
 
-  /* Message and modal adjustments */
   .message {
-    bottom: 10px;
+    bottom: 60px; /* above tab bar */
     right: 10px;
     left: 10px;
     padding: 10px 15px;
@@ -1418,14 +724,12 @@
     max-height: 85vh;
   }
 
-  /* Squad player modal - match transfer table modal sizing */
   #squadPlayerInfoModal .player-info-content {
-    max-width: 95% !important;
+    max-width: 95%;
     padding: 15px 12px;
     max-height: 80vh;
   }
 
-  /* Reduce spacing in squad modal sections for mobile */
   #squadPlayerInfoModal .player-info-section {
     margin-top: 12px;
   }
@@ -1435,7 +739,6 @@
     margin-bottom: 6px;
   }
 
-  /* Make action buttons more compact */
   #squadPlayerInfoModal .modal-action-btn {
     padding: 8px 12px;
     font-size: 12px;
@@ -1464,7 +767,7 @@
   }
 
   .transfer-panel {
-    max-height: 600px;
+    max-height: none;
   }
 
   .player-table-compact {
@@ -1478,250 +781,7 @@
     font-size: 11px;
     padding: 5px;
   }
-}
 
-/* ===== Tablet Portrait Overrides (Better spacing for tablets) ===== */
-/* Tablets in portrait have much more room than phones - give them better spacing */
-/* This targets tablets (481-900px) in portrait ONLY, falling between: */
-/* - The 900px breakpoint (which applies to both portrait and landscape) */
-/* - The 480px mobile portrait breakpoint (which only applies to small phones) */
-/* This ensures tablets get comfortable 12px gaps without affecting desktop or phone layouts */
-@media (min-width: 481px) and (max-width: 900px) and (orientation: portrait) {
-  /* Increase card spacing for tablets - they have plenty of room */
-  /* Combined formation-line rules and removed !important */
-  .formation-line {
-    gap: 12px;
-    overflow-x: hidden;
-  }
-
-  .bench-slots {
-    gap: 12px;
-    overflow-x: hidden;
-  }
-
-  /* Ensure no horizontal scrolling on tablets */
-  .pitch {
-    overflow-x: hidden;
-  }
-
-  .bench {
-    overflow-x: hidden;
-  }
-
-  /* Squad player modal - adjust for tablet */
-  #squadPlayerInfoModal .player-info-content {
-    max-width: 90% !important;
-    padding: 18px 14px;
-  }
-
-  #squadPlayerInfoModal .player-info-section {
-    margin-top: 14px;
-  }
-
-  #squadPlayerInfoModal .player-info-section h3 {
-    font-size: 15px;
-  }
-
-  #squadPlayerInfoModal .modal-action-btn {
-    padding: 9px 14px;
-    font-size: 12px;
-  }
-}
-
-/* ===== Mobile Portrait Pitch Overrides (DO NOT AFFECT DESKTOP) ===== */
-/* Phase 1: CSS-only fix for mobile portrait to eliminate gutters and horizontal scrolling */
-@media (max-width: 480px) and (orientation: portrait) {
-  /* 1. Remove mobile portrait gutters - override body padding */
-  body {
-    padding-left: 0;
-    padding-right: 0;
-    /* Keep vertical padding as-is */
-  }
-
-  /* 2. Ensure container is full width and remove padding */
-  .container {
-    max-width: 100%;
-    margin-left: 0;
-    margin-right: 0;
-    padding-left: 0;
-    padding-right: 0;
-  }
-
-  /* 3. Make pitch-stack and pitch full width - remove horizontal centering */
-  .pitch-stack {
-    width: 100%;
-    max-width: none;
-    margin-left: 0;
-    margin-right: 0;
-  }
-
-  .pitch {
-    width: 100%;
-    max-width: none;
-    margin-left: 0;
-    margin-right: 0;
-    /* 4. Disable horizontal scrolling on pitch - override overflow-x: auto from 900px/768px breakpoints */
-    overflow-x: hidden;
-  }
-
-  /* 5. Ensure formation rows expand to pitch width and are not scroll containers */
-  .formation-line {
-    width: 100%;
-    overflow-x: hidden;
-  }
-
-  /* Also disable overflow on bench to match */
-  .bench {
-    overflow-x: hidden;
-  }
-
-  .bench-slots {
-    overflow-x: hidden;
-  }
-
-  /* ===== Phase 2: Card sizing and spacing to prevent overlap ===== */
-  
-  /* Tune player card width and padding for 360-430px portrait phones */
-  /* Must fit 5 cards for 3-5-2 and 5-3-2 formations in 360px viewport */
-  /* Note: 65px is larger than 480px breakpoint (52px) because portrait mode */
-  /* has more vertical space, allowing us to use larger cards for better UX */
-  /* while still preventing horizontal overlap in 5-card formations */
-  .player-card {
-    width: 65px;
-    min-width: 65px;
-    padding: 2px;
-  }
-
-  /* Adjust text sizes proportionally for 65px cards (vs 52px at 480px) */
-  .player-card .name {
-    font-size: 8px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    font-weight: 800;
-  }
-
-  .player-card .info {
-    font-size: 7px;
-    display: flex;
-    align-items: center;
-    gap: 2px;
-    max-width: 100%;
-  }
-
-  .player-card .info .next-fixture {
-    font-size: 7px;
-    font-weight: 700;
-    white-space: nowrap;
-    flex-grow: 1;
-    min-width: 0;
-  }
-
-  .player-card .info .price {
-    font-size: 9px;
-    font-weight: 700;
-    white-space: nowrap;
-    flex-shrink: 0;
-    margin-left: auto;
-  }
-
-  .player-card .fixtures {
-    font-size: 6px;
-  }
-
-  /* Adjust formation line gap and min-height for better spacing */
-  /* Gap sized to fit 5 cards: (65*5) + (5*4) = 325px + 20px = 345px fits in 360px */
-  /* Note: 65px width includes padding (box-sizing: border-box) */
-  .formation-line {
-    gap: 5px;
-    min-height: 85px;
-    padding-top: 8px;
-    padding-bottom: 5px;
-  }
-
-  /* Adjust bench slots gap */
-  .bench-slots {
-    gap: 5px;
-  }
-
-  /* Reduce badge container size to match smaller cards */
-  .badge-container {
-    width: 26px;
-    height: 26px;
-  }
-
-  .badge-container .badge {
-    width: 26px;
-    height: 26px;
-  }
-
-  /* Adjust card button positioning to prevent overlap on smaller cards */
-  /* Buttons positioned INSIDE card corners to prevent overlap with adjacent cards */
-  /* Mobile portrait has 5px gap (tight for 5-card formations); buttons inside prevent overlap */
-  .card-btn {
-    width: 12px;
-    height: 12px;
-    font-size: 9px;
-  }
-
-  .btn-remove {
-    top: 2px;
-    left: 2px;
-  }
-
-  .btn-swap {
-    top: 2px;
-    right: 2px;
-  }
-
-  /* Adjust captain/status badges for smaller cards */
-  /* Badges are 16px (same as 600px breakpoint), so use same 6px font */
-  .captain-badge {
-    left: 2px;
-    top: 2px;
-    transform: none;
-    width: 16px;
-    height: 16px;
-    font-size: 6px;
-  }
-
-  .captain-btn {
-    width: 16px;
-    height: 16px;
-    font-size: 6px;
-  }
-
-  .status-flag-badge {
-    right: 2px;
-    top: 2px;
-    transform: none;
-    width: 16px;
-    height: 16px;
-    font-size: 6px;
-  }
-}
-
-/* Responsive styles for fixtures view toggle */
-@media (max-width: 600px) {
-  .fixtures-view-toggle-btn {
-    font-size: 11px;
-    padding: 5px 12px;
-  }
-
-  .fixtures-team-select {
-    font-size: 11px;
-    padding: 5px 8px;
-    max-width: 180px;
-  }
-
-  .fixture-gw-badge {
-    font-size: 9px;
-    padding: 1px 4px;
-    margin-left: 4px;
-  }
-}
-
-@media (max-width: 480px) {
   .fixtures-view-toggle-btn {
     font-size: 10px;
     padding: 4px 10px;
@@ -1742,28 +802,322 @@
     padding: 1px 3px;
     margin-left: 3px;
   }
-  
+
   .team-fixture-row {
     grid-template-columns: 48px 24px 1fr 46px;
     gap: 5px;
     padding: 6px 8px;
     font-size: 11px;
   }
-  
+
   .team-fixture-gw {
     font-size: 11px;
   }
-  
+
   .team-fixture-badge {
     width: 20px;
     height: 20px;
   }
-  
+
   .team-fixture-opponent {
     font-size: 11px;
   }
-  
+
   .team-fixture-venue {
     font-size: 10px;
+  }
+}
+
+/* ----------------------------------------
+   Tablet Portrait (481–900px, portrait)
+   Better spacing for tablets
+---------------------------------------- */
+@media (min-width: 481px) and (max-width: 900px) and (orientation: portrait) {
+  .formation-line {
+    overflow-x: hidden;
+  }
+
+  .formation-line[data-player-count="1"] { gap: 0px; }
+  .formation-line[data-player-count="2"] { gap: 20px; }
+  .formation-line[data-player-count="3"] { gap: 14px; }
+  .formation-line[data-player-count="4"] { gap: 10px; }
+  .formation-line[data-player-count="5"] { gap: 8px; }
+
+  .bench-slots {
+    gap: 12px;
+    overflow-x: hidden;
+  }
+
+  .pitch {
+    overflow-x: hidden;
+  }
+
+  .bench {
+    overflow-x: hidden;
+  }
+
+  #squadPlayerInfoModal .player-info-content {
+    max-width: 90%;
+    padding: 18px 14px;
+  }
+
+  #squadPlayerInfoModal .player-info-section {
+    margin-top: 14px;
+  }
+
+  #squadPlayerInfoModal .player-info-section h3 {
+    font-size: 15px;
+  }
+
+  #squadPlayerInfoModal .modal-action-btn {
+    padding: 9px 14px;
+    font-size: 12px;
+  }
+}
+
+/* ----------------------------------------
+   Tablet Landscape (≤1024px, landscape, ≤768px height)
+   Compact side-by-side layout
+---------------------------------------- */
+@media (max-width: 1024px) and (max-height: 768px) and (orientation: landscape) {
+  body {
+    padding: 8px;
+  }
+
+  #plannerMain {
+    grid-template-columns: 280px 1fr 320px;
+    gap: 10px;
+  }
+
+  #fixturesPanel {
+    order: 1;
+    max-height: calc(100vh - 100px);
+    overflow-y: auto;
+  }
+
+  #mainColumn {
+    order: 2;
+  }
+
+  .transfer-panel {
+    order: 3;
+    max-height: calc(100vh - 100px);
+  }
+
+  .header {
+    margin-bottom: 8px;
+  }
+
+  .header h1 {
+    font-size: 18px;
+    width: auto;
+  }
+
+  .pitch {
+    padding: 12px 10px;
+    min-height: 240px;
+    margin-bottom: 8px;
+    overflow-x: hidden;
+  }
+
+  .bench {
+    padding: 10px;
+    overflow-x: hidden;
+  }
+
+  .bench h3 {
+    font-size: 14px;
+    margin-bottom: 8px;
+  }
+
+  .formation-line {
+    gap: 8px;
+    min-height: 70px;
+  }
+
+  .badge-container {
+    width: 28px;
+    height: 28px;
+  }
+
+  .badge-container .badge {
+    width: 28px;
+    height: 28px;
+  }
+
+  .gw-nav {
+    margin-bottom: 10px;
+    flex-direction: row;
+    gap: 10px;
+  }
+
+  .gw-nav h2 {
+    font-size: 16px;
+  }
+
+  .gw-nav button {
+    padding: 6px 12px;
+    font-size: 12px;
+  }
+
+  .filters-compact {
+    gap: 4px;
+    margin-bottom: 8px;
+  }
+
+  .filters-compact input,
+  .filters-compact select {
+    padding: 5px;
+    font-size: 11px;
+  }
+
+  .header-btn,
+  .bank-display,
+  .price-toggle,
+  .donate-btn {
+    height: 26px;
+    padding: 4px 8px;
+    font-size: 11px;
+  }
+}
+
+/* ----------------------------------------
+   Mobile Landscape (≤900px, ≤500px height, landscape)
+   Very compact single column
+---------------------------------------- */
+@media (max-width: 900px) and (max-height: 500px) and (orientation: landscape) {
+  body {
+    padding: 6px;
+  }
+
+  #plannerMain {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  #fixturesPanel {
+    max-height: 200px;
+    overflow-y: auto;
+    order: 3;
+  }
+
+  .header {
+    margin-bottom: 6px;
+  }
+
+  .header h1 {
+    font-size: 16px;
+  }
+
+  .pitch {
+    padding: 8px 6px;
+    min-height: 200px;
+    margin-bottom: 6px;
+    overflow-x: hidden;
+  }
+
+  .bench {
+    padding: 8px;
+    overflow-x: hidden;
+  }
+
+  .bench h3 {
+    font-size: 12px;
+    margin-bottom: 6px;
+  }
+
+  .formation-line {
+    gap: 5px;
+    min-height: 60px;
+  }
+
+  .bench-slots {
+    gap: 6px;
+  }
+
+  .badge-container {
+    width: 24px;
+    height: 24px;
+  }
+
+  .badge-container .badge {
+    width: 24px;
+    height: 24px;
+  }
+
+  .gw-nav {
+    margin-bottom: 6px;
+    flex-direction: row;
+    gap: 8px;
+  }
+
+  .gw-nav h2 {
+    font-size: 14px;
+  }
+
+  .gw-nav button {
+    padding: 4px 10px;
+    font-size: 11px;
+  }
+
+  .sync-toggle-btn {
+    padding: 4px 8px !important;
+    font-size: 12px;
+  }
+
+  .transfer-panel {
+    max-height: calc(100vh - 60px);
+    padding: 10px;
+  }
+
+  .transfer-panel h3 {
+    font-size: 14px;
+    margin-bottom: 6px;
+  }
+
+  .transfer-actions {
+    gap: 6px;
+    flex-direction: row;
+  }
+
+  .transfer-action-btn {
+    padding: 5px 10px;
+    font-size: 10px;
+    height: 28px;
+  }
+
+  .filters-compact {
+    gap: 4px;
+    margin-bottom: 6px;
+  }
+
+  .filters-compact input,
+  .filters-compact select {
+    padding: 4px;
+    font-size: 10px;
+  }
+
+  .header-btn,
+  .bank-display,
+  .price-toggle,
+  .donate-btn,
+  .sidebar-toggle {
+    height: 24px;
+    padding: 3px 6px;
+    font-size: 10px;
+  }
+
+  .bank-display input,
+  .price-toggle select {
+    height: 18px;
+    font-size: 10px;
+  }
+
+  table {
+    font-size: 10px;
+  }
+
+  th, td {
+    padding: 3px 2px;
   }
 }
