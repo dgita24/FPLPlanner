@@ -12,6 +12,9 @@ import { MAX_GAMEWEEK, MAX_DRAFTS_PER_MANAGER } from './constants.js';
 // Global selected draft tracker
 let selectedDraft = null;
 
+// Flag to prevent updateUI from overwriting the bank display while it's being edited
+let bankEditActive = false;
+
 // Helper function for pluralization
 function pluralize(word, count) {
   return count === 1 ? word : word + 's';
@@ -69,9 +72,9 @@ export function updateUI() {
   const mobileGWEl = document.getElementById('mobileGWDisplay');
   if (mobileGWEl) mobileGWEl.textContent = state.viewingGW;
 
-  // Update mobile bank display
+  // Update mobile bank display (skip if user is currently editing)
   const mobileBankEl = document.getElementById('mobileBankDisplay');
-  if (mobileBankEl) mobileBankEl.textContent = `£${Number(state.bank).toFixed(1)}m`;
+  if (mobileBankEl && !bankEditActive) mobileBankEl.textContent = `£${Number(state.bank).toFixed(1)}m`;
 
   const prevBtn = document.getElementById('prevGW');
   const nextBtn = document.getElementById('nextGW');
@@ -121,6 +124,83 @@ export function updateUI() {
 
   renderPitch();
   renderBench();
+  silentSave();
+}
+
+// Silently save current state to localStorage (no toast)
+function silentSave() {
+  try {
+    if (!state.plan || Object.keys(state.plan).length === 0) return;
+    const data = {
+      plan: state.plan,
+      bank: state.bank,
+      viewingGW: state.viewingGW,
+      minNavigableGW: state.minNavigableGW,
+      priceMode: state.priceMode
+    };
+    localStorage.setItem('fplplanner-state', JSON.stringify(data));
+  } catch (e) {
+    // Silently fail — storage may be full or unavailable
+  }
+}
+
+// Mobile bank badge: tap to inline-edit the bank value
+function setupMobileBankEdit() {
+  const bankDisplay = document.getElementById('mobileBankDisplay');
+  if (!bankDisplay) return;
+
+  bankDisplay.addEventListener('click', () => {
+    if (bankEditActive) return;
+    bankEditActive = true;
+
+    const originalBank = state.bank;
+
+    // Build the input element without interpolating bank value into HTML
+    bankDisplay.innerHTML = `<input id="mobileBankEditInput" type="number" step="0.1" min="0" />`;
+    const input = document.getElementById('mobileBankEditInput');
+    // Set value via JS to avoid any XSS risk from state.bank
+    input.value = Number(originalBank).toFixed(1);
+
+    // Style the inline input to fit the bank badge
+    Object.assign(input.style, {
+      width: '65px',
+      fontSize: '13px',
+      fontWeight: '700',
+      textAlign: 'center',
+      background: 'rgba(255,255,255,0.95)',
+      color: '#262626',
+      border: 'none',
+      borderRadius: '4px',
+      padding: '2px 4px',
+    });
+    input.focus();
+    input.select();
+
+    const cancel = () => {
+      state.bank = originalBank; // revert to value before edit
+      bankEditActive = false;
+      updateUI();
+    };
+
+    const commit = () => {
+      const v = parseFloat(input.value);
+      if (Number.isFinite(v) && v >= 0) {
+        state.bank = v;
+      } else {
+        state.bank = originalBank; // revert if invalid
+      }
+      bankEditActive = false;
+      updateUI();
+    };
+
+    input.addEventListener('blur', commit);
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') input.blur();
+      if (e.key === 'Escape') { input.removeEventListener('blur', commit); cancel(); }
+    });
+    // Prevent the click on the input from triggering the outer click listener again
+    input.addEventListener('click', (e) => e.stopPropagation());
+  });
 }
 
 // Helper function to change GW with validation
@@ -796,6 +876,9 @@ export function initUI() {
       updateUI();
     });
   }
+
+  // Mobile bank badge — tap to edit the bank value inline
+  setupMobileBankEdit();
 
   // Price mode dropdown should update player card prices
   const pm = document.getElementById('priceModeSelect');

@@ -527,8 +527,10 @@
 
 .mobile-top-bar {
   display: none; /* hidden on desktop, shown on ≤768px via responsive.css */
-  position: sticky;
+  position: fixed;
   top: 0;
+  left: 0;
+  right: 0;
   z-index: 500;
   height: 50px;
   background: var(--bg-dark);
@@ -601,6 +603,8 @@
   padding: 4px 8px;
   white-space: nowrap;
   flex-shrink: 0;
+  cursor: pointer;
+  user-select: none;
 }
 
 /* ===== Bottom Tab Bar ===== */
@@ -659,7 +663,7 @@
 /* ===== Bench ===== */
 
 .bench {
-  background: linear-gradient(to bottom, var(--success) 0%, var(--success-hover) 100%);
+  background: linear-gradient(to bottom, #1c8040 0%, #145e2c 100%);
   padding: 13px;
   border-radius: 10px;
   max-width: 935px;
@@ -669,9 +673,7 @@
 }
 
 .bench h3 {
-  text-align: center;
-  color: var(--bg-light);
-  margin-bottom: 12px;
+  display: none;
 }
 
 .bench-slots {
