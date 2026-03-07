@@ -121,6 +121,31 @@ function getNextFixturesCompact(teamId, startGW, count = 4) {
   return out;
 }
 
+// Returns array of { text, fdr } objects — compact opponent name + FDR value
+function getNextFixturesFDRData(teamId, startGW, count = 4) {
+  const out = [];
+  for (let i = 0; i < count; i++) {
+    const gw = startGW + i;
+    if (!fixturesByGW.has(gw)) {
+      out.push({ text: '?', fdr: null });
+      continue;
+    }
+    const list = fixturesByGW.get(gw);
+    const fx = bestFixtureForTeamInGW(teamId, list);
+    if (!fx) {
+      out.push({ text: '-', fdr: null });
+      continue;
+    }
+    const isHome = fx.team_h === teamId;
+    const oppId = isHome ? fx.team_a : fx.team_h;
+    const opp = getTeamShortName(oppId) || '???';
+    const text = isHome ? opp.toUpperCase() : opp.toLowerCase();
+    const fdr = isHome ? fx.team_h_difficulty : fx.team_a_difficulty;
+    out.push({ text, fdr });
+  }
+  return out;
+}
+
 export function ensureFixturesForView() {
   const token = ++fixturesLoadToken;
   const start = state.viewingGW;
@@ -280,17 +305,11 @@ export function renderPitch() {
 
   const renderCard = (e) => e.isPlaceholder ? placeholderCard(e, 'starting') : playerCard(e, 'starting');
 
-  // Add chip indicator and button
-  const chipUI = renderChipUI();
-
   // Determine formation for CSS targeting
   const formation = `${def.length}${mid.length}${fwd.length}`;
   pitch.setAttribute('data-formation', formation);
 
   pitch.innerHTML = `
-    <div class="pitch-top-controls">
-      ${chipUI}
-    </div>
     <div class="formation-line" data-player-count="${gk.length}">${gk.map(renderCard).join('')}</div>
     <div class="formation-line" data-player-count="${def.length}">${def.map(renderCard).join('')}</div>
     <div class="formation-line" data-player-count="${mid.length}">${mid.map(renderCard).join('')}</div>
@@ -319,6 +338,12 @@ export function renderBench() {
 
   const renderCard = (e) => e.isPlaceholder ? placeholderCard(e, 'bench') : playerCard(e, 'bench');
   benchSlots.innerHTML = benchPlayers.map(renderCard).join('');
+
+  // Render chip buttons in chip area below bench
+  const chipArea = document.getElementById('chipArea');
+  if (chipArea) {
+    chipArea.innerHTML = renderChipUI();
+  }
 }
 
 function playerCard(entry, source) {
@@ -330,30 +355,13 @@ function playerCard(entry, source) {
   const teamShort = getTeamShortName(teamId);
 
   const price = displayPrice(entry).toFixed(1);
-  const label =
-    state.priceMode === 'current'
-      ? 'Cur'
-      : state.priceMode === 'purchase'
-        ? 'Buy'
-        : 'Sell';
-  
-  const shortLabel =
-    state.priceMode === 'current'
-      ? 'C'
-      : state.priceMode === 'purchase'
-        ? 'P'
-        : 'S';
 
-  const fx = getNextFixturesForTeam(teamId, state.viewingGW, 4);
-  const fxCompact = getNextFixturesCompact(teamId, state.viewingGW, 4);
-  const fx1 = fx[0] || '--';
-  const fx2 = fx[1] || '--';
-  const fx3 = fx[2] || '--';
-  const fx4 = fx[3] || '--';
-  const fx1Compact = fxCompact[0] || '--';
-  const fx2Compact = fxCompact[1] || '--';
-  const fx3Compact = fxCompact[2] || '--';
-  const fx4Compact = fxCompact[3] || '--';
+  // Get compact fixtures with FDR data (4 GWs: current + 3 future)
+  const fxData = getNextFixturesFDRData(teamId, state.viewingGW, 4);
+  const fx1 = fxData[0] || { text: '--', fdr: null };
+  const fx2 = fxData[1] || { text: '--', fdr: null };
+  const fx3 = fxData[2] || { text: '--', fdr: null };
+  const fx4 = fxData[3] || { text: '--', fdr: null };
 
   const removeFn = `removePlayer(${entry.id}, '${source}')`;
   const subFn = `substitutePlayer(${entry.id})`;
@@ -362,55 +370,31 @@ function playerCard(entry, source) {
   const cardClass = `player-card${armed ? ' pending-swap' : ''}`;
   const swapTitle = armed ? 'Cancel swap' : 'Swap';
 
-  // Injury/suspension status - show circular badges similar to captain badges
-  // status: 'a' = available, 'd' = doubtful (yellow), 'i' = injured (red), 's' = suspended (red), 'u' = unavailable (red)
-  // news: contains injury details text
+  // Injury/suspension status badges
   let statusFlags = '';
-  
-  // Pass events array for date-based suspension parsing
   const events = state.bootstrap?.events || [];
   if (shouldShowPlayerFlag(p, state.viewingGW, state.currentGW, events)) {
     const isDoubtful = p.status === 'd';
-    const isSuspended = p.status === 's';
-    
-    // For red flags (suspended/injured/unavailable): show "0"
-    // For yellow flags (doubtful): show chance of playing percentage
     let badgeText = '0';
     let badgeClass = 'red';
-    
     if (isDoubtful) {
       badgeClass = 'yellow';
-      // Use chance_of_playing_this_round for the viewing gameweek
-      const chanceOfPlaying = state.viewingGW === state.currentGW 
-        ? p.chance_of_playing_this_round 
-        : state.viewingGW === state.currentGW + 1 
-          ? p.chance_of_playing_next_round 
-          : null;
-      
-      // Use shared helper to get display value
       badgeText = getChanceOfPlayingDisplay(p, state.viewingGW, state.currentGW);
     }
-    
     const flagTitle = escapeHtml(p.news || (isDoubtful ? 'Doubtful' : 'Unavailable'));
-    
-    statusFlags = `
-      <div class="status-flag-badge ${badgeClass}" title="${flagTitle}">${badgeText}</div>
-    `;
+    statusFlags = `<div class="status-flag-badge ${badgeClass}" title="${flagTitle}">${badgeText}</div>`;
   }
 
-  // Captain/Vice-Captain UI - only show for starting XI players
+  // Captain/Vice-Captain UI — only for starting XI players
   const team = state.plan[state.viewingGW];
   const isCaptain = team && team.captain === entry.id;
   const isViceCaptain = team && team.viceCaptain === entry.id;
-  
+
   let captainUI = '';
   if (source === 'starting') {
-    // Always show selector on hover for interactivity
-    // Show badge when assigned (visible when not hovering)
-    const badge = isCaptain ? `<div class="captain-badge c">C</div>` 
-                  : isViceCaptain ? `<div class="captain-badge vc">VC</div>` 
+    const badge = isCaptain ? `<div class="captain-badge c">C</div>`
+                  : isViceCaptain ? `<div class="captain-badge vc">VC</div>`
                   : '';
-    
     captainUI = `
       ${badge}
       <div class="captain-selector">
@@ -420,6 +404,9 @@ function playerCard(entry, source) {
     `;
   }
 
+  // FDR CSS class helper
+  const fdrClass = (fdr) => fdr != null ? `fdr-${fdr}` : 'fdr-none';
+
   return `
     <div class="${cardClass}" onclick="showSquadPlayerInfo(${entry.id}, '${source}')">
       <button class="card-btn btn-remove" onclick="event.stopPropagation(); ${removeFn}" title="Transfer out">×</button>
@@ -428,22 +415,19 @@ function playerCard(entry, source) {
       <div class="badge-container">
         ${captainUI}
         ${statusFlags}
+        <span class="card-price">${price}</span>
         <img src="https://resources.premierleague.com/premierleague/badges/70/t${teamCode}.png"
              class="badge" alt="${teamShort}">
       </div>
 
       <div class="name">${p.web_name}</div>
 
-      <div class="info">
-        <span class="team">${teamShort}</span>
-        <span class="next-fixture"><span class="fixture-full">${fx1}</span><span class="fixture-compact">${fx1Compact}</span></span>
-        <span class="price"><span class="price-label price-label-long">${label}</span><span class="price-label price-label-short">${shortLabel}</span> ${price}</span>
-      </div>
+      <div class="card-fixture-next">${fx1.text}</div>
 
       <div class="future-fixtures">
-        <span class="fixture"><span class="fixture-full">${fx2}</span><span class="fixture-compact">${fx2Compact}</span></span>
-        <span class="fixture"><span class="fixture-full">${fx3}</span><span class="fixture-compact">${fx3Compact}</span></span>
-        <span class="fixture"><span class="fixture-full">${fx4}</span><span class="fixture-compact">${fx4Compact}</span></span>
+        <span class="fdr-pill ${fdrClass(fx2.fdr)}">${fx2.text}</span>
+        <span class="fdr-pill ${fdrClass(fx3.fdr)}">${fx3.text}</span>
+        <span class="fdr-pill ${fdrClass(fx4.fdr)}">${fx4.text}</span>
       </div>
     </div>
   `;
@@ -476,16 +460,12 @@ function placeholderCard(removedPlayer, source) {
 
       <div class="name">${p.web_name}</div>
 
-      <div class="info">
-        <span class="team">${teamShort}</span>
-        <span class="next-fixture"><span class="fixture-full">--</span><span class="fixture-compact">--</span></span>
-        <span class="price"><span class="price-label price-label-long">Sell</span><span class="price-label price-label-short">S</span> ${price}</span>
-      </div>
+      <div class="card-fixture-next">--</div>
 
       <div class="future-fixtures">
-        <span class="fixture"><span class="fixture-full">--</span><span class="fixture-compact">--</span></span>
-        <span class="fixture"><span class="fixture-full">--</span><span class="fixture-compact">--</span></span>
-        <span class="fixture"><span class="fixture-full">--</span><span class="fixture-compact">--</span></span>
+        <span class="fdr-pill fdr-none">--</span>
+        <span class="fdr-pill fdr-none">--</span>
+        <span class="fdr-pill fdr-none">--</span>
       </div>
     </div>
   `;

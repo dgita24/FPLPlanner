@@ -65,10 +65,24 @@ export function updateUI() {
   const gwEl = document.getElementById('currentGWDisplay');
   if (gwEl) gwEl.textContent = state.viewingGW;
 
+  // Update mobile GW display
+  const mobileGWEl = document.getElementById('mobileGWDisplay');
+  if (mobileGWEl) mobileGWEl.textContent = state.viewingGW;
+
+  // Update mobile bank display
+  const mobileBankEl = document.getElementById('mobileBankDisplay');
+  if (mobileBankEl) mobileBankEl.textContent = `£${Number(state.bank).toFixed(1)}m`;
+
   const prevBtn = document.getElementById('prevGW');
   const nextBtn = document.getElementById('nextGW');
   if (prevBtn) prevBtn.disabled = state.viewingGW <= state.minNavigableGW;
   if (nextBtn) nextBtn.disabled = state.viewingGW >= MAX_GAMEWEEK;
+
+  // Update mobile GW nav button states
+  const prevBtnMobile = document.getElementById('prevGWMobile');
+  const nextBtnMobile = document.getElementById('nextGWMobile');
+  if (prevBtnMobile) prevBtnMobile.disabled = state.viewingGW <= state.minNavigableGW;
+  if (nextBtnMobile) nextBtnMobile.disabled = state.viewingGW >= MAX_GAMEWEEK;
 
   // Update sync toggle visual state
   const syncToggle = document.getElementById('fixturesSyncToggle');
@@ -654,8 +668,37 @@ function setupCaptainSelectorTouchHandlers() {
   });
 }
 
+// Switch between mobile tabs (Pitch / Fixtures / Transfers / More)
+function switchMobileTab(tab) {
+  const allTabs = ['pitch', 'fixtures', 'transfers', 'more'];
+
+  // Remove active state from all tab buttons
+  allTabs.forEach((t) => {
+    const btn = document.getElementById(`tab${t.charAt(0).toUpperCase() + t.slice(1)}`);
+    if (btn) btn.classList.remove('tab-active');
+  });
+
+  // Remove overlay class from panels
+  const fixturesPanel = document.getElementById('fixturesPanel');
+  const transferPanel = document.getElementById('transferPanel');
+  if (fixturesPanel) fixturesPanel.classList.remove('mobile-panel-active');
+  if (transferPanel) transferPanel.classList.remove('mobile-panel-active');
+
+  // Activate the selected tab button
+  const activeBtn = document.getElementById(`tab${tab.charAt(0).toUpperCase() + tab.slice(1)}`);
+  if (activeBtn) activeBtn.classList.add('tab-active');
+
+  // Show the relevant panel overlay
+  if (tab === 'fixtures' && fixturesPanel) {
+    fixturesPanel.classList.add('mobile-panel-active');
+  } else if (tab === 'transfers' && transferPanel) {
+    transferPanel.classList.add('mobile-panel-active');
+  }
+  // 'pitch' and 'more' show default content (mainColumn)
+}
+
 export function initUI() {
-  // Inject CSS for two-click swap highlight + fixture UI + placeholder cards + chip UI
+  // Inject CSS for two-click swap highlight + placeholder cards
   if (!document.getElementById('plannerInjectedStyle')) {
     const style = document.createElement('style');
     style.id = 'plannerInjectedStyle';
@@ -736,232 +779,6 @@ export function initUI() {
         display: inline-block;
         line-height: 1;
       }
-
-      /* Next fixture + fixtures strip */
-      .player-card .fixture {
-        font-size: 11px;
-        color: var(--accent); /* blue */
-        text-align: center;
-        white-space: nowrap;
-      }
-
-      .player-card .fixture-next {
-        font-weight: 800;
-      }
-
-      /* Put team | next fixture | price on one centered row */
-      .player-card .info {
-        display: grid;
-        grid-template-columns: 1fr auto 1fr;
-        align-items: center;
-        column-gap: 6px;
-      }
-
-      .player-card .info .team {
-        justify-self: start;
-      }
-
-      .player-card .info .next-fixture {
-        justify-self: center;
-        font-size: 11px;
-        font-weight: 800;
-        color: var(--accent); /* blue */
-        white-space: nowrap;
-      }
-
-      .player-card .info .price {
-        justify-self: end;
-      }
-
-      .player-card .future-fixtures {
-        margin-top: 4px;
-        padding: 3px 4px;
-        border-top: 1px solid rgba(0,0,0,0.12);
-        display: flex;
-        justify-content: center;
-        gap: 8px;
-        flex-wrap: nowrap;
-      }
-
-      .player-card .future-fixtures .fixture {
-        font-size: 10px;
-        font-weight: 600;
-        opacity: 0.95;
-      }
-
-      /* Note: Mobile/tablet responsive styles are handled in responsive.css */
-
-      /* Chip container - positioned at top center of pitch */
-      .chip-container {
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-        gap: 8px;
-        justify-content: center;
-        z-index: 10;
-      }
-
-      /* Chip indicator - shown when chip is selected */
-      .chip-indicator {
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        padding: 8px 12px;
-        background: rgba(255, 215, 0, 0.95);
-        border: 2px solid var(--primary);
-        border-radius: 8px;
-        font-weight: bold;
-        font-size: 13px;
-        color: var(--bg);
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-        animation: chipPulse 2s ease-in-out infinite;
-      }
-
-      @keyframes chipPulse {
-        0%, 100% { transform: scale(1); }
-        50% { transform: scale(1.05); }
-      }
-
-      .chip-icon {
-        font-size: 18px;
-        color: var(--primary);
-      }
-
-      .chip-name {
-        font-weight: 700;
-        letter-spacing: 0.5px;
-      }
-
-      .chip-gw {
-        background: rgba(0, 0, 0, 0.3);
-        padding: 2px 6px;
-        border-radius: 4px;
-        font-size: 11px;
-      }
-
-      /* Chip button */
-      .chip-btn {
-        padding: 10px 16px;
-        background: var(--primary);
-        color: var(--bg);
-        border: 2px solid var(--primary);
-        border-radius: 6px;
-        font-weight: bold;
-        font-size: 13px;
-        cursor: pointer;
-        transition: all 0.2s;
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-        white-space: nowrap;
-      }
-
-      .chip-btn:hover {
-        background: var(--primary-light);
-        border-color: var(--primary-light);
-        transform: translateY(-2px);
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-      }
-
-      .chip-btn-active {
-        background: var(--primary);
-        border-color: var(--primary);
-        color: var(--bg);
-      }
-
-      .chip-btn-active:hover {
-        background: var(--primary-light);
-        border-color: var(--primary-light);
-      }
-
-      /* Chip buttons row - container for multiple chip buttons */
-      .chip-buttons-row {
-        display: flex;
-        gap: 6px;
-        flex-wrap: nowrap;
-        justify-content: center;
-      }
-
-      /* Smaller chip buttons for multiple chips */
-      .chip-btn-small {
-        padding: 6px 10px;
-        background: var(--primary);
-        color: var(--bg);
-        border: 2px solid var(--primary);
-        border-radius: 5px;
-        font-weight: bold;
-        font-size: 11px;
-        cursor: pointer;
-        transition: all 0.2s;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-        white-space: nowrap;
-        min-width: 80px;
-        text-align: center;
-      }
-
-      .chip-btn-small:hover {
-        background: var(--primary-light);
-        border-color: var(--primary-light);
-        transform: translateY(-1px);
-        box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
-      }
-
-      .chip-btn-small.chip-btn-active {
-        background: var(--primary);
-        border-color: var(--primary);
-        color: var(--bg);
-      }
-
-      .chip-btn-small.chip-btn-active:hover {
-        background: var(--primary-light);
-        border-color: var(--primary-light);
-      }
-
-      /* Used/disabled chip buttons - crossed out appearance */
-      .chip-btn-small.chip-btn-used {
-        background: var(--bg-dark);
-        border-color: var(--border);
-        color: var(--text-light);
-        cursor: not-allowed;
-        text-decoration: line-through;
-        opacity: 0.6;
-      }
-
-      .chip-btn-small.chip-btn-used:hover {
-        background: var(--bg-dark);
-        border-color: var(--border);
-        transform: none;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-      }
-
-      .chip-btn-small:disabled {
-        cursor: not-allowed;
-      }
-
-      /* Mobile adjustments for chip UI */
-      @media (max-width: 768px) {
-        .chip-indicator {
-          padding: 6px 10px;
-          font-size: 11px;
-        }
-
-        .chip-icon {
-          font-size: 14px;
-        }
-
-        .chip-btn {
-          padding: 8px 12px;
-          font-size: 12px;
-        }
-
-        .chip-btn-small {
-          padding: 5px 8px;
-          font-size: 10px;
-          min-width: 70px;
-        }
-
-        .chip-buttons-row {
-          gap: 4px;
-        }
-      }
     `;
     document.head.appendChild(style);
   }
@@ -1017,6 +834,9 @@ export function initUI() {
 
   // Expose chip selection function
   window.selectChip = (chipType) => selectChip(chipType, updateUI);
+
+  // Mobile tab navigation
+  window.switchMobileTab = switchMobileTab;
 
   // Setup sidebar event handlers
   setupSidebarHandlers();
