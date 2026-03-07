@@ -259,11 +259,12 @@
   }
 
   .player-card .name {
-    font-size: 9px;
+    font-size: 11px;
+    font-weight: 800;
   }
 
   .card-fixture-next {
-    font-size: 9px;
+    font-size: 10px;
   }
 
   .badge-container {
@@ -277,14 +278,24 @@
   }
 
   .card-btn {
-    width: 14px;
-    height: 14px;
-    font-size: 10px;
+    width: 18px;
+    height: 18px;
+    font-size: 11px;
+  }
+
+  .btn-swap {
+    font-size: 11px;
+  }
+
+  .status-flag-badge {
+    /* below btn-remove (18px at top:2px → bottom:20px) + 4px gap */
+    top: 24px;
   }
 
   .formation-line {
     overflow-x: hidden;
     gap: 4px;
+    padding-top: 12px;
     padding-bottom: 5px;
   }
 
@@ -297,6 +308,7 @@
   .bench-slots {
     overflow-x: hidden;
     gap: 6px;
+    padding-top: 12px;
     padding-bottom: 5px;
   }
 
@@ -385,11 +397,12 @@
   }
 
   .player-card .name {
-    font-size: 8px;
+    font-size: 10px;
+    font-weight: 800;
   }
 
   .card-fixture-next {
-    font-size: 8px;
+    font-size: 9px;
   }
 
   .fdr-pill {
@@ -470,7 +483,7 @@
     overflow-x: hidden;
     gap: 3px;
     min-height: 75px;
-    padding-top: 8px;
+    padding-top: 12px;
     padding-bottom: 5px;
   }
 
@@ -483,6 +496,7 @@
   .bench-slots {
     overflow-x: hidden;
     gap: 4px;
+    padding-top: 12px;
     padding-bottom: 5px;
   }
 
@@ -497,25 +511,31 @@
   }
 
   .player-card .name {
-    font-size: 7px;
+    font-size: 9px;
+    font-weight: 800;
   }
 
   .card-fixture-next {
-    font-size: 7px;
+    font-size: 8px;
   }
 
   .fdr-pill {
-    font-size: 6px;
+    font-size: 7px;
   }
 
   .card-price {
     font-size: 7px;
+    padding: 2px 4px;
   }
 
   .card-btn {
-    width: 12px;
-    height: 12px;
-    font-size: 9px;
+    width: 16px;
+    height: 16px;
+    font-size: 10px;
+  }
+
+  .btn-swap {
+    font-size: 10px;
   }
 
   .captain-badge {
@@ -531,6 +551,8 @@
   }
 
   .status-flag-badge {
+    /* below btn-remove (16px at top:2px → bottom:18px) + 4px gap */
+    top: 22px;
     width: 14px;
     height: 14px;
     font-size: 6px;

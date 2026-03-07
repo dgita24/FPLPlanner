@@ -409,13 +409,13 @@ function playerCard(entry, source) {
 
   return `
     <div class="${cardClass}" onclick="showSquadPlayerInfo(${entry.id}, '${source}')">
+      <span class="card-price">${price}</span>
       <button class="card-btn btn-remove" onclick="event.stopPropagation(); ${removeFn}" title="Transfer out">×</button>
       <button class="card-btn btn-swap" onclick="event.stopPropagation(); ${subFn}" title="${swapTitle}">⇅</button>
+      ${statusFlags}
 
       <div class="badge-container">
         ${captainUI}
-        ${statusFlags}
-        <span class="card-price">${price}</span>
         <img src="https://resources.premierleague.com/premierleague/badges/70/t${teamCode}.png"
              class="badge" alt="${teamShort}">
       </div>
@@ -447,6 +447,7 @@ function placeholderCard(removedPlayer, source) {
 
   return `
     <div class="player-card placeholder-card">
+      <span class="card-price">${price}</span>
       <div class="placeholder-overlay">
         <button class="reinstate-btn" onclick="${reinstateFn}" title="Undo removal">↶</button>
         <span class="placeholder-text">SOLD</span>
