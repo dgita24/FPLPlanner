@@ -7,7 +7,7 @@
 }
 
 .pitch {
-  background: linear-gradient(to bottom, #4d8c5d 0%, #3d7a4e 100%);
+   background: linear-gradient(to bottom, #3f7c50 0%, #316842 100%);
   padding: 2px 17px 8px;
   border-radius: 10px;
   max-width: 935px;
@@ -777,7 +777,7 @@
 /* ===== Bench ===== */
 
 .bench {
-  background: linear-gradient(to bottom, #7ec87e 0%, #6ab86a 100%);
+  background: linear-gradient(to bottom, #6fbf6f 0%, #59a759 100%);
   padding: 8px 13px;
   border-radius: 10px;
   max-width: 935px;
