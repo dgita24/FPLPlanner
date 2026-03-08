@@ -1549,6 +1549,7 @@ td.fixtures-cell {
   width: 100%;
   border-collapse: collapse;
   font-size: 12px;
+  table-layout: fixed;
 }
 
 .player-table-compact th {
@@ -1581,6 +1582,11 @@ td.fixtures-cell {
   padding-left: 6px;
   font-size: 12px;
   font-weight: 600;
+  max-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  cursor: pointer;
 }
 
 .player-table-compact tr:hover {
@@ -1599,18 +1605,10 @@ td.fixtures-cell {
   background: var(--selected-hover-bg);
 }
 
-.player-table-compact .th-select {
-  width: 28px;
-  min-width: 28px;
-  max-width: 28px;
-  padding: 4px 2px;
-  text-align: center;
-}
-
 .player-table-compact .th-info {
-  width: 28px;
-  min-width: 28px;
-  max-width: 28px;
+  width: 30px;
+  min-width: 30px;
+  max-width: 30px;
 }
 
 .player-table-compact .th-club {
@@ -1619,34 +1617,21 @@ td.fixtures-cell {
   max-width: 30px;
 }
 
-.player-table-compact .th-status {
-  width: 30px;
-  min-width: 30px;
-  max-width: 30px;
-}
-
 .player-table-compact .th-name {
   width: auto;
-  min-width: 70px;
-}
-
-.player-table-compact .th-pos {
-  width: 32px;
-  min-width: 32px;
-  max-width: 32px;
 }
 
 .player-table-compact .th-price {
-  width: 45px;
+  width: 46px;
 }
 
 .player-table-compact .th-points {
-  width: 45px;
+  width: 46px;
 }
 
 .player-table-compact .th-stat-dynamic {
-  width: 60px;
-  min-width: 60px;
+  width: 46px;
+  min-width: 46px;
 }
 
 .player-table-compact .info-cell {
@@ -1657,23 +1642,6 @@ td.fixtures-cell {
 .player-table-compact .club-cell {
   padding: 4px;
   text-align: center;
-}
-
-.player-table-compact .select-cell {
-  padding: 4px 2px;
-  text-align: center;
-  width: 28px;
-  min-width: 28px;
-  max-width: 28px;
-}
-
-.player-table-compact .select-cell input[type="checkbox"],
-.player-table-compact .th-select input[type="checkbox"] {
-  width: 16px;
-  height: 16px;
-  min-width: 16px;
-  cursor: pointer;
-  accent-color: var(--primary);
 }
 
 .club-badge {
@@ -1704,6 +1672,26 @@ td.fixtures-cell {
 .info-btn:hover {
   background: var(--accent-hover);
   transform: scale(1.1);
+}
+
+.info-btn.status-red {
+  background: var(--error);
+}
+
+.info-btn.status-red:hover {
+  background: var(--error);
+  filter: brightness(1.15);
+}
+
+.info-btn.status-yellow {
+  background: var(--warning);
+  color: var(--text-dark);
+}
+
+.info-btn.status-yellow:hover {
+  background: var(--warning);
+  filter: brightness(1.1);
+  color: var(--text-dark);
 }
 
 /* ===== Player Info Modal ===== */
