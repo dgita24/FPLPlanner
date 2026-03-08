@@ -321,6 +321,7 @@ export function renderPitch() {
   pitch.setAttribute('data-formation', formation);
 
   pitch.innerHTML = `
+    <button class="pitch-save-btn" onclick="openCloudSave()" title="Cloud Save">💾</button>
     <button class="pitch-reset-btn" onclick="resetToImportedTeam()">⏮️ Reset</button>
     <div class="formation-line" data-player-count="${gk.length}">${gk.map(renderCard).join('')}</div>
     <div class="formation-line" data-player-count="${def.length}">${def.map(renderCard).join('')}</div>

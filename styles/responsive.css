@@ -439,8 +439,7 @@
   }
 
   .sidebar {
-    width: 100%;
-    padding-top: 60px;
+    /* Inherits mobile styles from 768px breakpoint */
   }
 
   /* Full-width pitch with no side gutters */
