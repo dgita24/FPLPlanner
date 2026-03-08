@@ -167,18 +167,22 @@ export function updateUI() {
   renderPitch();
   renderBench();
 
-  // Auto-persist state to localStorage after every UI update
-  try {
-    const data = {
-      plan: state.plan,
-      bank: state.bank,
-      viewingGW: state.viewingGW,
-      minNavigableGW: state.minNavigableGW,
-      priceMode: state.priceMode
-    };
-    localStorage.setItem('fplplanner-state', JSON.stringify(data));
-  } catch (e) {
-    // silently fail - localStorage might be full or disabled
+  // Auto-persist state to localStorage after every UI update,
+  // but only when a team is actually loaded (avoid overwriting saved data with an empty plan)
+  const hasTeam = state.plan && Object.values(state.plan).some(gw => gw?.starting?.length > 0);
+  if (hasTeam) {
+    try {
+      const data = {
+        plan: state.plan,
+        bank: state.bank,
+        viewingGW: state.viewingGW,
+        minNavigableGW: state.minNavigableGW,
+        priceMode: state.priceMode
+      };
+      localStorage.setItem('fplplanner-state', JSON.stringify(data));
+    } catch (e) {
+      // silently fail - localStorage might be full or disabled
+    }
   }
 }
 
@@ -905,23 +909,6 @@ export function initUI() {
 
   // Populate saved teams dropdown
   populateSavedTeamsDropdown();
-
-  // Auto-load saved state on startup if no team is currently loaded
-  try {
-    const saved = localStorage.getItem('fplplanner-state');
-    if (saved && Object.keys(state.plan || {}).length === 0) {
-      const data = JSON.parse(saved);
-      if (data.plan && Object.keys(data.plan).length > 0) {
-        state.plan = data.plan;
-        state.bank = data.bank;
-        state.viewingGW = data.viewingGW;
-        state.minNavigableGW = data.minNavigableGW ?? state.viewingGW;
-        state.priceMode = data.priceMode;
-      }
-    }
-  } catch (e) {
-    // silently fail
-  }
 
   updateUI();
 }
