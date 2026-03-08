@@ -1,9 +1,19 @@
 // Maximum drafts allowed per manager ID
 const MAX_DRAFTS_PER_MANAGER = 5;
 
+// Constant-time string comparison to prevent timing attacks
+function timingSafeEqual(a, b) {
+  if (a.length !== b.length) return false;
+  let result = 0;
+  for (let i = 0; i < a.length; i++) {
+    result |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  }
+  return result === 0;
+}
+
 export async function onRequestPost({ request, env, context }) {
   try {
-    const { teamid, label, password, payload, managerid } = await request.json();
+    const { teamid, label, password, oldPassword, payload, managerid } = await request.json();
     if (!teamid || !password || !payload) {
       return new Response(JSON.stringify({ error: 'Missing required fields' }), {
         status: 400,
@@ -62,6 +72,28 @@ export async function onRequestPost({ request, env, context }) {
 
     let saveResponse;
     if (existing.length > 0) {
+      // Overwrite requires the current password to be verified first
+      if (!oldPassword) {
+        return new Response(JSON.stringify({ error: 'Current password required to overwrite an existing draft' }), {
+          status: 403,
+          headers: { 'Content-Type': 'application/json' }
+        });
+      }
+
+      // Hash the supplied old password and compare against stored hash
+      const oldData = encoder.encode(oldPassword);
+      const oldHashBuffer = await crypto.subtle.digest('SHA-256', oldData);
+      const oldHashArray = Array.from(new Uint8Array(oldHashBuffer));
+      const oldPasswordHash = oldHashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+
+      const storedHash = existing[0].passwordhash || '';
+      if (!timingSafeEqual(storedHash, oldPasswordHash)) {
+        return new Response(JSON.stringify({ error: 'Invalid password' }), {
+          status: 403,
+          headers: { 'Content-Type': 'application/json' }
+        });
+      }
+
       // Update existing - use composite key (teamid, managerid) to identify the correct record
       saveResponse = await fetch(`${supabaseUrl}/rest/v1/team_saves?${queryString}`, {
         method: 'PATCH',
