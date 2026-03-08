@@ -214,6 +214,10 @@
 .formation-line[data-player-count="4"] { gap: 10px; }
 .formation-line[data-player-count="5"] { gap: 6px; }
 
+#plannerMain .pitch-stack {
+  max-width: none;
+}
+
 #plannerMain .pitch {
   margin: 0;
   max-width: none;
