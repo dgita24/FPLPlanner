@@ -59,6 +59,9 @@
   z-index: 20;
   transition: all 0.2s;
   line-height: 1;
+  -webkit-appearance: none;
+  appearance: none;
+  box-sizing: border-box;
 }
 
 .pitch-save-btn {
