@@ -114,11 +114,10 @@
       </div>
 
       <div id="transferPanel" class="transfer-panel">
-        <h3 style="margin-bottom: 10px; text-align: center;">Transfers</h3>
-        
-        <!-- Transfer action buttons below the header -->
-        <div class="transfer-actions">
+        <!-- Header row: Add to squad | Transfers heading | Cancel transfer -->
+        <div class="transfer-header-row">
           <button class="transfer-action-btn add-btn" onclick="addSelectedToSquad()" id="addToSquadBtn">Add to squad</button>
+          <h3>Transfers</h3>
           <button class="transfer-action-btn cancel-btn" onclick="cancelTransfer()" id="cancelTransferBtn">Cancel transfer</button>
         </div>
         
@@ -165,77 +164,20 @@
         </div>
 
         <div class="price-filters">
-          <select id="filterMinPrice" onchange="renderTable()">
-            <option value="">Min Price</option>
-            <option value="3.0">£3.0m</option>
-            <option value="3.5">£3.5m</option>
-            <option value="4.0">£4.0m</option>
-            <option value="4.5">£4.5m</option>
-            <option value="5.0">£5.0m</option>
-            <option value="5.5">£5.5m</option>
-            <option value="6.0">£6.0m</option>
-            <option value="6.5">£6.5m</option>
-            <option value="7.0">£7.0m</option>
-            <option value="7.5">£7.5m</option>
-            <option value="8.0">£8.0m</option>
-            <option value="8.5">£8.5m</option>
-            <option value="9.0">£9.0m</option>
-            <option value="9.5">£9.5m</option>
-            <option value="10.0">£10.0m</option>
-            <option value="10.5">£10.5m</option>
-            <option value="11.0">£11.0m</option>
-            <option value="11.5">£11.5m</option>
-            <option value="12.0">£12.0m</option>
-            <option value="12.5">£12.5m</option>
-            <option value="13.0">£13.0m</option>
-            <option value="13.5">£13.5m</option>
-            <option value="14.0">£14.0m</option>
-            <option value="14.5">£14.5m</option>
-            <option value="15.0">£15.0m</option>
-            <option value="15.5">£15.5m</option>
-            <option value="16.0">£16.0m</option>
-            <option value="16.5">£16.5m</option>
-            <option value="17.0">£17.0m</option>
-          </select>
-
-          <select id="filterMaxPrice" onchange="renderTable()">
-            <option value="">Max Price</option>
-            <option value="3.0">£3.0m</option>
-            <option value="3.5">£3.5m</option>
-            <option value="4.0">£4.0m</option>
-            <option value="4.5">£4.5m</option>
-            <option value="5.0">£5.0m</option>
-            <option value="5.5">£5.5m</option>
-            <option value="6.0">£6.0m</option>
-            <option value="6.5">£6.5m</option>
-            <option value="7.0">£7.0m</option>
-            <option value="7.5">£7.5m</option>
-            <option value="8.0">£8.0m</option>
-            <option value="8.5">£8.5m</option>
-            <option value="9.0">£9.0m</option>
-            <option value="9.5">£9.5m</option>
-            <option value="10.0">£10.0m</option>
-            <option value="10.5">£10.5m</option>
-            <option value="11.0">£11.0m</option>
-            <option value="11.5">£11.5m</option>
-            <option value="12.0">£12.0m</option>
-            <option value="12.5">£12.5m</option>
-            <option value="13.0">£13.0m</option>
-            <option value="13.5">£13.5m</option>
-            <option value="14.0">£14.0m</option>
-            <option value="14.5">£14.5m</option>
-            <option value="15.0">£15.0m</option>
-            <option value="15.5">£15.5m</option>
-            <option value="16.0">£16.0m</option>
-            <option value="16.5">£16.5m</option>
-            <option value="17.0">£17.0m</option>
-          </select>
+          <div class="price-slider-container">
+            <div class="price-slider-label" id="priceRangeLabel">£0.0m – £20.0m</div>
+            <div class="price-range-track">
+              <input type="range" id="priceSliderMin" min="0" max="20" step="0.5" value="0" oninput="updatePriceSlider()" />
+              <input type="range" id="priceSliderMax" min="0" max="20" step="0.5" value="20" oninput="updatePriceSlider()" />
+            </div>
+          </div>
         </div>
 
         <div class="player-table-compact">
           <table id="pTable">
             <thead>
               <tr>
+                <th class="th-select"><input type="checkbox" id="selectAllPlayers" title="Select all" /></th>
                 <th class="th-info">Info</th>
                 <th class="th-club">Club</th>
                 <th class="th-status">Status</th>

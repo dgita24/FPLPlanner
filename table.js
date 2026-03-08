@@ -251,13 +251,15 @@ export function renderTable() {
     initializeStatColumns();
     populateTeamFilter();
     isFirstRender = false;
+    // Initialize price slider track fill without triggering renderTable
+    updatePriceSliderTrack();
   }
 
   const search = foldForSearch(document.getElementById('searchName')?.value || '');
   const posFilter = document.getElementById('filterPos')?.value || '';
   const teamFilter = document.getElementById('filterTeam')?.value || '';
-  const minPrice = document.getElementById('filterMinPrice')?.value || '';
-  const maxPrice = document.getElementById('filterMaxPrice')?.value || '';
+  const minPrice = parseFloat(document.getElementById('priceSliderMin')?.value ?? 0);
+  const maxPrice = parseFloat(document.getElementById('priceSliderMax')?.value ?? 20);
 
   let filtered = state.elements.filter((player) => {
     const matchesSearch = foldForSearch(player.web_name || '').includes(search);
@@ -266,8 +268,8 @@ export function renderTable() {
     
     // Price filtering
     const playerPrice = player.now_cost / PRICE_CONVERSION_FACTOR;
-    const matchesMinPrice = !minPrice || playerPrice >= parseFloat(minPrice);
-    const matchesMaxPrice = !maxPrice || playerPrice <= parseFloat(maxPrice);
+    const matchesMinPrice = playerPrice >= minPrice;
+    const matchesMaxPrice = playerPrice <= maxPrice;
     
     return matchesSearch && matchesPos && matchesTeam && matchesMinPrice && matchesMaxPrice;
   });
@@ -299,7 +301,6 @@ export function renderTable() {
   // -------- RENDER --------
   tbody.innerHTML = filtered
     .map((player) => {
-      const checked = window.selectedPlayerIds.includes(player.id) ? 'checked' : '';
 
       // Status flag for table - using circular badge similar to captain badges
       let statusFlagHtml = '';
@@ -355,7 +356,10 @@ export function renderTable() {
         : '';
 
       return `
-        <tr onclick="selectPlayer(event, ${player.id})" data-player-id="${player.id}" class="${checked ? 'selected' : ''}">
+        <tr onclick="selectPlayer(event, ${player.id})" data-player-id="${player.id}" class="${window.selectedPlayerIds.includes(player.id) ? 'selected' : ''}">
+          <td class="select-cell" onclick="event.stopPropagation()">
+            <input type="checkbox" class="player-select-cb" data-player-id="${player.id}" ${window.selectedPlayerIds.includes(player.id) ? 'checked' : ''} onchange="togglePlayerSelect(event, ${player.id})" />
+          </td>
           <td class="info-cell">
             <button class="info-btn" onclick="showPlayerInfo(event, ${player.id})" title="View player stats">i</button>
           </td>
@@ -372,6 +376,26 @@ export function renderTable() {
 
   // Update sort icons after rendering
   updateSortIcons();
+
+  // Wire up select-all checkbox after rendering
+  const selectAllCb = document.getElementById('selectAllPlayers');
+  if (selectAllCb) {
+    selectAllCb.checked = false;
+    selectAllCb.onchange = function () {
+      const visibleIds = filtered.map(p => p.id);
+      if (selectAllCb.checked) {
+        window.selectedPlayerIds = [...new Set([...window.selectedPlayerIds, ...visibleIds])];
+      } else {
+        window.selectedPlayerIds = window.selectedPlayerIds.filter(id => !visibleIds.includes(id));
+      }
+      document.querySelectorAll('#tableBody .player-select-cb').forEach(cb => {
+        const pid = parseInt(cb.getAttribute('data-player-id'));
+        cb.checked = window.selectedPlayerIds.includes(pid);
+        const row = cb.closest('tr');
+        if (row) row.classList.toggle('selected', cb.checked);
+      });
+    };
+  }
 }
 
 export function populateFilters() {
@@ -399,34 +423,88 @@ function populateTeamFilter() {
   });
 }
 
+// Checkbox change handler for individual player rows
+window.togglePlayerSelect = function (ev, id) {
+  if (ev) ev.stopPropagation();
+  const cb = ev.target;
+  const idx = window.selectedPlayerIds.indexOf(id);
+  if (cb.checked && idx < 0) {
+    window.selectedPlayerIds.push(id);
+  } else if (!cb.checked && idx >= 0) {
+    window.selectedPlayerIds.splice(idx, 1);
+  }
+  const row = cb.closest('tr');
+  if (row) row.classList.toggle('selected', cb.checked);
+};
+
 window.selectPlayer = function (ev, id) {
   if (ev) ev.stopPropagation();
-  
-  // Single selection only - replace previous selection
-  const previouslySelected = window.selectedPlayerIds.length > 0 ? window.selectedPlayerIds[0] : null;
-  
-  // If clicking the same player, deselect
-  if (previouslySelected === id) {
-    window.selectedPlayerIds = [];
+  // Toggle player in/out of selectedPlayerIds by simulating a checkbox change
+  const row = document.querySelector(`#tableBody tr[data-player-id="${id}"]`);
+  const cb = row ? row.querySelector('.player-select-cb') : null;
+  if (cb) {
+    cb.checked = !cb.checked;
+    window.togglePlayerSelect({ target: cb, stopPropagation: () => {} }, id);
   } else {
-    window.selectedPlayerIds = [id];
-  }
-
-  // Update all row styling
-  const allRows = document.querySelectorAll('#tableBody tr[data-player-id]');
-  allRows.forEach(row => {
-    const rowId = parseInt(row.getAttribute('data-player-id'));
-    if (rowId === id && window.selectedPlayerIds.includes(id)) {
-      row.classList.add('selected');
+    // Fallback: update array directly when checkbox not yet in DOM
+    const idx = window.selectedPlayerIds.indexOf(id);
+    if (idx >= 0) {
+      window.selectedPlayerIds.splice(idx, 1);
     } else {
-      row.classList.remove('selected');
+      window.selectedPlayerIds.push(id);
     }
-  });
+    if (row) row.classList.toggle('selected', window.selectedPlayerIds.includes(id));
+  }
 };
 
 // Expose for inline handlers
 window.renderTable = renderTable;
 window.populateFilters = populateFilters;
+
+// Private helper: update the price slider track fill CSS variables
+function updatePriceSliderTrack() {
+  const minEl = document.getElementById('priceSliderMin');
+  const maxEl = document.getElementById('priceSliderMax');
+  if (!minEl || !maxEl) return;
+  const range = parseFloat(minEl.max) - parseFloat(minEl.min);
+  const leftPct = ((parseFloat(minEl.value) - parseFloat(minEl.min)) / range) * 100;
+  const rightPct = ((parseFloat(maxEl.max) - parseFloat(maxEl.value)) / range) * 100;
+  const track = minEl.closest('.price-range-track');
+  if (track) {
+    track.style.setProperty('--range-left', leftPct + '%');
+    track.style.setProperty('--range-right', rightPct + '%');
+  }
+}
+
+// Price slider dual-thumb update
+window.updatePriceSlider = function () {
+  const minEl = document.getElementById('priceSliderMin');
+  const maxEl = document.getElementById('priceSliderMax');
+  const label = document.getElementById('priceRangeLabel');
+  if (!minEl || !maxEl) return;
+
+  let minVal = parseFloat(minEl.value);
+  let maxVal = parseFloat(maxEl.value);
+
+  // Prevent thumbs crossing
+  if (minVal > maxVal) {
+    if (document.activeElement === minEl) {
+      minEl.value = maxVal;
+      minVal = maxVal;
+    } else {
+      maxEl.value = minVal;
+      maxVal = minVal;
+    }
+  }
+
+  if (label) {
+    label.textContent = `£${minVal.toFixed(1)}m – £${maxVal.toFixed(1)}m`;
+  }
+
+  updatePriceSliderTrack();
+
+  renderTable();
+};
 
 window.sortTable = function (key) {
   if (tableSort.key === key) {
