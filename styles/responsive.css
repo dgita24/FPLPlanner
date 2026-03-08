@@ -198,6 +198,13 @@
     display: flex;
   }
 
+  /* Position import banner below the fixed mobile top bar */
+  .import-banner {
+    top: 50px;
+    font-size: 12px;
+    padding: 8px 36px 8px 12px;
+  }
+
   /* Hide desktop header and GW nav on mobile — replaced by mobile top bar */
   .header {
     display: none;

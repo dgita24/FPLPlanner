@@ -28,6 +28,13 @@ async function init() {
           state.viewingGW = data.viewingGW;
           state.minNavigableGW = data.minNavigableGW ?? data.viewingGW;
           state.priceMode = data.priceMode;
+
+          // Show persistent banner prompting user to import their team,
+          // since managerId is not saved to localStorage
+          if (!state.managerId) {
+            const banner = document.getElementById('import-banner');
+            if (banner) banner.style.display = 'block';
+          }
         }
       }
     } catch (e) {
