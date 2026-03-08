@@ -27,16 +27,38 @@
 }
 
 /* ----------------------------------------
-   Desktop: Fixtures + Transfers side-by-side (each half-width)
-   On desktop, clicking either tab shows both panels at once.
+   Desktop: Pitch (left) + Transfers (right) always visible side-by-side.
+   Transfer panel is part of normal document flow, not an overlay.
+   Fixtures panel remains a full-screen overlay when toggled.
 ---------------------------------------- */
 @media (min-width: 769px) {
-  #fixturesPanel.mobile-panel-active {
-    right: 50%;
+  #plannerMain {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 12px;
   }
 
-  #transferPanel.mobile-panel-active {
-    left: 50%;
+  #mainColumn {
+    flex: 1 1 0;
+    min-width: 0;
+    max-width: none;
+    margin: 0;
+  }
+
+  /* Transfer panel is always visible as the right column on desktop */
+  #transferPanel {
+    display: flex;
+    position: static;
+    top: auto;
+    bottom: auto;
+    left: auto;
+    right: auto;
+    flex: 1 1 0;
+    min-width: 0;
+    max-height: calc(100vh - var(--top-bar-height) - var(--bottom-bar-height));
+    overflow-y: auto;
+    z-index: auto;
   }
 }
 

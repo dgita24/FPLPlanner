@@ -916,16 +916,14 @@ function switchMobileTab(tab) {
   if (activeBtn) activeBtn.classList.add('tab-active');
 
   // Show the relevant panel overlay
-  if (isDesktop && (tab === 'fixtures' || tab === 'transfers')) {
-    // On desktop: show both panels side-by-side (each occupying half the screen)
-    if (fixturesPanel) fixturesPanel.classList.add('mobile-panel-active');
-    if (transferPanel) transferPanel.classList.add('mobile-panel-active');
-  } else if (tab === 'fixtures' && fixturesPanel) {
+  if (tab === 'fixtures' && fixturesPanel) {
+    // Fixtures panel shown as overlay on all screen sizes
     fixturesPanel.classList.add('mobile-panel-active');
-  } else if (tab === 'transfers' && transferPanel) {
+  } else if (tab === 'transfers' && transferPanel && !isDesktop) {
+    // Transfer panel overlay only on mobile; on desktop it is always visible
     transferPanel.classList.add('mobile-panel-active');
   }
-  // 'pitch' and 'more' show default content (mainColumn)
+  // 'pitch' and 'more' show default content; on desktop the transfers panel is always visible
 }
 
 export function initUI() {
