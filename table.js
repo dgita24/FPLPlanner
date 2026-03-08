@@ -302,41 +302,34 @@ export function renderTable() {
   tbody.innerHTML = filtered
     .map((player) => {
 
-      // Status flag for table - using circular badge similar to captain badges
-      let statusFlagHtml = '';
+      // Status flag — drives info button colour and name suffix
+      let infoBtnStatusClass = '';
+      let nameChanceSuffix = '';
       
       // Pass events array for date-based suspension parsing
       const events = state.bootstrap?.events || [];
       if (shouldShowPlayerFlag(player, state.viewingGW, state.currentGW, events)) {
         const isDoubtful = player.status === 'd';
         
-        // For red flags (suspended/injured/unavailable): show "0"
-        // For yellow flags (doubtful): show chance of playing percentage
-        let badgeText = '0';
-        let badgeClass = 'red';
-        
         if (isDoubtful) {
-          badgeClass = 'yellow';
-          // Use chance_of_playing_this_round for the viewing gameweek
+          infoBtnStatusClass = 'status-yellow';
           const chanceOfPlaying = state.viewingGW === state.currentGW 
             ? player.chance_of_playing_this_round 
             : state.viewingGW === state.currentGW + 1 
               ? player.chance_of_playing_next_round 
               : null;
           
-          // Show 25, 50, or 75 based on chance_of_playing
+          let chanceText = '50';
           if (chanceOfPlaying !== null && chanceOfPlaying !== undefined) {
-            if (chanceOfPlaying <= 25) badgeText = '25';
-            else if (chanceOfPlaying <= 50) badgeText = '50';
-            else if (chanceOfPlaying <= 75) badgeText = '75';
-            else badgeText = '75'; // Default for any value > 75 but < 100
-          } else {
-            badgeText = '50'; // Default if no chance_of_playing data
+            if (chanceOfPlaying <= 25) chanceText = '25';
+            else if (chanceOfPlaying <= 50) chanceText = '50';
+            else chanceText = '75';
           }
+          nameChanceSuffix = ` (${chanceText}%)`;
+        } else {
+          infoBtnStatusClass = 'status-red';
+          nameChanceSuffix = ' (0%)';
         }
-        
-        const flagTitle = player.news || (isDoubtful ? 'Doubtful' : 'Unavailable');
-        statusFlagHtml = `<span class="table-status-flag-badge ${badgeClass}" title="${flagTitle}">${badgeText}</span>`;
       }
 
       // Get stat value for the single filterable column
@@ -356,17 +349,12 @@ export function renderTable() {
         : '';
 
       return `
-        <tr onclick="selectPlayer(event, ${player.id})" data-player-id="${player.id}" class="${window.selectedPlayerIds.includes(player.id) ? 'selected' : ''}">
-          <td class="select-cell" onclick="event.stopPropagation()">
-            <input type="checkbox" class="player-select-cb" data-player-id="${player.id}" ${window.selectedPlayerIds.includes(player.id) ? 'checked' : ''} onchange="togglePlayerSelect(event, ${player.id})" />
-          </td>
+        <tr data-player-id="${player.id}" class="${window.selectedPlayerIds.includes(player.id) ? 'selected' : ''}">
           <td class="info-cell">
-            <button class="info-btn" onclick="showPlayerInfo(event, ${player.id})" title="View player stats">i</button>
+            <button class="info-btn${infoBtnStatusClass ? ` ${infoBtnStatusClass}` : ''}" onclick="showPlayerInfo(event, ${player.id})" title="View player stats">i</button>
           </td>
           <td class="club-cell">${badgeHtml}</td>
-          <td class="status-cell">${statusFlagHtml}</td>
-          <td class="name-cell">${playerNameEscaped}</td>
-          <td>${posNames[player.element_type]}</td>
+          <td class="name-cell" onclick="selectPlayer(event, ${player.id})">${playerNameEscaped}${nameChanceSuffix}</td>
           <td>${(player.now_cost / 10).toFixed(1)}</td>
           <td class="stat-col-cell">${statValue}</td>
         </tr>
@@ -376,26 +364,6 @@ export function renderTable() {
 
   // Update sort icons after rendering
   updateSortIcons();
-
-  // Wire up select-all checkbox after rendering
-  const selectAllCb = document.getElementById('selectAllPlayers');
-  if (selectAllCb) {
-    selectAllCb.checked = false;
-    selectAllCb.onchange = function () {
-      const visibleIds = filtered.map(p => p.id);
-      if (selectAllCb.checked) {
-        window.selectedPlayerIds = [...new Set([...window.selectedPlayerIds, ...visibleIds])];
-      } else {
-        window.selectedPlayerIds = window.selectedPlayerIds.filter(id => !visibleIds.includes(id));
-      }
-      document.querySelectorAll('#tableBody .player-select-cb').forEach(cb => {
-        const pid = parseInt(cb.getAttribute('data-player-id'));
-        cb.checked = window.selectedPlayerIds.includes(pid);
-        const row = cb.closest('tr');
-        if (row) row.classList.toggle('selected', cb.checked);
-      });
-    };
-  }
 }
 
 export function populateFilters() {
@@ -423,38 +391,16 @@ function populateTeamFilter() {
   });
 }
 
-// Checkbox change handler for individual player rows
-window.togglePlayerSelect = function (ev, id) {
-  if (ev) ev.stopPropagation();
-  const cb = ev.target;
-  const idx = window.selectedPlayerIds.indexOf(id);
-  if (cb.checked && idx < 0) {
-    window.selectedPlayerIds.push(id);
-  } else if (!cb.checked && idx >= 0) {
-    window.selectedPlayerIds.splice(idx, 1);
-  }
-  const row = cb.closest('tr');
-  if (row) row.classList.toggle('selected', cb.checked);
-};
-
 window.selectPlayer = function (ev, id) {
   if (ev) ev.stopPropagation();
-  // Toggle player in/out of selectedPlayerIds by simulating a checkbox change
   const row = document.querySelector(`#tableBody tr[data-player-id="${id}"]`);
-  const cb = row ? row.querySelector('.player-select-cb') : null;
-  if (cb) {
-    cb.checked = !cb.checked;
-    window.togglePlayerSelect({ target: cb, stopPropagation: () => {} }, id);
+  const idx = window.selectedPlayerIds.indexOf(id);
+  if (idx >= 0) {
+    window.selectedPlayerIds.splice(idx, 1);
   } else {
-    // Fallback: update array directly when checkbox not yet in DOM
-    const idx = window.selectedPlayerIds.indexOf(id);
-    if (idx >= 0) {
-      window.selectedPlayerIds.splice(idx, 1);
-    } else {
-      window.selectedPlayerIds.push(id);
-    }
-    if (row) row.classList.toggle('selected', window.selectedPlayerIds.includes(id));
+    window.selectedPlayerIds.push(id);
   }
+  if (row) row.classList.toggle('selected', window.selectedPlayerIds.includes(id));
 };
 
 // Expose for inline handlers
@@ -790,6 +736,11 @@ function initializeStatColumns() {
     const escapedLabel = escapeHtml(statCol.label);
     const escapedTooltip = escapeHtml(statCol.tooltip);
     colHeader.innerHTML = `<span onclick="sortTable('${escapedKey}')" class="th-sortable" style="cursor: pointer;" title="${escapedTooltip}">${escapedLabel} <span id="sortStatIcon">⇅</span></span>`;
+    
+    // Auto-size column width to fit the label (header is the widest thing in this column)
+    const labelPx = Math.max(46, statCol.label.length * 8 + 28);
+    colHeader.style.width = labelPx + 'px';
+    colHeader.style.minWidth = labelPx + 'px';
   }
 }
 
