@@ -282,9 +282,8 @@
   }
 
   .pitch {
-    padding: 2px 8px 8px;
+    padding: 2px 8px 14px;
     overflow-x: hidden;
-    min-height: 530px;
   }
 
   .bench {
@@ -519,9 +518,8 @@
     max-width: none;
     margin-left: 0;
     margin-right: 0;
-    padding: 2px 4px 8px;
+    padding: 2px 4px 12px;
     overflow-x: hidden;
-    min-height: 480px;
   }
 
   .bench {
