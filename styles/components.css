@@ -1386,19 +1386,28 @@ td.fixtures-cell {
   margin: 0;
   text-align: center;
   white-space: nowrap;
-  font-size: 18px;
+  font-size: 22px;
 }
 
 .transfer-header-row .transfer-action-btn {
-  width: 100%;
-  padding: 8px 8px;
-  font-size: 11px;
+  width: 75%;
+  padding: 13px 6px;
+  font-size: 10px;
   height: auto;
-  white-space: nowrap;
+  white-space: normal;
+  overflow-wrap: break-word;
   text-align: center;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  line-height: 1.2;
   min-width: 0;
+}
+
+/* Align each button towards the centre heading */
+.transfer-header-row .add-btn {
+  justify-self: end;
+}
+
+.transfer-header-row .cancel-btn {
+  justify-self: start;
 }
 
 .transfer-panel h3 {

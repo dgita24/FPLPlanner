@@ -506,6 +506,72 @@ window.updatePriceSlider = function () {
   renderTable();
 };
 
+// Make the full slider track tappable/clickable, not just the thumb circles.
+// Attaches touch and click handlers to the track container so that touching
+// anywhere moves the nearest thumb to that position.
+function initPriceSliderTouch() {
+  const track = document.querySelector('.price-range-track');
+  if (!track) return;
+
+  function valueFromClientX(clientX) {
+    const rect = track.getBoundingClientRect();
+    const pct = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
+    const minEl = document.getElementById('priceSliderMin');
+    const sliderMin = parseFloat(minEl.min);
+    const sliderMax = parseFloat(minEl.max);
+    const step = parseFloat(minEl.step) || 0.1;
+    const raw = sliderMin + pct * (sliderMax - sliderMin);
+    return Math.round(raw / step) * step;
+  }
+
+  function moveNearestThumb(clientX) {
+    const minEl = document.getElementById('priceSliderMin');
+    const maxEl = document.getElementById('priceSliderMax');
+    if (!minEl || !maxEl) return null;
+    const value = valueFromClientX(clientX);
+    const minVal = parseFloat(minEl.value);
+    const maxVal = parseFloat(maxEl.value);
+    const moveMin = Math.abs(value - minVal) <= Math.abs(value - maxVal);
+    if (moveMin) {
+      minEl.value = Math.min(value, maxVal);
+    } else {
+      maxEl.value = Math.max(value, minVal);
+    }
+    window.updatePriceSlider();
+    return moveMin ? minEl : maxEl;
+  }
+
+  let touchActiveSlider = null;
+
+  track.addEventListener('touchstart', function (e) {
+    touchActiveSlider = moveNearestThumb(e.touches[0].clientX);
+    e.preventDefault(); // stop page scroll while adjusting slider
+  }, { passive: false });
+
+  track.addEventListener('touchmove', function (e) {
+    if (!touchActiveSlider) return;
+    e.preventDefault();
+    const minEl = document.getElementById('priceSliderMin');
+    const maxEl = document.getElementById('priceSliderMax');
+    const value = valueFromClientX(e.touches[0].clientX);
+    if (touchActiveSlider === minEl) {
+      minEl.value = Math.min(value, parseFloat(maxEl.value));
+    } else {
+      maxEl.value = Math.max(value, parseFloat(minEl.value));
+    }
+    window.updatePriceSlider();
+  }, { passive: false });
+
+  track.addEventListener('touchend', function () {
+    touchActiveSlider = null;
+  });
+
+  // Also let mouse users click anywhere on the track
+  track.addEventListener('click', function (e) {
+    moveNearestThumb(e.clientX);
+  });
+}
+
 window.sortTable = function (key) {
   if (tableSort.key === key) {
     // Toggle direction
@@ -729,4 +795,11 @@ function initializeStatColumns() {
 
 // Call initialization on first render
 let isFirstRender = true;
+
+// Attach price-slider touch/click support once DOM is ready
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initPriceSliderTouch);
+} else {
+  initPriceSliderTouch();
+}
 
