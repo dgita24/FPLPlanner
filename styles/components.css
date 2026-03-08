@@ -214,20 +214,6 @@
 .formation-line[data-player-count="4"] { gap: 10px; }
 .formation-line[data-player-count="5"] { gap: 6px; }
 
-/* Desktop only: Formation-specific spacing */
-@media (min-width: 1025px) {
-  /* Fixed pitch width to accommodate 5 players */
-  .pitch {
-    width: 935px;
-    max-width: 935px;
-  }
-  
-  .pitch-stack {
-    width: 935px;
-    max-width: 935px;
-  }
-}
-
 #plannerMain .pitch {
   margin: 0;
   max-width: none;
@@ -637,13 +623,13 @@
 /* ===== Mobile Top Bar ===== */
 
 .mobile-top-bar {
-  display: none; /* hidden on desktop, shown on ≤768px via responsive.css */
+  display: flex; /* always visible at all screen sizes */
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   z-index: 500;
-  height: 50px;
+  height: var(--top-bar-height);
   background: var(--bg-dark);
   border-bottom: 1px solid var(--border);
   align-items: center;
@@ -733,12 +719,12 @@
 /* ===== Bottom Tab Bar ===== */
 
 .bottom-tab-bar {
-  display: none; /* hidden on desktop, shown on ≤768px via responsive.css */
+  display: flex; /* always visible at all screen sizes */
   position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
-  height: 52px;
+  height: var(--bottom-bar-height);
   background: var(--bg-dark);
   border-top: 1px solid var(--border);
   z-index: 500;
