@@ -12,6 +12,9 @@ import { MAX_GAMEWEEK, MAX_DRAFTS_PER_MANAGER } from './constants.js';
 // Global selected draft tracker
 let selectedDraft = null;
 
+// Tracks the draft chosen for overwrite from the save card
+let selectedOverwriteDraft = null;
+
 // Promise resolver for the delete draft modal
 let _deleteDraftResolve = null;
 
@@ -531,6 +534,97 @@ async function populateSavedTeamsDropdown() {
   }
 }
 
+// Populate the overwrite list inside the save card
+async function populateSaveCardOverwrite() {
+  const container = document.getElementById('saveOverwriteContainer');
+  if (!container) return;
+
+  if (!state.managerId) {
+    container.innerHTML = '<p class="helper-text">Import a team to see saved drafts</p>';
+    return;
+  }
+
+  container.innerHTML = '<p class="helper-text">Loading...</p>';
+
+  try {
+    const response = await fetch('/api/list-drafts', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ managerid: state.managerId })
+    });
+
+    if (!response.ok) {
+      container.innerHTML = '<p class="helper-text" style="color: var(--error);">Failed to load drafts</p>';
+      return;
+    }
+
+    const result = await response.json();
+
+    if (result.success && result.drafts && result.drafts.length > 0) {
+      let html = '<ul>';
+      result.drafts.forEach(draft => {
+        const htmlEscaped = draft.teamid
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#39;');
+        html += `
+          <li data-teamid="${htmlEscaped}">
+            <span>• ${htmlEscaped}</span>
+          </li>
+        `;
+      });
+      html += '</ul>';
+      container.innerHTML = html;
+    } else {
+      container.innerHTML = '<p class="helper-text">No saved drafts yet</p>';
+    }
+  } catch (e) {
+    container.innerHTML = '<p class="helper-text" style="color: var(--error);">Error loading drafts</p>';
+  }
+}
+
+// Select a draft as the overwrite target in the save card
+function selectOverwriteDraft(teamid) {
+  selectedOverwriteDraft = teamid;
+
+  // Update visual selection using data-teamid for reliable matching
+  document.querySelectorAll('#saveOverwriteContainer li[data-teamid]').forEach(li => {
+    if (li.dataset.teamid === teamid) {
+      li.classList.add('selected');
+    } else {
+      li.classList.remove('selected');
+    }
+  });
+
+  // Pre-fill the draft name field
+  const saveTeamId = document.getElementById('saveTeamId');
+  if (saveTeamId) saveTeamId.value = teamid;
+
+  // Show overwrite indicator
+  const indicator = document.getElementById('overwriteIndicator');
+  if (indicator) {
+    indicator.textContent = `⚠️ Overwriting: "${teamid}"`;
+    indicator.style.display = 'block';
+  }
+
+  // Focus the password field for a smooth UX
+  const savePassword = document.getElementById('savePassword');
+  if (savePassword) savePassword.focus();
+}
+
+// Clear the overwrite selection when the user manually edits the draft name
+function onSaveNameInput() {
+  const saveTeamId = document.getElementById('saveTeamId');
+  if (selectedOverwriteDraft && saveTeamId && saveTeamId.value.trim() !== selectedOverwriteDraft) {
+    selectedOverwriteDraft = null;
+    document.querySelectorAll('#saveOverwriteContainer li').forEach(li => li.classList.remove('selected'));
+    const indicator = document.getElementById('overwriteIndicator');
+    if (indicator) indicator.style.display = 'none';
+  }
+}
+
 // Cloud Load
 async function loadTeam() {
   const teamId = selectedDraft; // Use selected draft instead of input field
@@ -954,6 +1048,8 @@ export function initUI() {
   window.deleteDraft = deleteDraft;
   window.toggleCard = toggleCard;
   window.selectDraft = selectDraft;
+  window.selectOverwriteDraft = selectOverwriteDraft;
+  window.onSaveNameInput = onSaveNameInput;
   window.undoLastAction = undoLastAction;
   window.resetToImportedTeam = resetToImportedTeam;
   window.setCaptain = setCaptain;
@@ -972,6 +1068,18 @@ export function initUI() {
       document.querySelectorAll('.action-card').forEach(ac => ac.classList.remove('active'));
       const saveCard = document.getElementById('saveCard');
       if (saveCard) saveCard.style.display = 'block';
+
+      // Reset overwrite state and form fields
+      selectedOverwriteDraft = null;
+      const saveTeamId = document.getElementById('saveTeamId');
+      if (saveTeamId) saveTeamId.value = '';
+      const savePassword = document.getElementById('savePassword');
+      if (savePassword) savePassword.value = '';
+      const indicator = document.getElementById('overwriteIndicator');
+      if (indicator) indicator.style.display = 'none';
+
+      // Refresh overwrite candidates
+      populateSaveCardOverwrite();
     }, 100);
   };
 
@@ -989,6 +1097,15 @@ export function initUI() {
 
   // Setup touch/click handlers for captain selector on mobile
   setupCaptainSelectorTouchHandlers();
+
+  // Delegated click handler for the overwrite list in the save card
+  const overwriteContainer = document.getElementById('saveOverwriteContainer');
+  if (overwriteContainer) {
+    overwriteContainer.addEventListener('click', (e) => {
+      const li = e.target.closest('li[data-teamid]');
+      if (li) selectOverwriteDraft(li.dataset.teamid);
+    });
+  }
 
   // Populate saved teams dropdown
   populateSavedTeamsDropdown();

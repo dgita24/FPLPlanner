@@ -487,6 +487,72 @@ body {
   font-style: italic;
 }
 
+.save-overwrite-label {
+  margin: 0 0 4px 0;
+}
+
+/* Overwrite list in save card — mirrors #savedDraftsContainer styles */
+#saveOverwriteContainer {
+  margin: 0 0 4px;
+}
+
+#saveOverwriteContainer ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+#saveOverwriteContainer li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 10px;
+  background: var(--bg-dark);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  margin-bottom: 6px;
+  transition: all 0.2s;
+  font-size: 13px;
+}
+
+#saveOverwriteContainer li:hover {
+  background: var(--bg);
+  border-color: var(--primary);
+}
+
+#saveOverwriteContainer li.selected {
+  background: var(--accent);
+  border-color: var(--accent);
+  border-width: 2px;
+}
+
+#saveOverwriteContainer li span {
+  cursor: pointer;
+  flex: 1;
+  font-weight: 500;
+  color: var(--text);
+}
+
+/* Divider between overwrite list and new-draft form */
+.save-card-divider {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 12px 0;
+}
+
+/* Indicator shown when a draft is selected for overwrite */
+.overwrite-indicator {
+  font-size: 12px;
+  color: #ff9800;
+  background: rgba(255, 152, 0, 0.12);
+  border: 1px solid rgba(255, 152, 0, 0.4);
+  border-radius: 4px;
+  padding: 6px 10px;
+  margin-bottom: 10px;
+  font-weight: 600;
+  font-style: normal;
+}
+
 /* Sidebar Message */
 .sidebar-message {
   padding: 12px 20px;
