@@ -39,6 +39,11 @@ function toggleCard(cardId) {
   if (!isVisible) {
     card.style.display = 'block';
     clickedCard.classList.add('active');
+
+    // Refresh drafts list whenever the drafts card is opened
+    if (cardId === 'draftsCard') {
+      populateSavedTeamsDropdown();
+    }
   }
 }
 
