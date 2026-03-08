@@ -274,7 +274,16 @@
 .card-fixture-next {
   font-size: 12px;
   font-weight: 800;
-  color: var(--accent);
+
+  /* more readable on pitch green */
+  color: #ffe066; /* warm yellow */
+
+  /* adds contrast regardless of background */
+  text-shadow:
+    0 1px 0 rgba(0, 0, 0, 0.65),
+    0 0 2px rgba(0, 0, 0, 0.55);
+
+  /* keep existing layout/overflow behavior */
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
