@@ -1,6 +1,16 @@
+// Constant-time string comparison to prevent timing attacks
+function timingSafeEqual(a, b) {
+  if (a.length !== b.length) return false;
+  let result = 0;
+  for (let i = 0; i < a.length; i++) {
+    result |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  }
+  return result === 0;
+}
+
 export async function onRequestPost({ request, env }) {
   try {
-    const { teamid, managerid } = await request.json();
+    const { teamid, managerid, password } = await request.json();
     
     if (!teamid) {
       return new Response(JSON.stringify({ error: 'Missing teamid' }), {
@@ -16,6 +26,13 @@ export async function onRequestPost({ request, env }) {
       });
     }
 
+    if (!password) {
+      return new Response(JSON.stringify({ error: 'Missing password' }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+
     const supabaseUrl = env.SUPABASE_URL;
     const supabaseKey = env.SUPABASE_ANON_KEY;
     
@@ -26,9 +43,50 @@ export async function onRequestPost({ request, env }) {
       'Prefer': 'return=representation'
     };
 
-    // Delete the draft - only if it belongs to this manager (security)
+    // Hash the provided password using SHA-256 (same method as save.js and load.js)
+    const encoder = new TextEncoder();
+    const pwdData = encoder.encode(password);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', pwdData);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    const inputHash = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+
+    // Fetch the draft record to verify the password before deleting
     const encodedTeamId = encodeURIComponent(teamid);
     const encodedManagerId = encodeURIComponent(managerid);
+    const fetchResponse = await fetch(
+      `${supabaseUrl}/rest/v1/team_saves?teamid=eq.${encodedTeamId}&managerid=eq.${encodedManagerId}&select=passwordhash`,
+      {
+        method: 'GET',
+        headers
+      }
+    );
+
+    if (!fetchResponse.ok) {
+      console.error(`Supabase error fetching draft for password verification: ${fetchResponse.status} ${fetchResponse.statusText}`);
+      return new Response(JSON.stringify({ error: 'Failed to verify password' }), {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+
+    const records = await fetchResponse.json();
+    if (!records || records.length === 0) {
+      return new Response(JSON.stringify({ error: 'Draft not found' }), {
+        status: 404,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+
+    // Verify password hash using constant-time comparison to prevent timing attacks
+    const storedHash = records[0].passwordhash || '';
+    if (storedHash.length !== inputHash.length || !timingSafeEqual(storedHash, inputHash)) {
+      return new Response(JSON.stringify({ error: 'Invalid password' }), {
+        status: 403,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+
+    // Delete the draft - only if it belongs to this manager (security)
     const response = await fetch(
       `${supabaseUrl}/rest/v1/team_saves?teamid=eq.${encodedTeamId}&managerid=eq.${encodedManagerId}`,
       {

@@ -23,6 +23,12 @@
     <div class="mobile-bank-display mobile-bank-editable" id="mobileBankDisplay" onclick="editMobileBank()">£0.0m</div>
   </div>
 
+  <!-- Import prompt banner: shown when team is restored from localStorage without a manager ID -->
+  <div id="import-banner" class="import-banner" style="display:none;" role="alert">
+    <span>Your last session was restored. Import your team via the ☰ menu to access drafts and sync features.</span>
+    <button class="import-banner-dismiss" onclick="document.getElementById('import-banner').style.display='none'" aria-label="Dismiss notification">×</button>
+  </div>
+
   <div class="container">
     <div class="header">
       <h1>FPL TEAM PLANNER</h1>
@@ -318,6 +324,19 @@
       <p><strong>PlanFPLTeam</strong> is a free Fantasy Premier League transfer planner with no paywalls or premium tiers—unlike other tools that lock features behind subscriptions.</p>
 
       <p>Questions or feedback? Reach out at <a href="mailto:contact@planfplteam.com">contact@planfplteam.com</a> and I'll do my best to help!</p>
+    </div>
+  </div>
+
+  <!-- Delete Draft Confirmation Modal -->
+  <div id="deleteDraftModal" class="delete-draft-modal" role="dialog" aria-modal="true" aria-labelledby="deleteDraftModalTitle">
+    <div class="delete-draft-modal-content">
+      <h3 id="deleteDraftModalTitle">Delete Draft</h3>
+      <p id="deleteDraftModalMessage"></p>
+      <input type="password" id="deleteDraftPassword" class="delete-draft-password-input" placeholder="Password" autocomplete="current-password" />
+      <div class="delete-draft-modal-actions">
+        <button class="delete-draft-btn-cancel" onclick="window._cancelDeleteDraft()">Cancel</button>
+        <button class="delete-draft-btn-confirm" onclick="window._confirmDeleteDraft()">Delete</button>
+      </div>
     </div>
   </div>
 

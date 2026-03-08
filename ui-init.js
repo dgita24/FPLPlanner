@@ -12,6 +12,51 @@ import { MAX_GAMEWEEK, MAX_DRAFTS_PER_MANAGER } from './constants.js';
 // Global selected draft tracker
 let selectedDraft = null;
 
+// Promise resolver for the delete draft modal
+let _deleteDraftResolve = null;
+
+// Show the delete-draft confirmation modal; returns a Promise that resolves with
+// the entered password string, or null if the user cancelled.
+function showDeleteDraftModal(teamid) {
+  const modal = document.getElementById('deleteDraftModal');
+  const msgEl = document.getElementById('deleteDraftModalMessage');
+  const pwdEl = document.getElementById('deleteDraftPassword');
+  if (!modal || !msgEl || !pwdEl) {
+    // Fallback to native prompt if modal elements are missing
+    return Promise.resolve(prompt(`Enter the password for draft "${teamid}" to confirm deletion:\n\nThis action cannot be undone.`));
+  }
+  msgEl.textContent = `Enter the password for draft "${teamid}" to confirm deletion. This action cannot be undone.`;
+  pwdEl.value = '';
+  modal.classList.add('open');
+  pwdEl.focus();
+
+  // Allow pressing Enter to confirm
+  function onKeyDown(e) {
+    if (e.key === 'Enter') { e.preventDefault(); window._confirmDeleteDraft(); }
+    if (e.key === 'Escape') { e.preventDefault(); window._cancelDeleteDraft(); }
+  }
+  pwdEl.addEventListener('keydown', onKeyDown);
+
+  return new Promise(resolve => {
+    _deleteDraftResolve = (value) => {
+      pwdEl.removeEventListener('keydown', onKeyDown);
+      modal.classList.remove('open');
+      _deleteDraftResolve = null;
+      resolve(value);
+    };
+  });
+}
+
+// Exposed to inline onclick handlers in index.html
+window._cancelDeleteDraft = function () {
+  if (_deleteDraftResolve) _deleteDraftResolve(null);
+};
+
+window._confirmDeleteDraft = function () {
+  const pwd = document.getElementById('deleteDraftPassword')?.value ?? '';
+  if (_deleteDraftResolve) _deleteDraftResolve(pwd);
+};
+
 // Helper function for pluralization
 function pluralize(word, count) {
   return count === 1 ? word : word + 's';
@@ -272,6 +317,10 @@ async function importTeam() {
   // Store manager ID for syncing saved drafts
   state.managerId = teamId;
 
+  // Dismiss the import prompt banner now that the team has been imported
+  const importBanner = document.getElementById('import-banner');
+  if (importBanner) importBanner.style.display = 'none';
+
   // Update team ID display in sidebar header
   const teamIdDisplay = document.getElementById('currentTeamId');
   if (teamIdDisplay && state.managerId) {
@@ -319,9 +368,14 @@ async function deleteDraft(teamid) {
     return;
   }
 
-  // Confirmation dialog
-  const confirmed = confirm(`Are you sure you want to delete "${teamid}"?\n\nThis action cannot be undone.`);
-  if (!confirmed) {
+  // Prompt for the password used to save this draft — required to confirm deletion
+  const password = await showDeleteDraftModal(teamid);
+  if (password === null) {
+    // User cancelled
+    return;
+  }
+  if (!password) {
+    showMessage('Password is required to delete a draft.', 'error');
     return;
   }
 
@@ -331,7 +385,8 @@ async function deleteDraft(teamid) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ 
         teamid: teamid,
-        managerid: state.managerId
+        managerid: state.managerId,
+        password: password
       })
     });
 
