@@ -157,14 +157,14 @@
 
   .formation-line {
     overflow-x: hidden;
-    padding-bottom: 2px;
+    padding-bottom: 3px;
     padding-top: 11px;
-    margin-bottom: 2px;
+    margin-bottom: 10px;
   }
 
   .bench-slots {
     overflow-x: hidden;
-    padding-bottom: 2px;
+    padding-bottom: 8px;
   }
 
   .pitch {
@@ -174,7 +174,7 @@
 
   .bench {
     overflow-x: hidden;
-    padding: 15px 10px;
+    padding: 15px 10px 18px;
   }
 
   .gw-nav button {
@@ -282,14 +282,13 @@
   }
 
   .pitch {
-    padding: 2px 8px 8px;
+    padding: 2px 8px 14px;
     overflow-x: hidden;
-    min-height: unset;
   }
 
   .bench {
     overflow-x: hidden;
-    padding: 12px 8px;
+    padding: 12px 8px 18px;
   }
 
   /* Stack transfer action buttons vertically on mobile */
@@ -345,8 +344,10 @@
   .formation-line {
     overflow-x: hidden;
     gap: 4px;
+    min-height: 100px;
     padding-top: 11px;
-    padding-bottom: 2px;
+    padding-bottom: 3px;
+    margin-bottom: 14px;
   }
 
   .formation-line[data-player-count="1"] { gap: 0px; }
@@ -359,7 +360,7 @@
     overflow-x: hidden;
     gap: 6px;
     padding-top: 14px;
-    padding-bottom: 2px;
+    padding-bottom: 8px;
   }
 
   .filters {
@@ -517,22 +518,23 @@
     max-width: none;
     margin-left: 0;
     margin-right: 0;
-    padding: 2px 4px 8px;
+    padding: 2px 4px 12px;
     overflow-x: hidden;
   }
 
   .bench {
     overflow-x: hidden;
-    padding: 10px 4px;
+    padding: 10px 4px 14px;
   }
 
   .formation-line {
     width: 100%;
     overflow-x: hidden;
     gap: 3px;
-    min-height: 70px;
+    min-height: 85px;
     padding-top: 11px;
     padding-bottom: 2px;
+    margin-bottom: 12px;
   }
 
   .formation-line[data-player-count="1"] { gap: 0px; }
@@ -545,7 +547,7 @@
     overflow-x: hidden;
     gap: 4px;
     padding-top: 14px;
-    padding-bottom: 2px;
+    padding-bottom: 6px;
   }
 
   .badge-container {
