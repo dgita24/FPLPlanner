@@ -275,9 +275,13 @@
 .player-card .future-fixtures {
   display: flex;
   gap: 0;
-  width: 100%;
+  width: calc(100% + 10px);
+  margin-left: -5px;
+  margin-right: -5px;
+  margin-bottom: -5px;
   margin-top: 1px;
   overflow: visible;
+  border-radius: 0 0 7px 7px;
 }
 
 /* Individual GW segment in the future-fixtures band */
@@ -332,7 +336,7 @@
 .fdr-1, .fdr-2, .fdr-3, .fdr-4, .fdr-5 {
   background: rgba(60, 60, 60, 0.40);
 }
-.fdr-none { background: var(--bg-dark); color: var(--text-light); }
+.fdr-none { background: rgba(60, 60, 60, 0.40); }
 
 .card-btn {
   position: absolute;

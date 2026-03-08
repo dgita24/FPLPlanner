@@ -516,6 +516,11 @@
 
   .fdr-segment {
     font-size: 7px;
+    padding: 2px 0;
+  }
+
+  .fdr-segment.dgw > span {
+    padding: 1px 0;
   }
 
   .card-price {
