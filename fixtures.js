@@ -308,7 +308,6 @@ export function renderFixtures() {
         </div>
         <button class="fixtures-control-btn local-btn" onclick="localSave()">💾 Local Save</button>
         
-        <button class="fixtures-control-btn" onclick="resetToImportedTeam()">⏮️ Reset</button>
         <button class="fixtures-control-btn" onclick="toggleHelpModal()">❓ Help</button>
       </div>
     </div>
