@@ -64,11 +64,17 @@
 
       <!-- Save Card (hidden by default) -->
       <div class="expandable-card" id="saveCard" style="display: none;">
-        <h4>Save New Draft</h4>
-        <input type="text" id="saveTeamId" placeholder="Draft name (e.g., 'WC_GW20')" />
-        <input type="password" id="savePassword" placeholder="Create Password" />
-        <button class="btn-primary" onclick="saveTeam()">Save Team</button>
-        <p class="helper-text">Max 5 drafts per manager</p>
+        <h4>Save Draft</h4>
+        <p class="helper-text save-overwrite-label">Overwrite existing:</p>
+        <div id="saveOverwriteContainer">
+          <p class="helper-text">Import a team to see saved drafts</p>
+        </div>
+        <hr class="save-card-divider" />
+        <div id="overwriteIndicator" class="overwrite-indicator" style="display: none;"></div>
+        <input type="text" id="saveTeamId" placeholder="Draft name (e.g., 'WC_GW20')" oninput="onSaveNameInput()" />
+        <input type="password" id="savePassword" placeholder="Password" />
+        <button class="btn-primary" onclick="saveTeam()">Save Draft</button>
+        <p class="helper-text">Select an existing draft above to overwrite it, or enter a new name to create one. Max 5 per manager.</p>
       </div>
 
       <!-- Drafts Card (hidden by default) -->
