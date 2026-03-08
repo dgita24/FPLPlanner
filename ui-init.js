@@ -897,6 +897,7 @@ function setupCaptainSelectorTouchHandlers() {
 // Switch between mobile tabs (Pitch / Fixtures / Transfers / More)
 function switchMobileTab(tab) {
   const allTabs = ['pitch', 'fixtures', 'transfers', 'more'];
+  const isDesktop = window.innerWidth >= 769; // matches CSS @media (min-width: 769px)
 
   // Remove active state from all tab buttons
   allTabs.forEach((t) => {
@@ -915,7 +916,11 @@ function switchMobileTab(tab) {
   if (activeBtn) activeBtn.classList.add('tab-active');
 
   // Show the relevant panel overlay
-  if (tab === 'fixtures' && fixturesPanel) {
+  if (isDesktop && (tab === 'fixtures' || tab === 'transfers')) {
+    // On desktop: show both panels side-by-side (each occupying half the screen)
+    if (fixturesPanel) fixturesPanel.classList.add('mobile-panel-active');
+    if (transferPanel) transferPanel.classList.add('mobile-panel-active');
+  } else if (tab === 'fixtures' && fixturesPanel) {
     fixturesPanel.classList.add('mobile-panel-active');
   } else if (tab === 'transfers' && transferPanel) {
     transferPanel.classList.add('mobile-panel-active');

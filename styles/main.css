@@ -677,6 +677,9 @@ body {
   display: flex;
   flex-direction: column;
   gap: 12px;
+  max-width: 935px;
+  margin: 0 auto;
+  width: 100%;
 }
 
 /* ===== Transfer Section ===== */

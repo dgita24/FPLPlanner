@@ -27,6 +27,20 @@
 }
 
 /* ----------------------------------------
+   Desktop: Fixtures + Transfers side-by-side (each half-width)
+   On desktop, clicking either tab shows both panels at once.
+---------------------------------------- */
+@media (min-width: 769px) {
+  #fixturesPanel.mobile-panel-active {
+    right: 50%;
+  }
+
+  #transferPanel.mobile-panel-active {
+    left: 50%;
+  }
+}
+
+/* ----------------------------------------
    Large Desktop (max-width: 1280px)
    Single-column layout
 ---------------------------------------- */
