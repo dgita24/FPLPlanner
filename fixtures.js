@@ -291,11 +291,6 @@ export function renderFixtures() {
         <button class="fixtures-control-btn import-save-btn" onclick="toggleSidebarMenu()">Menu/Login</button>
         <button class="fixtures-control-btn donate-btn" onclick="donatePlaceholder()">💝 Donate</button>
         
-        <div class="bank-display">
-          <span>Bank</span>
-          <input type="number" id="bankInput" value="${state.bank.toFixed(1)}" step="0.1" />
-          <span>m</span>
-        </div>
         <button class="fixtures-control-btn local-btn" onclick="localLoad()">📂 Local Load</button>
         
         <div class="price-toggle">
@@ -307,8 +302,6 @@ export function renderFixtures() {
           </select>
         </div>
         <button class="fixtures-control-btn local-btn" onclick="localSave()">💾 Local Save</button>
-        
-        <button class="fixtures-control-btn" onclick="toggleHelpModal()">❓ Help</button>
       </div>
     </div>
 

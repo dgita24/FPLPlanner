@@ -1,7 +1,7 @@
 // ui-init.js - Initializes all UI-related event listeners and dependencies
 
 import { state, history, loadTeamEntry } from './data.js';
-import { setupSidebarHandlers, closeSidebar } from './ui-sidebar.js';
+import { setupSidebarHandlers, closeSidebar, toggleSidebarMenu } from './ui-sidebar.js';
 import { showMessage, renderPitch, renderBench, ensureFixturesForView } from './ui-render.js';
 import { renderFixtures, setFixturesGW, isFixturesSyncEnabled } from './fixtures.js';
 import { cancelTransfer, substitutePlayer, addSelectedToSquad, removePlayer, resetTransferState, isPendingTransfer, getBatchTransferInfo, reinstatePlayer, selectChip } from './team-operations.js';
@@ -891,6 +891,20 @@ export function initUI() {
   window.setViceCaptain = setViceCaptain;
   window.donatePlaceholder = () => showMessage('Donate feature coming soon! This is a placeholder for now.', 'info');
   window.closeSidebar = closeSidebar;
+
+  // Open sidebar and expand the cloud save card
+  window.openCloudSave = function() {
+    const sb = document.getElementById('sidebar');
+    if (!sb || !sb.classList.contains('open')) {
+      toggleSidebarMenu();
+    }
+    setTimeout(() => {
+      document.querySelectorAll('.expandable-card').forEach(c => { c.style.display = 'none'; });
+      document.querySelectorAll('.action-card').forEach(ac => ac.classList.remove('active'));
+      const saveCard = document.getElementById('saveCard');
+      if (saveCard) saveCard.style.display = 'block';
+    }, 100);
+  };
 
   // Expose updateUI so it can be called from fixtures.js
   window.updateUI = updateUI;
