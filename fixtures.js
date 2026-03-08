@@ -286,25 +286,6 @@ export function renderFixtures() {
     : fixturesContent;
 
   panel.innerHTML = `
-    <div class="fixtures-controls">
-      <div class="fixtures-button-grid">
-        <button class="fixtures-control-btn import-save-btn" onclick="toggleSidebarMenu()">Menu/Login</button>
-        <button class="fixtures-control-btn donate-btn" onclick="donatePlaceholder()">💝 Donate</button>
-        
-        <button class="fixtures-control-btn local-btn" onclick="localLoad()">📂 Local Load</button>
-        
-        <div class="price-toggle">
-          <span>Prices</span>
-          <select id="priceModeSelect">
-            <option value="selling" ${state.priceMode === 'selling' ? 'selected' : ''}>Selling</option>
-            <option value="purchase" ${state.priceMode === 'purchase' ? 'selected' : ''}>Purchase</option>
-            <option value="current" ${state.priceMode === 'current' ? 'selected' : ''}>Current</option>
-          </select>
-        </div>
-        <button class="fixtures-control-btn local-btn" onclick="localSave()">💾 Local Save</button>
-      </div>
-    </div>
-
     ${headerHTML}
 
     ${fixturesHTML}
@@ -329,17 +310,6 @@ function reattachFixturesControls() {
         return;
       }
       state.bank = v;
-      // Trigger updateUI if available globally
-      if (window.updateUI) {
-        window.updateUI();
-      }
-    });
-  }
-
-  const pm = document.getElementById('priceModeSelect');
-  if (pm) {
-    pm.addEventListener('change', (e) => {
-      state.priceMode = e.target.value;
       // Trigger updateUI if available globally
       if (window.updateUI) {
         window.updateUI();

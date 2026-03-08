@@ -270,10 +270,6 @@
     gap: 4px;
   }
 
-  .transfer-header-row h3 {
-    font-size: 24px;
-  }
-
   .transfer-header-row .transfer-action-btn {
     font-size: 12px;
     padding: 10px 6px;
@@ -1160,6 +1156,11 @@
 /* Pitch reset button: smaller on mobile */
 @media (max-width: 768px) {
   .pitch-reset-btn {
+    font-size: 12px;
+    padding: 3px 7px;
+  }
+
+  .pitch-price-btn {
     font-size: 12px;
     padding: 3px 7px;
   }
