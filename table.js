@@ -180,12 +180,11 @@ function foldForSearch(s) {
   return str.toLowerCase().trim();
 }
 
-function bestFixtureForTeamInGW(teamId, fixtures) {
-  if (!Array.isArray(fixtures) || fixtures.length === 0) return null;
+function allFixturesForTeamInGW(teamId, fixtures) {
+  if (!Array.isArray(fixtures) || fixtures.length === 0) return [];
   const matches = fixtures.filter((f) => f && (f.team_h === teamId || f.team_a === teamId));
-  if (matches.length === 0) return null;
   matches.sort((a, b) => kickoffTimeValue(a) - kickoffTimeValue(b));
-  return matches[0]; // If DGW, pick the earliest kickoff
+  return matches;
 }
 
 function getTeamShortName(teamId) {
@@ -210,8 +209,12 @@ function getNextFixturesForTeam(teamId, startGW, count = 4) {
       continue;
     }
     const list = fixturesByGW.get(gw);
-    const fx = bestFixtureForTeamInGW(teamId, list);
-    out.push(formatOpponent(teamId, fx));
+    const matches = allFixturesForTeamInGW(teamId, list);
+    if (matches.length === 0) {
+      out.push('--');
+      continue;
+    }
+    out.push(matches.map((fx) => formatOpponent(teamId, fx)).join(' + '));
   }
   return out;
 }

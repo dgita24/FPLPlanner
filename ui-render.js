@@ -56,16 +56,15 @@ function kickoffTimeValue(fx) {
   return Number.isFinite(t) ? t : Number.POSITIVE_INFINITY;
 }
 
-function bestFixtureForTeamInGW(teamId, fixtures) {
-  if (!Array.isArray(fixtures) || fixtures.length === 0) return null;
+function allFixturesForTeamInGW(teamId, fixtures) {
+  if (!Array.isArray(fixtures) || fixtures.length === 0) return [];
 
   const matches = fixtures.filter(
     (f) => f && (f.team_h === teamId || f.team_a === teamId)
   );
-  if (matches.length === 0) return null;
 
   matches.sort((a, b) => kickoffTimeValue(a) - kickoffTimeValue(b));
-  return matches[0];
+  return matches;
 }
 
 function formatOpponent(teamId, fixture) {
@@ -98,8 +97,12 @@ function getNextFixturesForTeam(teamId, startGW, count = 4) {
     }
 
     const list = fixturesByGW.get(gw);
-    const fx = bestFixtureForTeamInGW(teamId, list);
-    out.push(formatOpponent(teamId, fx));
+    const matches = allFixturesForTeamInGW(teamId, list);
+    if (matches.length === 0) {
+      out.push('--');
+      continue;
+    }
+    out.push(matches.map((fx) => formatOpponent(teamId, fx)).join(' + '));
   }
   return out;
 }
@@ -115,33 +118,41 @@ function getNextFixturesCompact(teamId, startGW, count = 4) {
     }
 
     const list = fixturesByGW.get(gw);
-    const fx = bestFixtureForTeamInGW(teamId, list);
-    out.push(formatOpponentCompact(teamId, fx));
+    const matches = allFixturesForTeamInGW(teamId, list);
+    if (matches.length === 0) {
+      out.push('--');
+      continue;
+    }
+    out.push(matches.map((fx) => formatOpponentCompact(teamId, fx)).join('+'));
   }
   return out;
 }
 
-// Returns array of { text, fdr } objects — compact opponent name + FDR value
+// Returns an array where each element represents one GW and contains a fixtures
+// array of {text, fdr} objects — one per fixture (2 entries for Double Gameweeks).
 function getNextFixturesFDRData(teamId, startGW, count = 4) {
   const out = [];
   for (let i = 0; i < count; i++) {
     const gw = startGW + i;
     if (!fixturesByGW.has(gw)) {
-      out.push({ text: '?', fdr: null });
+      out.push({ fixtures: [{ text: '?', fdr: null }] });
       continue;
     }
     const list = fixturesByGW.get(gw);
-    const fx = bestFixtureForTeamInGW(teamId, list);
-    if (!fx) {
-      out.push({ text: '-', fdr: null });
+    const matches = allFixturesForTeamInGW(teamId, list);
+    if (matches.length === 0) {
+      out.push({ fixtures: [{ text: '-', fdr: null }] });
       continue;
     }
-    const isHome = fx.team_h === teamId;
-    const oppId = isHome ? fx.team_a : fx.team_h;
-    const opp = getTeamShortName(oppId) || '???';
-    const text = isHome ? opp.toUpperCase() : opp.toLowerCase();
-    const fdr = isHome ? fx.team_h_difficulty : fx.team_a_difficulty;
-    out.push({ text, fdr });
+    const gwFixtures = matches.map((fx) => {
+      const isHome = fx.team_h === teamId;
+      const oppId = isHome ? fx.team_a : fx.team_h;
+      const opp = getTeamShortName(oppId) || '???';
+      const text = isHome ? opp.toUpperCase() : opp.toLowerCase();
+      const fdr = isHome ? fx.team_h_difficulty : fx.team_a_difficulty;
+      return { text, fdr };
+    });
+    out.push({ fixtures: gwFixtures });
   }
   return out;
 }
@@ -347,6 +358,21 @@ export function renderBench() {
   }
 }
 
+// Renders a single GW segment for the future-fixtures band.
+// DGW segments stack two fixtures vertically; single GW shows one centered text.
+function renderFutureFxSegment(gwData) {
+  const fxs = gwData.fixtures;
+  const fdrClass = (fdr) => (fdr != null ? `fdr-${fdr}` : 'fdr-none');
+  if (fxs.length > 1) {
+    const items = fxs
+      .map((fx) => `<span class="${fdrClass(fx.fdr)}">${fx.text}</span>`)
+      .join('');
+    return `<div class="fdr-segment dgw">${items}</div>`;
+  }
+  const fx = fxs[0] || { text: '--', fdr: null };
+  return `<div class="fdr-segment ${fdrClass(fx.fdr)}">${fx.text}</div>`;
+}
+
 function playerCard(entry, source) {
   const p = getPlayer(entry.id);
   if (!p) return '';
@@ -359,10 +385,10 @@ function playerCard(entry, source) {
 
   // Get compact fixtures with FDR data (4 GWs: current + 3 future)
   const fxData = getNextFixturesFDRData(teamId, state.viewingGW, 4);
-  const fx1 = fxData[0] || { text: '--', fdr: null };
-  const fx2 = fxData[1] || { text: '--', fdr: null };
-  const fx3 = fxData[2] || { text: '--', fdr: null };
-  const fx4 = fxData[3] || { text: '--', fdr: null };
+  const gw1 = fxData[0] || { fixtures: [{ text: '--', fdr: null }] };
+  const gw2 = fxData[1] || { fixtures: [{ text: '--', fdr: null }] };
+  const gw3 = fxData[2] || { fixtures: [{ text: '--', fdr: null }] };
+  const gw4 = fxData[3] || { fixtures: [{ text: '--', fdr: null }] };
 
   const removeFn = `removePlayer(${entry.id}, '${source}')`;
   const subFn = `substitutePlayer(${entry.id})`;
@@ -408,6 +434,11 @@ function playerCard(entry, source) {
   // FDR CSS class helper
   const fdrClass = (fdr) => fdr != null ? `fdr-${fdr}` : 'fdr-none';
 
+  // Next fixture display: DGW shows two stacked lines
+  const nextFxHtml = gw1.fixtures.length > 1
+    ? `<div class="card-fixture-next dgw-next">${gw1.fixtures.map((fx) => `<span class="fxline">${fx.text}</span>`).join('')}</div>`
+    : `<div class="card-fixture-next">${(gw1.fixtures[0] || { text: '--' }).text}</div>`;
+
   return `
     <div class="${cardClass}" onclick="showSquadPlayerInfo(${entry.id}, '${source}')">
       <span class="card-price">${price}</span>
@@ -422,12 +453,12 @@ function playerCard(entry, source) {
 
       <div class="name">${p.web_name}</div>
 
-      <div class="card-fixture-next">${fx1.text}</div>
+      ${nextFxHtml}
 
       <div class="future-fixtures">
-        <span class="fdr-pill ${fdrClass(fx2.fdr)}">${fx2.text}</span>
-        <span class="fdr-pill ${fdrClass(fx3.fdr)}">${fx3.text}</span>
-        <span class="fdr-pill ${fdrClass(fx4.fdr)}">${fx4.text}</span>
+        ${renderFutureFxSegment(gw2)}
+        ${renderFutureFxSegment(gw3)}
+        ${renderFutureFxSegment(gw4)}
       </div>
     </div>
   `;
@@ -464,9 +495,9 @@ function placeholderCard(removedPlayer, source) {
       <div class="card-fixture-next">--</div>
 
       <div class="future-fixtures">
-        <span class="fdr-pill fdr-none">--</span>
-        <span class="fdr-pill fdr-none">--</span>
-        <span class="fdr-pill fdr-none">--</span>
+        <div class="fdr-segment fdr-none">--</div>
+        <div class="fdr-segment fdr-none">--</div>
+        <div class="fdr-segment fdr-none">--</div>
       </div>
     </div>
   `;
