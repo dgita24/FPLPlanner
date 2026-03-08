@@ -59,6 +59,15 @@ function selectDraft(teamid) {
       li.classList.remove('selected');
     }
   });
+
+  // Ensure the load section (password + button) is visible and ready for input
+  const loadSection = document.getElementById('loadSection');
+  const loadPassword = document.getElementById('loadPassword');
+  if (loadSection) loadSection.style.display = 'block';
+  if (loadPassword) {
+    loadPassword.value = '';
+    loadPassword.focus();
+  }
 }
 
 // Editable mobile bank display
