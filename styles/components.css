@@ -275,13 +275,13 @@
   font-size: 12px;
   font-weight: 800;
 
-  /* more readable on pitch green */
-  color: #ffe066; /* warm yellow */
+  /* navy text */
+  color: #0b1f3b;
 
-  /* adds contrast regardless of background */
+  /* keep it readable on green/varied card backgrounds */
   text-shadow:
-    0 1px 0 rgba(0, 0, 0, 0.65),
-    0 0 2px rgba(0, 0, 0, 0.55);
+    0 1px 0 rgba(255, 255, 255, 0.35),
+    0 0 2px rgba(255, 255, 255, 0.25);
 
   /* keep existing layout/overflow behavior */
   white-space: nowrap;
