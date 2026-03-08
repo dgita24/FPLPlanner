@@ -11,7 +11,7 @@
   }
 
   #plannerMain {
-    grid-template-columns: 350px 1fr 350px;
+    grid-template-columns: 350px minmax(0, 1fr) 350px;
     gap: 10px;
   }
 
@@ -263,6 +263,20 @@
   .transfer-actions .transfer-action-btn {
     max-width: 100%;
     width: 100%;
+  }
+
+  /* Transfer header row - keep on one line on mobile */
+  .transfer-header-row {
+    gap: 4px;
+  }
+
+  .transfer-header-row h3 {
+    font-size: 19px;
+  }
+
+  .transfer-header-row .transfer-action-btn {
+    font-size: 11px;
+    padding: 10px 5px;
   }
 
   .player-card .name {
@@ -588,6 +602,24 @@
     height: 30px;
   }
 
+  .transfer-header-row {
+    gap: 4px;
+  }
+
+  .transfer-header-row h3 {
+    font-size: 17px;
+  }
+
+  .transfer-header-row .transfer-action-btn {
+    font-size: 10px;
+    padding: 8px 4px;
+    height: auto;
+  }
+
+  .price-slider-label {
+    font-size: 11px;
+  }
+
   .chip-btn-small {
     padding: 5px 9px;
     font-size: 10px;
@@ -889,7 +921,7 @@
   }
 
   #plannerMain {
-    grid-template-columns: 280px 1fr 320px;
+    grid-template-columns: 280px minmax(0, 1fr) 320px;
     gap: 10px;
   }
 
