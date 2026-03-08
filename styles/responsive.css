@@ -1114,3 +1114,11 @@
     padding: 3px 2px;
   }
 }
+
+/* Pitch reset button: smaller on mobile */
+@media (max-width: 768px) {
+  .pitch-reset-btn {
+    font-size: 12px;
+    padding: 3px 7px;
+  }
+}

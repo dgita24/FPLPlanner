@@ -310,6 +310,7 @@ export function renderPitch() {
   pitch.setAttribute('data-formation', formation);
 
   pitch.innerHTML = `
+    <button class="pitch-reset-btn" onclick="resetToImportedTeam()">⏮️ Reset</button>
     <div class="formation-line" data-player-count="${gk.length}">${gk.map(renderCard).join('')}</div>
     <div class="formation-line" data-player-count="${def.length}">${def.map(renderCard).join('')}</div>
     <div class="formation-line" data-player-count="${mid.length}">${mid.map(renderCard).join('')}</div>
@@ -732,14 +733,14 @@ window.showSquadPlayerInfo = function (playerId, source) {
       
       ${availabilityFlagHtml}
       
+      ${captainSelectorHtml}
+      
+      ${actionButtonsHtml}
+      
       <div class="player-info-section">
         <h3>Season Statistics</h3>
         ${statsHtml}
       </div>
-      
-      ${captainSelectorHtml}
-      
-      ${actionButtonsHtml}
     </div>
   `;
   

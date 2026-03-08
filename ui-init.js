@@ -166,6 +166,24 @@ export function updateUI() {
 
   renderPitch();
   renderBench();
+
+  // Auto-persist state to localStorage after every UI update,
+  // but only when a team is actually loaded (avoid overwriting saved data with an empty plan)
+  const hasTeam = state.plan && Object.values(state.plan).some(gw => gw?.starting?.length > 0);
+  if (hasTeam) {
+    try {
+      const data = {
+        plan: state.plan,
+        bank: state.bank,
+        viewingGW: state.viewingGW,
+        minNavigableGW: state.minNavigableGW,
+        priceMode: state.priceMode
+      };
+      localStorage.setItem('fplplanner-state', JSON.stringify(data));
+    } catch (e) {
+      // silently fail - localStorage might be full or disabled
+    }
+  }
 }
 
 // Helper function to change GW with validation
