@@ -1023,15 +1023,6 @@ export function initUI() {
     });
   }
 
-  // Price mode dropdown should update player card prices
-  const pm = document.getElementById('priceModeSelect');
-  if (pm) {
-    pm.addEventListener('change', (e) => {
-      state.priceMode = e.target.value;
-      updateUI();
-    });
-  }
-
   // Expose nav + actions used by inline onclicks in index.html
   window.changeGW = changeGW;
   window.syncPitchGWFromFixtures = syncPitchGWFromFixtures;
@@ -1056,6 +1047,10 @@ export function initUI() {
   window.setViceCaptain = setViceCaptain;
   window.donatePlaceholder = () => showMessage('Donate feature coming soon! This is a placeholder for now.', 'info');
   window.closeSidebar = closeSidebar;
+  window.changePriceMode = (value) => {
+    state.priceMode = value;
+    updateUI();
+  };
 
   // Open sidebar and expand the cloud save card
   window.openCloudSave = function() {

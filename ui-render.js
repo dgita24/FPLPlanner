@@ -323,6 +323,11 @@ export function renderPitch() {
   pitch.innerHTML = `
     <button class="pitch-save-btn" onclick="openCloudSave()" title="Cloud Save">💾</button>
     <button class="pitch-reset-btn" onclick="resetToImportedTeam()">⏮️ Reset</button>
+    <select class="pitch-price-btn" id="priceModeSelect" onchange="changePriceMode(this.value)">
+      <option value="selling" ${state.priceMode === 'selling' ? 'selected' : ''}>Selling</option>
+      <option value="purchase" ${state.priceMode === 'purchase' ? 'selected' : ''}>Purchase</option>
+      <option value="current" ${state.priceMode === 'current' ? 'selected' : ''}>Current</option>
+    </select>
     <div class="formation-line" data-player-count="${gk.length}">${gk.map(renderCard).join('')}</div>
     <div class="formation-line" data-player-count="${def.length}">${def.map(renderCard).join('')}</div>
     <div class="formation-line" data-player-count="${mid.length}">${mid.map(renderCard).join('')}</div>
