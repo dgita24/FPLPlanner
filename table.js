@@ -736,6 +736,11 @@ function initializeStatColumns() {
     const escapedLabel = escapeHtml(statCol.label);
     const escapedTooltip = escapeHtml(statCol.tooltip);
     colHeader.innerHTML = `<span onclick="sortTable('${escapedKey}')" class="th-sortable" style="cursor: pointer;" title="${escapedTooltip}">${escapedLabel} <span id="sortStatIcon">⇅</span></span>`;
+    
+    // Auto-size column width to fit the label (header is the widest thing in this column)
+    const labelPx = Math.max(46, statCol.label.length * 8 + 28);
+    colHeader.style.width = labelPx + 'px';
+    colHeader.style.minWidth = labelPx + 'px';
   }
 }
 

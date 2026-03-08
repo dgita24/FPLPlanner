@@ -1374,7 +1374,7 @@ td.fixtures-cell {
 /* Transfer header row: buttons flanking the title */
 .transfer-header-row {
   display: grid;
-  grid-template-columns: 1fr auto 1fr;
+  grid-template-columns: auto 1fr auto;
   align-items: center;
   gap: 6px;
   margin-bottom: 8px;
@@ -1386,11 +1386,11 @@ td.fixtures-cell {
   margin: 0;
   text-align: center;
   white-space: nowrap;
-  font-size: 22px;
+  font-size: clamp(22px, 6vw, 34px);
 }
 
 .transfer-header-row .transfer-action-btn {
-  width: 75%;
+  width: auto;
   padding: 13px 6px;
   font-size: 10px;
   height: auto;
@@ -1401,13 +1401,13 @@ td.fixtures-cell {
   min-width: 0;
 }
 
-/* Align each button towards the centre heading */
+/* Align buttons to panel edges */
 .transfer-header-row .add-btn {
-  justify-self: end;
+  justify-self: start;
 }
 
 .transfer-header-row .cancel-btn {
-  justify-self: start;
+  justify-self: end;
 }
 
 .transfer-panel h3 {
@@ -1631,7 +1631,6 @@ td.fixtures-cell {
 
 .player-table-compact .th-stat-dynamic {
   width: 46px;
-  min-width: 46px;
 }
 
 .player-table-compact .info-cell {
