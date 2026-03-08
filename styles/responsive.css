@@ -40,7 +40,7 @@
   }
 
   #mainColumn {
-    flex: 1 1 0;
+    flex: 3 1 0;
     min-width: 0;
     max-width: none;
     margin: 0;
@@ -55,7 +55,7 @@
     left: auto;
     right: auto;
     flex: 1 1 0;
-    min-width: 0;
+    min-width: 280px;
     max-height: calc(100vh - var(--top-bar-height) - var(--bottom-bar-height));
     overflow-y: auto;
     z-index: auto;
