@@ -1353,6 +1353,8 @@ td.fixtures-cell {
   max-height: calc(100vh - 150px);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   border: 1px solid var(--border);
+  min-width: 0;
+  overflow: hidden;
 }
 
 /* Transfer action buttons container */
@@ -1371,32 +1373,32 @@ td.fixtures-cell {
 
 /* Transfer header row: buttons flanking the title */
 .transfer-header-row {
-  display: flex;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
   align-items: center;
   gap: 6px;
   margin-bottom: 8px;
   flex-shrink: 0;
-  min-width: 0;
 }
 
 .transfer-header-row h3 {
   color: var(--text);
   margin: 0;
   text-align: center;
-  flex: 1;
-  min-width: 0;
   white-space: nowrap;
-  overflow: hidden;
-  font-size: 15px;
+  font-size: 18px;
 }
 
 .transfer-header-row .transfer-action-btn {
-  padding: 5px 10px;
+  width: 100%;
+  padding: 8px 8px;
   font-size: 11px;
   height: auto;
   white-space: nowrap;
-  flex-shrink: 0;
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
 }
 
 .transfer-panel h3 {

@@ -11,7 +11,7 @@
   }
 
   #plannerMain {
-    grid-template-columns: 350px 1fr 350px;
+    grid-template-columns: 350px minmax(0, 1fr) 350px;
     gap: 10px;
   }
 
@@ -271,12 +271,12 @@
   }
 
   .transfer-header-row h3 {
-    font-size: 13px;
+    font-size: 16px;
   }
 
   .transfer-header-row .transfer-action-btn {
-    font-size: 10px;
-    padding: 4px 8px;
+    font-size: 11px;
+    padding: 6px 8px;
   }
 
   .player-card .name {
@@ -607,12 +607,12 @@
   }
 
   .transfer-header-row h3 {
-    font-size: 12px;
+    font-size: 14px;
   }
 
   .transfer-header-row .transfer-action-btn {
-    font-size: 9px;
-    padding: 4px 6px;
+    font-size: 10px;
+    padding: 5px 7px;
     height: auto;
   }
 
@@ -921,7 +921,7 @@
   }
 
   #plannerMain {
-    grid-template-columns: 280px 1fr 320px;
+    grid-template-columns: 280px minmax(0, 1fr) 320px;
     gap: 10px;
   }
 
