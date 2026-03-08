@@ -33,6 +33,10 @@
   --fdr-3: #8d8d8d;
   --fdr-4: #e07800;
   --fdr-5: #b30000;
+
+  /* Navigation bar heights */
+  --top-bar-height: 50px;
+  --bottom-bar-height: 52px;
 }
 
 * {
@@ -45,7 +49,7 @@ body {
   font-family: "Segoe UI", sans-serif;
   background: linear-gradient(135deg, #1a1a1a 0%, #0d0d0d 100%);
   color: var(--text);
-  padding: 20px;
+  padding: var(--top-bar-height) 20px var(--bottom-bar-height);
   min-height: 100vh;
 }
 
@@ -57,7 +61,7 @@ body {
 /* ===== Header ===== */
 
 .header {
-  display: flex;
+  display: none;
   align-items: center;
   justify-content: center;
   margin-bottom: 10px;
@@ -231,14 +235,14 @@ body {
 
 .sidebar {
   position: fixed;
-  top: 20px;
+  top: var(--top-bar-height);
   left: 20px;
   width: 360px;
-  max-height: calc(100vh - 40px);
+  max-height: calc(100vh - var(--top-bar-height) - var(--bottom-bar-height));
   background: var(--bg);
   border-radius: 12px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-  transform: translateX(-400px);
+  transform: translateX(calc(-100% - 30px));
   transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   z-index: 1000;
   overflow-y: auto;
@@ -592,7 +596,7 @@ body {
 
 #plannerMain {
   display: grid;
-  grid-template-columns: 370px minmax(0, 1fr) 370px;
+  grid-template-columns: 1fr;
   gap: 12px;
   justify-content: center;
   width: 100%;
@@ -600,7 +604,7 @@ body {
 }
 
 .gw-nav {
-  display: flex;
+  display: none;
   justify-content: center;
   align-items: center;
   gap: 12px;
@@ -673,6 +677,9 @@ body {
   display: flex;
   flex-direction: column;
   gap: 12px;
+  max-width: 935px;
+  margin: 0 auto;
+  width: 100%;
 }
 
 /* ===== Transfer Section ===== */
@@ -723,7 +730,7 @@ body {
   font-size: 14px;
   font-weight: 600;
   position: sticky;
-  top: 0;
+  top: var(--top-bar-height);
   z-index: 1500;
   width: 100%;
   box-sizing: border-box;
@@ -752,7 +759,7 @@ body {
 
 .message {
   position: fixed;
-  bottom: 20px;
+  bottom: calc(var(--bottom-bar-height) + 10px);
   right: 20px;
   padding: 15px 25px;
   border-radius: 8px;

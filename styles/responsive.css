@@ -1,8 +1,70 @@
 /* ===== Responsive Design ===== */
 
 /* ----------------------------------------
+   Base: Panel overlay behavior applies at ALL screen sizes.
+   Fixtures and transfer panels are fullscreen overlays (hidden by default),
+   shown via .mobile-panel-active class (toggled by switchMobileTab()).
+---------------------------------------- */
+#fixturesPanel,
+#transferPanel {
+  display: none;
+  position: fixed;
+  top: var(--top-bar-height);    /* below top bar */
+  bottom: var(--bottom-bar-height); /* above tab bar */
+  left: 0;
+  right: 0;
+  z-index: 200;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  border-radius: 0;
+  max-height: none;
+  order: unset;
+}
+
+#fixturesPanel.mobile-panel-active,
+#transferPanel.mobile-panel-active {
+  display: block;
+}
+
+/* ----------------------------------------
+   Desktop: Pitch (left) + Transfers (right) always visible side-by-side.
+   Transfer panel is part of normal document flow, not an overlay.
+   Fixtures panel remains a full-screen overlay when toggled.
+---------------------------------------- */
+@media (min-width: 769px) {
+  #plannerMain {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  #mainColumn {
+    flex: 3 1 0;
+    min-width: 0;
+    max-width: none;
+    margin: 0;
+  }
+
+  /* Transfer panel is always visible as the right column on desktop */
+  #transferPanel {
+    display: flex;
+    position: static;
+    top: auto;
+    bottom: auto;
+    left: auto;
+    right: auto;
+    flex: 1 1 0;
+    min-width: 280px;
+    max-height: calc(100vh - var(--top-bar-height) - var(--bottom-bar-height));
+    overflow-y: auto;
+    z-index: auto;
+  }
+}
+
+/* ----------------------------------------
    Large Desktop (max-width: 1280px)
-   3-column grid, slightly narrower columns
+   Single-column layout
 ---------------------------------------- */
 @media (max-width: 1280px) {
   .container {
@@ -11,12 +73,8 @@
   }
 
   #plannerMain {
-    grid-template-columns: 350px minmax(0, 1fr) 350px;
+    grid-template-columns: 1fr;
     gap: 10px;
-  }
-
-  #fixturesPanel {
-    max-height: calc(100vh - 150px);
   }
 
   .pitch {
@@ -35,7 +93,7 @@
 
 /* ----------------------------------------
    Tablet (max-width: 1024px)
-   Single column, all panels stacked
+   Single column layout
 ---------------------------------------- */
 @media (max-width: 1024px) {
   #plannerMain {
@@ -44,30 +102,7 @@
   }
 
   #fixturesPanel {
-    order: 1;
-    margin-top: 0;
-    max-height: 500px;
-  }
-
-  #mainColumn {
-    order: 2;
-  }
-
-  .transfer-panel {
-    order: 3;
-  }
-
-  .header {
-    flex-wrap: wrap;
-    gap: 8px;
-    width: 100%;
-    height: auto;
-  }
-
-  .header h1 {
-    width: 100%;
-    text-align: center;
-    margin-bottom: 5px;
+    max-height: none;
   }
 
   .pitch {
@@ -82,7 +117,10 @@
 ---------------------------------------- */
 @media (max-width: 900px) {
   body {
-    padding: 12px;
+    padding-top: var(--top-bar-height);
+    padding-bottom: var(--bottom-bar-height);
+    padding-left: 12px;
+    padding-right: 12px;
   }
 
   .container {
@@ -908,40 +946,19 @@
 
 /* ----------------------------------------
    Tablet Landscape (≤1024px, landscape, ≤768px height)
-   Compact side-by-side layout
+   Compact single-column layout
 ---------------------------------------- */
 @media (max-width: 1024px) and (max-height: 768px) and (orientation: landscape) {
   body {
-    padding: 8px;
+    padding-top: var(--top-bar-height);
+    padding-bottom: var(--bottom-bar-height);
+    padding-left: 8px;
+    padding-right: 8px;
   }
 
   #plannerMain {
-    grid-template-columns: 280px minmax(0, 1fr) 320px;
+    grid-template-columns: 1fr;
     gap: 10px;
-  }
-
-  #fixturesPanel {
-    order: 1;
-    max-height: calc(100vh - 100px);
-    overflow-y: auto;
-  }
-
-  #mainColumn {
-    order: 2;
-  }
-
-  .transfer-panel {
-    order: 3;
-    max-height: calc(100vh - 100px);
-  }
-
-  .header {
-    margin-bottom: 8px;
-  }
-
-  .header h1 {
-    font-size: 18px;
-    width: auto;
   }
 
   .pitch {
@@ -1018,7 +1035,10 @@
 ---------------------------------------- */
 @media (max-width: 900px) and (max-height: 500px) and (orientation: landscape) {
   body {
-    padding: 6px;
+    padding-top: var(--top-bar-height);
+    padding-bottom: var(--bottom-bar-height);
+    padding-left: 6px;
+    padding-right: 6px;
   }
 
   #plannerMain {
@@ -1027,9 +1047,7 @@
   }
 
   #fixturesPanel {
-    max-height: 200px;
-    overflow-y: auto;
-    order: 3;
+    max-height: none;
   }
 
   .header {
