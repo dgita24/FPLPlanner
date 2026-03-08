@@ -336,7 +336,7 @@
 .fdr-1, .fdr-2, .fdr-3, .fdr-4, .fdr-5 {
   background: rgba(60, 60, 60, 0.40);
 }
-.fdr-none { background: var(--bg-dark); color: var(--text-light); }
+.fdr-none { background: rgba(60, 60, 60, 0.40); }
 
 .card-btn {
   position: absolute;
