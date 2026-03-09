@@ -18,6 +18,23 @@ let selectedOverwriteDraft = null;
 // Promise resolver for the delete draft modal
 let _deleteDraftResolve = null;
 
+// ---------------------------------------------------------------------------
+// Per-draft password memory (localStorage, cleared on cache clear)
+// ---------------------------------------------------------------------------
+const DRAFT_PWD_KEY_PREFIX = 'fplplanner-draft-pwd-';
+
+function rememberDraftPassword(teamid, password) {
+  try { localStorage.setItem(DRAFT_PWD_KEY_PREFIX + teamid, password); } catch (e) { console.warn('rememberDraftPassword failed:', e); }
+}
+
+function getRememberedDraftPassword(teamid) {
+  try { return localStorage.getItem(DRAFT_PWD_KEY_PREFIX + teamid) || ''; } catch (e) { console.warn('getRememberedDraftPassword failed:', e); return ''; }
+}
+
+function forgetDraftPassword(teamid) {
+  try { localStorage.removeItem(DRAFT_PWD_KEY_PREFIX + teamid); } catch (e) { console.warn('forgetDraftPassword failed:', e); }
+}
+
 // Show the delete-draft confirmation modal; returns a Promise that resolves with
 // the entered password string, or null if the user cancelled.
 function showDeleteDraftModal(teamid) {
@@ -29,9 +46,10 @@ function showDeleteDraftModal(teamid) {
     return Promise.resolve(prompt(`Enter the password for draft "${teamid}" to confirm deletion:\n\nThis action cannot be undone.`));
   }
   msgEl.textContent = `Enter the password for draft "${teamid}" to confirm deletion. This action cannot be undone.`;
-  pwdEl.value = '';
+  const remembered = getRememberedDraftPassword(teamid);
+  pwdEl.value = remembered;
   modal.classList.add('open');
-  pwdEl.focus();
+  if (remembered) pwdEl.select(); else pwdEl.focus();
 
   // Allow pressing Enter to confirm
   function onKeyDown(e) {
@@ -111,11 +129,14 @@ function selectDraft(teamid) {
   // Ensure the load section (password + button) is visible and ready for input
   const loadSection = document.getElementById('loadSection');
   const loadPassword = document.getElementById('loadPassword');
+  const loadRemember = document.getElementById('loadRememberPassword');
   if (loadSection) loadSection.style.display = 'block';
+  const remembered = getRememberedDraftPassword(teamid);
   if (loadPassword) {
-    loadPassword.value = '';
-    loadPassword.focus();
+    loadPassword.value = remembered;
+    if (remembered) loadPassword.select(); else loadPassword.focus();
   }
+  if (loadRemember) loadRemember.checked = !!remembered;
 }
 
 // Editable mobile bank display
@@ -397,6 +418,7 @@ async function deleteDraft(teamid) {
 
     if (response.ok && result.success) {
       showMessage(`Draft "${teamid}" deleted successfully`, 'success');
+      forgetDraftPassword(teamid);
       
       // Refresh the saved teams list
       await populateSavedTeamsDropdown();
@@ -609,9 +631,15 @@ function selectOverwriteDraft(teamid) {
     indicator.style.display = 'block';
   }
 
-  // Focus the password field for a smooth UX
+  // Focus the password field for a smooth UX; pre-fill if password remembered
   const savePassword = document.getElementById('savePassword');
-  if (savePassword) savePassword.focus();
+  const saveRemember = document.getElementById('saveRememberPassword');
+  const remembered = getRememberedDraftPassword(teamid);
+  if (savePassword) {
+    savePassword.value = remembered;
+    if (remembered) savePassword.select(); else savePassword.focus();
+  }
+  if (saveRemember) saveRemember.checked = !!remembered;
 }
 
 // Clear the overwrite selection when the user manually edits the draft name
@@ -659,6 +687,14 @@ async function loadTeam() {
       state.viewingGW = data.payload.viewingGW;
       state.minNavigableGW = data.payload.minNavigableGW ?? state.viewingGW;
       state.priceMode = data.payload.priceMode;
+
+      // Remember or forget password based on checkbox
+      const loadRemember = document.getElementById('loadRememberPassword');
+      if (loadRemember?.checked) {
+        rememberDraftPassword(teamId, password);
+      } else {
+        forgetDraftPassword(teamId);
+      }
 
       updateUI();
       showMessage('Team loaded from cloud!', 'success');
@@ -716,6 +752,14 @@ async function saveTeam() {
     const result = await response.json();
 
     if (response.ok && result.success) {
+      // Remember or forget password based on checkbox
+      const saveRemember = document.getElementById('saveRememberPassword');
+      if (saveRemember?.checked) {
+        rememberDraftPassword(teamId, password);
+      } else {
+        forgetDraftPassword(teamId);
+      }
+
       showMessage('Team saved to cloud!', 'success');
       if (sideMsg) sideMsg.textContent = `✓ Saved as: ${teamId}`;
       
