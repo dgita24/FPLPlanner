@@ -46,6 +46,11 @@
     margin: 0;
   }
 
+  /* Show GW nav on desktop (hidden by default for mobile) */
+  .gw-nav {
+    display: flex;
+  }
+
   /* Transfer panel is always visible as the right column on desktop */
   #transferPanel {
     display: flex;
