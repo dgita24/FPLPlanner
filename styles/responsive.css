@@ -57,7 +57,7 @@
     flex: 1 1 0;
     min-width: 280px;
     max-height: none;
-    overflow-y: hidden;
+    overflow: hidden;
     z-index: auto;
   }
 }
