@@ -179,8 +179,10 @@ window.editPitchBank = function() {
   });
 };
 
-// Open sidebar and show the Import card
-window.openImportMenu = function() {
+// Open the sidebar and activate a specific expandable card by ID.
+// The setTimeout allows the sidebar open animation to begin before
+// manipulating the card visibility.
+function openSidebarCard(cardId, afterOpen) {
   const sb = document.getElementById('sidebar');
   if (!sb || !sb.classList.contains('open')) {
     toggleSidebarMenu();
@@ -188,28 +190,22 @@ window.openImportMenu = function() {
   setTimeout(() => {
     document.querySelectorAll('.expandable-card').forEach(c => { c.style.display = 'none'; });
     document.querySelectorAll('.action-card').forEach(ac => ac.classList.remove('active'));
-    const importCard = document.getElementById('importCard');
-    if (importCard) importCard.style.display = 'block';
-    const importActionCard = document.querySelector('[onclick="toggleCard(\'importCard\')"]');
-    if (importActionCard) importActionCard.classList.add('active');
+    const card = document.getElementById(cardId);
+    if (card) card.style.display = 'block';
+    const actionCard = document.querySelector(`[onclick="toggleCard('${cardId}')"]`);
+    if (actionCard) actionCard.classList.add('active');
+    if (afterOpen) afterOpen();
   }, 50);
+}
+
+// Open sidebar and show the Import card
+window.openImportMenu = function() {
+  openSidebarCard('importCard');
 };
 
 // Open sidebar and show the Drafts card
 window.openDraftsMenu = function() {
-  const sb = document.getElementById('sidebar');
-  if (!sb || !sb.classList.contains('open')) {
-    toggleSidebarMenu();
-  }
-  setTimeout(() => {
-    document.querySelectorAll('.expandable-card').forEach(c => { c.style.display = 'none'; });
-    document.querySelectorAll('.action-card').forEach(ac => ac.classList.remove('active'));
-    const draftsCard = document.getElementById('draftsCard');
-    if (draftsCard) draftsCard.style.display = 'block';
-    const draftsActionCard = document.querySelector('[onclick="toggleCard(\'draftsCard\')"]');
-    if (draftsActionCard) draftsActionCard.classList.add('active');
-    populateSavedTeamsDropdown();
-  }, 50);
+  openSidebarCard('draftsCard', populateSavedTeamsDropdown);
 };
 
 // Editable mobile bank display
