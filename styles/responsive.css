@@ -1173,15 +1173,32 @@
   }
 }
 
-/* Pitch reset button: smaller on mobile */
+/* Pitch controls: smaller on mobile */
 @media (max-width: 768px) {
-  .pitch-reset-btn {
-    font-size: 12px;
-    padding: 3px 7px;
+  .pitch-reset-btn,
+  .pitch-save-btn,
+  .pitch-import-btn,
+  .pitch-drafts-btn {
+    font-size: 11px;
+    padding: 3px 6px;
   }
 
   .pitch-price-btn {
-    font-size: 12px;
-    padding: 3px 7px;
+    font-size: 11px;
+    padding: 3px 6px;
+  }
+
+  .pitch-bank-badge {
+    font-size: 11px;
+    padding: 3px 6px;
+  }
+
+  .pitch-left-controls,
+  .pitch-right-controls {
+    gap: 3px;
+  }
+
+  .pitch-save-import-row {
+    gap: 3px;
   }
 }

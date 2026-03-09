@@ -139,6 +139,79 @@ function selectDraft(teamid) {
   if (loadRemember) loadRemember.checked = !!remembered;
 }
 
+// Editable pitch bank badge (inside pitch, under price dropdown)
+window.editPitchBank = function() {
+  const el = document.getElementById('pitchBankBadge');
+  if (!el || el.querySelector('input')) return; // already editing
+
+  const currentVal = Number(state.bank).toFixed(1);
+  el.innerHTML = '';
+  el.onclick = null;
+
+  const input = document.createElement('input');
+  input.type = 'number';
+  input.step = '0.1';
+  input.value = currentVal;
+  input.className = 'pitch-bank-input';
+
+  el.appendChild(document.createTextNode('£'));
+  el.appendChild(input);
+  el.appendChild(document.createTextNode('m'));
+
+  input.focus();
+  input.select();
+
+  function finishEdit() {
+    const v = parseFloat(input.value);
+    if (Number.isFinite(v) && v >= 0) {
+      state.bank = v;
+    }
+    updateUI();
+  }
+
+  input.addEventListener('blur', finishEdit);
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') { input.blur(); }
+    if (e.key === 'Escape') {
+      input.value = currentVal;
+      input.blur();
+    }
+  });
+};
+
+// Open sidebar and show the Import card
+window.openImportMenu = function() {
+  const sb = document.getElementById('sidebar');
+  if (!sb || !sb.classList.contains('open')) {
+    toggleSidebarMenu();
+  }
+  setTimeout(() => {
+    document.querySelectorAll('.expandable-card').forEach(c => { c.style.display = 'none'; });
+    document.querySelectorAll('.action-card').forEach(ac => ac.classList.remove('active'));
+    const importCard = document.getElementById('importCard');
+    if (importCard) importCard.style.display = 'block';
+    const importActionCard = document.querySelector('[onclick="toggleCard(\'importCard\')"]');
+    if (importActionCard) importActionCard.classList.add('active');
+  }, 50);
+};
+
+// Open sidebar and show the Drafts card
+window.openDraftsMenu = function() {
+  const sb = document.getElementById('sidebar');
+  if (!sb || !sb.classList.contains('open')) {
+    toggleSidebarMenu();
+  }
+  setTimeout(() => {
+    document.querySelectorAll('.expandable-card').forEach(c => { c.style.display = 'none'; });
+    document.querySelectorAll('.action-card').forEach(ac => ac.classList.remove('active'));
+    const draftsCard = document.getElementById('draftsCard');
+    if (draftsCard) draftsCard.style.display = 'block';
+    const draftsActionCard = document.querySelector('[onclick="toggleCard(\'draftsCard\')"]');
+    if (draftsActionCard) draftsActionCard.classList.add('active');
+    populateSavedTeamsDropdown();
+  }, 50);
+};
+
 // Editable mobile bank display
 window.editMobileBank = function() {
   const el = document.getElementById('mobileBankDisplay');

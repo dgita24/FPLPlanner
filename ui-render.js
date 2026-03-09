@@ -321,13 +321,22 @@ export function renderPitch() {
   pitch.setAttribute('data-formation', formation);
 
   pitch.innerHTML = `
-    <button class="pitch-save-btn" onclick="openCloudSave()" title="Cloud Save">💾</button>
-    <button class="pitch-reset-btn" onclick="resetToImportedTeam()">⏮️ Reset</button>
-    <select class="pitch-price-btn" id="priceModeSelect" onchange="changePriceMode(this.value)">
-      <option value="selling" ${state.priceMode === 'selling' ? 'selected' : ''}>Selling</option>
-      <option value="purchase" ${state.priceMode === 'purchase' ? 'selected' : ''}>Purchase</option>
-      <option value="current" ${state.priceMode === 'current' ? 'selected' : ''}>Current</option>
-    </select>
+    <div class="pitch-left-controls">
+      <div class="pitch-save-import-row">
+        <button class="pitch-save-btn" onclick="openCloudSave()" title="Cloud Save">💾 Save</button>
+        <button class="pitch-import-btn" onclick="openImportMenu()" title="Import Team">📥 Import</button>
+      </div>
+      <button class="pitch-drafts-btn" onclick="openDraftsMenu()">📂 Drafts</button>
+    </div>
+    <div class="pitch-right-controls">
+      <button class="pitch-reset-btn" onclick="resetToImportedTeam()">⏮️ Reset</button>
+      <select class="pitch-price-btn" id="priceModeSelect" onchange="changePriceMode(this.value)">
+        <option value="selling" ${state.priceMode === 'selling' ? 'selected' : ''}>Selling</option>
+        <option value="purchase" ${state.priceMode === 'purchase' ? 'selected' : ''}>Purchase</option>
+        <option value="current" ${state.priceMode === 'current' ? 'selected' : ''}>Current</option>
+      </select>
+      <div class="pitch-bank-badge pitch-bank-editable" id="pitchBankBadge" onclick="editPitchBank()" title="Edit bank balance">£${Number(state.bank).toFixed(1)}m</div>
+    </div>
     <div class="formation-line" data-player-count="${gk.length}">${gk.map(renderCard).join('')}</div>
     <div class="formation-line" data-player-count="${def.length}">${def.map(renderCard).join('')}</div>
     <div class="formation-line" data-player-count="${mid.length}">${mid.map(renderCard).join('')}</div>
