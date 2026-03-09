@@ -35,7 +35,7 @@
   #plannerMain {
     display: flex;
     flex-direction: row;
-    align-items: flex-start;
+    align-items: stretch;
     gap: 12px;
   }
 
@@ -56,8 +56,8 @@
     right: auto;
     flex: 1 1 0;
     min-width: 280px;
-    max-height: calc(100vh - var(--top-bar-height) - var(--bottom-bar-height));
-    overflow-y: auto;
+    max-height: none;
+    overflow-y: hidden;
     z-index: auto;
   }
 }
