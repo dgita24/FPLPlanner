@@ -72,11 +72,9 @@
         <hr class="save-card-divider" />
         <div id="overwriteIndicator" class="overwrite-indicator" style="display: none;"></div>
         <input type="text" id="saveTeamId" placeholder="Draft name (e.g., 'WC_GW20')" oninput="onSaveNameInput()" />
-        <input type="password" id="saveOldPassword" placeholder="Current password (required to overwrite)" style="display: none;" />
         <input type="password" id="savePassword" placeholder="Password" />
         <button class="btn-primary" onclick="saveTeam()">Save Draft</button>
         <p class="helper-text">⚠️ Passwords cannot be recovered and are required to load this draft on any device.</p>
-        <p class="helper-text" id="overwritePasswordHint" style="display: none;">Enter your current password above, then set a new password below.</p>
         <p class="helper-text">Select an existing draft above to overwrite it, or enter a new name to create one. Max 5 per manager.</p>
       </div>
 

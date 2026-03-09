@@ -609,21 +609,9 @@ function selectOverwriteDraft(teamid) {
     indicator.style.display = 'block';
   }
 
-  // Show the old password field (required for overwrite)
-  const saveOldPassword = document.getElementById('saveOldPassword');
-  if (saveOldPassword) {
-    saveOldPassword.style.display = '';
-    saveOldPassword.value = '';
-    saveOldPassword.focus();
-  } else {
-    // Focus the password field for a smooth UX
-    const savePassword = document.getElementById('savePassword');
-    if (savePassword) savePassword.focus();
-  }
-
-  // Show the overwrite-specific hint
-  const overwriteHint = document.getElementById('overwritePasswordHint');
-  if (overwriteHint) overwriteHint.style.display = '';
+  // Focus the password field for a smooth UX
+  const savePassword = document.getElementById('savePassword');
+  if (savePassword) savePassword.focus();
 }
 
 // Clear the overwrite selection when the user manually edits the draft name
@@ -634,14 +622,6 @@ function onSaveNameInput() {
     document.querySelectorAll('#saveOverwriteContainer li').forEach(li => li.classList.remove('selected'));
     const indicator = document.getElementById('overwriteIndicator');
     if (indicator) indicator.style.display = 'none';
-    // Hide old password field when no longer overwriting
-    const saveOldPassword = document.getElementById('saveOldPassword');
-    if (saveOldPassword) {
-      saveOldPassword.style.display = 'none';
-      saveOldPassword.value = '';
-    }
-    const overwriteHint = document.getElementById('overwritePasswordHint');
-    if (overwriteHint) overwriteHint.style.display = 'none';
   }
 }
 
@@ -703,16 +683,9 @@ async function saveTeam() {
   const teamId = document.getElementById('saveTeamId')?.value?.trim();
   const password = document.getElementById('savePassword')?.value?.trim();
   const label = document.getElementById('saveLabel')?.value?.trim();
-  const oldPassword = document.getElementById('saveOldPassword')?.value?.trim();
 
   if (!teamId || !password) {
     showMessage('Draft team name and/or password missing or incorrect.', 'error');
-    return;
-  }
-
-  // When overwriting, old password is required
-  if (selectedOverwriteDraft && !oldPassword) {
-    showMessage('Current password is required to overwrite an existing draft.', 'error');
     return;
   }
 
@@ -728,22 +701,16 @@ async function saveTeam() {
       priceMode: state.priceMode
     };
 
-    const body = { 
-      teamid: teamId, 
-      label, 
-      password, 
-      payload,
-      managerid: state.managerId || null
-    };
-
-    if (selectedOverwriteDraft) {
-      body.oldPassword = oldPassword;
-    }
-
     const response = await fetch('/api/save', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body)
+      body: JSON.stringify({ 
+        teamid: teamId, 
+        label, 
+        password, 
+        payload,
+        managerid: state.managerId || null
+      })
     });
 
     const result = await response.json();
@@ -764,8 +731,8 @@ async function saveTeam() {
     const errorMsg = err.message || 'Unknown error';
     if (errorMsg.includes('Maximum draft limit')) {
       showMessage('⚠️ Draft limit reached (5/5). Update an existing draft or delete one first.', 'error');
-    } else if (errorMsg.includes('Invalid password') || errorMsg.includes('Current password required')) {
-      showMessage('Incorrect current password. The draft was not updated.', 'error');
+    } else if (errorMsg.includes('Invalid password')) {
+      showMessage('Incorrect password. The draft was not updated.', 'error');
     } else {
       showMessage(`Save error: ${errorMsg}`, 'error');
     }
@@ -1108,13 +1075,6 @@ export function initUI() {
       if (saveTeamId) saveTeamId.value = '';
       const savePassword = document.getElementById('savePassword');
       if (savePassword) savePassword.value = '';
-      const saveOldPasswordEl = document.getElementById('saveOldPassword');
-      if (saveOldPasswordEl) {
-        saveOldPasswordEl.style.display = 'none';
-        saveOldPasswordEl.value = '';
-      }
-      const overwriteHintEl = document.getElementById('overwritePasswordHint');
-      if (overwriteHintEl) overwriteHintEl.style.display = 'none';
       const indicator = document.getElementById('overwriteIndicator');
       if (indicator) indicator.style.display = 'none';
 

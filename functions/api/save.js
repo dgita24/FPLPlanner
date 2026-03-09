@@ -13,7 +13,7 @@ function timingSafeEqual(a, b) {
 
 export async function onRequestPost({ request, env, context }) {
   try {
-    const { teamid, label, password, oldPassword, payload, managerid } = await request.json();
+    const { teamid, label, password, payload, managerid } = await request.json();
     if (!teamid || !password || !payload) {
       return new Response(JSON.stringify({ error: 'Missing required fields' }), {
         status: 400,
@@ -72,22 +72,9 @@ export async function onRequestPost({ request, env, context }) {
 
     let saveResponse;
     if (existing.length > 0) {
-      // Overwrite requires the current password to be verified first
-      if (!oldPassword) {
-        return new Response(JSON.stringify({ error: 'Current password required to overwrite an existing draft' }), {
-          status: 403,
-          headers: { 'Content-Type': 'application/json' }
-        });
-      }
-
-      // Hash the supplied old password and compare against stored hash
-      const oldData = encoder.encode(oldPassword);
-      const oldHashBuffer = await crypto.subtle.digest('SHA-256', oldData);
-      const oldHashArray = Array.from(new Uint8Array(oldHashBuffer));
-      const oldPasswordHash = oldHashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-
+      // Overwrite requires the same password used when the draft was created
       const storedHash = existing[0].passwordhash || '';
-      if (!timingSafeEqual(storedHash, oldPasswordHash)) {
+      if (!timingSafeEqual(storedHash, passwordhash)) {
         return new Response(JSON.stringify({ error: 'Invalid password' }), {
           status: 403,
           headers: { 'Content-Type': 'application/json' }
