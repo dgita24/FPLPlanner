@@ -24,8 +24,8 @@
   --error-transparent: rgba(227, 57, 53, 0.85);
   --selected-bg: #007FFF;
   --selected-hover-bg: #0066CC;
-  --captain-badge: #000000;
-  --captain-badge-active: #222222;
+  --captain-badge: #1565C0;
+  --captain-badge-active: #0D47A1;
 
   /* FDR (Fixture Difficulty Rating) colours */
   --fdr-1: #00843e;

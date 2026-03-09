@@ -311,7 +311,7 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  background: #162033;
+  background: rgba(22, 32, 51, 0.55);
   padding: 2px 3px;
   border-radius: 3px;
   margin: 2px 0 1px;
