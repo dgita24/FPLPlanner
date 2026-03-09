@@ -1223,5 +1223,23 @@ export function initUI() {
   // Populate saved teams dropdown
   populateSavedTeamsDropdown();
 
+  // Sync transfer panel height to pitch+bench column on desktop so they stay
+  // matched regardless of zoom level. Uses ResizeObserver so it reacts to any
+  // layout change (content, zoom, window resize) without polling.
+  (function syncTransferPanelHeight() {
+    const mainCol = document.getElementById('mainColumn');
+    const transferPanel = document.getElementById('transferPanel');
+    if (!mainCol || !transferPanel) return;
+
+    const ro = new ResizeObserver(() => {
+      if (window.innerWidth >= 769) {
+        transferPanel.style.height = mainCol.getBoundingClientRect().height + 'px';
+      } else {
+        transferPanel.style.height = '';
+      }
+    });
+    ro.observe(mainCol);
+  })();
+
   updateUI();
 }
