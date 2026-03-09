@@ -73,7 +73,9 @@
         <div id="overwriteIndicator" class="overwrite-indicator" style="display: none;"></div>
         <input type="text" id="saveTeamId" placeholder="Draft name (e.g., 'WC_GW20')" oninput="onSaveNameInput()" />
         <input type="password" id="savePassword" placeholder="Password" />
+        <label class="remember-pwd-label"><input type="checkbox" id="saveRememberPassword" /> Remember password on this device</label>
         <button class="btn-primary" onclick="saveTeam()">Save Draft</button>
+        <p class="helper-text">⚠️ Passwords cannot be recovered and are required to load this draft on any device.</p>
         <p class="helper-text">Select an existing draft above to overwrite it, or enter a new name to create one. Max 5 per manager.</p>
       </div>
 
@@ -85,6 +87,7 @@
         </div>
         <div id="loadSection" style="display: none;">
           <input type="password" id="loadPassword" placeholder="Password" />
+          <label class="remember-pwd-label"><input type="checkbox" id="loadRememberPassword" /> Remember password on this device</label>
           <button class="btn-secondary" onclick="loadTeam()">Load Selected</button>
         </div>
       </div>
