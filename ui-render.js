@@ -322,10 +322,8 @@ export function renderPitch() {
 
   pitch.innerHTML = `
     <div class="pitch-left-controls">
-      <div class="pitch-save-import-row">
-        <button class="pitch-save-btn" onclick="openCloudSave()" title="Cloud Save">💾 Save</button>
-        <button class="pitch-import-btn" onclick="openImportMenu()" title="Import Team">📥 Import</button>
-      </div>
+      <button class="pitch-save-btn" onclick="openCloudSave()" title="Cloud Save">💾 Save</button>
+      <button class="pitch-import-btn" onclick="openImportMenu()" title="Import Team">📥 Import</button>
       <button class="pitch-drafts-btn" onclick="openDraftsMenu()">📂 Drafts</button>
     </div>
     <div class="pitch-right-controls">

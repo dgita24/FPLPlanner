@@ -22,7 +22,7 @@
   display: none;
 }
 
-/* Left controls: Save + Import row, then Drafts below */
+/* Left controls: Save, Import, Drafts stacked vertically */
 .pitch-left-controls {
   position: absolute;
   top: 6px;
@@ -31,11 +31,7 @@
   flex-direction: column;
   gap: 4px;
   z-index: 20;
-}
-
-.pitch-save-import-row {
-  display: flex;
-  gap: 4px;
+  align-items: stretch;
 }
 
 /* Right controls: Reset, Price dropdown, Bank badge stacked */
