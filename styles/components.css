@@ -325,7 +325,7 @@
 .card-fixture-next {
   font-size: 12px;
   font-weight: 800;
-  color: rgba(255, 255, 255, 0.95);
+  color: #FFFFFF; /* <-- changed from rgba(255, 255, 255, 0.95) */
   text-shadow: 0 1px 3px rgba(0, 0, 0, 0.75);
   white-space: nowrap;
   overflow: hidden;
