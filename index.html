@@ -96,7 +96,6 @@
 
     <!-- MAIN PLANNER -->
     <div id="plannerMain">
-      <div id="fixturesPanel"></div>
 
       <div id="mainColumn">
 
@@ -121,7 +120,18 @@
 
       </div>
 
-      <div id="transferPanel" class="transfer-panel">
+      <!-- Right panel: desktop tab bar + Transfers/Fixtures panels -->
+      <div id="rightPanel">
+        <!-- Desktop-only tab buttons (hidden on mobile via CSS) -->
+        <div class="desktop-tab-bar">
+          <button class="desktop-tab-btn desktop-tab-active" data-tab="transfers" onclick="switchDesktopTab('transfers')" aria-label="Transfers panel"><span aria-hidden="true">🔄</span> Transfers</button>
+          <button class="desktop-tab-btn" data-tab="fixtures" onclick="switchDesktopTab('fixtures')" aria-label="Fixtures panel"><span aria-hidden="true">📅</span> Fixtures</button>
+        </div>
+
+        <!-- Fixtures panel (desktop: shown when fixtures tab active; mobile: fullscreen overlay) -->
+        <div id="fixturesPanel"></div>
+
+        <div id="transferPanel" class="transfer-panel">
         <!-- Header row: Add to squad | Transfers heading | Cancel transfer -->
         <div class="transfer-header-row">
           <button class="transfer-action-btn add-btn" onclick="addSelectedToSquad()" id="addToSquadBtn">ADD TO SQUAD</button>
@@ -196,6 +206,7 @@
             <tbody id="tableBody"></tbody>
           </table>
         </div>
+      </div>
       </div>
     </div>
 

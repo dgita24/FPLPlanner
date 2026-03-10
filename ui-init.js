@@ -1009,6 +1009,24 @@ function setupCaptainSelectorTouchHandlers() {
   });
 }
 
+// Switch between desktop right-panel tabs (Transfers / Fixtures)
+function switchDesktopTab(tab) {
+  const rightPanel = document.getElementById('rightPanel');
+  if (!rightPanel) return;
+
+  if (tab === 'fixtures') {
+    rightPanel.classList.add('desktop-fixtures-active');
+  } else {
+    rightPanel.classList.remove('desktop-fixtures-active');
+  }
+
+  // Update active state on tab buttons
+  const tabBtns = rightPanel.querySelectorAll('.desktop-tab-btn');
+  tabBtns.forEach(btn => {
+    btn.classList.toggle('desktop-tab-active', btn.dataset.tab === tab);
+  });
+}
+
 // Switch between mobile tabs (Pitch / Fixtures / Transfers / More)
 function switchMobileTab(tab) {
   const allTabs = ['pitch', 'fixtures', 'transfers', 'more'];
@@ -1032,13 +1050,16 @@ function switchMobileTab(tab) {
 
   // Show the relevant panel overlay
   if (tab === 'fixtures' && fixturesPanel) {
-    // Fixtures panel shown as overlay on all screen sizes
-    fixturesPanel.classList.add('mobile-panel-active');
+    if (!isDesktop) {
+      // Fixtures panel shown as fullscreen overlay on mobile only;
+      // on desktop it is handled by the desktop tab bar (switchDesktopTab)
+      fixturesPanel.classList.add('mobile-panel-active');
+    }
   } else if (tab === 'transfers' && transferPanel && !isDesktop) {
     // Transfer panel overlay only on mobile; on desktop it is always visible
     transferPanel.classList.add('mobile-panel-active');
   }
-  // 'pitch' and 'more' show default content; on desktop the transfers panel is always visible
+  // 'pitch' and 'more' show default content; on desktop the right panel is always visible
 }
 
 export function initUI() {
@@ -1205,6 +1226,9 @@ export function initUI() {
   // Mobile tab navigation
   window.switchMobileTab = switchMobileTab;
 
+  // Desktop right-panel tab navigation
+  window.switchDesktopTab = switchDesktopTab;
+
   // Setup sidebar event handlers
   setupSidebarHandlers();
 
@@ -1223,19 +1247,19 @@ export function initUI() {
   // Populate saved teams dropdown
   populateSavedTeamsDropdown();
 
-  // Sync transfer panel height to pitch+bench column on desktop so they stay
+  // Sync right panel height to pitch+bench column on desktop so they stay
   // matched regardless of zoom level. Uses ResizeObserver so it reacts to any
   // layout change (content, zoom, window resize) without polling.
-  (function syncTransferPanelHeight() {
+  (function syncRightPanelHeight() {
     const mainCol = document.getElementById('mainColumn');
-    const transferPanel = document.getElementById('transferPanel');
-    if (!mainCol || !transferPanel) return;
+    const rightPanel = document.getElementById('rightPanel');
+    if (!mainCol || !rightPanel) return;
 
     const ro = new ResizeObserver(() => {
       if (window.innerWidth >= 769) {
-        transferPanel.style.height = mainCol.getBoundingClientRect().height + 'px';
+        rightPanel.style.height = mainCol.getBoundingClientRect().height + 'px';
       } else {
-        transferPanel.style.height = '';
+        rightPanel.style.height = '';
       }
     });
     ro.observe(mainCol);
