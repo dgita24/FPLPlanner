@@ -1010,6 +1010,39 @@ td.fixtures-cell {
   font-size: 9px;
 }
 
+/* ===== Desktop Right-Panel Tab Bar ===== */
+
+.desktop-tab-bar {
+  gap: 6px;
+  padding-bottom: 8px;
+}
+
+.desktop-tab-btn {
+  flex: 1;
+  padding: 8px 12px;
+  background: var(--bg-dark);
+  color: var(--text-light);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 13px;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.desktop-tab-btn:hover {
+  background: var(--bg);
+  color: var(--text);
+  border-color: var(--primary);
+}
+
+.desktop-tab-btn.desktop-tab-active {
+  background: var(--primary);
+  color: var(--bg);
+  border-color: var(--primary);
+}
+
 /* ===== Fixtures Panel ===== */
 
 #fixturesPanel {
