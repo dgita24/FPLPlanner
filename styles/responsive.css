@@ -831,12 +831,12 @@
   }
 
   .player-info-modal {
-    padding: 10px;
+    padding: 8px;
   }
 
   .player-info-content {
-    padding: 20px 15px;
-    max-height: 85vh;
+    padding: 15px 12px;
+    max-height: 88vh;
   }
 
   #squadPlayerInfoModal .player-info-content {

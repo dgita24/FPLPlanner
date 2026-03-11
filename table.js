@@ -615,18 +615,37 @@ function formatScore(wasHome, teamHScore, teamAScore) {
   return wasHome ? `${teamHScore}–${teamAScore}` : `${teamAScore}–${teamHScore}`;
 }
 
-// Build the instantly-rendered modal shell (header + status/news only)
+// Build status colour class and label from player.status field
+function getPlayerStatusInfo(player) {
+  const status = player.status || 'a';
+  const labelMap = { a: 'Available', d: 'Doubtful', u: 'Unavailable', i: 'Injured', s: 'Suspended', n: 'Not Available' };
+  const colorMap = { a: 'success', d: 'warning', u: 'error', i: 'error', s: 'error', n: 'muted' };
+  const label = labelMap[status] || 'Unknown';
+  const colorClass = colorMap[status] || 'muted';
+
+  let chanceHtml = '';
+  if (status === 'd' || status === 'u' || status === 'i') {
+    const chance = player.chance_of_playing_next_round;
+    if (chance !== null && chance !== undefined) {
+      chanceHtml = `<span class="pim-chance">${chance}% chance next GW</span>`;
+    }
+  }
+
+  const newsHtml = player.news
+    ? `<p class="pim-news-text">${escapeHtml(player.news)}</p>`
+    : '';
+
+  return `<span class="pim-status-dot pim-status-dot--${colorClass}"></span>
+    <span class="pim-status-label">${label}</span>
+    ${chanceHtml}
+    ${newsHtml}`;
+}
+
+// Build the instantly-rendered modal shell (header + status icon only)
 function buildPlayerInfoShell(player, team) {
   const teamNameEscaped = escapeHtml(team ? team.name : 'Unknown');
   const teamCode = team ? team.code : '';
   const playerNameEscaped = escapeHtml(player.web_name);
-  const newsEscaped = player.news ? escapeHtml(player.news) : '';
-
-  const statusInfo = player.news ? `
-    <div class="player-info-section">
-      <h3>Status</h3>
-      <p class="pim-status-text">${newsEscaped}</p>
-    </div>` : '';
 
   return `
     <div class="player-info-content">
@@ -635,18 +654,29 @@ function buildPlayerInfoShell(player, team) {
       <div class="player-info-header">
         <img src="${getTeamBadgeUrl(teamCode)}" class="player-info-badge" alt="${teamNameEscaped}">
         <div class="player-info-title">
-          <h2>${playerNameEscaped}</h2>
+          <div class="pim-title-row">
+            <h2>${playerNameEscaped}</h2>
+            <button class="pim-status-btn" onclick="pimToggleStatus()" title="Player availability" aria-label="Toggle player status">ℹ</button>
+          </div>
           <p>${teamNameEscaped} • ${posNames[player.element_type]}</p>
         </div>
       </div>
 
-      ${statusInfo}
+      <div id="pim-status-panel" class="pim-status-panel" hidden>
+        ${getPlayerStatusInfo(player)}
+      </div>
 
       <div id="pim-dynamic-sections">
         <div class="pim-loading">Loading fixtures &amp; match history…</div>
       </div>
     </div>`;
 }
+
+// Toggle the status/news panel when the ℹ icon is pressed
+window.pimToggleStatus = function () {
+  const panel = document.getElementById('pim-status-panel');
+  if (panel) panel.hidden = !panel.hidden;
+};
 
 // Build the fixture chip strip (visual scrollable chips with badge, H/A colour, blank/DGW)
 function buildFixtureChipsHtml(fixtures) {
@@ -682,7 +712,9 @@ function buildFixtureChipsHtml(fixtures) {
     }
     const isDGW = gwFxs.length > 1;
     return gwFxs.map(fx => {
-      const oppTeam = state.teams.find(t => t.id === fx.opponent_team);
+      // element-summary fixtures use team_h/team_a/is_home, NOT opponent_team
+      const oppTeamId = fx.is_home ? fx.team_a : fx.team_h;
+      const oppTeam = state.teams.find(t => t.id === oppTeamId);
       const abbr = escapeHtml(oppTeam ? (oppTeam.short_name || oppTeam.name) : '???');
       const teamCode = oppTeam ? oppTeam.code : '';
       const venue = fx.is_home ? 'H' : 'A';

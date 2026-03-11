@@ -1840,10 +1840,12 @@ td.fixtures-cell {
   width: 100%;
   max-height: 90vh;
   overflow-y: auto;
+  overflow-x: hidden;
   padding: 20px;
   position: relative;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
   border: 1px solid var(--border);
+  min-width: 0;
 }
 
 .player-info-close {
@@ -1937,6 +1939,84 @@ td.fixtures-cell {
   font-size: 16px;
 }
 
+/* ---- Player name row with ℹ status icon ---- */
+.pim-title-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.pim-status-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 50%;
+  color: var(--text-light);
+  width: 22px;
+  height: 22px;
+  font-size: 13px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  line-height: 1;
+  padding: 0;
+  transition: background 120ms, color 120ms;
+}
+
+.pim-status-btn:hover {
+  background: rgba(255, 255, 255, 0.22);
+  color: var(--text);
+}
+
+/* ---- Player availability status panel ---- */
+.pim-status-panel {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+  background: var(--bg-dark);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 8px 12px;
+  margin-top: 10px;
+  font-size: 12px;
+}
+
+.pim-status-panel[hidden] {
+  display: none;
+}
+
+.pim-status-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.pim-status-dot--success { background: var(--success); }
+.pim-status-dot--warning { background: var(--warning); }
+.pim-status-dot--error   { background: var(--error); }
+.pim-status-dot--muted   { background: var(--text-light); }
+
+.pim-status-label {
+  font-weight: 700;
+  color: var(--text);
+}
+
+.pim-chance {
+  color: var(--text-light);
+  font-size: 11px;
+}
+
+.pim-news-text {
+  width: 100%;
+  color: var(--text);
+  line-height: 1.5;
+  margin: 4px 0 0 0;
+  font-size: 12px;
+}
+
 /* ===== Player Info Modal — richer content ===== */
 
 .pim-status-text {
@@ -1975,6 +2055,7 @@ td.fixtures-cell {
   padding-bottom: 4px;
   scrollbar-width: none;
   -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
 }
 
 .pim-fix-strip::-webkit-scrollbar {
@@ -2114,6 +2195,7 @@ td.fixtures-cell {
 .pim-table-wrap {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
 }
 
 .pim-table {
