@@ -1937,6 +1937,148 @@ td.fixtures-cell {
   font-size: 16px;
 }
 
+/* ===== Player Info Modal — richer content ===== */
+
+.pim-status-text {
+  color: var(--text);
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* Compact key-stats strip */
+.pim-key-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.pim-key-stat {
+  background: var(--bg-dark);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 6px 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 54px;
+}
+
+.pim-key-label {
+  color: var(--primary);
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  margin-bottom: 2px;
+}
+
+.pim-key-value {
+  color: var(--text);
+  font-size: 15px;
+  font-weight: 700;
+}
+
+/* Shared table style for fixtures and match history */
+.pim-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+  margin-top: 6px;
+}
+
+.pim-table th {
+  color: var(--primary);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  padding: 4px 6px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+
+.pim-table td {
+  color: var(--text);
+  padding: 5px 6px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.pim-table tbody tr:hover {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+/* Fixture table specifics */
+.pim-fix-gw {
+  color: var(--text-light);
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+.pim-fix-date {
+  color: var(--text-light);
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+.pim-fix-opp {
+  font-weight: 600;
+}
+
+/* FDR-coloured opponent pill */
+.pim-fdr-pill {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #fff;
+}
+
+.pim-fdr-pill.fdr-1 { background: var(--fdr-1); }
+.pim-fdr-pill.fdr-2 { background: var(--fdr-2); }
+.pim-fdr-pill.fdr-3 { background: var(--fdr-3); }
+.pim-fdr-pill.fdr-4 { background: var(--fdr-4); }
+.pim-fdr-pill.fdr-5 { background: var(--fdr-5); }
+
+/* Match history specifics */
+.pim-hist-opp {
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.pim-pts-high {
+  color: var(--success);
+  font-weight: 700;
+}
+
+.pim-pts-med {
+  color: var(--primary);
+  font-weight: 700;
+}
+
+/* Loading / error / empty states */
+.pim-loading {
+  color: var(--text-light);
+  font-size: 13px;
+  padding: 16px 0;
+  text-align: center;
+}
+
+.pim-error {
+  color: var(--error);
+  font-size: 13px;
+  padding: 12px 0;
+  margin: 0;
+}
+
+.pim-empty {
+  color: var(--text-light);
+  font-size: 12px;
+  padding: 8px 0;
+  margin: 0;
+}
+
 .modal-action-btn {
   padding: 10px 16px;
   border: none;

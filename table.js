@@ -577,23 +577,199 @@ window.updateStatColumns = function () {
   updateSortIcons();
 };
 
+/* ---- Player Info Modal helpers ---- */
+
+// In-memory cache so repeated opens don't re-fetch
+const playerSummaryCache = new Map();
+
+async function fetchPlayerSummary(playerId) {
+  if (playerSummaryCache.has(playerId)) {
+    return playerSummaryCache.get(playerId);
+  }
+  const res = await fetch(`/api/fpl/element-summary/${playerId}/`);
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  const data = await res.json();
+  playerSummaryCache.set(playerId, data);
+  return data;
+}
+
+function getFdrClass(difficulty) {
+  const d = Number(difficulty);
+  if (d <= 1) return 'fdr-1';
+  if (d === 2) return 'fdr-2';
+  if (d === 3) return 'fdr-3';
+  if (d === 4) return 'fdr-4';
+  return 'fdr-5';
+}
+
+function buildPlayerInfoShell(player, team) {
+  const teamNameEscaped = escapeHtml(team ? team.name : 'Unknown');
+  const teamCode = team ? team.code : '';
+  const playerNameEscaped = escapeHtml(player.web_name);
+  const newsEscaped = player.news ? escapeHtml(player.news) : '';
+
+  const statusInfo = player.news ? `
+    <div class="player-info-section">
+      <h3>Status</h3>
+      <p class="pim-status-text">${newsEscaped}</p>
+    </div>` : '';
+
+  // Compact key-stats row
+  const xG = parseFloat(player.expected_goals || 0).toFixed(1);
+  const xA = parseFloat(player.expected_assists || 0).toFixed(1);
+  const ppg = parseFloat(player.points_per_game || 0).toFixed(1);
+  const keyStatsHtml = `
+    <div class="pim-key-stats">
+      <div class="pim-key-stat"><span class="pim-key-label">Price</span><span class="pim-key-value">£${(player.now_cost / 10).toFixed(1)}m</span></div>
+      <div class="pim-key-stat"><span class="pim-key-label">Pts</span><span class="pim-key-value">${player.total_points || 0}</span></div>
+      <div class="pim-key-stat"><span class="pim-key-label">PPG</span><span class="pim-key-value">${ppg}</span></div>
+      <div class="pim-key-stat"><span class="pim-key-label">Form</span><span class="pim-key-value">${player.form || '0'}</span></div>
+      <div class="pim-key-stat"><span class="pim-key-label">Owned</span><span class="pim-key-value">${parseFloat(player.selected_by_percent || 0).toFixed(1)}%</span></div>
+      <div class="pim-key-stat"><span class="pim-key-label">Goals</span><span class="pim-key-value">${player.goals_scored || 0}</span></div>
+      <div class="pim-key-stat"><span class="pim-key-label">Assists</span><span class="pim-key-value">${player.assists || 0}</span></div>
+      <div class="pim-key-stat"><span class="pim-key-label">CS</span><span class="pim-key-value">${player.clean_sheets || 0}</span></div>
+      <div class="pim-key-stat"><span class="pim-key-label">Bonus</span><span class="pim-key-value">${player.bonus || 0}</span></div>
+      <div class="pim-key-stat"><span class="pim-key-label">xG</span><span class="pim-key-value">${xG}</span></div>
+      <div class="pim-key-stat"><span class="pim-key-label">xA</span><span class="pim-key-value">${xA}</span></div>
+      <div class="pim-key-stat"><span class="pim-key-label">Minutes</span><span class="pim-key-value">${player.minutes || 0}</span></div>
+    </div>`;
+
+  return `
+    <div class="player-info-content">
+      <button class="player-info-close" onclick="closePlayerInfo()">×</button>
+
+      <div class="player-info-header">
+        <img src="${getTeamBadgeUrl(teamCode)}" class="player-info-badge" alt="${teamNameEscaped}">
+        <div class="player-info-title">
+          <h2>${playerNameEscaped}</h2>
+          <p>${teamNameEscaped} • ${posNames[player.element_type]}</p>
+        </div>
+      </div>
+
+      ${statusInfo}
+
+      <div class="player-info-section">
+        <h3>Season Statistics</h3>
+        ${keyStatsHtml}
+      </div>
+
+      <div id="pim-dynamic-sections">
+        <div class="pim-loading">Loading fixtures &amp; match history…</div>
+      </div>
+    </div>`;
+}
+
+function buildFixturesHtml(fixtures) {
+  if (!Array.isArray(fixtures) || fixtures.length === 0) {
+    return '<p class="pim-empty">No upcoming fixtures available.</p>';
+  }
+  const next6 = fixtures.slice(0, 6);
+  const rows = next6.map(f => {
+    const oppName = escapeHtml(getTeamShortName(f.opponent_team) || '???');
+    const venue = f.is_home ? 'H' : 'A';
+    const fdrClass = getFdrClass(f.difficulty);
+    const gwLabel = f.event ? `GW${f.event}` : '–';
+    let dateStr = '–';
+    if (f.kickoff_time) {
+      const d = new Date(f.kickoff_time);
+      dateStr = d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+    }
+    return `<tr>
+      <td class="pim-fix-gw">${gwLabel}</td>
+      <td class="pim-fix-date">${dateStr}</td>
+      <td class="pim-fix-opp"><span class="pim-fdr-pill ${fdrClass}">${oppName} (${venue})</span></td>
+    </tr>`;
+  }).join('');
+
+  return `<table class="pim-table">
+    <thead><tr><th>GW</th><th>Date</th><th>Opponent</th></tr></thead>
+    <tbody>${rows}</tbody>
+  </table>`;
+}
+
+function buildMatchHistoryHtml(history, posType) {
+  if (!Array.isArray(history) || history.length === 0) {
+    return '<p class="pim-empty">No match history available.</p>';
+  }
+  // Show the most recent 6 matches
+  const recent = history.slice(-6).reverse();
+  const isGK = posType === 1;
+  const isDef = posType === 2;
+
+  let hasXg = false;
+  let hasXa = false;
+  for (const h of recent) {
+    if (h.expected_goals !== undefined) hasXg = true;
+    if (h.expected_assists !== undefined) hasXa = true;
+    if (hasXg && hasXa) break;
+  }
+
+  const rows = recent.map(h => {
+    const oppName = escapeHtml(getTeamShortName(h.opponent_team) || '???');
+    const venue = h.was_home ? 'H' : 'A';
+    const score = (h.team_h_score !== null && h.team_a_score !== null)
+      ? (h.was_home ? `${h.team_h_score}–${h.team_a_score}` : `${h.team_a_score}–${h.team_h_score}`)
+      : '–';
+    const pts = h.total_points ?? '–';
+    const ptsClass = pts >= 9 ? 'pim-pts-high' : (pts >= 6 ? 'pim-pts-med' : '');
+    const mins = h.minutes ?? '–';
+    const goals = h.goals_scored ?? 0;
+    const assists = h.assists ?? 0;
+    const bonus = h.bonus ?? 0;
+    const saves = isGK ? (h.saves ?? 0) : null;
+    const cs = (isGK || isDef) ? (h.clean_sheets ?? 0) : null;
+
+    const extraCols = [];
+    if (saves !== null) extraCols.push(`<td>${saves}</td>`);
+    if (cs !== null) extraCols.push(`<td>${cs}</td>`);
+    if (hasXg) extraCols.push(`<td>${h.expected_goals != null ? parseFloat(h.expected_goals).toFixed(1) : '–'}</td>`);
+    if (hasXa) extraCols.push(`<td>${h.expected_assists != null ? parseFloat(h.expected_assists).toFixed(1) : '–'}</td>`);
+
+    return `<tr>
+      <td class="pim-hist-opp">${oppName} (${venue})</td>
+      <td>${score}</td>
+      <td>${mins}</td>
+      <td class="${ptsClass}">${pts}</td>
+      <td>${goals}</td>
+      <td>${assists}</td>
+      <td>${bonus}</td>
+      ${extraCols.join('')}
+    </tr>`;
+  }).join('');
+
+  const extraHeaders = [];
+  if (isGK) extraHeaders.push('<th>Sav</th>');
+  if (isGK || isDef) extraHeaders.push('<th>CS</th>');
+  if (hasXg) extraHeaders.push('<th>xG</th>');
+  if (hasXa) extraHeaders.push('<th>xA</th>');
+
+  return `<table class="pim-table">
+    <thead><tr>
+      <th>Opponent</th>
+      <th>Score</th>
+      <th>Min</th>
+      <th>Pts</th>
+      <th>G</th>
+      <th>A</th>
+      <th>Bns</th>
+      ${extraHeaders.join('')}
+    </tr></thead>
+    <tbody>${rows}</tbody>
+  </table>`;
+}
+
 // Show player info modal
 window.showPlayerInfo = function (ev, playerId) {
   if (ev) {
     ev.stopPropagation();
     ev.preventDefault();
   }
-  
+
   const player = state.elements.find(p => p.id === playerId);
   if (!player) return;
-  
+
   const team = state.teams.find(t => t.id === player.team);
-  const teamName = team ? team.name : 'Unknown';
-  const teamCode = team ? team.code : '';
-  const teamNameEscaped = escapeHtml(teamName);
-  const playerNameEscaped = escapeHtml(player.web_name);
-  const newsEscaped = player.news ? escapeHtml(player.news) : '';
-  
+
   // Create modal if it doesn't exist
   let modal = document.getElementById('playerInfoModal');
   if (!modal) {
@@ -602,121 +778,48 @@ window.showPlayerInfo = function (ev, playerId) {
     modal.className = 'player-info-modal';
     document.body.appendChild(modal);
   }
-  
-  // Build stats grid
-  const statsHtml = `
-    <div class="player-info-stats">
-      <div class="player-stat-item">
-        <div class="player-stat-label">Total Points</div>
-        <div class="player-stat-value">${player.total_points || 0}</div>
-      </div>
-      <div class="player-stat-item">
-        <div class="player-stat-label">Price</div>
-        <div class="player-stat-value">£${(player.now_cost / 10).toFixed(1)}m</div>
-      </div>
-      <div class="player-stat-item">
-        <div class="player-stat-label">Form</div>
-        <div class="player-stat-value">${player.form || '0'}</div>
-      </div>
-      <div class="player-stat-item">
-        <div class="player-stat-label">Goals Scored</div>
-        <div class="player-stat-value">${player.goals_scored || 0}</div>
-      </div>
-      <div class="player-stat-item">
-        <div class="player-stat-label">Assists</div>
-        <div class="player-stat-value">${player.assists || 0}</div>
-      </div>
-      <div class="player-stat-item">
-        <div class="player-stat-label">Clean Sheets</div>
-        <div class="player-stat-value">${player.clean_sheets || 0}</div>
-      </div>
-      <div class="player-stat-item">
-        <div class="player-stat-label">Bonus Points</div>
-        <div class="player-stat-value">${player.bonus || 0}</div>
-      </div>
-      <div class="player-stat-item">
-        <div class="player-stat-label">Minutes Played</div>
-        <div class="player-stat-value">${player.minutes || 0}</div>
-      </div>
-      <div class="player-stat-item">
-        <div class="player-stat-label">Goals Conceded</div>
-        <div class="player-stat-value">${player.goals_conceded || 0}</div>
-      </div>
-      <div class="player-stat-item">
-        <div class="player-stat-label">Yellow Cards</div>
-        <div class="player-stat-value">${player.yellow_cards || 0}</div>
-      </div>
-      <div class="player-stat-item">
-        <div class="player-stat-label">Red Cards</div>
-        <div class="player-stat-value">${player.red_cards || 0}</div>
-      </div>
-      <div class="player-stat-item">
-        <div class="player-stat-label">Saves</div>
-        <div class="player-stat-value">${player.saves || 0}</div>
-      </div>
-      <div class="player-stat-item">
-        <div class="player-stat-label">Penalties Saved</div>
-        <div class="player-stat-value">${player.penalties_saved || 0}</div>
-      </div>
-      <div class="player-stat-item">
-        <div class="player-stat-label">Penalties Missed</div>
-        <div class="player-stat-value">${player.penalties_missed || 0}</div>
-      </div>
-      <div class="player-stat-item">
-        <div class="player-stat-label">Owned By</div>
-        <div class="player-stat-value">${parseFloat(player.selected_by_percent || 0).toFixed(1)}%</div>
-      </div>
-      <div class="player-stat-item">
-        <div class="player-stat-label">Transfers In (GW)</div>
-        <div class="player-stat-value">${player.transfers_in_event || 0}</div>
-      </div>
-      <div class="player-stat-item">
-        <div class="player-stat-label">Transfers Out (GW)</div>
-        <div class="player-stat-value">${player.transfers_out_event || 0}</div>
-      </div>
-      <div class="player-stat-item">
-        <div class="player-stat-label">ICT Index</div>
-        <div class="player-stat-value">${parseFloat(player.ict_index || 0).toFixed(1)}</div>
-      </div>
-    </div>
-  `;
-  
-  const statusInfo = player.news ? `
-    <div class="player-info-section">
-      <h3>Status</h3>
-      <p style="color: var(--text); line-height: 1.6;">${newsEscaped}</p>
-    </div>
-  ` : '';
-  
-  modal.innerHTML = `
-    <div class="player-info-content">
-      <button class="player-info-close" onclick="closePlayerInfo()">×</button>
-      
-      <div class="player-info-header">
-        <img src="${getTeamBadgeUrl(teamCode)}" 
-             class="player-info-badge" alt="${teamNameEscaped}">
-        <div class="player-info-title">
-          <h2>${playerNameEscaped}</h2>
-          <p>${teamNameEscaped} • ${posNames[player.element_type]}</p>
-        </div>
-      </div>
-      
-      ${statusInfo}
-      
-      <div class="player-info-section">
-        <h3>Season Statistics</h3>
-        ${statsHtml}
-      </div>
-    </div>
-  `;
-  
+
+  // Render shell with loading placeholder immediately
+  modal.innerHTML = buildPlayerInfoShell(player, team);
   modal.classList.add('open');
+
+  // Close on backdrop click
+  modal.onclick = function (e) {
+    if (e.target === modal) closePlayerInfo();
+  };
+
+  // Fetch and render dynamic sections
+  fetchPlayerSummary(playerId)
+    .then(data => {
+      const dynamicEl = modal.querySelector('#pim-dynamic-sections');
+      if (!dynamicEl) return;
+
+      const fixturesHtml = buildFixturesHtml(data.fixtures || []);
+      const historyHtml = buildMatchHistoryHtml(data.history || [], player.element_type);
+
+      dynamicEl.innerHTML = `
+        <div class="player-info-section">
+          <h3>Next Fixtures</h3>
+          ${fixturesHtml}
+        </div>
+        <div class="player-info-section">
+          <h3>Recent Matches</h3>
+          ${historyHtml}
+        </div>`;
+    })
+    .catch(() => {
+      const dynamicEl = modal.querySelector('#pim-dynamic-sections');
+      if (dynamicEl) {
+        dynamicEl.innerHTML = '<p class="pim-error">Could not load fixture &amp; match data.</p>';
+      }
+    });
 };
 
 window.closePlayerInfo = function () {
   const modal = document.getElementById('playerInfoModal');
   if (modal) {
     modal.classList.remove('open');
+    modal.onclick = null;
   }
 };
 
