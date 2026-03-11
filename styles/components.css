@@ -1840,10 +1840,12 @@ td.fixtures-cell {
   width: 100%;
   max-height: 90vh;
   overflow-y: auto;
+  overflow-x: hidden;
   padding: 20px;
   position: relative;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
   border: 1px solid var(--border);
+  min-width: 0;
 }
 
 .player-info-close {
@@ -1935,6 +1937,424 @@ td.fixtures-cell {
   color: var(--primary);
   margin-bottom: 8px;
   font-size: 16px;
+}
+
+/* ---- Player name row with ℹ status icon ---- */
+.pim-title-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.pim-status-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 50%;
+  color: var(--text-light);
+  width: 22px;
+  height: 22px;
+  font-size: 13px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  line-height: 1;
+  padding: 0;
+  transition: background 120ms, color 120ms;
+}
+
+.pim-status-btn:hover {
+  background: rgba(255, 255, 255, 0.22);
+  color: var(--text);
+}
+
+/* ---- Player availability status panel ---- */
+.pim-status-panel {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+  background: var(--bg-dark);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 8px 12px;
+  margin-top: 10px;
+  font-size: 12px;
+}
+
+.pim-status-panel[hidden] {
+  display: none;
+}
+
+.pim-status-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.pim-status-dot--success { background: var(--success); }
+.pim-status-dot--warning { background: var(--warning); }
+.pim-status-dot--error   { background: var(--error); }
+.pim-status-dot--muted   { background: var(--text-light); }
+
+.pim-status-label {
+  font-weight: 700;
+  color: var(--text);
+}
+
+.pim-chance {
+  color: var(--text-light);
+  font-size: 11px;
+}
+
+.pim-news-text {
+  width: 100%;
+  color: var(--text);
+  line-height: 1.5;
+  margin: 4px 0 0 0;
+  font-size: 12px;
+}
+
+/* ===== Player Info Modal — richer content ===== */
+
+.pim-status-text {
+  color: var(--text);
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* Section header row: title + filter buttons side by side */
+.pim-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+
+.pim-section-header h3 {
+  margin-bottom: 0;
+}
+
+.pim-history-count {
+  font-size: 11px;
+  color: var(--text-light);
+  font-weight: 400;
+  margin-left: 4px;
+}
+
+/* ---- Fixture chip strip ---- */
+.pim-fix-strip {
+  display: flex;
+  align-items: stretch;
+  gap: 4px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+}
+
+.pim-fix-strip::-webkit-scrollbar {
+  display: none;
+}
+
+.pim-fix-chip {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 6px;
+  padding: 5px 6px;
+  min-width: 52px;
+  flex-shrink: 0;
+}
+
+.pim-fix-chip--blank {
+  opacity: 0.45;
+  border-style: dashed;
+}
+
+.pim-fix-chip--dgw {
+  background: rgba(255, 215, 0, 0.1);
+  border-color: rgba(255, 215, 0, 0.5);
+  box-shadow: 0 0 0 1px rgba(255, 215, 0, 0.2);
+}
+
+.pim-fix-chip__top {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+}
+
+.pim-fix-chip__bot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+}
+
+.pim-fix-chip__badge {
+  width: 16px;
+  height: 16px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.pim-fix-chip__opp {
+  font-size: 9px;
+  font-weight: 700;
+  white-space: nowrap;
+  color: var(--text);
+}
+
+.pim-fix-chip__gw {
+  font-size: 8px;
+  font-weight: 500;
+  color: var(--text-light);
+  white-space: nowrap;
+}
+
+.pim-fix-chip__gw-top {
+  font-size: 8px;
+  font-weight: 500;
+  color: var(--text-light);
+  white-space: nowrap;
+}
+
+.pim-fix-chip__venue {
+  font-size: 8px;
+  font-weight: 700;
+  padding: 0 3px;
+  border-radius: 2px;
+  line-height: 13px;
+}
+
+.pim-fix-chip__venue--h {
+  background: rgba(34, 180, 85, 0.22);
+  color: var(--success);
+}
+
+.pim-fix-chip__venue--a {
+  background: rgba(229, 57, 53, 0.18);
+  color: var(--error);
+}
+
+.pim-fix-chip__blank-label {
+  font-size: 8px;
+  font-weight: 600;
+  color: var(--text-light);
+  font-style: italic;
+}
+
+/* ---- All / Home / Away filter pill group ---- */
+.pim-filter-group {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 6px;
+  padding: 3px;
+  flex-shrink: 0;
+}
+
+.pim-filter-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-light);
+  border-radius: 4px;
+  padding: 0 10px;
+  height: 26px;
+  min-width: 38px;
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+  transition: background 120ms, color 120ms;
+}
+
+.pim-filter-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text);
+}
+
+.pim-filter-btn.is-active {
+  background: var(--accent);
+  color: #fff;
+}
+
+/* ---- Match history table ---- */
+.pim-table-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+}
+
+.pim-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 11px;
+}
+
+.pim-table thead {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+
+.pim-table th {
+  background: var(--bg-dark);
+  color: var(--text-light);
+  font-size: 10px;
+  font-weight: 600;
+  text-align: center;
+  padding: 5px 4px;
+  border-bottom: 2px solid var(--border);
+  border-right: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+.pim-table th:last-child {
+  border-right: none;
+}
+
+.pim-table td {
+  color: var(--text);
+  padding: 5px 4px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  border-right: 1px solid rgba(255, 255, 255, 0.04);
+  text-align: center;
+  vertical-align: middle;
+  font-size: 11px;
+}
+
+.pim-table td:last-child {
+  border-right: none;
+}
+
+.pim-table tbody tr:hover {
+  background: var(--bg-dark);
+}
+
+/* Frozen columns: GW, Opp, Res (first 3) */
+.pim-table--history th:nth-child(1),
+.pim-table--history td:nth-child(1) {
+  position: sticky;
+  left: 0;
+  min-width: 30px;
+  width: 30px;
+  background: var(--bg);
+  z-index: 3;
+}
+
+.pim-table--history th:nth-child(2),
+.pim-table--history td:nth-child(2) {
+  position: sticky;
+  left: 30px;
+  min-width: 58px;
+  width: 58px;
+  background: var(--bg);
+  z-index: 3;
+  text-align: left;
+}
+
+.pim-table--history th:nth-child(3),
+.pim-table--history td:nth-child(3) {
+  position: sticky;
+  left: 88px;
+  min-width: 38px;
+  width: 38px;
+  background: var(--bg);
+  z-index: 3;
+}
+
+/* Thead frozen cells sit on top of body frozen cells during vertical scroll */
+.pim-table--history thead th:nth-child(1),
+.pim-table--history thead th:nth-child(2),
+.pim-table--history thead th:nth-child(3) {
+  background: var(--bg-dark);
+  z-index: 4;
+}
+
+/* Keep frozen cells visually in sync with row hover */
+.pim-table--history tbody tr:hover td:nth-child(1),
+.pim-table--history tbody tr:hover td:nth-child(2),
+.pim-table--history tbody tr:hover td:nth-child(3) {
+  background: var(--bg-dark);
+}
+
+/* Cell-specific */
+.pim-col-gw {
+  font-weight: 600;
+}
+
+.pim-col-opp {
+  white-space: nowrap;
+}
+
+.pim-opp-name {
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.pim-col-res {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.pim-pts {
+  font-weight: 700;
+}
+
+.pim-pts--high {
+  color: var(--success);
+}
+
+.pim-pts--low {
+  color: var(--error);
+}
+
+/* DC / goals / assists badge (blue pill) */
+.pim-dc-badge {
+  display: inline-block;
+  background: var(--accent);
+  color: #fff;
+  border-radius: 4px;
+  padding: 0 4px;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 16px;
+}
+
+/* Loading / error / empty states */
+.pim-loading {
+  color: var(--text-light);
+  font-size: 13px;
+  padding: 16px 0;
+  text-align: center;
+}
+
+.pim-error {
+  color: var(--error);
+  font-size: 13px;
+  padding: 12px 0;
+  margin: 0;
+}
+
+.pim-empty {
+  color: var(--text-light);
+  font-size: 12px;
+  padding: 8px 0;
+  margin: 0;
 }
 
 .modal-action-btn {

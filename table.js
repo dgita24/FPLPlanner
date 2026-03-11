@@ -577,23 +577,307 @@ window.updateStatColumns = function () {
   updateSortIcons();
 };
 
+/* ---- Player Info Modal helpers ---- */
+
+// In-memory cache so repeated opens don't re-fetch
+const playerSummaryCache = new Map();
+
+async function fetchPlayerSummary(playerId) {
+  if (playerSummaryCache.has(playerId)) {
+    return playerSummaryCache.get(playerId);
+  }
+  const res = await fetch(`/api/fpl/element-summary/${playerId}/`);
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  const data = await res.json();
+  playerSummaryCache.set(playerId, data);
+  return data;
+}
+
+// Module-level state for the match history filter (retained across renders)
+let pimFilter = 'all'; // 'all' | 'home' | 'away'
+let pimHistoryRows = [];
+let pimElementType = 0;
+
+// Compute DEFCON points for a single match row (mirrors fplmanagerdata logic)
+function computeMatchDC(row, elementType) {
+  if (elementType === 1) return 0;
+  const cbi = row.clearances_blocks_interceptions ?? 0;
+  const tackles = row.tackles ?? 0;
+  const recoveries = row.recoveries ?? 0;
+  const cbit = cbi + tackles;
+  if (elementType === 2) return cbit >= 10 ? 2 : 0;
+  return (cbit + recoveries) >= 12 ? 2 : 0;
+}
+
+// Format score from the player's perspective
+function formatScore(wasHome, teamHScore, teamAScore) {
+  if (teamHScore === null || teamAScore === null) return '–';
+  return wasHome ? `${teamHScore}–${teamAScore}` : `${teamAScore}–${teamHScore}`;
+}
+
+// Build status colour class and label from player.status field
+function getPlayerStatusInfo(player) {
+  const status = player.status || 'a';
+  const labelMap = { a: 'Available', d: 'Doubtful', u: 'Unavailable', i: 'Injured', s: 'Suspended', n: 'Not Available' };
+  const colorMap = { a: 'success', d: 'warning', u: 'error', i: 'error', s: 'error', n: 'muted' };
+  const label = labelMap[status] || 'Unknown';
+  const colorClass = colorMap[status] || 'muted';
+
+  let chanceHtml = '';
+  if (status === 'd' || status === 'u' || status === 'i') {
+    const chance = player.chance_of_playing_next_round;
+    if (chance !== null && chance !== undefined) {
+      chanceHtml = `<span class="pim-chance">${chance}% chance next GW</span>`;
+    }
+  }
+
+  const newsHtml = player.news
+    ? `<p class="pim-news-text">${escapeHtml(player.news)}</p>`
+    : '';
+
+  return `<span class="pim-status-dot pim-status-dot--${colorClass}"></span>
+    <span class="pim-status-label">${label}</span>
+    ${chanceHtml}
+    ${newsHtml}`;
+}
+
+// Build the instantly-rendered modal shell (header + status icon only)
+function buildPlayerInfoShell(player, team) {
+  const teamNameEscaped = escapeHtml(team ? team.name : 'Unknown');
+  const teamCode = team ? team.code : '';
+  const playerNameEscaped = escapeHtml(player.web_name);
+
+  return `
+    <div class="player-info-content">
+      <button class="player-info-close" onclick="closePlayerInfo()">×</button>
+
+      <div class="player-info-header">
+        <img src="${getTeamBadgeUrl(teamCode)}" class="player-info-badge" alt="${teamNameEscaped}">
+        <div class="player-info-title">
+          <div class="pim-title-row">
+            <h2>${playerNameEscaped}</h2>
+            <button class="pim-status-btn" onclick="pimToggleStatus()" title="Player availability" aria-label="Toggle player status">ℹ</button>
+          </div>
+          <p>${teamNameEscaped} • ${posNames[player.element_type]}</p>
+        </div>
+      </div>
+
+      <div id="pim-status-panel" class="pim-status-panel" hidden>
+        ${getPlayerStatusInfo(player)}
+      </div>
+
+      <div id="pim-dynamic-sections">
+        <div class="pim-loading">Loading fixtures &amp; match history…</div>
+      </div>
+    </div>`;
+}
+
+// Toggle the status/news panel when the ℹ icon is pressed
+window.pimToggleStatus = function () {
+  const panel = document.getElementById('pim-status-panel');
+  if (panel) panel.hidden = !panel.hidden;
+};
+
+// Build the fixture chip strip (visual scrollable chips with badge, H/A colour, blank/DGW)
+function buildFixtureChipsHtml(fixtures) {
+  // Get upcoming GWs from bootstrap events (not finished, not current)
+  const upcomingGWs = (state.bootstrap?.events || [])
+    .filter(e => !e.finished && !e.is_current)
+    .sort((a, b) => a.id - b.id)
+    .slice(0, 5)
+    .map(e => e.id);
+
+  if (!upcomingGWs.length) {
+    return '<p class="pim-empty">No upcoming fixtures available.</p>';
+  }
+
+  // Index the player's fixtures by GW
+  const gwMap = new Map();
+  for (const f of (fixtures || [])) {
+    if (f.event != null) {
+      const arr = gwMap.get(f.event) || [];
+      arr.push(f);
+      gwMap.set(f.event, arr);
+    }
+  }
+
+  const chips = upcomingGWs.flatMap(gw => {
+    const gwFxs = gwMap.get(gw);
+    if (!gwFxs || !gwFxs.length) {
+      // Blank GW
+      return [`<div class="pim-fix-chip pim-fix-chip--blank" title="GW${gw}: Blank">
+        <div class="pim-fix-chip__top"><span class="pim-fix-chip__gw-top">GW${gw}</span></div>
+        <div class="pim-fix-chip__bot"><span class="pim-fix-chip__blank-label">Blank</span></div>
+      </div>`];
+    }
+    const isDGW = gwFxs.length > 1;
+    return gwFxs.map(fx => {
+      // element-summary fixtures use team_h/team_a/is_home, NOT opponent_team
+      const oppTeamId = fx.is_home ? fx.team_a : fx.team_h;
+      const oppTeam = state.teams.find(t => t.id === oppTeamId);
+      const abbr = escapeHtml(oppTeam ? (oppTeam.short_name || oppTeam.name) : '???');
+      const teamCode = oppTeam ? oppTeam.code : '';
+      const venue = fx.is_home ? 'H' : 'A';
+      const badgeHtml = teamCode
+        ? `<img class="pim-fix-chip__badge" src="https://resources.premierleague.com/premierleague/badges/t${teamCode}.png" alt="${abbr}" width="16" height="16" loading="lazy">`
+        : '';
+      return `<div class="pim-fix-chip${isDGW ? ' pim-fix-chip--dgw' : ''}" title="GW${gw}: ${abbr} (${venue})${isDGW ? ' — DGW' : ''}">
+        <div class="pim-fix-chip__top">${badgeHtml}<span class="pim-fix-chip__opp">${abbr}</span></div>
+        <div class="pim-fix-chip__bot"><span class="pim-fix-chip__gw">GW${gw}</span><span class="pim-fix-chip__venue pim-fix-chip__venue--${venue.toLowerCase()}">${venue}</span></div>
+      </div>`;
+    });
+  });
+
+  return `<div class="pim-fix-strip">${chips.join('')}</div>`;
+}
+
+// Compact helper: parse a nullable float value to a fixed-decimal string
+function fmtDec(value, decimals = 2) {
+  return parseFloat(String(value ?? '0')).toFixed(decimals);
+}
+
+// Build the match history table body for the current filter
+function buildMatchHistoryTableRows(rows, elementType) {
+  const isGK = elementType === 1;
+  let hasXg = false;
+  let hasXa = false;
+  for (const h of rows) {
+    if (h.expected_goals !== undefined) hasXg = true;
+    if (h.expected_assists !== undefined) hasXa = true;
+    if (hasXg && hasXa) break;
+  }
+
+  // Newest first
+  const sorted = [...rows].sort((a, b) => b.round - a.round);
+
+  const tableRows = sorted.map(h => {
+    const oppName = escapeHtml(getTeamShortName(h.opponent_team) || '???');
+    const venue = h.was_home ? 'H' : 'A';
+    const score = formatScore(h.was_home, h.team_h_score, h.team_a_score);
+    const pts = h.total_points ?? 0;
+    const ptsCls = pts >= 9 ? 'pim-pts--high' : (pts <= 1 ? 'pim-pts--low' : '');
+    const dc = computeMatchDC(h, elementType);
+    const gcVal = h.goals_conceded ?? 0;
+    const xgcVal = fmtDec(h.expected_goals_conceded);
+    const gVal = h.goals_scored ?? 0;
+    const aVal = h.assists ?? 0;
+    const gBadge = gVal > 0 ? `<span class="pim-dc-badge">${gVal}</span>` : '0';
+    const aBadge = aVal > 0 ? `<span class="pim-dc-badge">${aVal}</span>` : '0';
+
+    const posCells = isGK
+      ? `<td>${h.minutes}</td>
+         <td class="pim-pts ${ptsCls}">${pts}</td>
+         <td>${gcVal}</td>
+         <td>${xgcVal}</td>
+         <td>${h.saves ?? 0}</td>
+         <td>${h.penalties_saved ?? 0}</td>
+         <td>${h.bonus ?? 0}</td>
+         <td>${h.yellow_cards ?? 0}</td>
+         <td>${h.red_cards ?? 0}</td>
+         <td>${gBadge}</td>
+         <td>${aBadge}</td>
+         <td>${h.own_goals ?? 0}</td>`
+      : `<td>${h.minutes}</td>
+         <td class="pim-pts ${ptsCls}">${pts}</td>
+         <td>${gBadge}</td>
+         <td>${aBadge}</td>
+         <td>${dc > 0 ? `<span class="pim-dc-badge">${dc}</span>` : '0'}</td>
+         <td>${h.bonus ?? 0}</td>
+         ${hasXg ? `<td>${fmtDec(h.expected_goals)}</td><td>${fmtDec(h.expected_assists)}</td>` : ''}
+         <td>${gcVal}</td>
+         <td>${xgcVal}</td>
+         <td>${h.yellow_cards ?? 0}</td>
+         <td>${h.red_cards ?? 0}</td>
+         <td>${h.own_goals ?? 0}</td>`;
+
+    return `<tr>
+      <td class="pim-col-gw">${h.round}</td>
+      <td class="pim-col-opp"><span class="pim-opp-name">${oppName} (${venue})</span></td>
+      <td class="pim-col-res">${score}</td>
+      ${posCells}
+    </tr>`;
+  }).join('');
+
+  const thead = isGK
+    ? `<thead><tr>
+        <th title="Gameweek">GW</th>
+        <th title="Opponent">Opp</th>
+        <th title="Result">Res</th>
+        <th title="Minutes">Mins</th>
+        <th title="Total Points">Pts</th>
+        <th title="Goals Conceded">GC</th>
+        <th title="xGoals Conceded">xGC</th>
+        <th title="Saves">Svs</th>
+        <th title="Penalties Saved">PenSv</th>
+        <th title="Bonus">Bon</th>
+        <th title="Yellow Cards">YC</th>
+        <th title="Red Cards">RC</th>
+        <th title="Goals">G</th>
+        <th title="Assists">A</th>
+        <th title="Own Goals">OG</th>
+      </tr></thead>`
+    : `<thead><tr>
+        <th title="Gameweek">GW</th>
+        <th title="Opponent">Opp</th>
+        <th title="Result">Res</th>
+        <th title="Minutes">Mins</th>
+        <th title="Total Points">Pts</th>
+        <th title="Goals">G</th>
+        <th title="Assists">A</th>
+        <th title="DEFCON Points">DC</th>
+        <th title="Bonus">Bon</th>
+        ${hasXg ? '<th title="Expected Goals">xG</th><th title="Expected Assists">xA</th>' : ''}
+        <th title="Goals Conceded">GC</th>
+        <th title="xGoals Conceded">xGC</th>
+        <th title="Yellow Cards">YC</th>
+        <th title="Red Cards">RC</th>
+        <th title="Own Goals">OG</th>
+      </tr></thead>`;
+
+  return `${thead}<tbody>${tableRows}</tbody>`;
+}
+
+// Re-render only the table tbody when the filter changes (called from onclick)
+window.pimSetFilter = function (filter) {
+  pimFilter = filter;
+  // Update button active states
+  document.querySelectorAll('.pim-filter-btn').forEach(btn => {
+    const active = btn.dataset.filter === filter;
+    btn.classList.toggle('is-active', active);
+    btn.setAttribute('aria-pressed', String(active));
+  });
+  // Re-render table
+  const wrap = document.getElementById('pim-history-table-wrap');
+  if (!wrap) return;
+  const filteredRows = pimFilter === 'home'
+    ? pimHistoryRows.filter(r => r.was_home === true)
+    : pimFilter === 'away'
+      ? pimHistoryRows.filter(r => r.was_home === false)
+      : pimHistoryRows;
+  if (!filteredRows.length) {
+    wrap.innerHTML = '<p class="pim-empty">No matches for the selected filter.</p>';
+    return;
+  }
+  wrap.innerHTML = `<div class="pim-table-wrap"><table class="pim-table pim-table--history">${buildMatchHistoryTableRows(filteredRows, pimElementType)}</table></div>`;
+};
+
 // Show player info modal
 window.showPlayerInfo = function (ev, playerId) {
   if (ev) {
     ev.stopPropagation();
     ev.preventDefault();
   }
-  
+
   const player = state.elements.find(p => p.id === playerId);
   if (!player) return;
-  
+
   const team = state.teams.find(t => t.id === player.team);
-  const teamName = team ? team.name : 'Unknown';
-  const teamCode = team ? team.code : '';
-  const teamNameEscaped = escapeHtml(teamName);
-  const playerNameEscaped = escapeHtml(player.web_name);
-  const newsEscaped = player.news ? escapeHtml(player.news) : '';
-  
+
+  // Reset filter state for this new player
+  pimFilter = 'all';
+  pimHistoryRows = [];
+  pimElementType = player.element_type;
+
   // Create modal if it doesn't exist
   let modal = document.getElementById('playerInfoModal');
   if (!modal) {
@@ -602,121 +886,65 @@ window.showPlayerInfo = function (ev, playerId) {
     modal.className = 'player-info-modal';
     document.body.appendChild(modal);
   }
-  
-  // Build stats grid
-  const statsHtml = `
-    <div class="player-info-stats">
-      <div class="player-stat-item">
-        <div class="player-stat-label">Total Points</div>
-        <div class="player-stat-value">${player.total_points || 0}</div>
-      </div>
-      <div class="player-stat-item">
-        <div class="player-stat-label">Price</div>
-        <div class="player-stat-value">£${(player.now_cost / 10).toFixed(1)}m</div>
-      </div>
-      <div class="player-stat-item">
-        <div class="player-stat-label">Form</div>
-        <div class="player-stat-value">${player.form || '0'}</div>
-      </div>
-      <div class="player-stat-item">
-        <div class="player-stat-label">Goals Scored</div>
-        <div class="player-stat-value">${player.goals_scored || 0}</div>
-      </div>
-      <div class="player-stat-item">
-        <div class="player-stat-label">Assists</div>
-        <div class="player-stat-value">${player.assists || 0}</div>
-      </div>
-      <div class="player-stat-item">
-        <div class="player-stat-label">Clean Sheets</div>
-        <div class="player-stat-value">${player.clean_sheets || 0}</div>
-      </div>
-      <div class="player-stat-item">
-        <div class="player-stat-label">Bonus Points</div>
-        <div class="player-stat-value">${player.bonus || 0}</div>
-      </div>
-      <div class="player-stat-item">
-        <div class="player-stat-label">Minutes Played</div>
-        <div class="player-stat-value">${player.minutes || 0}</div>
-      </div>
-      <div class="player-stat-item">
-        <div class="player-stat-label">Goals Conceded</div>
-        <div class="player-stat-value">${player.goals_conceded || 0}</div>
-      </div>
-      <div class="player-stat-item">
-        <div class="player-stat-label">Yellow Cards</div>
-        <div class="player-stat-value">${player.yellow_cards || 0}</div>
-      </div>
-      <div class="player-stat-item">
-        <div class="player-stat-label">Red Cards</div>
-        <div class="player-stat-value">${player.red_cards || 0}</div>
-      </div>
-      <div class="player-stat-item">
-        <div class="player-stat-label">Saves</div>
-        <div class="player-stat-value">${player.saves || 0}</div>
-      </div>
-      <div class="player-stat-item">
-        <div class="player-stat-label">Penalties Saved</div>
-        <div class="player-stat-value">${player.penalties_saved || 0}</div>
-      </div>
-      <div class="player-stat-item">
-        <div class="player-stat-label">Penalties Missed</div>
-        <div class="player-stat-value">${player.penalties_missed || 0}</div>
-      </div>
-      <div class="player-stat-item">
-        <div class="player-stat-label">Owned By</div>
-        <div class="player-stat-value">${parseFloat(player.selected_by_percent || 0).toFixed(1)}%</div>
-      </div>
-      <div class="player-stat-item">
-        <div class="player-stat-label">Transfers In (GW)</div>
-        <div class="player-stat-value">${player.transfers_in_event || 0}</div>
-      </div>
-      <div class="player-stat-item">
-        <div class="player-stat-label">Transfers Out (GW)</div>
-        <div class="player-stat-value">${player.transfers_out_event || 0}</div>
-      </div>
-      <div class="player-stat-item">
-        <div class="player-stat-label">ICT Index</div>
-        <div class="player-stat-value">${parseFloat(player.ict_index || 0).toFixed(1)}</div>
-      </div>
-    </div>
-  `;
-  
-  const statusInfo = player.news ? `
-    <div class="player-info-section">
-      <h3>Status</h3>
-      <p style="color: var(--text); line-height: 1.6;">${newsEscaped}</p>
-    </div>
-  ` : '';
-  
-  modal.innerHTML = `
-    <div class="player-info-content">
-      <button class="player-info-close" onclick="closePlayerInfo()">×</button>
-      
-      <div class="player-info-header">
-        <img src="${getTeamBadgeUrl(teamCode)}" 
-             class="player-info-badge" alt="${teamNameEscaped}">
-        <div class="player-info-title">
-          <h2>${playerNameEscaped}</h2>
-          <p>${teamNameEscaped} • ${posNames[player.element_type]}</p>
-        </div>
-      </div>
-      
-      ${statusInfo}
-      
-      <div class="player-info-section">
-        <h3>Season Statistics</h3>
-        ${statsHtml}
-      </div>
-    </div>
-  `;
-  
+
+  // Render shell with loading placeholder immediately
+  modal.innerHTML = buildPlayerInfoShell(player, team);
   modal.classList.add('open');
+
+  // Close on backdrop click
+  modal.onclick = function (e) {
+    if (e.target === modal) closePlayerInfo();
+  };
+
+  // Fetch and render dynamic sections
+  fetchPlayerSummary(playerId)
+    .then(data => {
+      const dynamicEl = modal.querySelector('#pim-dynamic-sections');
+      if (!dynamicEl) return;
+
+      pimHistoryRows = data.history || [];
+      pimElementType = player.element_type;
+
+      const fixtureChipsHtml = buildFixtureChipsHtml(data.fixtures || []);
+      const filteredRows = pimHistoryRows; // 'all' on open
+      const historyTableContent = filteredRows.length
+        ? `<div class="pim-table-wrap"><table class="pim-table pim-table--history">${buildMatchHistoryTableRows(filteredRows, pimElementType)}</table></div>`
+        : '<p class="pim-empty">No match history available.</p>';
+
+      const historyCount = pimHistoryRows.length;
+
+      dynamicEl.innerHTML = `
+        <div class="player-info-section">
+          <h3>Next Fixtures</h3>
+          ${fixtureChipsHtml}
+        </div>
+        <div class="player-info-section">
+          <div class="pim-section-header">
+            <h3>Match History <span class="pim-history-count">${historyCount}</span></h3>
+            <div class="pim-filter-group" role="group" aria-label="Venue filter">
+              <button class="pim-filter-btn is-active" data-filter="all" aria-pressed="true" onclick="pimSetFilter('all')">All</button>
+              <button class="pim-filter-btn" data-filter="home" aria-pressed="false" onclick="pimSetFilter('home')">Home</button>
+              <button class="pim-filter-btn" data-filter="away" aria-pressed="false" onclick="pimSetFilter('away')">Away</button>
+            </div>
+          </div>
+          <div id="pim-history-table-wrap">
+            ${historyTableContent}
+          </div>
+        </div>`;
+    })
+    .catch(() => {
+      const dynamicEl = modal.querySelector('#pim-dynamic-sections');
+      if (dynamicEl) {
+        dynamicEl.innerHTML = '<p class="pim-error">Could not load fixture &amp; match data.</p>';
+      }
+    });
 };
 
 window.closePlayerInfo = function () {
   const modal = document.getElementById('playerInfoModal');
   if (modal) {
     modal.classList.remove('open');
+    modal.onclick = null;
   }
 };
 

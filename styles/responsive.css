@@ -831,12 +831,12 @@
   }
 
   .player-info-modal {
-    padding: 10px;
+    padding: 8px;
   }
 
   .player-info-content {
-    padding: 20px 15px;
-    max-height: 85vh;
+    padding: 15px 12px;
+    max-height: 88vh;
   }
 
   #squadPlayerInfoModal .player-info-content {
@@ -879,6 +879,36 @@
 
   .player-stat-label {
     font-size: 10px;
+  }
+
+  .pim-section-header {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .pim-filter-btn {
+    height: 24px;
+    font-size: 10px;
+    padding: 0 8px;
+    min-width: 32px;
+  }
+
+  .pim-fix-chip {
+    min-width: 46px;
+    padding: 4px 5px;
+  }
+
+  .pim-fix-chip__opp {
+    font-size: 8px;
+  }
+
+  .pim-table {
+    font-size: 10px;
+  }
+
+  .pim-table th,
+  .pim-table td {
+    padding: 4px 3px;
   }
 
   .transfer-panel {
