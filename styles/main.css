@@ -387,6 +387,82 @@ body {
   color: var(--text-light);
 }
 
+/* Recent Team IDs suggestion list */
+.import-input-wrapper {
+  position: relative;
+  margin-bottom: 10px;
+}
+
+.import-input-wrapper #importTeamId {
+  margin-bottom: 0;
+  width: 100%;
+}
+
+.recent-team-ids {
+  position: absolute;
+  top: calc(100% + 2px);
+  left: 0;
+  right: 0;
+  background: var(--bg-dark);
+  border: 2px solid var(--primary);
+  border-radius: 6px;
+  z-index: 200;
+  max-height: 220px;
+  overflow-y: auto;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+.recent-ids-list {
+  list-style: none;
+  margin: 0;
+  padding: 4px 0;
+}
+
+.recent-ids-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0;
+}
+
+.recent-ids-value {
+  flex: 1;
+  padding: 9px 12px;
+  font-size: 14px;
+  color: var(--text);
+  cursor: pointer;
+  user-select: none;
+}
+
+.recent-ids-value:hover,
+.recent-ids-value:focus {
+  background: var(--primary);
+  color: var(--bg);
+  outline: none;
+}
+
+.recent-ids-delete {
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  color: var(--text-light);
+  font-size: 18px;
+  line-height: 1;
+  padding: 8px 12px;
+  cursor: pointer;
+  width: auto;
+  min-width: 36px;
+  transition: color 0.15s;
+}
+
+.recent-ids-delete:hover,
+.recent-ids-delete:focus {
+  color: var(--danger, #e74c3c);
+  outline: none;
+}
+
+
+
 /* Buttons - Matching site colors (Gold primary and Blue secondary) */
 .sidebar button.btn-primary {
   width: 100%;

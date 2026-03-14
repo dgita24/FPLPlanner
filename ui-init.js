@@ -19,6 +19,93 @@ let selectedOverwriteDraft = null;
 let _deleteDraftResolve = null;
 
 // ---------------------------------------------------------------------------
+// Recent Team IDs (localStorage, cap: 8 entries)
+// ---------------------------------------------------------------------------
+const RECENT_TEAM_IDS_KEY = 'fplplanner-recent-team-ids';
+// Maximum number of recent team IDs to persist and display.
+const MAX_RECENT_TEAM_IDS = 8;
+
+function getRecentTeamIds() {
+  try {
+    const raw = localStorage.getItem(RECENT_TEAM_IDS_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch (e) {
+    return [];
+  }
+}
+
+function saveRecentTeamIds(ids) {
+  try {
+    localStorage.setItem(RECENT_TEAM_IDS_KEY, JSON.stringify(ids));
+  } catch (e) {
+    // Silently fail if localStorage is unavailable or full.
+  }
+}
+
+function addRecentTeamId(id) {
+  const ids = getRecentTeamIds().filter(v => v !== id); // deduplicate
+  ids.unshift(id); // most-recent first
+  saveRecentTeamIds(ids.slice(0, MAX_RECENT_TEAM_IDS));
+  renderRecentTeamIds();
+}
+
+function removeRecentTeamId(id) {
+  saveRecentTeamIds(getRecentTeamIds().filter(v => v !== id));
+  renderRecentTeamIds();
+}
+
+function renderRecentTeamIds() {
+  const container = document.getElementById('recentTeamIds');
+  if (!container) return;
+  const ids = getRecentTeamIds();
+  container.innerHTML = '';
+  if (!ids.length) {
+    container.style.display = 'none';
+    return;
+  }
+  container.style.display = 'block';
+  const list = document.createElement('ul');
+  list.className = 'recent-ids-list';
+  list.setAttribute('role', 'listbox');
+  list.setAttribute('aria-label', 'Recent team IDs');
+  ids.forEach(id => {
+    const li = document.createElement('li');
+    li.className = 'recent-ids-item';
+    li.setAttribute('role', 'option');
+    // Click on the ID text fills the input
+    const span = document.createElement('span');
+    span.className = 'recent-ids-value';
+    span.textContent = id;
+    span.setAttribute('tabindex', '0');
+    span.setAttribute('aria-label', `Use team ID ${id}`);
+    span.addEventListener('click', () => {
+      const input = document.getElementById('importTeamId');
+      if (input) { input.value = id; input.focus(); }
+      container.style.display = 'none';
+    });
+    span.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        span.click();
+      }
+    });
+    // Delete button removes the ID from the list
+    const del = document.createElement('button');
+    del.className = 'recent-ids-delete';
+    del.textContent = '×';
+    del.setAttribute('aria-label', `Remove team ID ${id} from recent list`);
+    del.addEventListener('click', (e) => {
+      e.stopPropagation();
+      removeRecentTeamId(id);
+    });
+    li.appendChild(span);
+    li.appendChild(del);
+    list.appendChild(li);
+  });
+  container.appendChild(list);
+}
+
+// ---------------------------------------------------------------------------
 // Per-draft password memory (localStorage, cleared on cache clear)
 // ---------------------------------------------------------------------------
 const DRAFT_PWD_KEY_PREFIX = 'fplplanner-draft-pwd-';
@@ -409,6 +496,9 @@ async function importTeam() {
 
   // Store manager ID for syncing saved drafts
   state.managerId = teamId;
+
+  // Persist this team ID to the recent list for future quick-fill.
+  addRecentTeamId(teamId);
 
   // Dismiss the import prompt banner now that the team has been imported
   const importBanner = document.getElementById('import-banner');
@@ -1246,6 +1336,42 @@ export function initUI() {
 
   // Populate saved teams dropdown
   populateSavedTeamsDropdown();
+
+  // Recent Team IDs: render saved suggestions and attach focus/blur handlers.
+  renderRecentTeamIds();
+  const importInput = document.getElementById('importTeamId');
+  const recentContainer = document.getElementById('recentTeamIds');
+  // Delay (ms) before hiding suggestions so a click/tap on an item registers first.
+  const SUGGESTION_HIDE_DELAY = 150;
+  if (importInput && recentContainer) {
+    importInput.addEventListener('focus', () => {
+      renderRecentTeamIds();
+      if (getRecentTeamIds().length) recentContainer.style.display = 'block';
+    });
+    // Hide suggestions when focus leaves both the input and the list.
+    importInput.addEventListener('blur', () => {
+      setTimeout(() => {
+        if (!document.activeElement || !recentContainer.contains(document.activeElement)) {
+          recentContainer.style.display = 'none';
+        }
+      }, SUGGESTION_HIDE_DELAY);
+    });
+    recentContainer.addEventListener('focusout', () => {
+      setTimeout(() => {
+        if (!document.activeElement || (!recentContainer.contains(document.activeElement) && document.activeElement !== importInput)) {
+          recentContainer.style.display = 'none';
+        }
+      }, SUGGESTION_HIDE_DELAY);
+    });
+  }
+
+  // Close suggestions when clicking outside the import card.
+  const importCard = document.getElementById('importCard');
+  document.addEventListener('click', (e) => {
+    if (importCard && !importCard.contains(e.target)) {
+      if (recentContainer) recentContainer.style.display = 'none';
+    }
+  });
 
   // Sync right panel height to pitch+bench column on desktop so they stay
   // matched regardless of zoom level. Uses ResizeObserver so it reacts to any

@@ -63,7 +63,10 @@
       <!-- Import Card (hidden by default) -->
       <div class="expandable-card" id="importCard" style="display: none;">
         <h4>Import Your Team</h4>
-        <input type="text" id="importTeamId" placeholder="FPL Team ID (e.g., 717348)" />
+        <div class="import-input-wrapper">
+          <input type="text" id="importTeamId" placeholder="FPL Team ID (e.g., 717348)" autocomplete="off" />
+          <div id="recentTeamIds" class="recent-team-ids" style="display: none;"></div>
+        </div>
         <button class="btn-primary" onclick="importTeam()">Import from FPL</button>
       </div>
 
