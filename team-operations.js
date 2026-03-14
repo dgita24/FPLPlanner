@@ -108,6 +108,13 @@ function swapWithinTeam(team, aId, bId) {
     return true;
   }
 
+  if (aBench !== -1 && bBench !== -1) {
+    const tmp = team.bench[aBench];
+    team.bench[aBench] = team.bench[bBench];
+    team.bench[bBench] = tmp;
+    return true;
+  }
+
   return false;
 }
 
@@ -140,15 +147,26 @@ export function substitutePlayer(playerId, updateUI) {
     return;
   }
 
-  // Clicking a different player on the same side: keep original armed selection.
+  // Clicking a different player on the same side.
   if (currentPendingSwap.side === sideNow) {
-    const want = currentPendingSwap.side === 'starting' ? 'bench' : 'starter';
-    showMessage(
-      `Swap in progress: select a ${want} to complete (or click again to cancel).`,
-      'info'
-    );
-    updateUI();
-    return;
+    if (sideNow === 'bench') {
+      // Bench-to-bench reorder: only allowed between outfield bench players.
+      if (isGK(currentPendingSwap.id) || isGK(playerId)) {
+        setPendingSwap(null);
+        showMessage('Bench GK can only swap with the starting GK.', 'error');
+        updateUI();
+        return;
+      }
+      // Both are outfield bench players – fall through to apply the swap.
+    } else {
+      // Both in the starting XI: prompt to select a bench player.
+      showMessage(
+        'Swap in progress: select a bench player to complete (or click again to cancel).',
+        'info'
+      );
+      updateUI();
+      return;
+    }
   }
 
   // GK must swap with GK.
