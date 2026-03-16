@@ -67,6 +67,16 @@
     flex-shrink: 0;
   }
 
+  /* Show desktop GW nav (inside pitch-stack, centers naturally over the pitch) */
+  .gw-nav {
+    display: flex;
+  }
+
+  /* Hide GW nav from the top bar on desktop — shown in pitch-stack instead */
+  .mobile-gw-nav {
+    display: none;
+  }
+
   /* Reset fixed-overlay positioning for both panels when inside #rightPanel */
   #rightPanel #transferPanel,
   #rightPanel #fixturesPanel {
@@ -446,19 +456,19 @@
   }
 
   .fixture-row {
-    grid-template-columns: minmax(100px, 1fr) 50px minmax(100px, 1fr);
-    font-size: 12px;
-    padding: 5px 0;
+    grid-template-columns: minmax(100px, 1fr) 52px minmax(100px, 1fr);
+    font-size: 13px;
+    padding: 6px 0;
   }
 
   .team-badge {
-    width: 18px;
-    height: 18px;
+    width: 20px;
+    height: 20px;
   }
 
   .fixture-time {
-    font-size: 10px;
-    padding: 2px 4px;
+    font-size: 11px;
+    padding: 2px 5px;
   }
 
   .transfer-panel {
@@ -777,17 +787,18 @@
   }
 
   .fixture-row {
-    grid-template-columns: minmax(70px, 1fr) 40px minmax(70px, 1fr);
-    font-size: 10px;
+    grid-template-columns: 1fr 54px 1fr;
+    font-size: 14px;
+    padding: 8px 2px;
   }
 
   .team-name {
-    font-size: 10px;
+    font-size: 13px;
   }
 
   .team-badge {
-    width: 14px;
-    height: 14px;
+    width: 22px;
+    height: 22px;
   }
 
   .club-badge {
@@ -796,13 +807,13 @@
   }
 
   .fixture-date-banner {
-    font-size: 11px;
-    padding: 3px 6px;
+    font-size: 13px;
+    padding: 5px 8px;
   }
 
   .fixture-time {
-    font-size: 9px;
-    padding: 2px 3px;
+    font-size: 11px;
+    padding: 3px 5px;
   }
 
   .message {
