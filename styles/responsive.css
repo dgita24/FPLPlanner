@@ -38,6 +38,10 @@
    Fixtures/transfer panels are in normal document flow, not overlays.
 ---------------------------------------- */
 @media (min-width: 769px) {
+  body {
+    padding-bottom: 0;
+  }
+
   #plannerMain {
     display: flex;
     flex-direction: row;
@@ -65,6 +69,11 @@
   .desktop-tab-bar {
     display: flex;
     flex-shrink: 0;
+  }
+
+  /* Hide bottom mobile tab bar on desktop */
+  .bottom-tab-bar {
+    display: none;
   }
 
   /* Show desktop GW nav (inside pitch-stack, centers naturally over the pitch) */
