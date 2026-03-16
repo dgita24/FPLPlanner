@@ -11,11 +11,12 @@ let defconCache = {
 };
 
 /**
- * Determines the latest completed gameweek by checking fixtures.
- * A gameweek is considered completed when all its fixtures are finished.
- * @returns {Promise<number>} Latest completed gameweek number
+ * Determines the latest started or live gameweek by checking fixtures.
+ * A gameweek is considered started when at least one of its fixtures has begun,
+ * even if the gameweek is not yet fully finished.
+ * @returns {Promise<number>} Latest started/live gameweek number
  */
-async function getLatestCompletedGameweek() {
+async function getLatestStartedGameweek() {
   try {
     const res = await fetch(`${FPL_BASE}/fixtures/`);
     if (!res.ok) {
@@ -28,24 +29,28 @@ async function getLatestCompletedGameweek() {
       return 0;
     }
 
-    // Group fixtures by event (gameweek) and check if all are finished
+    // Group fixtures by event (gameweek) and check if any have started or finished
     const gwStatus = {};
     fixtures.forEach(fixture => {
       if (!fixture.event) return;
       if (!gwStatus[fixture.event]) {
-        gwStatus[fixture.event] = { total: 0, finished: 0 };
+        gwStatus[fixture.event] = { total: 0, started: 0, finished: 0 };
       }
       gwStatus[fixture.event].total++;
+      if (fixture.started) {
+        gwStatus[fixture.event].started++;
+      }
       if (fixture.finished || fixture.finished_provisional) {
         gwStatus[fixture.event].finished++;
       }
     });
 
-    // Find the highest GW where all fixtures are finished
+    // Find the highest GW where at least one fixture has started or finished
+    // This includes live/in-progress gameweeks so DC points are counted up to date
     let latestCompleted = 0;
     for (const [gw, status] of Object.entries(gwStatus)) {
       const gwNum = parseInt(gw);
-      if (status.finished === status.total && gwNum > latestCompleted) {
+      if ((status.started > 0 || status.finished > 0) && gwNum > latestCompleted) {
         latestCompleted = gwNum;
       }
     }
@@ -118,8 +123,9 @@ function calculateDefconPoints(playerData, elementType) {
 }
 
 /**
- * Fetches and aggregates DEFCON points across all completed gameweeks.
+ * Fetches and aggregates DEFCON points across all started/live gameweeks.
  * Awards points for DEF (≥10 contributions), MID (≥12), and FWD (≥12) per fixture.
+ * Includes the current in-progress gameweek so totals remain up to date.
  * @param {Array<Object>} playerElements - Array of player elements from bootstrap-static with properties: id, element_type, etc.
  * @returns {Promise<Map<number, number>>} Map of player_id -> total DEFCON points
  */
@@ -143,22 +149,22 @@ export async function fetchDefconData(playerElements) {
     }
   });
 
-  // Determine completed gameweeks
-  const latestCompleted = await getLatestCompletedGameweek();
+  // Determine the latest started/live gameweek (includes in-progress GWs)
+  const latestCompleted = await getLatestStartedGameweek();
   if (latestCompleted === 0) {
-    console.warn('No completed gameweeks found for DEFCON');
+    console.warn('No started gameweeks found for DEFCON');
     return new Map();
   }
 
-  // Create array of completed gameweeks [1, 2, ..., latestCompleted]
+  // Create array of gameweeks to process [1, 2, ..., latestCompleted]
   const completedGWs = Array.from({ length: latestCompleted }, (_, i) => i + 1);
   
   defconCache.completedGWs = completedGWs;
 
-  // Aggregate DEFCON points across all completed gameweeks
+  // Aggregate DEFCON points across all started/live gameweeks
   const defconTotals = new Map();
 
-  // Fetch live data for each completed gameweek
+  // Fetch live data for each gameweek
   const fetchPromises = completedGWs.map(gw => fetchLiveGameweek(gw));
   const results = await Promise.all(fetchPromises);
 
