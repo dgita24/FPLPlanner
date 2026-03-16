@@ -1117,9 +1117,9 @@ function switchDesktopTab(tab) {
   });
 }
 
-// Switch between mobile tabs (Pitch / Fixtures / Transfers / More)
+// Switch between mobile tabs (Pitch / Fixtures / Transfers)
 function switchMobileTab(tab) {
-  const allTabs = ['pitch', 'fixtures', 'transfers', 'more'];
+  const allTabs = ['pitch', 'fixtures', 'transfers'];
   const isDesktop = window.innerWidth >= 769; // matches CSS @media (min-width: 769px)
 
   // Remove active state from all tab buttons
@@ -1149,7 +1149,7 @@ function switchMobileTab(tab) {
     // Transfer panel overlay only on mobile; on desktop it is always visible
     transferPanel.classList.add('mobile-panel-active');
   }
-  // 'pitch' and 'more' show default content; on desktop the right panel is always visible
+  // 'pitch' shows default content; on desktop the right panel is always visible
 }
 
 export function initUI() {
