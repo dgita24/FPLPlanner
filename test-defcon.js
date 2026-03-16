@@ -186,4 +186,45 @@ boundaryTests.forEach(test => {
   console.log(`  ${test.desc}: ${result} - ${result === test.expected ? '✓ PASS' : '✗ FAIL'}`);
 });
 
+// Test 6: getLatestCompletedGameweek logic — includes in-progress GWs
+console.log('\nTest 6: getLatestCompletedGameweek includes started/live gameweeks');
+
+// Simulate gwStatus produced from fixture data across 3 gameweeks:
+// GW1: fully finished, GW2: partially finished (some started, some not), GW3: not started
+const mockGwStatus = {
+  1: { total: 10, started: 10, finished: 10 }, // fully complete
+  2: { total: 10, started: 5,  finished: 3  }, // in progress (live)
+  3: { total: 10, started: 0,  finished: 0  }, // not yet started
+};
+
+function simulateGetLatestStartedGameweek(gwStatus) {
+  let latestCompleted = 0;
+  for (const [gw, status] of Object.entries(gwStatus)) {
+    const gwNum = parseInt(gw);
+    if ((status.started > 0 || status.finished > 0) && gwNum > latestCompleted) {
+      latestCompleted = gwNum;
+    }
+  }
+  return latestCompleted;
+}
+
+const latestResult = simulateGetLatestStartedGameweek(mockGwStatus);
+console.log(`  Latest started/live GW: ${latestResult} (expected: 2) - ${latestResult === 2 ? '✓ PASS' : '✗ FAIL'}`);
+
+// Edge case: only fully finished GWs (no live/in-progress)
+const allFinishedStatus = {
+  1: { total: 10, started: 10, finished: 10 },
+  2: { total: 10, started: 10, finished: 10 },
+};
+const allFinishedResult = simulateGetLatestStartedGameweek(allFinishedStatus);
+console.log(`  All finished: latest GW ${allFinishedResult} (expected: 2) - ${allFinishedResult === 2 ? '✓ PASS' : '✗ FAIL'}`);
+
+// Edge case: no GW has started yet
+const noneStartedStatus = {
+  1: { total: 10, started: 0, finished: 0 },
+  2: { total: 10, started: 0, finished: 0 },
+};
+const noneStartedResult = simulateGetLatestStartedGameweek(noneStartedStatus);
+console.log(`  None started: latest GW ${noneStartedResult} (expected: 0) - ${noneStartedResult === 0 ? '✓ PASS' : '✗ FAIL'}`);
+
 console.log('\n=== All Tests Complete ===');
