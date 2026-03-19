@@ -82,6 +82,7 @@ function renderRecentTeamIds() {
       const input = document.getElementById('importTeamId');
       if (input) { input.value = id; input.focus(); }
       container.style.display = 'none';
+      importTeam();
     });
     span.addEventListener('keydown', (e) => {
       if (e.key === 'Enter' || e.key === ' ') {
