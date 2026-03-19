@@ -647,3 +647,32 @@ export function getActiveChip(gw) {
   const team = state.plan[gw];
   return team ? team.chip : null;
 }
+
+/* -------------------------
+   PLAYER MARK / TARGET
+-------------------------- */
+
+export function togglePlayerMark(playerId, updateUI) {
+  const gw = state.viewingGW;
+  const team = state.plan[gw];
+  if (!team) return;
+
+  const entry =
+    team.starting.find((e) => e.id === playerId) ||
+    team.bench.find((e) => e.id === playerId);
+  if (!entry) return;
+
+  pushUndoState();
+  entry.marked = !entry.marked;
+
+  const p = state.elements.find((el) => el.id === playerId);
+  const name = p ? p.web_name : `Player ${playerId}`;
+  showMessage(
+    entry.marked
+      ? `${name} marked for transfer/bench`
+      : `${name} mark removed`,
+    'info'
+  );
+
+  updateUI();
+}

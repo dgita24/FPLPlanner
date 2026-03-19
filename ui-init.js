@@ -4,7 +4,7 @@ import { state, history, loadTeamEntry } from './data.js';
 import { setupSidebarHandlers, closeSidebar, toggleSidebarMenu } from './ui-sidebar.js';
 import { showMessage, renderPitch, renderBench, ensureFixturesForView } from './ui-render.js';
 import { renderFixtures, setFixturesGW, isFixturesSyncEnabled } from './fixtures.js';
-import { cancelTransfer, substitutePlayer, addSelectedToSquad, removePlayer, resetTransferState, isPendingTransfer, getBatchTransferInfo, reinstatePlayer, selectChip } from './team-operations.js';
+import { cancelTransfer, substitutePlayer, addSelectedToSquad, removePlayer, resetTransferState, isPendingTransfer, getBatchTransferInfo, reinstatePlayer, selectChip, togglePlayerMark } from './team-operations.js';
 import { setPendingSwap } from './ui-render.js';
 import { setDefaultSort } from './table.js';
 import { MAX_GAMEWEEK, MAX_DRAFTS_PER_MANAGER } from './constants.js';
@@ -1261,6 +1261,7 @@ export function initUI() {
   window.substitutePlayer = (playerId) => substitutePlayer(playerId, updateUI);
   window.addSelectedToSquad = () => addSelectedToSquad(updateUI);
   window.cancelTransfer = () => cancelTransfer(updateUI);
+  window.togglePlayerMark = (playerId) => togglePlayerMark(playerId, updateUI);
   window.importTeam = importTeam;
   window.localSave = localSave;
   window.localLoad = localLoad;

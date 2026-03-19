@@ -407,7 +407,8 @@ function playerCard(entry, source) {
   const subFn = `substitutePlayer(${entry.id})`;
 
   const armed = pendingSwap && pendingSwap.id === entry.id;
-  const cardClass = `player-card${armed ? ' pending-swap' : ''}`;
+  const isMarked = entry.marked === true;
+  const cardClass = `player-card${armed ? ' pending-swap' : ''}${isMarked ? ' player-card--marked' : ''}`;
   const swapTitle = armed ? 'Cancel swap' : 'Swap';
 
   // Injury/suspension status badges
@@ -592,6 +593,11 @@ window.showSquadPlayerInfo = function (playerId, source) {
   const isStartingXI = currentTeam && currentTeam.starting.some(p => p.id === playerId);
   const isCaptain = currentTeam && currentTeam.captain === playerId;
   const isViceCaptain = currentTeam && currentTeam.viceCaptain === playerId;
+  const playerEntry = currentTeam && (
+    currentTeam.starting.find(e => e.id === playerId) ||
+    currentTeam.bench.find(e => e.id === playerId)
+  );
+  const isMarked = playerEntry && playerEntry.marked === true;
   
   // Build availability flag section
   const events = state.bootstrap?.events || [];
@@ -757,6 +763,14 @@ window.showSquadPlayerInfo = function (playerId, source) {
           onclick="substitutePlayer(${playerId}); closeSquadPlayerInfo();"
           style="flex: 1; background: var(--accent);">
           Swap/Substitute
+        </button>
+      </div>
+      <div style="margin-top: 8px;">
+        <button 
+          class="modal-action-btn ${isMarked ? 'active' : ''}" 
+          onclick="togglePlayerMark(${playerId}); closeSquadPlayerInfo();"
+          style="width: 100%; background: ${isMarked ? 'var(--error)' : 'var(--primary)'};">
+          ${isMarked ? '✓ Marked (click to unmark)' : 'Mark / Target'}
         </button>
       </div>
     </div>
