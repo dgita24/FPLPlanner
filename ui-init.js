@@ -5,7 +5,7 @@ import { setupSidebarHandlers, closeSidebar, toggleSidebarMenu } from './ui-side
 import { showMessage, renderPitch, renderBench, ensureFixturesForView } from './ui-render.js';
 import { renderFixtures, setFixturesGW, isFixturesSyncEnabled } from './fixtures.js';
 import { cancelTransfer, substitutePlayer, addSelectedToSquad, removePlayer, resetTransferState, isPendingTransfer, getBatchTransferInfo, reinstatePlayer, selectChip, togglePlayerMark } from './team-operations.js';
-import { setPendingSwap } from './ui-render.js';
+import { setPendingSwap, getPendingSwap } from './ui-render.js';
 import { setDefaultSort } from './table.js';
 import { MAX_GAMEWEEK, MAX_DRAFTS_PER_MANAGER } from './constants.js';
 
@@ -1264,6 +1264,16 @@ export function initUI() {
   window.removePlayer = (playerId, source) => removePlayer(playerId, source, updateUI);
   window.reinstatePlayer = (playerId) => reinstatePlayer(playerId, updateUI);
   window.substitutePlayer = (playerId) => substitutePlayer(playerId, updateUI);
+  window.onPlayerCardClick = function (playerId, source) {
+    const pending = getPendingSwap();
+    if (pending) {
+      // A swap is already armed: complete (or cancel) it without opening the modal.
+      window.substitutePlayer(playerId);
+    } else {
+      // Normal behaviour: open the player info modal.
+      window.showSquadPlayerInfo(playerId, source);
+    }
+  };
   window.addSelectedToSquad = () => addSelectedToSquad(updateUI);
   window.cancelTransfer = () => cancelTransfer(updateUI);
   window.togglePlayerMark = (playerId) => togglePlayerMark(playerId, updateUI);
