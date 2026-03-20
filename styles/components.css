@@ -575,10 +575,12 @@
 
 .quick-remove {
   color: #cc0000;
+  -webkit-text-stroke: 0.3px currentColor;
 }
 
 .quick-swap {
   color: #0055cc;
+  font-size: 18px;
 }
 
 /* ===== Captain/Vice-Captain Selection ===== */
