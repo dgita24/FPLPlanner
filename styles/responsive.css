@@ -372,8 +372,14 @@
   }
 
   .player-card .name {
-    font-size: 12px;
+    font-size: 10px;
     font-weight: 800;
+  }
+
+  .player-card .name-action-btn {
+    flex: 0 0 18px;
+    width: 18px;
+    font-size: 10px;
   }
 
   .card-fixture-next {
@@ -510,8 +516,14 @@
   }
 
   .player-card .name {
-    font-size: 11px;
+    font-size: 10px;
     font-weight: 800;
+  }
+
+  .player-card .name-action-btn {
+    flex: 0 0 18px;
+    width: 18px;
+    font-size: 10px;
   }
 
   .card-fixture-next {
