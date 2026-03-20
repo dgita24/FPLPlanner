@@ -330,13 +330,69 @@
   overflow: hidden;
   text-overflow: ellipsis;
   background: rgba(220, 220, 220, 0.4);
-  padding: 2px 3px;
+  /* 14px horizontal padding reserves space for the 20px .quick-btn buttons
+     (left: 0 / right: 0) so text ellipsizes before sliding under them */
+  padding: 2px 14px;
   border-radius: 3px;
-  margin: 2px 0 1px;
+  margin: 0;
   width: 100%;
   text-align: center;
   letter-spacing: 0.2px;
+  box-sizing: border-box;
 }
+
+/* ===== Quick action buttons (Transfer / Swap) in the name bar ===== */
+
+.name-container {
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  margin: 2px 0 1px;
+}
+
+.quick-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 20px;
+  height: 20px;
+  border: none;
+  border-radius: 3px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 900;
+  line-height: 1;
+  cursor: pointer;
+  user-select: none;
+  color: #fff;
+  padding: 0;
+  z-index: 5;
+  flex-shrink: 0;
+}
+
+.quick-btn:active {
+  transform: translateY(-50%) scale(0.92);
+}
+
+.quick-remove {
+  left: 0;
+  background: rgba(200, 40, 40, 0.75);
+}
+
+.quick-swap {
+  right: 0;
+  background: rgba(0, 100, 200, 0.65);
+}
+
+/* To remove quick buttons on mobile if space is too tight, uncomment:
+@media (max-width: 480px) {
+  .quick-btn { display: none !important; }
+  .name-container .name { padding: 0 !important; }
+}
+*/
 
 /* Next fixture (compact format, current GW) */
 .card-fixture-next {
