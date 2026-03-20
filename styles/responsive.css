@@ -1267,6 +1267,21 @@
   }
 }
 
+/* ----------------------------------------
+   Desktop only (≥1025px): shrink price pill so it clears the club crest.
+   Mobile layout is untouched — these overrides only apply above tablet width.
+   Do NOT reduce top: the pill must still sit half-above the card top edge.
+---------------------------------------- */
+@media (min-width: 1025px) {
+  .player-card .card-price {
+    font-size: 12px;
+    padding: 1px 6px;
+    border-width: 1px;
+    line-height: 1.2;
+    border-radius: 8px;
+  }
+}
+
 /* Pitch controls: smaller on mobile */
 @media (max-width: 768px) {
   .pitch-reset-btn,
