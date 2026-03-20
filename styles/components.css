@@ -384,13 +384,13 @@
 }
 
 .player-card .name-action-btn--transfer {
-  background: rgba(200, 30, 30, 0.70);
-  color: #fff;
+  background: transparent;
+  color: #c81e1e;
 }
 
 .player-card .name-action-btn--swap {
-  background: rgba(0, 90, 200, 0.60);
-  color: #fff;
+  background: transparent;
+  color: #005ac8;
 }
 
 /* Next fixture (compact format, current GW) */
