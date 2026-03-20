@@ -628,6 +628,12 @@
     font-weight: 800;
   }
 
+  .player-card .name-action-btn {
+    flex: 0 0 18px;
+    width: 18px;
+    font-size: 10px;
+  }
+
   .card-fixture-next {
     font-size: 10px;
   }
@@ -1274,7 +1280,7 @@
 ---------------------------------------- */
 @media (min-width: 1025px) {
   .player-card .card-price {
-    font-size: 12px;
+    font-size: 11px;
     padding: 1px 6px;
     border-width: 1px;
     line-height: 1.2;

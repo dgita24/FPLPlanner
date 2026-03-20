@@ -465,7 +465,21 @@ function playerCard(entry, source) {
              class="badge" alt="${teamShort}">
       </div>
 
-      <div class="name">${p.web_name}</div>
+      <div class="name-bar">
+        <button
+          class="name-action-btn name-action-btn--transfer"
+          title="Transfer out"
+          aria-label="Transfer out"
+          onclick="event.stopPropagation(); removePlayer(${entry.id}, '${source}')"
+        >×</button>
+        <div class="name">${p.web_name}</div>
+        <button
+          class="name-action-btn name-action-btn--swap"
+          title="${swapTitle}"
+          aria-label="${swapTitle}"
+          onclick="event.stopPropagation(); substitutePlayer(${entry.id})"
+        >⇅</button>
+      </div>
 
       ${nextFxHtml}
 

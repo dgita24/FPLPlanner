@@ -338,6 +338,61 @@
   letter-spacing: 0.2px;
 }
 
+/* ===== Name bar: name text + quick-action buttons ===== */
+.player-card .name-bar {
+  width: 100%;
+  display: flex;
+  align-items: stretch;
+  background: rgba(220, 220, 220, 0.4);
+  border-radius: 3px;
+  margin: 2px 0 1px;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+/* Name inside name-bar: removes standalone background/margin/radius */
+.player-card .name-bar .name {
+  flex: 1;
+  min-width: 0;
+  background: transparent;
+  margin: 0;
+  border-radius: 0;
+  width: auto;
+}
+
+/* Quick-action buttons on each end of the name banner */
+.player-card .name-action-btn {
+  flex: 0 0 20px;
+  width: 20px;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  user-select: none;
+  font-weight: 900;
+  font-size: 11px;
+  line-height: 1;
+  padding: 0;
+  touch-action: manipulation;
+  transition: opacity 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.player-card .name-action-btn:active {
+  opacity: 0.7;
+}
+
+.player-card .name-action-btn--transfer {
+  background: rgba(200, 30, 30, 0.70);
+  color: #fff;
+}
+
+.player-card .name-action-btn--swap {
+  background: rgba(0, 90, 200, 0.60);
+  color: #fff;
+}
+
 /* Next fixture (compact format, current GW) */
 .card-fixture-next {
   font-size: 12px;
