@@ -559,9 +559,10 @@
 .quick-btn {
   background: none;
   border: none;
-  padding: 0 2px;
+  padding: 0 1px;
   font-size: 15px;
   font-weight: 900;
+  -webkit-text-stroke: 0.6px currentColor;
   cursor: pointer;
   line-height: 1;
   user-select: none;
