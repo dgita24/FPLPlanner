@@ -828,6 +828,11 @@ async function loadTeam() {
     return;
   }
 
+  if (!state.managerId) {
+    showMessage('No manager ID available. Import a team first before loading a cloud draft.', 'error');
+    return;
+  }
+
   const sideMsg = document.getElementById('sideMsg');
   if (sideMsg) sideMsg.textContent = 'Loading...';
 
@@ -835,7 +840,7 @@ async function loadTeam() {
     const response = await fetch('/api/load', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ teamid: teamId, password })
+      body: JSON.stringify({ teamid: teamId, managerid: state.managerId, password })
     });
 
     const result = await response.json();

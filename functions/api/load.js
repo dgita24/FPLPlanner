@@ -1,8 +1,15 @@
 export async function onRequestPost({ request, env }) {
   try {
-    const { teamid, password } = await request.json();
+    const { teamid, managerid, password } = await request.json();
     if (!teamid || !password) {
       return new Response(JSON.stringify({ error: 'Missing teamid or password' }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+
+    if (!managerid) {
+      return new Response(JSON.stringify({ error: 'Missing managerid' }), {
         status: 400,
         headers: { 'Content-Type': 'application/json' }
       });
@@ -24,11 +31,16 @@ export async function onRequestPost({ request, env }) {
       'Prefer': 'return=representation'
     };
 
-    // Fetch by teamid
-    const response = await fetch(`${supabaseUrl}/rest/v1/team_saves?teamid=eq.${teamid}`, {
-      method: 'GET',
-      headers
-    });
+    // Fetch by teamid scoped to managerid (same composite key used by save and delete)
+    const encodedTeamId = encodeURIComponent(teamid);
+    const encodedManagerId = encodeURIComponent(managerid);
+    const response = await fetch(
+      `${supabaseUrl}/rest/v1/team_saves?teamid=eq.${encodedTeamId}&managerid=eq.${encodedManagerId}`,
+      {
+        method: 'GET',
+        headers
+      }
+    );
 
     if (!response.ok) {
       const err = await response.json();
