@@ -455,7 +455,11 @@ function playerCard(entry, source) {
 
   return `
     <div class="${cardClass}" onclick="onPlayerCardClick(${entry.id}, '${source}')">
-      <span class="card-price">${price}</span>
+      <div class="price-and-actions">
+        <button class="quick-btn quick-remove" onclick="event.stopPropagation(); removePlayer(${entry.id}, '${source}')" aria-label="Transfer out">✖</button>
+        <span class="card-price">${price}</span>
+        <button class="quick-btn quick-swap" onclick="event.stopPropagation(); substitutePlayer(${entry.id})" aria-label="Swap">⇅</button>
+      </div>
       ${captainBadge}
       ${statusFlags}
 

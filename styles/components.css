@@ -537,6 +537,49 @@
   white-space: nowrap;
 }
 
+/* ===== Price + Quick-action buttons cluster ===== */
+.price-and-actions {
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  z-index: 10;
+  white-space: nowrap;
+}
+
+.price-and-actions .card-price {
+  position: static;
+  transform: none;
+  margin: 0;
+}
+
+.quick-btn {
+  background: none;
+  border: none;
+  padding: 0 4px;
+  font-size: 14px;
+  font-weight: 900;
+  cursor: pointer;
+  line-height: 1;
+  user-select: none;
+}
+
+.price-and-actions .quick-btn {
+  background: none;
+  border: none;
+}
+
+.quick-remove {
+  color: #ff3333;
+}
+
+.quick-swap {
+  color: #3399ff;
+}
+
 /* ===== Captain/Vice-Captain Selection ===== */
 
 /* Hover bridge: invisible element to keep selector visible while mouse moves from badge to selector */

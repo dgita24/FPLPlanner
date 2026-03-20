@@ -1311,3 +1311,10 @@
     gap: 3px;
   }
 }
+
+/* Desktop: push badge down slightly so the price pill doesn't overlap it */
+@media (min-width: 768px) {
+  .player-card .badge-container {
+    margin-top: 8px;
+  }
+}
