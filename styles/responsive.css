@@ -1274,11 +1274,11 @@
 ---------------------------------------- */
 @media (min-width: 1025px) {
   .player-card .card-price {
-    font-size: 11px;
-    padding: 1px 5px;
+    font-size: 12px;
+    padding: 1px 6px;
     border-width: 1px;
-    line-height: 1.15;
-    border-radius: 7px;
+    line-height: 1.2;
+    border-radius: 8px;
   }
 }
 
