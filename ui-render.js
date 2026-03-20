@@ -454,7 +454,7 @@ function playerCard(entry, source) {
     : `<div class="card-fixture-next">${(gw1.fixtures[0] || { text: '--' }).text}</div>`;
 
   return `
-    <div class="${cardClass}" onclick="showSquadPlayerInfo(${entry.id}, '${source}')">
+    <div class="${cardClass}" onclick="onPlayerCardClick(${entry.id}, '${source}')">
       <span class="card-price">${price}</span>
       ${captainBadge}
       ${statusFlags}
