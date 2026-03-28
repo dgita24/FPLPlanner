@@ -1274,11 +1274,17 @@
 ---------------------------------------- */
 @media (min-width: 1025px) {
   .player-card .card-price {
-    font-size: 12px;
-    padding: 1px 6px;
+    font-size: 11px;
+    padding: 1px 5px;
     border-width: 1px;
-    line-height: 1.2;
+    line-height: 1.15;
     border-radius: 8px;
+  }
+
+  /* Push the crest down a little on desktop so the smaller pill never overlaps it.
+     DGW fixture space is unaffected — only the top margin of the badge changes. */
+  .player-card .badge-container {
+    margin-top: 8px;
   }
 }
 

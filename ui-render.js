@@ -469,7 +469,11 @@ function playerCard(entry, source) {
              class="badge" alt="${teamShort}">
       </div>
 
-      <div class="name">${p.web_name}</div>
+      <div class="name-container">
+        <button class="quick-btn quick-remove" title="Transfer out" aria-label="Transfer out" onclick="event.stopPropagation(); ${removeFn}">✖</button>
+        <div class="name">${p.web_name}</div>
+        <button class="quick-btn quick-swap" title="Swap / Substitute" aria-label="Swap / Substitute" onclick="event.stopPropagation(); ${subFn}">⇅</button>
+      </div>
 
       ${nextFxHtml}
 
