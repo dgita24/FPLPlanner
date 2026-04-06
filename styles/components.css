@@ -1964,6 +1964,22 @@ td.fixtures-cell {
   font-size: 13px;
 }
 
+/* Header main area: groups player-info-title + fixture chips */
+.pim-header-main {
+  display: flex;
+  flex-direction: row;
+  flex: 1;
+  min-width: 0;
+  gap: 12px;
+  align-items: center;
+}
+
+/* Fixture chips in the header area */
+.pim-header-fixtures {
+  flex: 1;
+  min-width: 0;
+}
+
 .player-info-stats {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));

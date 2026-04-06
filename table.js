@@ -653,12 +653,15 @@ function buildPlayerInfoShell(player, team) {
 
       <div class="player-info-header">
         <img src="${getTeamBadgeUrl(teamCode)}" class="player-info-badge" alt="${teamNameEscaped}">
-        <div class="player-info-title">
-          <div class="pim-title-row">
-            <h2>${playerNameEscaped}</h2>
-            <button class="pim-status-btn" onclick="pimToggleStatus()" title="Player availability" aria-label="Toggle player status">ℹ</button>
+        <div class="pim-header-main">
+          <div class="player-info-title">
+            <div class="pim-title-row">
+              <h2>${playerNameEscaped}</h2>
+              <button class="pim-status-btn" onclick="pimToggleStatus()" title="Player availability" aria-label="Toggle player status">ℹ</button>
+            </div>
+            <p>${teamNameEscaped} • ${posNames[player.element_type]}</p>
           </div>
-          <p>${teamNameEscaped} • ${posNames[player.element_type]}</p>
+          <div id="pim-header-fixtures" class="pim-header-fixtures"></div>
         </div>
       </div>
 
@@ -906,6 +909,12 @@ window.showPlayerInfo = function (ev, playerId) {
       pimElementType = player.element_type;
 
       const fixtureChipsHtml = buildFixtureChipsHtml(data.fixtures || []);
+
+      const headerFixturesEl = modal.querySelector('#pim-header-fixtures');
+      if (headerFixturesEl) {
+        headerFixturesEl.innerHTML = fixtureChipsHtml;
+      }
+
       const filteredRows = pimHistoryRows; // 'all' on open
       const historyTableContent = filteredRows.length
         ? `<div class="pim-table-wrap"><table class="pim-table pim-table--history">${buildMatchHistoryTableRows(filteredRows, pimElementType)}</table></div>`
