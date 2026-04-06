@@ -884,6 +884,12 @@
     text-align: center;
   }
 
+  .pim-header-main {
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+  }
+
   .player-info-stats {
     grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
     gap: 8px;
