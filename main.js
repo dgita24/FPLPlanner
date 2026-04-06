@@ -1,5 +1,5 @@
 // main.js - App initialization
-import { loadBootstrap, state } from './data.js';
+import { loadBootstrap, state, normalizePlanPrices } from './data.js';
 import { renderTable, populateFilters } from './table.js';
 import { initUI } from './ui.js';
 import { loadFixturesData, renderFixtures } from './fixtures.js';
@@ -24,6 +24,7 @@ async function init() {
         const data = JSON.parse(saved);
         if (data.plan && Object.values(data.plan).some(gw => gw?.starting?.length > 0)) {
           state.plan = data.plan;
+          normalizePlanPrices(state.plan);
           state.bank = data.bank;
           state.viewingGW = data.viewingGW;
           state.minNavigableGW = data.minNavigableGW ?? data.viewingGW;
