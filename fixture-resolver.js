@@ -31,7 +31,7 @@ export async function initFixtureResolver() {
   if (_allFixturesByGW !== null) return; // already initialised
 
   const res = await fetch('/api/fpl/fixtures');
-  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  if (!res.ok) throw new Error(`Failed to load fixtures (HTTP ${res.status})`);
 
   const data = await res.json();
   const resolved = applyOverrides(data);
