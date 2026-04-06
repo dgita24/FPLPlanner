@@ -160,7 +160,7 @@ function getNextFixturesFDRData(teamId, startGW, count = 4) {
 export function ensureFixturesForView() {
   const token = ++fixturesLoadToken;
   const start = state.viewingGW;
-  const needed = [start, start + 1, start + 2, start + 3];
+  const needed = [start, start + 1, start + 2, start + 3, start + 4, start + 5];
   const missing = needed.filter((gw) => !fixturesByGW.has(gw));
 
   if (missing.length === 0) return;
@@ -180,6 +180,28 @@ export function ensureFixturesForView() {
     // Re-render once fixtures arrive
     renderPitch();
     renderBench();
+    // Refresh fixture strip in the squad player modal if it's open
+    const squadModal = document.getElementById('squadPlayerInfoModal');
+    if (squadModal && squadModal.classList.contains('open')) {
+      const strip = squadModal.querySelector('.pim-header-fixtures');
+      if (strip) {
+        const badge = squadModal.querySelector('.player-info-badge');
+        if (badge) {
+          // Derive teamId by matching badge src against team codes
+          const teamId = (() => {
+            const src = badge.src || '';
+            const m = src.match(/t(\d+)\.png/);
+            if (!m) return null;
+            const code = parseInt(m[1], 10);
+            const t = state.teams.find(x => x.code === code);
+            return t ? t.id : null;
+          })();
+          if (teamId !== null) {
+            strip.innerHTML = buildSquadFixtureChipsHtml(teamId, state.viewingGW, 6);
+          }
+        }
+      }
+    }
   });
 }
 
