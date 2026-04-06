@@ -572,6 +572,50 @@ function getChanceOfPlayingDisplay(player, viewingGW, currentGW) {
   return '50'; // Default if no data
 }
 
+// Build a scrollable fixture chip strip for the squad player modal header.
+// Uses locally-cached fixturesByGW data (synchronous, no network call needed).
+function buildSquadFixtureChipsHtml(teamId, startGW, count = 6) {
+  const chips = [];
+  for (let i = 0; i < count; i++) {
+    const gw = startGW + i;
+    const list = fixturesByGW.get(gw);
+    if (!list) {
+      chips.push(`<div class="pim-fix-chip pim-fix-chip--blank" title="GW${gw}: no data">
+        <div class="pim-fix-chip__top"><span class="pim-fix-chip__gw-top">GW${gw}</span></div>
+        <div class="pim-fix-chip__bot"><span class="pim-fix-chip__blank-label">?</span></div>
+      </div>`);
+      continue;
+    }
+    const matches = allFixturesForTeamInGW(teamId, list);
+    if (!matches.length) {
+      chips.push(`<div class="pim-fix-chip pim-fix-chip--blank" title="GW${gw}: Blank">
+        <div class="pim-fix-chip__top"><span class="pim-fix-chip__gw-top">GW${gw}</span></div>
+        <div class="pim-fix-chip__bot"><span class="pim-fix-chip__blank-label">Blank</span></div>
+      </div>`);
+      continue;
+    }
+    const isDGW = matches.length > 1;
+    for (const fx of matches) {
+      const isHome = fx.team_h === teamId;
+      const oppId = isHome ? fx.team_a : fx.team_h;
+      const oppTeam = state.teams.find(t => t.id === oppId);
+      const abbr = escapeHtml(oppTeam ? (oppTeam.short_name || oppTeam.name) : '???');
+      const teamCode = oppTeam ? oppTeam.code : '';
+      const venue = isHome ? 'H' : 'A';
+      const badgeHtml = teamCode
+        ? `<img class="pim-fix-chip__badge" src="https://resources.premierleague.com/premierleague/badges/t${teamCode}.png" alt="${abbr}" width="16" height="16" loading="lazy">`
+        : '';
+      chips.push(`<div class="pim-fix-chip${isDGW ? ' pim-fix-chip--dgw' : ''}" title="GW${gw}: ${abbr} (${venue})${isDGW ? ' — DGW' : ''}">
+        <div class="pim-fix-chip__top">${badgeHtml}<span class="pim-fix-chip__opp">${abbr}</span></div>
+        <div class="pim-fix-chip__bot"><span class="pim-fix-chip__gw">GW${gw}</span><span class="pim-fix-chip__venue pim-fix-chip__venue--${venue.toLowerCase()}">${venue}</span></div>
+      </div>`);
+    }
+  }
+  return chips.length
+    ? `<div class="pim-fix-strip">${chips.join('')}</div>`
+    : '';
+}
+
 // Show player info modal for squad players (pitch and bench)
 window.showSquadPlayerInfo = function (playerId, source) {
   const player = getPlayer(playerId);
@@ -780,6 +824,8 @@ window.showSquadPlayerInfo = function (playerId, source) {
     </div>
   `;
   
+  const fixtureChipsHtml = buildSquadFixtureChipsHtml(player.team, state.viewingGW, 6);
+
   modal.innerHTML = `
     <div class="player-info-content" style="max-width: 700px;">
       <button class="player-info-close" onclick="closeSquadPlayerInfo()">×</button>
@@ -787,9 +833,12 @@ window.showSquadPlayerInfo = function (playerId, source) {
       <div class="player-info-header">
         <img src="${getTeamBadgeUrl(teamCode)}" 
              class="player-info-badge" alt="${teamNameEscaped}">
-        <div class="player-info-title">
-          <h2>${playerNameEscaped}</h2>
-          <p>${teamNameEscaped} • ${posNames[player.element_type]}</p>
+        <div class="pim-header-main">
+          <div class="player-info-title">
+            <h2>${playerNameEscaped}</h2>
+            <p>${teamNameEscaped} • ${posNames[player.element_type]}</p>
+          </div>
+          <div class="pim-header-fixtures">${fixtureChipsHtml}</div>
         </div>
       </div>
       
