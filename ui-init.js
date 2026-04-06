@@ -1,6 +1,6 @@
 // ui-init.js - Initializes all UI-related event listeners and dependencies
 
-import { state, history, loadTeamEntry } from './data.js';
+import { state, history, loadTeamEntry, normalizePlanPrices } from './data.js';
 import { setupSidebarHandlers, closeSidebar, toggleSidebarMenu } from './ui-sidebar.js';
 import { showMessage, renderPitch, renderBench, ensureFixturesForView } from './ui-render.js';
 import { renderFixtures, setFixturesGW, isFixturesSyncEnabled } from './fixtures.js';
@@ -616,6 +616,7 @@ function localLoad() {
     }
     const data = JSON.parse(saved);
     state.plan = data.plan;
+    normalizePlanPrices(state.plan);
     state.bank = data.bank;
     state.viewingGW = data.viewingGW;
     state.minNavigableGW = data.minNavigableGW ?? state.viewingGW; // fallback for old saves
@@ -848,6 +849,7 @@ async function loadTeam() {
     if (response.ok && result.success) {
       const data = result.data;
       state.plan = data.payload.plan;
+      normalizePlanPrices(state.plan);
       state.bank = data.payload.bank;
       state.viewingGW = data.payload.viewingGW;
       state.minNavigableGW = data.payload.minNavigableGW ?? state.viewingGW;

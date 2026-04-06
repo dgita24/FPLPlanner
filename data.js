@@ -62,6 +62,29 @@ function getCurrentPrice(elementId) {
   return p ? (p.now_cost / 10) : 0;
 }
 
+/**
+ * Recomputes sellingPrice for every player entry in a plan using current bootstrap prices.
+ * Call this whenever a saved draft is loaded so that stale persisted sellingPrices
+ * (which can exceed currentPrice after an overnight price drop) are corrected.
+ */
+export function normalizePlanPrices(plan) {
+  if (!plan) return;
+  for (const gw of Object.values(plan)) {
+    if (!gw) continue;
+    for (const arr of [gw.starting, gw.bench]) {
+      if (!Array.isArray(arr)) continue;
+      for (let i = 0; i < arr.length; i++) {
+        const entry = arr[i];
+        if (!entry || !entry.id) continue;
+        const currentPrice = getCurrentPrice(entry.id);
+        const purchasePrice = entry.purchasePrice ?? currentPrice;
+        const sellingPrice = calculateSellingPrice(purchasePrice, currentPrice);
+        arr[i] = { ...entry, purchasePrice, sellingPrice };
+      }
+    }
+  }
+}
+
 async function parseJsonOrThrow(res) {
   const ct = res.headers.get('content-type') || '';
   if (!ct.includes('application/json')) {
