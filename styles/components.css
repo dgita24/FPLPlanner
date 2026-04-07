@@ -2234,6 +2234,41 @@ td.fixtures-cell {
   font-style: italic;
 }
 
+/* ---- Fixture override indicator styles ---- */
+
+/* Inline badge shown in the main fixtures panel (gameweek and team views) */
+.fixture-override-badge {
+  display: inline-block;
+  font-size: 9px;
+  padding: 1px 5px;
+  background: rgba(255, 165, 0, 0.18);
+  color: rgba(255, 165, 0, 0.95);
+  border: 1px solid rgba(255, 165, 0, 0.45);
+  border-radius: 3px;
+  vertical-align: middle;
+  margin-left: 4px;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  cursor: default;
+  white-space: nowrap;
+}
+
+/* Override-tinted fixture chip in modals */
+.pim-fix-chip--override {
+  border-color: rgba(255, 165, 0, 0.55) !important;
+  background: rgba(255, 165, 0, 0.09) !important;
+}
+
+/* Small dot inside override chip to flag the adjustment */
+.pim-fix-chip__override-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: rgba(255, 165, 0, 0.95);
+  flex-shrink: 0;
+  cursor: help;
+}
+
 /* ---- All / Home / Away filter pill group ---- */
 .pim-filter-group {
   display: flex;

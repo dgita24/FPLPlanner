@@ -1,0 +1,24 @@
+{
+  "version": "1.0",
+  "_comment": "FPLPlanner fixture override file. See FIXTURE_OVERRIDES.md for maintenance instructions.",
+  "overrides": [
+    {
+      "id": "sample-placeholder",
+      "_comment": "SAMPLE ENTRY — replace with a real override or leave the overrides array empty when no adjustments are needed. This placeholder is inactive because status is not 'confirmed'.",
+      "match": {
+        "fixture_id": null,
+        "team_h": 3,
+        "team_a": 13,
+        "original_event": 34
+      },
+      "override": {
+        "event": 33,
+        "kickoff_time": null
+      },
+      "status": "provisional",
+      "source_url": "https://www.premierleague.com/news/",
+      "notes": "Example: fixture moved from GW34 to GW33 due to FA Cup semi-finals. Change status to 'confirmed' and update team IDs/events to activate.",
+      "effective_from": "2025-04-01"
+    }
+  ]
+}

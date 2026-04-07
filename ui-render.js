@@ -4,6 +4,7 @@ import { state, loadFixtures } from './data.js';
 import { getElementType } from './validation.js';
 import { getBatchTransferInfo } from './team-operations.js';
 import { shouldShowPlayerFlag } from './player-status-utils.js';
+import { getResolvedFixturesForGW, isResolverReady } from './fixture-resolver.js';
 
 // --- Fixtures cache (per GW) ---
 const fixturesByGW = new Map(); // gw -> fixtures[]
@@ -161,6 +162,25 @@ export function ensureFixturesForView() {
   const token = ++fixturesLoadToken;
   const start = state.viewingGW;
   const needed = [start, start + 1, start + 2, start + 3, start + 4, start + 5];
+
+  // If the resolver cache is already populated (built by fixtures.js on startup),
+  // fill missing GWs directly from it without additional network requests.
+  if (isResolverReady()) {
+    let filled = false;
+    for (const gw of needed) {
+      if (!fixturesByGW.has(gw)) {
+        const resolved = getResolvedFixturesForGW(gw);
+        fixturesByGW.set(gw, resolved || []);
+        filled = true;
+      }
+    }
+    if (filled) {
+      renderPitch();
+      renderBench();
+    }
+    return;
+  }
+
   const missing = needed.filter((gw) => !fixturesByGW.has(gw));
 
   if (missing.length === 0) return;
@@ -627,8 +647,16 @@ function buildSquadFixtureChipsHtml(teamId, startGW, count = 6) {
       const badgeHtml = teamCode
         ? `<img class="pim-fix-chip__badge" src="https://resources.premierleague.com/premierleague/badges/t${teamCode}.png" alt="${abbr}" width="16" height="16" loading="lazy">`
         : '';
-      chips.push(`<div class="pim-fix-chip${isDGW ? ' pim-fix-chip--dgw' : ''}" title="GW${gw}: ${abbr} (${venue})${isDGW ? ' — DGW' : ''}">
-        <div class="pim-fix-chip__top">${badgeHtml}<span class="pim-fix-chip__opp">${abbr}</span></div>
+      const isOverride = !!fx._override;
+      const overrideClass = isOverride ? ' pim-fix-chip--override' : '';
+      const overrideDot = isOverride
+        ? `<span class="pim-fix-chip__override-dot" title="Official override: GW${fx._override.original_event} → GW${fx.event}${fx._override.notes ? ' — ' + fx._override.notes : ''}"></span>`
+        : '';
+      const overrideTitle = isOverride
+        ? `GW${gw}: ${abbr} (${venue})${isDGW ? ' — DGW' : ''} ⚡ Official override`
+        : `GW${gw}: ${abbr} (${venue})${isDGW ? ' — DGW' : ''}`;
+      chips.push(`<div class="pim-fix-chip${isDGW ? ' pim-fix-chip--dgw' : ''}${overrideClass}" title="${overrideTitle}">
+        <div class="pim-fix-chip__top">${badgeHtml}<span class="pim-fix-chip__opp">${abbr}</span>${overrideDot}</div>
         <div class="pim-fix-chip__bot"><span class="pim-fix-chip__gw">GW${gw}</span><span class="pim-fix-chip__venue pim-fix-chip__venue--${venue.toLowerCase()}">${venue}</span></div>
       </div>`);
     }

@@ -1,5 +1,6 @@
 import { state } from './data.js';
 import { MIN_GAMEWEEK, MAX_GAMEWEEK } from './constants.js';
+import { initFixtureResolver, getResolvedFixturesMap } from './fixture-resolver.js';
 
 // Note: We can't import updateUI and syncPitchGWFromFixtures here directly due to circular dependencies
 // (ui-init imports from fixtures, and fixtures would import from ui-init)
@@ -18,25 +19,20 @@ export async function loadFixturesData() {
     loadSyncState();
     // Load view preferences from localStorage
     loadViewPreferences();
-    
-    const res = await fetch('/api/fpl/fixtures');
-    
-    if (!res.ok) {
-      console.error(`Failed to load fixtures: HTTP ${res.status}`);
-      renderFixturesError(`Unable to load fixtures (HTTP ${res.status})`);
+
+    // Use the central fixture resolver – fetches all fixtures once and applies
+    // any confirmed overrides from fixture-overrides.json before caching.
+    await initFixtureResolver();
+
+    const resolvedMap = getResolvedFixturesMap();
+    if (!resolvedMap) {
+      renderFixturesError('Unable to load fixtures. Please check your connection.');
       return;
     }
 
-    const data = await res.json();
-
     fixturesByGW.clear();
-
-    for (const f of data) {
-      if (!f.event) continue;
-      if (!fixturesByGW.has(f.event)) {
-        fixturesByGW.set(f.event, []);
-      }
-      fixturesByGW.get(f.event).push(f);
+    for (const [gw, fixtures] of resolvedMap) {
+      fixturesByGW.set(gw, fixtures);
     }
 
     // Default to showing next gameweek's fixtures for planning
@@ -373,6 +369,13 @@ function renderFixtureRow(f) {
       : '';
   }
 
+  const overrideBadge = f._override
+    ? `<span class="fixture-override-badge"
+          title="Official override: GW${f._override.original_event} → GW${f.event}${f._override.notes ? ' — ' + f._override.notes : ''}"
+          ${f._override.source_url ? `onclick="window.open('${f._override.source_url}','_blank')" style="cursor:pointer;"` : ''}
+        >⚡ Official</span>`
+    : '';
+
   return `
     <div class="fixture-row">
       <div class="team home">
@@ -380,7 +383,7 @@ function renderFixtureRow(f) {
         <img class="team-badge" src="${home.badge}" />
       </div>
 
-      <div class="ko">${centreDisplay}</div>
+      <div class="ko">${centreDisplay}${overrideBadge}</div>
 
       <div class="team away">
         <img class="team-badge" src="${away.badge}" />
@@ -396,10 +399,17 @@ function renderTeamFixtureRow(f, teamId) {
   const opponentId = isHome ? f.team_a : f.team_h;
   const opponent = getTeam(opponentId);
   const venue = isHome ? 'Home' : 'Away';
-  
+
+  const overrideBadge = f._override
+    ? `<span class="fixture-override-badge"
+          title="Official override: GW${f._override.original_event} → GW${f.event}${f._override.notes ? ' — ' + f._override.notes : ''}"
+          ${f._override.source_url ? `onclick="window.open('${f._override.source_url}','_blank')" style="cursor:pointer;"` : ''}
+        >⚡</span>`
+    : '';
+
   return `
     <div class="team-fixture-row" data-gw="${f.event || ''}">
-      <div class="team-fixture-gw">GW${f.event || '?'}</div>
+      <div class="team-fixture-gw">GW${f.event || '?'}${overrideBadge}</div>
       <img class="team-fixture-badge" src="${opponent.badge}" alt="${opponent.name}" />
       <div class="team-fixture-opponent">${opponent.name}</div>
       <div class="team-fixture-venue ${isHome ? 'home' : 'away'}">${venue}</div>
