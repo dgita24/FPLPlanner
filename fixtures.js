@@ -225,6 +225,13 @@ export function renderFixtures() {
             title="${syncTitle}">
             🔗 Sync
           </button>
+          <button
+            onclick="openFixturePlanner(${fixturesGW})"
+            class="fp-open-btn"
+            aria-label="Open Fixture Planner"
+            title="Open Fixture Planner matrix">
+            📊 Planner
+          </button>
         </div>
         <button onclick="changeFixturesGW(1)">→</button>
       </div>

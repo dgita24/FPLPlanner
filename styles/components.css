@@ -2505,3 +2505,424 @@ td.fixtures-cell {
   transform: scale(1.1);
   filter: brightness(1.2);
 }
+
+/* ===== Fixture Planner Modal ===== */
+
+/* Open button in fixtures header */
+.fp-open-btn {
+  padding: 6px 10px !important;
+  font-size: 12px !important;
+  height: 30px !important;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--accent) !important;
+  color: var(--bg-light) !important;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s;
+}
+
+.fp-open-btn:hover {
+  background: var(--accent-hover) !important;
+  transform: translateY(-1px);
+}
+
+/* Modal backdrop */
+.fp-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 3000;
+  padding: 12px;
+  box-sizing: border-box;
+}
+
+.fp-modal.open {
+  display: flex;
+}
+
+/* Modal panel - desktop */
+.fp-modal-content {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 1100px;
+  max-height: 90vh;
+  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.5);
+  overflow: hidden;
+}
+
+/* Modal header */
+.fp-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.fp-modal-title {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0;
+}
+
+.fp-modal-close {
+  background: var(--primary);
+  color: var(--bg);
+  border: none;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  font-size: 20px;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+
+.fp-modal-close:hover {
+  background: var(--primary-light);
+  transform: scale(1.1);
+}
+
+/* Controls bar */
+.fp-controls-bar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 10px 18px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+  background: var(--bg-dark);
+}
+
+.fp-controls-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.fp-controls-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-light);
+  white-space: nowrap;
+}
+
+.fp-select {
+  padding: 4px 8px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--text);
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.fp-select:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+/* Sort buttons */
+.fp-sort-btns {
+  display: flex;
+  gap: 4px;
+}
+
+.fp-sort-btn {
+  padding: 4px 10px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--text-light);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.fp-sort-btn:hover {
+  border-color: var(--accent);
+  color: var(--text);
+}
+
+.fp-sort-btn.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+/* Restore hidden GWs button */
+.fp-restore-btn {
+  padding: 4px 10px;
+  background: var(--bg);
+  border: 1px solid var(--warning);
+  border-radius: 4px;
+  color: var(--warning);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.fp-restore-btn:hover {
+  background: rgba(255, 215, 0, 0.1);
+}
+
+/* FDR Legend */
+.fp-legend {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  padding: 6px 18px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+  background: var(--bg-dark);
+}
+
+.fp-legend-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-light);
+}
+
+.fp-legend-chip {
+  font-size: 10px;
+  font-weight: 700;
+  color: #fff;
+  padding: 2px 6px;
+  border-radius: 3px;
+  white-space: nowrap;
+}
+
+/* Matrix scrollable container */
+.fp-matrix-container {
+  flex: 1;
+  overflow: auto;
+  padding: 8px;
+}
+
+/* Loading placeholder */
+.fp-loading {
+  text-align: center;
+  padding: 40px;
+  opacity: 0.6;
+  font-size: 14px;
+}
+
+/* Wrapper that enables horizontal scroll */
+.fp-table-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Matrix table */
+.fp-matrix-table {
+  border-collapse: collapse;
+  min-width: 100%;
+  font-size: 12px;
+}
+
+/* Team column header */
+.fp-team-header {
+  text-align: left;
+  padding: 6px 10px;
+  background: var(--bg-dark);
+  color: var(--text-light);
+  font-size: 11px;
+  font-weight: 700;
+  border: 1px solid var(--border);
+  white-space: nowrap;
+  position: sticky;
+  left: 0;
+  z-index: 2;
+}
+
+/* GW column header */
+.fp-gw-header {
+  text-align: center;
+  padding: 4px 6px;
+  background: var(--bg-dark);
+  border: 1px solid var(--border);
+  min-width: 64px;
+  vertical-align: top;
+}
+
+.fp-gw-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--primary);
+  white-space: nowrap;
+}
+
+.fp-gw-date {
+  font-size: 9px;
+  color: var(--text-light);
+  white-space: nowrap;
+  margin-top: 2px;
+}
+
+/* GW hide button (×) */
+.fp-gw-hide-btn {
+  display: block;
+  margin: 0 auto 3px;
+  width: 16px;
+  height: 16px;
+  padding: 0;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  color: var(--text-light);
+  font-size: 11px;
+  line-height: 1;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.fp-gw-hide-btn:hover {
+  background: var(--error);
+  border-color: var(--error);
+  color: #fff;
+  transform: none;
+}
+
+/* Override the broad #fixturesPanel button rule so GW hide buttons
+   are not accidentally styled as gold arrow buttons */
+.fp-gw-hide-btn {
+  background: transparent !important;
+  color: var(--text-light) !important;
+}
+
+.fp-gw-hide-btn:hover {
+  background: var(--error) !important;
+  color: #fff !important;
+}
+
+/* Team cell (leftmost column) */
+.fp-team-row td.fp-team-cell {
+  display: table-cell;
+}
+
+.fp-team-cell {
+  padding: 4px 8px;
+  border: 1px solid var(--border);
+  white-space: nowrap;
+  background: var(--bg-dark);
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.fp-team-badge-sm {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.fp-team-short {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+/* Fixture cell */
+.fp-fixture-cell {
+  padding: 3px 4px;
+  border: 1px solid var(--border);
+  text-align: center;
+  vertical-align: middle;
+}
+
+.fp-fixture-blank {
+  background: var(--bg-darker);
+}
+
+/* FDR chip */
+.fp-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 3px 5px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 700;
+  color: #fff;
+  white-space: nowrap;
+  margin: 1px;
+  cursor: default;
+}
+
+.fp-chip-fdr {
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+}
+
+.fp-chip-venue {
+  font-size: 8px;
+  opacity: 0.85;
+  font-weight: 600;
+}
+
+.fp-chip-blank {
+  background: var(--bg-darker);
+  color: var(--text-light);
+  opacity: 0.5;
+}
+
+/* ── Mobile: full-screen modal ── */
+@media (max-width: 767px) {
+  .fp-modal {
+    padding: 0;
+  }
+
+  .fp-modal-content {
+    border-radius: 0;
+    max-width: 100%;
+    max-height: 100%;
+    height: 100%;
+    height: 100dvh;
+  }
+
+  .fp-controls-bar {
+    gap: 8px;
+    padding: 8px 12px;
+    overflow-x: auto;
+    flex-wrap: nowrap;
+  }
+
+  .fp-legend {
+    padding: 5px 12px;
+  }
+
+  .fp-matrix-container {
+    padding: 4px;
+  }
+}

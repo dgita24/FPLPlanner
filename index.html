@@ -305,6 +305,59 @@
     </div>
   </div>
 
+  <!-- Fixture Planner Modal -->
+  <div id="fixturePlannerModal" class="fp-modal" role="dialog" aria-modal="true" aria-labelledby="fpModalTitle">
+    <div class="fp-modal-content">
+      <!-- Modal header -->
+      <div class="fp-modal-header">
+        <h2 id="fpModalTitle" class="fp-modal-title">📊 Fixture Planner</h2>
+        <button class="fp-modal-close" onclick="closeFixturePlanner()" aria-label="Close fixture planner">×</button>
+      </div>
+
+      <!-- Controls bar -->
+      <div class="fp-controls-bar">
+        <div class="fp-controls-group">
+          <label class="fp-controls-label" for="fpNWeeksSelect">Weeks:</label>
+          <select id="fpNWeeksSelect" class="fp-select" onchange="fpSetNWeeks(this.value)" aria-label="Number of gameweeks to show">
+            <option value="4">4</option>
+            <option value="5">5</option>
+            <option value="6" selected>6</option>
+            <option value="7">7</option>
+            <option value="8">8</option>
+            <option value="10">10</option>
+            <option value="12">12</option>
+          </select>
+        </div>
+
+        <div class="fp-controls-group">
+          <span class="fp-controls-label">Sort by:</span>
+          <div class="fp-sort-btns" role="group" aria-label="Sort by fixture type">
+            <button class="fp-sort-btn active" data-sort="overall" onclick="fpSetSortMode('overall')" aria-pressed="true">Overall</button>
+            <button class="fp-sort-btn" data-sort="attack" onclick="fpSetSortMode('attack')" aria-pressed="false">Attack</button>
+            <button class="fp-sort-btn" data-sort="defence" onclick="fpSetSortMode('defence')" aria-pressed="false">Defence</button>
+          </div>
+        </div>
+
+        <button id="fpRestoreBtn" class="fp-restore-btn" onclick="fpRestoreGWs()" style="display:none;" aria-label="Restore hidden gameweeks">↩ Restore hidden GWs</button>
+      </div>
+
+      <!-- FDR legend -->
+      <div class="fp-legend">
+        <span class="fp-legend-label">FDR:</span>
+        <span class="fp-legend-chip" style="background:var(--fdr-1);">1 Easiest</span>
+        <span class="fp-legend-chip" style="background:var(--fdr-2);">2</span>
+        <span class="fp-legend-chip" style="background:var(--fdr-3);">3</span>
+        <span class="fp-legend-chip" style="background:var(--fdr-4);">4</span>
+        <span class="fp-legend-chip" style="background:var(--fdr-5);">5 Hardest</span>
+      </div>
+
+      <!-- Matrix container (scrollable) -->
+      <div id="fpMatrixContainer" class="fp-matrix-container">
+        <div class="fp-loading">Loading…</div>
+      </div>
+    </div>
+  </div>
+
   <!-- Module Loader -->
   <script type="module">
     import './data.js';
