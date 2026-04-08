@@ -171,6 +171,12 @@ function pluralize(word, count) {
   return count === 1 ? word : word + 's';
 }
 
+function updateFreeTransfersInputValue(elementId) {
+  const el = document.getElementById(elementId);
+  if (!el || document.activeElement === el) return;
+  el.value = String(getFreeTransfersForGW(state.viewingGW));
+}
+
 // Toggle expandable cards
 function toggleCard(cardId) {
   const card = document.getElementById(cardId);
@@ -351,14 +357,8 @@ export function updateUI() {
   const mobileGWEl = document.getElementById('mobileGWDisplay');
   if (mobileGWEl) mobileGWEl.textContent = state.viewingGW;
 
-  const freeTransfersInput = document.getElementById('freeTransfersInput');
-  if (freeTransfersInput && document.activeElement !== freeTransfersInput) {
-    freeTransfersInput.value = String(getFreeTransfersForGW(state.viewingGW));
-  }
-  const freeTransfersInputMobile = document.getElementById('freeTransfersInputMobile');
-  if (freeTransfersInputMobile && document.activeElement !== freeTransfersInputMobile) {
-    freeTransfersInputMobile.value = String(getFreeTransfersForGW(state.viewingGW));
-  }
+  updateFreeTransfersInputValue('freeTransfersInput');
+  updateFreeTransfersInputValue('freeTransfersInputMobile');
 
   // Update mobile bank display
   const mobileBankEl = document.getElementById('mobileBankDisplay');

@@ -133,7 +133,7 @@ export function ensureFreeTransfersByGW() {
     state.freeTransfersByGW = {};
   }
 
-  const startGW = Math.max(1, state.minNavigableGW || state.currentGW || 1);
+  const startGW = Math.max(1, state.minNavigableGW ?? state.currentGW ?? 1);
   for (let gw = startGW; gw <= 38; gw++) {
     state.freeTransfersByGW[gw] = normalizeFreeTransfersValue(state.freeTransfersByGW[gw]);
   }
