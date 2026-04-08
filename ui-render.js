@@ -294,7 +294,7 @@ function renderChipUI() {
   const usedToggleControls = chips.map(chip => {
     const checked = state.historicallyUsedChips?.[chip.type] ? 'checked' : '';
     return `
-      <label class="chip-used-toggle" title="Mark ${getChipDisplayName(chip.type)} as already used before your planning window">
+      <label class="chip-used-toggle" title="Mark as used before planning">
         <input type="checkbox" ${checked} onchange="setHistoricalChipUsed('${chip.type}', this.checked)" />
         <span>${chip.label.replace('Play ', '')}</span>
       </label>
