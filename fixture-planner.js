@@ -229,6 +229,7 @@ function renderFixturePlanner() {
   // ── Header row ─────────────────────────────
   let html = '<div class="fp-table-wrap"><table class="fp-matrix-table">';
   html += '<thead><tr>';
+  html += '<th class="fp-rank-header" aria-label="Sort rank">#</th>';
   html += '<th class="fp-team-header">Team</th>';
 
   for (const gw of visibleGWs) {
@@ -243,8 +244,10 @@ function renderFixturePlanner() {
 
   // ── Body rows ──────────────────────────────
   html += '<tbody>';
-  for (const { team } of scored) {
+  for (let i = 0; i < scored.length; i++) {
+    const { team } = scored[i];
     html += `<tr class="fp-team-row">`;
+    html += `<td class="fp-rank-cell">${i + 1}</td>`;
     html += `<td class="fp-team-cell">
       <img class="fp-team-badge-sm" src="${getTeamBadgeUrl(team)}" alt="${team.name}" />
       <span class="fp-team-short" title="${team.name}">${team.short_name}</span>
@@ -299,6 +302,17 @@ function renderFixturePlanner() {
     btn.classList.toggle('active', isActive);
     btn.setAttribute('aria-pressed', String(isActive));
   });
+
+  // Update "sorted over N GWs" counter so the user can see re-sorts happened
+  const sortWindowEl = document.getElementById('fpSortWindowCount');
+  if (sortWindowEl) {
+    const hidden = plannerHiddenGWs.size;
+    const total = allGWs.length;
+    const visible = visibleGWs.length;
+    sortWindowEl.textContent = hidden > 0
+      ? `${visible} of ${total} GWs`
+      : `${total} GW${total !== 1 ? 's' : ''}`;
+  }
 
   // Sync N-weeks selector
   const nWeeksSelect = document.getElementById('fpNWeeksSelect');

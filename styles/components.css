@@ -2926,3 +2926,51 @@ td.fixtures-cell {
     padding: 4px;
   }
 }
+
+/* Sort-window counter (e.g. "5 of 6 GWs") */
+.fp-sort-window-count {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--primary);
+  white-space: nowrap;
+  padding: 2px 6px;
+  background: rgba(255, 215, 0, 0.1);
+  border: 1px solid rgba(255, 215, 0, 0.3);
+  border-radius: 4px;
+  min-width: 60px;
+  text-align: center;
+}
+
+/* Rank column header */
+.fp-rank-header {
+  text-align: center;
+  padding: 6px 6px;
+  background: var(--bg-dark);
+  color: var(--text-light);
+  font-size: 11px;
+  font-weight: 700;
+  border: 1px solid var(--border);
+  white-space: nowrap;
+  width: 28px;
+  min-width: 28px;
+  position: sticky;
+  left: 0;
+  z-index: 2;
+}
+
+/* Rank cell in each team row */
+.fp-rank-cell {
+  text-align: center;
+  padding: 4px 4px;
+  border: 1px solid var(--border);
+  background: var(--bg-dark);
+  color: var(--primary);
+  font-size: 11px;
+  font-weight: 700;
+  width: 28px;
+  min-width: 28px;
+  white-space: nowrap;
+  position: sticky;
+  left: 0;
+  z-index: 1;
+}
