@@ -206,6 +206,33 @@
   justify-content: center;
 }
 
+.chip-used-toggles-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+  font-size: 11px;
+  color: var(--text-light);
+}
+
+.chip-used-toggles-label {
+  font-weight: 700;
+  color: var(--text);
+}
+
+.chip-used-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.chip-used-toggle input {
+  margin: 0;
+}
+
 .chip-btn-small {
   padding: 8px 14px;
   border: none;

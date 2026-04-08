@@ -1,6 +1,6 @@
 // ui-render.js - Rendering-related functionality (pitch, bench, player cards, etc.)
 
-import { state, loadFixtures } from './data.js';
+import { state, loadFixtures, CHIP_TYPES } from './data.js';
 import { getElementType } from './validation.js';
 import { getBatchTransferInfo } from './team-operations.js';
 import { shouldShowPlayerFlag } from './player-status-utils.js';
@@ -245,8 +245,10 @@ function renderChipUI() {
     </div>
   ` : '';
 
-  // Check which chips have been used in previous gameweeks
-  const usedChips = new Set();
+  // Check which chips have been used in previous gameweeks and historical flags
+  const usedChips = new Set(
+    CHIP_TYPES.filter((chip) => !!state.historicallyUsedChips?.[chip])
+  );
   for (let g = state.currentGW; g < gw; g++) {
     const prevTeam = state.plan[g];
     if (prevTeam && prevTeam.chip) {
@@ -289,11 +291,25 @@ function renderChipUI() {
     return `<button class="${buttonClass}" onclick="selectChip('${chip.type}')" title="${buttonTitle}" ${disabledAttr}>${buttonText}</button>`;
   }).join('');
 
+  const usedToggleControls = chips.map(chip => {
+    const checked = state.historicallyUsedChips?.[chip.type] ? 'checked' : '';
+    return `
+      <label class="chip-used-toggle" title="Mark ${getChipDisplayName(chip.type)} as already used before your planning window">
+        <input type="checkbox" ${checked} onchange="setHistoricalChipUsed('${chip.type}', this.checked)" />
+        <span>${chip.label.replace('Play ', '')}</span>
+      </label>
+    `;
+  }).join('');
+
   return `
     <div class="chip-container">
       ${chipIndicator}
       <div class="chip-buttons-row">
         ${chipButtons}
+      </div>
+      <div class="chip-used-toggles-row">
+        <span class="chip-used-toggles-label">Already used:</span>
+        ${usedToggleControls}
       </div>
     </div>
   `;

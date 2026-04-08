@@ -1,5 +1,5 @@
 // main.js - App initialization
-import { loadBootstrap, state, normalizePlanPrices, ensureFreeTransfersByGW } from './data.js';
+import { loadBootstrap, state, normalizePlanPrices, ensureFreeTransfersByGW, ensureHistoricallyUsedChips, recomputeFreeTransfersFromGW } from './data.js';
 import { renderTable, populateFilters } from './table.js';
 import { initUI } from './ui.js';
 import { loadFixturesData, renderFixtures } from './fixtures.js';
@@ -32,7 +32,10 @@ async function init() {
           state.minNavigableGW = data.minNavigableGW ?? data.viewingGW;
           state.priceMode = data.priceMode;
           state.freeTransfersByGW = data.freeTransfersByGW || {};
+          state.historicallyUsedChips = data.historicallyUsedChips || {};
           ensureFreeTransfersByGW();
+          ensureHistoricallyUsedChips();
+          recomputeFreeTransfersFromGW(state.viewingGW);
 
           // Show persistent banner prompting user to import their team,
           // since managerId is not saved to localStorage

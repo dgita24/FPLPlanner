@@ -1,10 +1,10 @@
 // ui-init.js - Initializes all UI-related event listeners and dependencies
 
-import { state, history, loadTeamEntry, normalizePlanPrices, ensureFreeTransfersByGW, getFreeTransfersForGW, setFreeTransfersForGW } from './data.js';
+import { state, history, loadTeamEntry, normalizePlanPrices, ensureFreeTransfersByGW, getFreeTransfersForGW, setFreeTransfersForGW, recomputeFreeTransfersFromGW, ensureHistoricallyUsedChips } from './data.js';
 import { setupSidebarHandlers, closeSidebar, toggleSidebarMenu } from './ui-sidebar.js';
 import { showMessage, renderPitch, renderBench, ensureFixturesForView } from './ui-render.js';
 import { renderFixtures, setFixturesGW, isFixturesSyncEnabled } from './fixtures.js';
-import { cancelTransfer, substitutePlayer, addSelectedToSquad, removePlayer, resetTransferState, isPendingTransfer, getBatchTransferInfo, reinstatePlayer, selectChip, togglePlayerMark } from './team-operations.js';
+import { cancelTransfer, substitutePlayer, addSelectedToSquad, removePlayer, resetTransferState, isPendingTransfer, getBatchTransferInfo, reinstatePlayer, selectChip, togglePlayerMark, setHistoricalChipUsedForPlanning } from './team-operations.js';
 import { setPendingSwap, getPendingSwap } from './ui-render.js';
 import { setDefaultSort } from './table.js';
 import { MAX_GAMEWEEK, MAX_DRAFTS_PER_MANAGER } from './constants.js';
@@ -427,7 +427,8 @@ export function updateUI() {
         viewingGW: state.viewingGW,
         minNavigableGW: state.minNavigableGW,
         priceMode: state.priceMode,
-        freeTransfersByGW: state.freeTransfersByGW
+        freeTransfersByGW: state.freeTransfersByGW,
+        historicallyUsedChips: state.historicallyUsedChips
       };
       localStorage.setItem('fplplanner-state', JSON.stringify(data));
     } catch (e) {
@@ -540,6 +541,8 @@ async function importTeam() {
   // Set minimum navigable GW to prevent going back before imported team
   state.minNavigableGW = state.viewingGW;
   ensureFreeTransfersByGW();
+  ensureHistoricallyUsedChips();
+  recomputeFreeTransfersFromGW(state.viewingGW);
 
   // reset transient UI state
   resetTransferState();
@@ -610,7 +613,8 @@ function localSave() {
       viewingGW: state.viewingGW,
       minNavigableGW: state.minNavigableGW,
       priceMode: state.priceMode,
-      freeTransfersByGW: state.freeTransfersByGW
+      freeTransfersByGW: state.freeTransfersByGW,
+      historicallyUsedChips: state.historicallyUsedChips
     };
     localStorage.setItem('fplplanner-state', JSON.stringify(data));
     showMessage('Team saved locally', 'success');
@@ -634,7 +638,10 @@ function localLoad() {
     state.minNavigableGW = data.minNavigableGW ?? state.viewingGW; // fallback for old saves
     state.priceMode = data.priceMode;
     state.freeTransfersByGW = data.freeTransfersByGW || {};
+    state.historicallyUsedChips = data.historicallyUsedChips || {};
     ensureFreeTransfersByGW();
+    ensureHistoricallyUsedChips();
+    recomputeFreeTransfersFromGW(state.viewingGW);
     updateUI();
     showMessage('Team loaded locally', 'success');
   } catch (e) {
@@ -869,7 +876,10 @@ async function loadTeam() {
       state.minNavigableGW = data.payload.minNavigableGW ?? state.viewingGW;
       state.priceMode = data.payload.priceMode;
       state.freeTransfersByGW = data.payload.freeTransfersByGW || {};
+      state.historicallyUsedChips = data.payload.historicallyUsedChips || {};
       ensureFreeTransfersByGW();
+      ensureHistoricallyUsedChips();
+      recomputeFreeTransfersFromGW(state.viewingGW);
 
       // Remember or forget password based on checkbox
       const loadRemember = document.getElementById('loadRememberPassword');
@@ -918,7 +928,8 @@ async function saveTeam() {
       viewingGW: state.viewingGW,
       minNavigableGW: state.minNavigableGW,
       priceMode: state.priceMode,
-      freeTransfersByGW: state.freeTransfersByGW
+      freeTransfersByGW: state.freeTransfersByGW,
+      historicallyUsedChips: state.historicallyUsedChips
     };
 
     const response = await fetch('/api/save', {
@@ -1318,8 +1329,10 @@ export function initUI() {
   };
   window.onFreeTransfersInputChange = (value) => {
     setFreeTransfersForGW(state.viewingGW, value);
+    recomputeFreeTransfersFromGW(state.viewingGW);
     updateUI();
   };
+  window.setHistoricalChipUsed = (chipType, isUsed) => setHistoricalChipUsedForPlanning(chipType, isUsed, updateUI);
 
   // Open sidebar and expand the cloud save card
   window.openCloudSave = function() {
