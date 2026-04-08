@@ -102,15 +102,16 @@ function fdrVar(difficulty) {
  * Compute a sortable aggregate score for `teamId` over `visibleGWs`.
  *
  * Sort modes:
- *  - 'overall':  Sum of fixture FDR values for this team.
- *                Lower = easier run of fixtures.
- *  - 'attack':   Sum of opponent's defensive strength (home or away depending
- *                on venue). Lower opponent defence = better attacking prospect.
- *  - 'defence':  Sum of opponent's attacking strength (home or away depending
- *                on venue). Lower opponent attack = better defensive prospect.
+ *  - 'overall':  Sum of ease scores derived from FDR (ease = 6 - FDR).
+ *                Higher = easier run of fixtures. DGWs are rewarded.
+ *  - 'attack':   Sum of (1500 - opponent defensive strength). Higher = weaker
+ *                defences to score against. DGWs accumulate more ease.
+ *  - 'defence':  Sum of (1500 - opponent attack strength). Higher = weaker
+ *                attacks to defend against. DGWs accumulate more ease.
  *
- * Teams with zero visible fixtures receive Infinity so they sort last.
- * Average per fixture is returned so DGW/BGW teams are treated fairly.
+ * Teams with zero visible fixtures receive -Infinity so they sort last.
+ * Scores are summed (not averaged) so double-gameweek teams rank higher
+ * than blank-gameweek teams with equivalent per-fixture difficulty.
  *
  * @param {number} teamId
  * @param {number[]} visibleGWs
@@ -132,14 +133,15 @@ export function computeTeamScore(teamId, visibleGWs, fixturesByGW, mode) {
       fixtureCount++;
 
       if (mode === 'overall') {
-        // FDR value assigned to this team for this fixture
-        total += isHome ? (f.team_h_difficulty || 3) : (f.team_a_difficulty || 3);
+        // Invert FDR so easier fixture = higher ease score (FDR 1 → 5, FDR 5 → 1)
+        const difficulty = isHome ? (f.team_h_difficulty || 3) : (f.team_a_difficulty || 3);
+        total += (6 - difficulty);
       } else {
         const opponentId = isHome ? f.team_a : f.team_h;
         const opponent = getTeamById(opponentId);
 
         if (mode === 'attack') {
-          // We want to score against opponent's defence.
+          // Ease of scoring: higher when opponent defence is weaker.
           // Opponent plays at the opposite venue to us:
           //   we play home → opponent plays away → use their away defence strength
           //   we play away → opponent plays home → use their home defence strength
@@ -148,25 +150,25 @@ export function computeTeamScore(teamId, visibleGWs, fixturesByGW, mode) {
                 ? (opponent.strength_defence_away || 1200)
                 : (opponent.strength_defence_home || 1200))
             : 1200;
-          total += oppDefStr;
+          total += (1500 - oppDefStr);
         } else {
           // mode === 'defence'
-          // Opponent's attacking threat (home/away) that we must defend against.
+          // Ease of keeping a clean sheet: higher when opponent attack is weaker.
           const oppAttStr = opponent
             ? (isHome
                 ? (opponent.strength_attack_away || 1200)
                 : (opponent.strength_attack_home || 1200))
             : 1200;
-          total += oppAttStr;
+          total += (1500 - oppAttStr);
         }
       }
     }
   }
 
-  if (fixtureCount === 0) return { score: Infinity, fixtureCount: 0 };
+  if (fixtureCount === 0) return { score: -Infinity, fixtureCount: 0 };
 
-  // Average per fixture for fair comparison across DGW / BGW weeks
-  return { score: total / fixtureCount, fixtureCount };
+  // Return the raw sum so double-gameweek teams are ranked above blank-gameweek teams
+  return { score: total, fixtureCount };
 }
 
 // ─────────────────────────────────────────────
@@ -204,11 +206,11 @@ function renderFixturePlanner() {
   }));
 
   scored.sort((a, b) => {
-    if (a.score === Infinity && b.score === Infinity)
+    if (a.score === -Infinity && b.score === -Infinity)
       return a.team.name.localeCompare(b.team.name);
-    if (a.score === Infinity) return 1;
-    if (b.score === Infinity) return -1;
-    const diff = a.score - b.score;
+    if (a.score === -Infinity) return 1;
+    if (b.score === -Infinity) return -1;
+    const diff = b.score - a.score; // descending: highest ease first
     if (diff !== 0) return diff;
     return a.team.name.localeCompare(b.team.name); // stable tie-break
   });
