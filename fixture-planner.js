@@ -293,9 +293,11 @@ function renderFixturePlanner() {
     }
   }
 
-  // Sync sort button active state
+  // Sync sort button active state and aria-pressed
   document.querySelectorAll('.fp-sort-btn').forEach(btn => {
-    btn.classList.toggle('active', btn.dataset.sort === plannerSortMode);
+    const isActive = btn.dataset.sort === plannerSortMode;
+    btn.classList.toggle('active', isActive);
+    btn.setAttribute('aria-pressed', String(isActive));
   });
 
   // Sync N-weeks selector
