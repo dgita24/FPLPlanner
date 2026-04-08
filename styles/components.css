@@ -342,12 +342,8 @@
 .card-fixture-next {
   font-size: 12px;
   font-weight: 800;
-  color: #FFFFFF;
-
-  /* Stronger separation from the green/grey band without using dark text */
-  text-shadow:
-    0 1px 0 rgba(0, 0, 0, 0.55),
-    0 0 3px rgba(0, 0, 0, 0.55);
+  color: #000000;
+  text-shadow: none;
 
   white-space: nowrap;
   overflow: hidden;
