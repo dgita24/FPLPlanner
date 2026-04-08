@@ -3,12 +3,14 @@ import { loadBootstrap, state, normalizePlanPrices } from './data.js';
 import { renderTable, populateFilters } from './table.js';
 import { initUI } from './ui.js';
 import { loadFixturesData, renderFixtures } from './fixtures.js';
+import { initFixturePlanner } from './fixture-planner.js';
 
 async function init() {
   console.log('FPLPlanner starting...');
 
   // CRITICAL: Initialize UI FIRST (binds window.toggleSidebarMenu etc.)
   initUI();
+  initFixturePlanner();
 
   const success = await loadBootstrap();
 
