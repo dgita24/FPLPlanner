@@ -383,7 +383,7 @@ export function addSelectedToSquad(updateUI) {
   }
 
   if (!batchTransfers.isActive || batchTransfers.removedPlayers.length === 0) {
-    showMessage('Sell a player first (X), then Add to squad (or Cancel transfer).', 'info');
+    showMessage('Sell a player first (X), then click a player name to transfer in (or Cancel transfer).', 'info');
     return;
   }
 

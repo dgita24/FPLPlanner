@@ -1608,10 +1608,10 @@ td.fixtures-cell {
   max-width: 48%;
 }
 
-/* Transfer header row: two buttons filling full width */
+/* Transfer header row: single cancel button filling full width */
 .transfer-header-row {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr;
   align-items: center;
   gap: 6px;
   margin-bottom: 8px;
@@ -1630,11 +1630,7 @@ td.fixtures-cell {
   min-width: 0;
 }
 
-/* Align buttons to panel edges */
-.transfer-header-row .add-btn {
-  justify-self: stretch;
-}
-
+/* Align button to panel edges */
 .transfer-header-row .cancel-btn {
   justify-self: stretch;
 }

@@ -410,14 +410,10 @@ function populateTeamFilter() {
 
 window.selectPlayer = function (ev, id) {
   if (ev) ev.stopPropagation();
-  const row = document.querySelector(`#tableBody tr[data-player-id="${id}"]`);
-  const idx = window.selectedPlayerIds.indexOf(id);
-  if (idx >= 0) {
-    window.selectedPlayerIds.splice(idx, 1);
-  } else {
-    window.selectedPlayerIds.push(id);
+  window.selectedPlayerIds = [id];
+  if (typeof window.addSelectedToSquad === 'function') {
+    window.addSelectedToSquad();
   }
-  if (row) row.classList.toggle('selected', window.selectedPlayerIds.includes(id));
 };
 
 // Expose for inline handlers
