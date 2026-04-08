@@ -85,6 +85,21 @@ export function normalizePlanPrices(plan) {
   }
 }
 
+/**
+ * Count transfers made in gameweek `gw` by comparing player IDs in plan[gw]
+ * against plan[gw - 1]. Returns 0 when either side is unavailable.
+ */
+export function countTransfersInGW(gw) {
+  const curr = state.plan?.[gw];
+  const prev = state.plan?.[gw - 1];
+  if (!curr || !prev) return 0;
+
+  const prevIds = new Set([...(prev.starting || []), ...(prev.bench || [])].map(e => e.id));
+  return [...(curr.starting || []), ...(curr.bench || [])]
+    .map(e => e.id)
+    .filter(id => !prevIds.has(id)).length;
+}
+
 async function parseJsonOrThrow(res) {
   const ct = res.headers.get('content-type') || '';
   if (!ct.includes('application/json')) {
