@@ -58,7 +58,8 @@ function computeTeamScore(teamId, visibleGWs, fixturesByGW, mode) {
       fixtureCount++;
 
       if (mode === 'overall') {
-        total += isHome ? (f.team_h_difficulty || 3) : (f.team_a_difficulty || 3);
+        const difficulty = isHome ? (f.team_h_difficulty || 3) : (f.team_a_difficulty || 3);
+        total += (6 - difficulty);
       } else {
         const opponentId = isHome ? f.team_a : f.team_h;
         const opponent = getTeamById(opponentId);
@@ -69,7 +70,7 @@ function computeTeamScore(teamId, visibleGWs, fixturesByGW, mode) {
                 ? (opponent.strength_defence_away || 1200)
                 : (opponent.strength_defence_home || 1200))
             : 1200;
-          total += oppDefStr;
+          total += (1500 - oppDefStr);
         } else {
           // 'defence'
           const oppAttStr = opponent
@@ -77,14 +78,14 @@ function computeTeamScore(teamId, visibleGWs, fixturesByGW, mode) {
                 ? (opponent.strength_attack_away || 1200)
                 : (opponent.strength_attack_home || 1200))
             : 1200;
-          total += oppAttStr;
+          total += (1500 - oppAttStr);
         }
       }
     }
   }
 
-  if (fixtureCount === 0) return { score: Infinity, fixtureCount: 0 };
-  return { score: total / fixtureCount, fixtureCount };
+  if (fixtureCount === 0) return { score: -Infinity, fixtureCount: 0 };
+  return { score: total, fixtureCount };
 }
 
 // ─────────────────────────────────────────────
@@ -123,22 +124,22 @@ const fixturesByGW = new Map([
 console.log('\nTest Suite 1: Overall (FDR-based) sorting');
 
 const arsGW1Overall = computeTeamScore(1, [1], fixturesByGW, 'overall');
-// Arsenal is home in GW1: team_h_difficulty = 2; average = 2/1 = 2
-assert(arsGW1Overall.score === 2, 'Arsenal GW1 overall score = 2', `got ${arsGW1Overall.score}`);
+// Arsenal is home in GW1: team_h_difficulty = 2; ease = 6 - 2 = 4
+assert(arsGW1Overall.score === 4, 'Arsenal GW1 overall score = 4', `got ${arsGW1Overall.score}`);
 assert(arsGW1Overall.fixtureCount === 1, 'Arsenal GW1 fixture count = 1', `got ${arsGW1Overall.fixtureCount}`);
 
 const breGW1Overall = computeTeamScore(2, [1], fixturesByGW, 'overall');
-// Brentford is away in GW1: team_a_difficulty = 4; average = 4
-assert(breGW1Overall.score === 4, 'Brentford GW1 overall score = 4', `got ${breGW1Overall.score}`);
+// Brentford is away in GW1: team_a_difficulty = 4; ease = 6 - 4 = 2
+assert(breGW1Overall.score === 2, 'Brentford GW1 overall score = 2', `got ${breGW1Overall.score}`);
 
 // Multi-GW: Arsenal GW1 (home, FDR 2) + GW2 (away, FDR 3)
 const arsGW12Overall = computeTeamScore(1, [1, 2], fixturesByGW, 'overall');
-// total = 2 + 3 = 5, count = 2, avg = 2.5
-assert(arsGW12Overall.score === 2.5, 'Arsenal GW1+2 overall avg = 2.5', `got ${arsGW12Overall.score}`);
+// ease GW1 = 6-2 = 4, ease GW2 = 6-3 = 3, total = 7
+assert(arsGW12Overall.score === 7, 'Arsenal GW1+2 overall ease sum = 7', `got ${arsGW12Overall.score}`);
 
 // Blank GW: Arsenal has no fixture in GW3
 const arsGW3Overall = computeTeamScore(1, [3], fixturesByGW, 'overall');
-assert(arsGW3Overall.score === Infinity, 'Arsenal GW3 (no fixture) = Infinity', `got ${arsGW3Overall.score}`);
+assert(arsGW3Overall.score === -Infinity, 'Arsenal GW3 (no fixture) = -Infinity', `got ${arsGW3Overall.score}`);
 assert(arsGW3Overall.fixtureCount === 0, 'Arsenal GW3 fixture count = 0', `got ${arsGW3Overall.fixtureCount}`);
 
 // ─────────────────────────────────────────────
@@ -148,16 +149,18 @@ console.log('\nTest Suite 2: Attack (opponent defence strength) sorting');
 
 // GW1: Arsenal HOME vs Brentford.
 //   Brentford is playing away → use Brentford.strength_defence_away = 1020
+//   ease = 1500 - 1020 = 480
 const arsGW1Attack = computeTeamScore(1, [1], fixturesByGW, 'attack');
-assert(arsGW1Attack.score === 1020, 'Arsenal GW1 attack score = 1020 (BRE away defence)', `got ${arsGW1Attack.score}`);
+assert(arsGW1Attack.score === 480, 'Arsenal GW1 attack score = 480 (1500 - BRE away defence 1020)', `got ${arsGW1Attack.score}`);
 
 // GW2: Arsenal AWAY at Chelsea.
 //   Chelsea is playing home → use Chelsea.strength_defence_home = 1170
+//   ease = 1500 - 1170 = 330
 const arsGW2Attack = computeTeamScore(1, [2], fixturesByGW, 'attack');
-assert(arsGW2Attack.score === 1170, 'Arsenal GW2 attack score = 1170 (CHE home defence)', `got ${arsGW2Attack.score}`);
+assert(arsGW2Attack.score === 330, 'Arsenal GW2 attack score = 330 (1500 - CHE home defence 1170)', `got ${arsGW2Attack.score}`);
 
-// Lower attack score = easier to score against → Arsenal GW1 (1020) < GW2 (1170) ✓
-assert(arsGW1Attack.score < arsGW2Attack.score, 'GW1 vs weaker defence gives lower attack score than GW2');
+// Higher attack ease score = easier to score → Arsenal GW1 (480) > GW2 (330) ✓
+assert(arsGW1Attack.score > arsGW2Attack.score, 'GW1 vs weaker defence gives higher attack score than GW2');
 
 // ─────────────────────────────────────────────
 //  Test Suite 3: Defence mode
@@ -166,16 +169,18 @@ console.log('\nTest Suite 3: Defence (opponent attack strength) sorting');
 
 // GW1: Arsenal HOME vs Brentford.
 //   Brentford plays away → use Brentford.strength_attack_away = 1040
+//   ease = 1500 - 1040 = 460
 const arsGW1Defence = computeTeamScore(1, [1], fixturesByGW, 'defence');
-assert(arsGW1Defence.score === 1040, 'Arsenal GW1 defence score = 1040 (BRE away attack)', `got ${arsGW1Defence.score}`);
+assert(arsGW1Defence.score === 460, 'Arsenal GW1 defence score = 460 (1500 - BRE away attack 1040)', `got ${arsGW1Defence.score}`);
 
 // GW2: Arsenal AWAY at Chelsea.
 //   Chelsea plays home → use Chelsea.strength_attack_home = 1180
+//   ease = 1500 - 1180 = 320
 const arsGW2Defence = computeTeamScore(1, [2], fixturesByGW, 'defence');
-assert(arsGW2Defence.score === 1180, 'Arsenal GW2 defence score = 1180 (CHE home attack)', `got ${arsGW2Defence.score}`);
+assert(arsGW2Defence.score === 320, 'Arsenal GW2 defence score = 320 (1500 - CHE home attack 1180)', `got ${arsGW2Defence.score}`);
 
-// Lower defence score = weaker attack to face → GW1 (1040) < GW2 (1180) ✓
-assert(arsGW1Defence.score < arsGW2Defence.score, 'GW1 vs weaker attack gives lower defence score than GW2');
+// Higher defence ease score = weaker attack to face → GW1 (460) > GW2 (320) ✓
+assert(arsGW1Defence.score > arsGW2Defence.score, 'GW1 vs weaker attack gives higher defence score than GW2');
 
 // ─────────────────────────────────────────────
 //  Test Suite 4: Sorting determinism
@@ -195,21 +200,21 @@ const scored = teams.map(t => ({
   ...computeTeamScore(t.id, visibleGWs, fixturesByGW, 'overall'),
 }));
 scored.sort((a, b) => {
-  if (a.score === Infinity && b.score === Infinity) return a.name.localeCompare(b.name);
-  if (a.score === Infinity) return 1;
-  if (b.score === Infinity) return -1;
-  const diff = a.score - b.score;
+  if (a.score === -Infinity && b.score === -Infinity) return a.name.localeCompare(b.name);
+  if (a.score === -Infinity) return 1;
+  if (b.score === -Infinity) return -1;
+  const diff = b.score - a.score; // descending: highest ease first
   if (diff !== 0) return diff;
   return a.name.localeCompare(b.name);
 });
 
-// Arsenal: GW1 home FDR=2, GW2 away FDR=3 → avg 2.5  (2 fixtures)
-// Brentford: GW1 away FDR=4, GW3 home FDR=2 → avg 3  (2 fixtures)
-// Chelsea: GW2 home FDR=3, GW3 away FDR=5 → avg 4  (2 fixtures)
-// Expected order: Arsenal (2.5) < Brentford (3) < Chelsea (4)
-assert(scored[0].name === 'Arsenal', `1st = Arsenal (easiest run)`, `got ${scored[0].name} (${scored[0].score})`);
+// Arsenal:   GW1 home FDR=2 (ease=4), GW2 away FDR=3 (ease=3) → sum = 7
+// Brentford: GW1 away FDR=4 (ease=2), GW3 home FDR=2 (ease=4) → sum = 6
+// Chelsea:   GW2 home FDR=3 (ease=3), GW3 away FDR=5 (ease=1) → sum = 4
+// Expected order descending: Arsenal (7), Brentford (6), Chelsea (4)
+assert(scored[0].name === 'Arsenal', `1st = Arsenal (highest ease)`, `got ${scored[0].name} (${scored[0].score})`);
 assert(scored[1].name === 'Brentford', `2nd = Brentford`, `got ${scored[1].name} (${scored[1].score})`);
-assert(scored[2].name === 'Chelsea', `3rd = Chelsea (hardest run)`, `got ${scored[2].name} (${scored[2].score})`);
+assert(scored[2].name === 'Chelsea', `3rd = Chelsea (lowest ease)`, `got ${scored[2].name} (${scored[2].score})`);
 
 // Stable tie-break: Two teams with identical scores should be sorted alphabetically
 const tieFixtures = new Map([
@@ -226,10 +231,10 @@ const scoredTie = [
   { ...aTeam, ...computeTeamScore(100, [1], tieFixtures, 'overall') },
 ];
 scoredTie.sort((a, b) => {
-  if (a.score === Infinity && b.score === Infinity) return a.name.localeCompare(b.name);
-  if (a.score === Infinity) return 1;
-  if (b.score === Infinity) return -1;
-  return a.score - b.score || a.name.localeCompare(b.name);
+  if (a.score === -Infinity && b.score === -Infinity) return a.name.localeCompare(b.name);
+  if (a.score === -Infinity) return 1;
+  if (b.score === -Infinity) return -1;
+  return b.score - a.score || a.name.localeCompare(b.name);
 });
 assert(scoredTie[0].name === 'Ace FC', 'Tie-break: Ace FC sorts before Zeal FC', `got ${scoredTie[0].name}`);
 
@@ -238,15 +243,15 @@ assert(scoredTie[0].name === 'Ace FC', 'Tie-break: Ace FC sorts before Zeal FC',
 // ─────────────────────────────────────────────
 console.log('\nTest Suite 5: GW hiding (score over subset of weeks)');
 
-// Without hiding: Arsenal GW1+2 average = 2.5
+// Without hiding: Arsenal GW1+2 ease sum = 7
 const withoutHide = computeTeamScore(1, [1, 2], fixturesByGW, 'overall');
-assert(withoutHide.score === 2.5, 'Arsenal GW1+2 score = 2.5 (no hiding)', `got ${withoutHide.score}`);
+assert(withoutHide.score === 7, 'Arsenal GW1+2 score = 7 (no hiding)', `got ${withoutHide.score}`);
 
-// Hide GW2: only GW1 visible → Arsenal score = 2
+// Hide GW2: only GW1 visible → Arsenal ease = 4 (6-2)
 const withHideGW2 = computeTeamScore(1, [1], fixturesByGW, 'overall');
-assert(withHideGW2.score === 2, 'Arsenal GW1 only (GW2 hidden) score = 2', `got ${withHideGW2.score}`);
+assert(withHideGW2.score === 4, 'Arsenal GW1 only (GW2 hidden) score = 4', `got ${withHideGW2.score}`);
 
-// Hide GW1: only GW2 visible → Arsenal score = 3
+// Hide GW1: only GW2 visible → Arsenal ease = 3 (6-3)
 const withHideGW1 = computeTeamScore(1, [2], fixturesByGW, 'overall');
 assert(withHideGW1.score === 3, 'Arsenal GW2 only (GW1 hidden) score = 3', `got ${withHideGW1.score}`);
 
