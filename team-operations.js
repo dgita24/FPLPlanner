@@ -1,6 +1,6 @@
 // team-operations.js - Team-related operations (transfers, swaps, etc.)
 
-import { state, history, calculateSellingPrice } from './data.js';
+import { state, history, calculateSellingPrice, recomputeFreeTransfersFromGW, isChipHistoricallyUsed, setChipHistoricallyUsed, ensureHistoricallyUsedChips } from './data.js';
 import { validateStartingXI, validateClubLimit, getOverLimitClubs, getElementType, getPlayerTeamId, validateSquadComposition } from './validation.js';
 import { displayPrice, showMessage, renderPitch, renderBench, setPendingSwap, getPendingSwap, getChipDisplayName } from './ui-render.js';
 
@@ -70,6 +70,7 @@ export function cancelTransfer(updateUI) {
     isActive: false
   };
 
+  recomputeFreeTransfersFromGW(state.viewingGW);
   showMessage('All transfers cancelled. Sold players restored.', 'success');
   updateUI();
 }
@@ -282,6 +283,7 @@ export function removePlayer(playerId, source, updateUI) {
     `Player ${removedCount} sold. ${removedCount === 1 ? 'Pick replacement' : 'Continue removing or add replacements'} (or Cancel).`,
     'info'
   );
+  recomputeFreeTransfersFromGW(gw);
   updateUI();
 }
 
@@ -365,6 +367,7 @@ export function reinstatePlayer(playerId, updateUI) {
     );
   }
 
+  recomputeFreeTransfersFromGW(state.viewingGW);
   updateUI();
 }
 
@@ -422,6 +425,7 @@ export function addSelectedToSquad(updateUI) {
     );
   }
 
+  recomputeFreeTransfersFromGW(gw);
   updateUI();
 }
 
@@ -626,6 +630,10 @@ export function selectChip(chipType, updateUI) {
     showMessage('No team data for this gameweek', 'error');
     return;
   }
+  if (isChipHistoricallyUsed(chipType) && team.chip !== chipType) {
+    showMessage(`${getChipDisplayName(chipType)} is marked as already used. Unmark it first to plan it again.`, 'error');
+    return;
+  }
 
   // Check if a chip is already selected for this GW
   if (team.chip === chipType) {
@@ -640,6 +648,35 @@ export function selectChip(chipType, updateUI) {
     showMessage(`${getChipDisplayName(chipType)} selected for GW${gw}`, 'success');
   }
   
+  recomputeFreeTransfersFromGW(gw);
+  updateUI();
+}
+
+export function setHistoricalChipUsedForPlanning(chipType, isUsed, updateUI) {
+  ensureHistoricallyUsedChips();
+  const nextUsed = !!isUsed;
+  if (isChipHistoricallyUsed(chipType) === nextUsed) {
+    updateUI();
+    return;
+  }
+
+  pushUndoState();
+  setChipHistoricallyUsed(chipType, nextUsed);
+
+  if (nextUsed) {
+    for (let g = state.minNavigableGW; g <= 38; g++) {
+      const team = state.plan[g];
+      if (team?.chip === chipType) team.chip = null;
+    }
+  }
+
+  recomputeFreeTransfersFromGW(state.minNavigableGW);
+  showMessage(
+    nextUsed
+      ? `${getChipDisplayName(chipType)} marked as already used`
+      : `${getChipDisplayName(chipType)} unmarked as used`,
+    'success'
+  );
   updateUI();
 }
 

@@ -37,9 +37,16 @@ export let state = {
 
   // Plan for all GWs up to GW38: plan[gw] = { starting: [{id,purchasePrice,sellingPrice}], bench: [...], chip: null|'wildcard'|'bboost'|'3xc'|'freehit', captain: null, viceCaptain: null }
   plan: {},
+
+  // Free transfers tracked per GW (manually editable in UI)
+  freeTransfersByGW: {},
+
+  // Chips marked as already used historically (for mid-season planners)
+  historicallyUsedChips: {},
 };
 
 const FPL_BASE = '/api/fpl';
+export const CHIP_TYPES = ['wildcard', 'freehit', 'bboost', '3xc'];
 
 function deepCopy(obj) {
   return JSON.parse(JSON.stringify(obj));
@@ -85,6 +92,21 @@ export function normalizePlanPrices(plan) {
   }
 }
 
+/**
+ * Count transfers made in gameweek `gw` by comparing player IDs in plan[gw]
+ * against plan[gw - 1]. Returns 0 when either side is unavailable.
+ */
+export function countTransfersInGW(gw) {
+  const curr = state.plan?.[gw];
+  const prev = state.plan?.[gw - 1];
+  if (!curr || !prev) return 0;
+
+  const prevIds = new Set([...(prev.starting || []), ...(prev.bench || [])].map(e => e.id));
+  return [...(curr.starting || []), ...(curr.bench || [])]
+    .map(e => e.id)
+    .filter(id => !prevIds.has(id)).length;
+}
+
 async function parseJsonOrThrow(res) {
   const ct = res.headers.get('content-type') || '';
   if (!ct.includes('application/json')) {
@@ -96,9 +118,89 @@ async function parseJsonOrThrow(res) {
 
 function initEmptyPlan() {
   state.plan = {};
+  state.freeTransfersByGW = {};
+  state.historicallyUsedChips = {};
   // Initialize plan up to GW38 to allow full season planning
   for (let gw = state.currentGW; gw <= 38; gw++) {
     state.plan[gw] = { starting: [], bench: [], chip: null, captain: null, viceCaptain: null };
+    state.freeTransfersByGW[gw] = 1;
+  }
+  for (const chip of CHIP_TYPES) state.historicallyUsedChips[chip] = false;
+}
+
+function normalizeFreeTransfersValue(value) {
+  const n = Number(value);
+  if (!Number.isInteger(n)) return 1;
+  return Math.max(0, Math.min(5, n));
+}
+
+export function ensureFreeTransfersByGW() {
+  if (!state.freeTransfersByGW || typeof state.freeTransfersByGW !== 'object') {
+    state.freeTransfersByGW = {};
+  }
+
+  const startGW = Math.max(1, state.minNavigableGW ?? state.currentGW ?? 1);
+  for (let gw = startGW; gw <= 38; gw++) {
+    state.freeTransfersByGW[gw] = normalizeFreeTransfersValue(state.freeTransfersByGW[gw]);
+  }
+}
+
+export function getFreeTransfersForGW(gw) {
+  return normalizeFreeTransfersValue(state.freeTransfersByGW?.[gw]);
+}
+
+export function setFreeTransfersForGW(gw, value) {
+  if (!state.freeTransfersByGW || typeof state.freeTransfersByGW !== 'object') {
+    state.freeTransfersByGW = {};
+  }
+  state.freeTransfersByGW[gw] = normalizeFreeTransfersValue(value);
+}
+
+export function recomputeFreeTransfersFromGW(startGW) {
+  ensureFreeTransfersByGW();
+  const start = Math.max(1, startGW ?? state.minNavigableGW ?? state.currentGW ?? 1);
+
+  for (let gw = start; gw < 38; gw++) {
+    const currentFT = getFreeTransfersForGW(gw);
+    const chip = state.plan?.[gw]?.chip || null;
+    const transfers = countTransfersInGW(gw);
+    const skipDeduction = chip === 'wildcard' || chip === 'freehit';
+
+    const nextFT = skipDeduction
+      ? currentFT
+      : Math.min(5, Math.max(0, currentFT - transfers) + 1);
+
+    state.freeTransfersByGW[gw + 1] = nextFT;
+  }
+}
+
+export function ensureHistoricallyUsedChips() {
+  if (!state.historicallyUsedChips || typeof state.historicallyUsedChips !== 'object') {
+    state.historicallyUsedChips = {};
+  }
+  for (const chip of CHIP_TYPES) {
+    state.historicallyUsedChips[chip] = !!state.historicallyUsedChips[chip];
+  }
+}
+
+export function isChipHistoricallyUsed(chipType) {
+  ensureHistoricallyUsedChips();
+  return !!state.historicallyUsedChips[chipType];
+}
+
+export function setChipHistoricallyUsed(chipType, isUsed) {
+  ensureHistoricallyUsedChips();
+  state.historicallyUsedChips[chipType] = !!isUsed;
+}
+
+export function resetChipUsageState() {
+  ensureHistoricallyUsedChips();
+  for (const chip of CHIP_TYPES) {
+    state.historicallyUsedChips[chip] = false;
+  }
+  for (let gw = state.currentGW; gw <= 38; gw++) {
+    if (!state.plan[gw]) continue;
+    state.plan[gw].chip = null;
   }
 }
 
@@ -314,9 +416,13 @@ export async function loadTeamEntry(managerId, gwRequested) {
         }
         state.plan[g].starting = deepCopy(starting);
         state.plan[g].bench = deepCopy(bench);
+        state.plan[g].chip = null;
         state.plan[g].captain = captainId;
         state.plan[g].viceCaptain = viceCaptainId;
       }
+      resetChipUsageState();
+      ensureFreeTransfersByGW();
+      recomputeFreeTransfersFromGW(state.currentGW);
 
       // Set viewing GW to next gameweek for planning purposes
       const events = state.bootstrap?.events || [];
