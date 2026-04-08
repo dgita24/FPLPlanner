@@ -697,7 +697,7 @@ body {
   display: none;
   justify-content: center;
   align-items: center;
-  gap: 12px;
+  gap: 16px;
   margin-bottom: 16px;
 }
 
@@ -761,6 +761,25 @@ body {
   display: flex;
   align-items: center;
   gap: 20px;
+}
+
+.gw-ft-control {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text);
+  font-weight: 700;
+}
+
+.gw-ft-control input {
+  width: 56px;
+  padding: 6px 8px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg-dark);
+  color: var(--text);
+  font-weight: 700;
+  text-align: center;
 }
 
 #mainColumn {

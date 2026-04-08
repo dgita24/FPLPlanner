@@ -37,6 +37,9 @@ export let state = {
 
   // Plan for all GWs up to GW38: plan[gw] = { starting: [{id,purchasePrice,sellingPrice}], bench: [...], chip: null|'wildcard'|'bboost'|'3xc'|'freehit', captain: null, viceCaptain: null }
   plan: {},
+
+  // Free transfers tracked per GW (manually editable in UI)
+  freeTransfersByGW: {},
 };
 
 const FPL_BASE = '/api/fpl';
@@ -111,10 +114,40 @@ async function parseJsonOrThrow(res) {
 
 function initEmptyPlan() {
   state.plan = {};
+  state.freeTransfersByGW = {};
   // Initialize plan up to GW38 to allow full season planning
   for (let gw = state.currentGW; gw <= 38; gw++) {
     state.plan[gw] = { starting: [], bench: [], chip: null, captain: null, viceCaptain: null };
+    state.freeTransfersByGW[gw] = 1;
   }
+}
+
+function normalizeFreeTransfersValue(value) {
+  const n = Number(value);
+  if (!Number.isInteger(n)) return 1;
+  return Math.max(0, Math.min(5, n));
+}
+
+export function ensureFreeTransfersByGW() {
+  if (!state.freeTransfersByGW || typeof state.freeTransfersByGW !== 'object') {
+    state.freeTransfersByGW = {};
+  }
+
+  const startGW = Math.max(1, state.minNavigableGW || state.currentGW || 1);
+  for (let gw = startGW; gw <= 38; gw++) {
+    state.freeTransfersByGW[gw] = normalizeFreeTransfersValue(state.freeTransfersByGW[gw]);
+  }
+}
+
+export function getFreeTransfersForGW(gw) {
+  return normalizeFreeTransfersValue(state.freeTransfersByGW?.[gw]);
+}
+
+export function setFreeTransfersForGW(gw, value) {
+  if (!state.freeTransfersByGW || typeof state.freeTransfersByGW !== 'object') {
+    state.freeTransfersByGW = {};
+  }
+  state.freeTransfersByGW[gw] = normalizeFreeTransfersValue(value);
 }
 
 // data.js - only this function needs updating

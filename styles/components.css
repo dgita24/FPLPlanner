@@ -836,6 +836,28 @@
   white-space: nowrap;
 }
 
+.mobile-ft-control {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--text);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.mobile-ft-control input {
+  width: 42px;
+  padding: 3px 4px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--bg);
+  color: var(--text);
+  text-align: center;
+  font-size: 12px;
+  font-weight: 700;
+}
+
 .mobile-bank-display {
   font-size: 13px;
   font-weight: 700;

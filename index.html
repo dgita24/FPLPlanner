@@ -26,6 +26,10 @@
       <span class="mobile-gw-label">GW<span id="mobileGWDisplay">1</span></span>
       <button class="mobile-gw-btn" onclick="changeGW(1)" id="nextGWMobile" aria-label="Next gameweek">→</button>
     </div>
+    <div class="mobile-ft-control">
+      <label for="freeTransfersInputMobile">FT</label>
+      <input type="number" id="freeTransfersInputMobile" min="0" max="5" step="1" value="1" onchange="onFreeTransfersInputChange(this.value)" aria-label="Free transfers for this gameweek" />
+    </div>
   </div>
 
   <!-- Import prompt banner: shown when team is restored from localStorage without a manager ID -->
@@ -114,6 +118,10 @@
               <button onclick="changeGW(-1)" id="prevGW">← GW</button>
               <h2>Gameweek <span id="currentGWDisplay">1</span></h2>
               <button onclick="changeGW(1)" id="nextGW">GW →</button>
+            </div>
+            <div class="gw-ft-control">
+              <label for="freeTransfersInput">FTs</label>
+              <input type="number" id="freeTransfersInput" min="0" max="5" step="1" value="1" onchange="onFreeTransfersInputChange(this.value)" aria-label="Free transfers for this gameweek" />
             </div>
           </div>
 

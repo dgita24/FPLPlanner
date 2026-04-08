@@ -1,6 +1,6 @@
 // ui-init.js - Initializes all UI-related event listeners and dependencies
 
-import { state, history, loadTeamEntry, normalizePlanPrices } from './data.js';
+import { state, history, loadTeamEntry, normalizePlanPrices, ensureFreeTransfersByGW, getFreeTransfersForGW, setFreeTransfersForGW } from './data.js';
 import { setupSidebarHandlers, closeSidebar, toggleSidebarMenu } from './ui-sidebar.js';
 import { showMessage, renderPitch, renderBench, ensureFixturesForView } from './ui-render.js';
 import { renderFixtures, setFixturesGW, isFixturesSyncEnabled } from './fixtures.js';
@@ -351,6 +351,15 @@ export function updateUI() {
   const mobileGWEl = document.getElementById('mobileGWDisplay');
   if (mobileGWEl) mobileGWEl.textContent = state.viewingGW;
 
+  const freeTransfersInput = document.getElementById('freeTransfersInput');
+  if (freeTransfersInput && document.activeElement !== freeTransfersInput) {
+    freeTransfersInput.value = String(getFreeTransfersForGW(state.viewingGW));
+  }
+  const freeTransfersInputMobile = document.getElementById('freeTransfersInputMobile');
+  if (freeTransfersInputMobile && document.activeElement !== freeTransfersInputMobile) {
+    freeTransfersInputMobile.value = String(getFreeTransfersForGW(state.viewingGW));
+  }
+
   // Update mobile bank display
   const mobileBankEl = document.getElementById('mobileBankDisplay');
   if (mobileBankEl && !mobileBankEl.querySelector('input')) {
@@ -417,7 +426,8 @@ export function updateUI() {
         bank: state.bank,
         viewingGW: state.viewingGW,
         minNavigableGW: state.minNavigableGW,
-        priceMode: state.priceMode
+        priceMode: state.priceMode,
+        freeTransfersByGW: state.freeTransfersByGW
       };
       localStorage.setItem('fplplanner-state', JSON.stringify(data));
     } catch (e) {
@@ -529,6 +539,7 @@ async function importTeam() {
   
   // Set minimum navigable GW to prevent going back before imported team
   state.minNavigableGW = state.viewingGW;
+  ensureFreeTransfersByGW();
 
   // reset transient UI state
   resetTransferState();
@@ -598,7 +609,8 @@ function localSave() {
       bank: state.bank,
       viewingGW: state.viewingGW,
       minNavigableGW: state.minNavigableGW,
-      priceMode: state.priceMode
+      priceMode: state.priceMode,
+      freeTransfersByGW: state.freeTransfersByGW
     };
     localStorage.setItem('fplplanner-state', JSON.stringify(data));
     showMessage('Team saved locally', 'success');
@@ -621,6 +633,8 @@ function localLoad() {
     state.viewingGW = data.viewingGW;
     state.minNavigableGW = data.minNavigableGW ?? state.viewingGW; // fallback for old saves
     state.priceMode = data.priceMode;
+    state.freeTransfersByGW = data.freeTransfersByGW || {};
+    ensureFreeTransfersByGW();
     updateUI();
     showMessage('Team loaded locally', 'success');
   } catch (e) {
@@ -854,6 +868,8 @@ async function loadTeam() {
       state.viewingGW = data.payload.viewingGW;
       state.minNavigableGW = data.payload.minNavigableGW ?? state.viewingGW;
       state.priceMode = data.payload.priceMode;
+      state.freeTransfersByGW = data.payload.freeTransfersByGW || {};
+      ensureFreeTransfersByGW();
 
       // Remember or forget password based on checkbox
       const loadRemember = document.getElementById('loadRememberPassword');
@@ -901,7 +917,8 @@ async function saveTeam() {
       bank: state.bank,
       viewingGW: state.viewingGW,
       minNavigableGW: state.minNavigableGW,
-      priceMode: state.priceMode
+      priceMode: state.priceMode,
+      freeTransfersByGW: state.freeTransfersByGW
     };
 
     const response = await fetch('/api/save', {
@@ -1297,6 +1314,10 @@ export function initUI() {
   window.closeSidebar = closeSidebar;
   window.changePriceMode = (value) => {
     state.priceMode = value;
+    updateUI();
+  };
+  window.onFreeTransfersInputChange = (value) => {
+    setFreeTransfersForGW(state.viewingGW, value);
     updateUI();
   };
 
