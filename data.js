@@ -167,7 +167,7 @@ export function recomputeFreeTransfersFromGW(startGW) {
     const skipDeduction = chip === 'wildcard' || chip === 'freehit';
 
     const nextFT = skipDeduction
-      ? Math.min(5, currentFT + 1)
+      ? currentFT
       : Math.min(5, Math.max(0, currentFT - transfers) + 1);
 
     state.freeTransfersByGW[gw + 1] = nextFT;
