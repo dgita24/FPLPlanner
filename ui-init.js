@@ -179,9 +179,10 @@ function updateFreeTransfersInputValue(elementId) {
   const chip = state.plan?.[gw]?.chip || null;
   // Wildcard and Free Hit chips mean no deduction – show the stored FT value as-is.
   // For all other cases show how many FTs remain after transfers already made this week.
+  // This value can be negative when the user takes a points hit (more transfers than FTs).
   const skipDeduction = chip === 'wildcard' || chip === 'freehit';
   const transfers = skipDeduction ? 0 : countTransfersInGW(gw);
-  el.value = String(Math.max(0, totalFT - transfers));
+  el.value = String(totalFT - transfers);
 }
 
 // Toggle expandable cards
