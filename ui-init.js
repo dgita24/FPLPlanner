@@ -1,6 +1,6 @@
 // ui-init.js - Initializes all UI-related event listeners and dependencies
 
-import { state, history, loadTeamEntry, normalizePlanPrices, ensureFreeTransfersByGW, getFreeTransfersForGW, setFreeTransfersForGW, recomputeFreeTransfersFromGW, ensureHistoricallyUsedChips } from './data.js';
+import { state, history, loadTeamEntry, normalizePlanPrices, ensureFreeTransfersByGW, getFreeTransfersForGW, setFreeTransfersForGW, recomputeFreeTransfersFromGW, ensureHistoricallyUsedChips, countTransfersInGW } from './data.js';
 import { setupSidebarHandlers, closeSidebar, toggleSidebarMenu } from './ui-sidebar.js';
 import { showMessage, renderPitch, renderBench, ensureFixturesForView } from './ui-render.js';
 import { renderFixtures, setFixturesGW, isFixturesSyncEnabled } from './fixtures.js';
@@ -174,7 +174,14 @@ function pluralize(word, count) {
 function updateFreeTransfersInputValue(elementId) {
   const el = document.getElementById(elementId);
   if (!el || document.activeElement === el) return;
-  el.value = String(getFreeTransfersForGW(state.viewingGW));
+  const gw = state.viewingGW;
+  const totalFT = getFreeTransfersForGW(gw);
+  const chip = state.plan?.[gw]?.chip || null;
+  // Wildcard and Free Hit chips mean no deduction – show the stored FT value as-is.
+  // For all other cases show how many FTs remain after transfers already made this week.
+  const skipDeduction = chip === 'wildcard' || chip === 'freehit';
+  const transfers = skipDeduction ? 0 : countTransfersInGW(gw);
+  el.value = String(Math.max(0, totalFT - transfers));
 }
 
 // Toggle expandable cards
@@ -1328,8 +1335,16 @@ export function initUI() {
     updateUI();
   };
   window.onFreeTransfersInputChange = (value) => {
-    setFreeTransfersForGW(state.viewingGW, value);
-    recomputeFreeTransfersFromGW(state.viewingGW);
+    const gw = state.viewingGW;
+    const chip = state.plan?.[gw]?.chip || null;
+    const skipDeduction = chip === 'wildcard' || chip === 'freehit';
+    // The input now displays *remaining* FTs for this week (total minus transfers already made).
+    // When the user edits it we need to back-calculate and store the correct *total* so that
+    // recomputeFreeTransfersFromGW continues to work correctly for future weeks.
+    const transfers = skipDeduction ? 0 : countTransfersInGW(gw);
+    const totalValue = Number(value) + transfers;
+    setFreeTransfersForGW(gw, totalValue);
+    recomputeFreeTransfersFromGW(gw);
     updateUI();
   };
   window.setHistoricalChipUsed = (chipType, isUsed) => setHistoricalChipUsedForPlanning(chipType, isUsed, updateUI);

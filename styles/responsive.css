@@ -483,6 +483,28 @@
   .transfer-panel {
     max-height: none;
   }
+
+  /* ── Chip area: center buttons and stack "Already used" row below ── */
+  .chip-area .chip-container {
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+  }
+
+  .chip-area .chip-buttons-row {
+    justify-content: center;
+    flex-wrap: wrap;
+    width: 100%;
+  }
+
+  .chip-area .chip-used-toggles-row {
+    width: 100%;
+    justify-content: center;
+    flex-wrap: wrap;
+    border-top: 1px solid var(--border);
+    padding-top: 6px;
+    margin-top: 2px;
+  }
 }
 
 /* ----------------------------------------
