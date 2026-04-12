@@ -505,9 +505,13 @@ async function importTeam() {
     return;
   }
 
-  showMessage(`Loading team (planning GW${state.currentGW})...`, 'info');
+  // Use viewingGW (what the user sees on the banner) as the target.
+  // loadTeamEntry will try this GW first, then fall back to the latest
+  // available GW if picks aren't ready yet (e.g. next-GW deadline not passed).
+  const planningGW = state.viewingGW;
+  showMessage(`Loading team (planning GW${planningGW})...`, 'info');
 
-  const data = await loadTeamEntry(teamId, state.currentGW);
+  const data = await loadTeamEntry(teamId, planningGW);
 
   if (!data || !data.picks) {
     showMessage('Failed to load team.', 'error');
@@ -530,27 +534,22 @@ async function importTeam() {
     teamIdDisplay.textContent = state.managerId;
   }
 
+  // Compare imported GW against the planning GW the user sees (viewingGW),
+  // not currentGW, so the toast message matches the banner.
   const importedGW = data._imported_gw || state.importedGW;
-  if (importedGW && importedGW !== state.currentGW) {
+  if (importedGW && importedGW !== planningGW) {
     showMessage(
-      `⚠️ Imported from GW${importedGW} (GW${state.currentGW} picks not yet available). Your current squad may be different if you made transfers since GW${importedGW}.`,
+      `⚠️ Imported GW${importedGW} squad (GW${planningGW} picks not yet available). Your current squad may differ if you made transfers since GW${importedGW}.`,
       'info'
     );
   } else {
-    showMessage(`Team imported for GW${state.currentGW}.`, 'success');
+    showMessage(`Team imported for GW${planningGW}.`, 'success');
   }
 
-  // Set viewing GW to next gameweek for planning purposes
-  const events = state.bootstrap?.events || [];
-  const next = events.find(e => e.is_next)?.id;
-  const current = events.find(e => e.is_current)?.id;
-  state.viewingGW = next || current || state.currentGW;
-  
   // Set minimum navigable GW to prevent going back before imported team
   state.minNavigableGW = state.viewingGW;
   ensureFreeTransfersByGW();
   ensureHistoricallyUsedChips();
-  recomputeFreeTransfersFromGW(state.viewingGW);
 
   // reset transient UI state
   resetTransferState();

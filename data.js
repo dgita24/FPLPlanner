@@ -295,30 +295,74 @@ async function loadTransfersPurchaseMap(managerId) {
 }
 
 /**
+ * Compute free transfers per GW from the FPL entry history API data.
+ * Returns { perGW: {gw: ft, ...}, nextGWft: number } or null on failure.
+ *
+ * FPL rules:
+ *  - Each GW you get +1 FT, max 5 stored
+ *  - Wildcard resets FT to 1 for the next GW
+ *  - Free Hit preserves FTs (transfers don't count), +1 for next GW
+ *  - Bench Boost / Triple Captain don't affect FT calculation
+ */
+function computeFreeTransfersFromHistory(historyData) {
+  if (!historyData?.current?.length) return null;
+
+  const events = [...historyData.current].sort((a, b) => a.event - b.event);
+  const chipMap = {};
+  for (const c of (historyData.chips || [])) {
+    chipMap[c.event] = c.name;
+  }
+
+  let ft = 1; // GW1 always starts with 1 FT
+  const perGW = {};
+
+  for (const ev of events) {
+    perGW[ev.event] = ft;
+    const chip = chipMap[ev.event];
+    const transfers = ev.event_transfers || 0;
+
+    if (chip === 'wildcard') {
+      ft = 1; // WC resets to 1
+    } else if (chip === 'freehit') {
+      ft = Math.min(5, ft + 1); // FH: FTs preserved, +1 for next GW
+    } else {
+      ft = Math.min(5, Math.max(0, ft - transfers) + 1);
+    }
+  }
+
+  // ft is now the FT count for the next unplayed GW
+  return { perGW, nextGWft: ft, chips: historyData.chips || [] };
+}
+
+/**
  * Option A import:
- * Try current GW first; if not found, fall back to latest finished/previous GW.
+ * Try gwRequested first; if not found, fall back to latest available GW.
  * When we import from an older GW, we still populate the plan starting at *currentGW*.
  */
 export async function loadTeamEntry(managerId, gwRequested) {
   const events = state.bootstrap?.events || [];
 
-  // Candidates to try (in order)
+  // Candidates to try (in order):
+  // 1. The requested GW (typically viewingGW – what the user sees)
+  // 2. Current/finished/previous GWs ≤ gwRequested (includes is_current so
+  //    the live GW is tried before older finished GWs)
+  // 3. Safety fallback: a handful of recent GWs
   const candidates = [];
 
   if (Number.isFinite(+gwRequested)) candidates.push(+gwRequested);
 
-  const finished = events
+  const completedOrCurrentGWs = events
     .filter(
       e =>
         e &&
         typeof e.id === 'number' &&
         e.id <= gwRequested &&
-        (e.finished || e.is_previous)
+        (e.finished || e.is_previous || e.is_current)
     )
     .sort((a, b) => b.id - a.id)
     .map(e => e.id);
 
-  for (const id of finished) candidates.push(id);
+  for (const id of completedOrCurrentGWs) candidates.push(id);
 
   // final safety
   for (let g = gwRequested - 1; g >= Math.max(1, gwRequested - 6); g--) {
@@ -421,16 +465,39 @@ export async function loadTeamEntry(managerId, gwRequested) {
         state.plan[g].viceCaptain = viceCaptainId;
       }
       resetChipUsageState();
-      ensureFreeTransfersByGW();
-      recomputeFreeTransfersFromGW(state.currentGW);
 
-      // Set viewing GW to next gameweek for planning purposes
-      const events = state.bootstrap?.events || [];
-      const next = events.find(e => e.is_next)?.id;
-      state.viewingGW = next || state.currentGW;
-      
-      // Set minimum navigable GW after successful team import to prevent going back before imported GW
-      state.minNavigableGW = state.viewingGW;
+      // --- Free-transfer initialization from FPL history (best-effort) ---
+      // Fetch the manager's season history to derive accurate FT counts.
+      // Falls back to default (1 FT) if the fetch fails.
+      let ftResult = null;
+      try {
+        const histRes = await fetch(`${FPL_BASE}/entry/${managerId}/history/`);
+        if (histRes.ok) {
+          const histData = await parseJsonOrThrow(histRes);
+          ftResult = computeFreeTransfersFromHistory(histData);
+        }
+      } catch (e) {
+        // non-fatal – FTs will default to 1
+      }
+
+      ensureFreeTransfersByGW();
+
+      if (ftResult) {
+        // Seed the planning GW (viewingGW) with the API-derived FT so the
+        // user sees their real FT balance immediately after import.
+        const planningGW = state.viewingGW;
+        state.freeTransfersByGW[planningGW] =
+          normalizeFreeTransfersValue(ftResult.nextGWft);
+
+        // Also mark historically used chips from the API response
+        for (const c of (ftResult.chips || [])) {
+          if (CHIP_TYPES.includes(c.name)) {
+            state.historicallyUsedChips[c.name] = true;
+          }
+        }
+      }
+
+      recomputeFreeTransfersFromGW(state.viewingGW);
 
       // Save baseline state for Reset
       history.baseline = JSON.parse(JSON.stringify(state));
