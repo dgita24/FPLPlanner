@@ -1,7 +1,7 @@
 // team-operations.js - Team-related operations (transfers, swaps, etc.)
 
 import { state, history, calculateSellingPrice, recomputeFreeTransfersFromGW, isChipHistoricallyUsed, setChipHistoricallyUsed, ensureHistoricallyUsedChips } from './data.js';
-import { validateStartingXI, validateClubLimit, getOverLimitClubs, getElementType, getPlayerTeamId, validateSquadComposition } from './validation.js';
+import { validateStartingXI, validateClubLimit, getOverLimitClubs, getElementType, getPlayerTeamId, validateSquadComposition, validatePositionLimits } from './validation.js';
 import { displayPrice, showMessage, renderPitch, renderBench, setPendingSwap, getPendingSwap, getChipDisplayName } from './ui-render.js';
 
 // Track batch transfers: multiple players can be removed before adding replacements
@@ -523,6 +523,12 @@ function addSinglePlayerToSquad(playerId, team, gw, updateUI) {
     const clubOk = validateClubLimit(temp);
     if (!clubOk.ok) {
       return { success: false, reason: 'Max 3 players per club' };
+    }
+
+    // Validate position maximums (2 GK, 5 DEF, 5 MID, 3 FWD) even for incomplete squads
+    const posOk = validatePositionLimits(temp);
+    if (!posOk.ok) {
+      return { success: false, reason: posOk.message };
     }
 
     // Validate squad composition (2 GK, 5 DEF, 5 MID, 3 FWD)
