@@ -2,9 +2,9 @@
 
 import { state, history, loadTeamEntry, normalizePlanPrices, ensureFreeTransfersByGW, getFreeTransfersForGW, setFreeTransfersForGW, recomputeFreeTransfersFromGW, ensureHistoricallyUsedChips, countTransfersInGW } from './data.js';
 import { setupSidebarHandlers, closeSidebar, toggleSidebarMenu } from './ui-sidebar.js';
-import { showMessage, renderPitch, renderBench, ensureFixturesForView, displayPrice } from './ui-render.js';
+import { showMessage, renderPitch, renderBench, ensureFixturesForView } from './ui-render.js';
 import { renderFixtures, setFixturesGW, isFixturesSyncEnabled } from './fixtures.js';
-import { cancelTransfer, substitutePlayer, addSelectedToSquad, removePlayer, resetTransferState, isPendingTransfer, getBatchTransferInfo, reinstatePlayer, selectChip, togglePlayerMark, setHistoricalChipUsedForPlanning } from './team-operations.js';
+import { cancelTransfer, substitutePlayer, addSelectedToSquad, removePlayer, resetTransferState, isPendingTransfer, getBatchTransferInfo, reinstatePlayer, selectChip, togglePlayerMark, setHistoricalChipUsedForPlanning, sellAllPlayers } from './team-operations.js';
 import { setPendingSwap, getPendingSwap } from './ui-render.js';
 import { setDefaultSort } from './table.js';
 import { MAX_GAMEWEEK, MAX_DRAFTS_PER_MANAGER } from './constants.js';
@@ -1023,48 +1023,7 @@ function resetToImportedTeam() {
 }
 
 function clearSquad() {
-  const gw = state.viewingGW;
-  const team = state.plan[gw];
-  if (!team) return;
-
-  // Nothing to clear
-  if (team.starting.length === 0 && team.bench.length === 0) {
-    showMessage('Squad is already empty.', 'info');
-    return;
-  }
-
-  // Save undo state so user can recover
-  history.undoStack.push(JSON.parse(JSON.stringify(state)));
-  if (history.undoStack.length > 50) history.undoStack.shift();
-
-  // Cancel any pending batch transfers first
-  resetTransferState();
-
-  // Sum up all selling prices and add to bank
-  const allPlayers = [...team.starting, ...team.bench];
-  let totalSellValue = 0;
-  for (const entry of allPlayers) {
-    totalSellValue += entry.sellingPrice ?? displayPrice(entry);
-  }
-  state.bank = Number((state.bank + totalSellValue).toFixed(1));
-
-  // Clear starting, bench, and captain/VC for current GW and all future GWs
-  for (let g = gw; g <= MAX_GAMEWEEK; g++) {
-    const t = state.plan[g];
-    if (!t) continue;
-    t.starting = [];
-    t.bench = [];
-    t.captain = null;
-    t.viceCaptain = null;
-  }
-
-  // Recompute FTs from current GW onward.
-  // After clearing, countTransfersInGW returns 0 (no new players vs previous GW),
-  // so the displayed FT value automatically resets to the stored start-of-week total.
-  recomputeFreeTransfersFromGW(gw);
-
-  updateUI();
-  showMessage('Squad cleared. All players sold.', 'success');
+  sellAllPlayers(updateUI);
 }
 
 // Captain/Vice-Captain functions
