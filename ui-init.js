@@ -2,7 +2,7 @@
 
 import { state, history, loadTeamEntry, normalizePlanPrices, ensureFreeTransfersByGW, getFreeTransfersForGW, setFreeTransfersForGW, recomputeFreeTransfersFromGW, ensureHistoricallyUsedChips, countTransfersInGW } from './data.js';
 import { setupSidebarHandlers, closeSidebar, toggleSidebarMenu } from './ui-sidebar.js';
-import { showMessage, renderPitch, renderBench, ensureFixturesForView } from './ui-render.js';
+import { showMessage, renderPitch, renderBench, ensureFixturesForView, displayPrice } from './ui-render.js';
 import { renderFixtures, setFixturesGW, isFixturesSyncEnabled } from './fixtures.js';
 import { cancelTransfer, substitutePlayer, addSelectedToSquad, removePlayer, resetTransferState, isPendingTransfer, getBatchTransferInfo, reinstatePlayer, selectChip, togglePlayerMark, setHistoricalChipUsedForPlanning } from './team-operations.js';
 import { setPendingSwap, getPendingSwap } from './ui-render.js';
@@ -1044,12 +1044,12 @@ function clearSquad() {
   const allPlayers = [...team.starting, ...team.bench];
   let totalSellValue = 0;
   for (const entry of allPlayers) {
-    totalSellValue += entry.sellingPrice ?? (entry.purchasePrice ?? 0);
+    totalSellValue += entry.sellingPrice ?? displayPrice(entry);
   }
   state.bank = Number((state.bank + totalSellValue).toFixed(1));
 
   // Clear starting, bench, and captain/VC for current GW and all future GWs
-  for (let g = gw; g <= 38; g++) {
+  for (let g = gw; g <= MAX_GAMEWEEK; g++) {
     const t = state.plan[g];
     if (!t) continue;
     t.starting = [];
