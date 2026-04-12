@@ -4,7 +4,7 @@ import { state, history, loadTeamEntry, normalizePlanPrices, ensureFreeTransfers
 import { setupSidebarHandlers, closeSidebar, toggleSidebarMenu } from './ui-sidebar.js';
 import { showMessage, renderPitch, renderBench, ensureFixturesForView } from './ui-render.js';
 import { renderFixtures, setFixturesGW, isFixturesSyncEnabled } from './fixtures.js';
-import { cancelTransfer, substitutePlayer, addSelectedToSquad, removePlayer, resetTransferState, isPendingTransfer, getBatchTransferInfo, reinstatePlayer, selectChip, togglePlayerMark, setHistoricalChipUsedForPlanning } from './team-operations.js';
+import { cancelTransfer, substitutePlayer, addSelectedToSquad, removePlayer, resetTransferState, isPendingTransfer, getBatchTransferInfo, reinstatePlayer, selectChip, togglePlayerMark, setHistoricalChipUsedForPlanning, sellAllPlayers } from './team-operations.js';
 import { setPendingSwap, getPendingSwap } from './ui-render.js';
 import { setDefaultSort } from './table.js';
 import { MAX_GAMEWEEK, MAX_DRAFTS_PER_MANAGER } from './constants.js';
@@ -1022,6 +1022,10 @@ function resetToImportedTeam() {
   showMessage('Team reset to imported state.', 'success');
 }
 
+function clearSquad() {
+  sellAllPlayers(updateUI);
+}
+
 // Captain/Vice-Captain functions
 // Logic: When setting a captain/VC on a player who already has the other role,
 // swap the roles between the two players (if both roles are currently assigned).
@@ -1327,6 +1331,7 @@ export function initUI() {
   window.onSaveNameInput = onSaveNameInput;
   window.undoLastAction = undoLastAction;
   window.resetToImportedTeam = resetToImportedTeam;
+  window.clearSquad = clearSquad;
   window.setCaptain = setCaptain;
   window.setViceCaptain = setViceCaptain;
   window.donatePlaceholder = () => showMessage('Donate feature coming soon! This is a placeholder for now.', 'info');

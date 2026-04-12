@@ -606,6 +606,56 @@ function addSinglePlayerToSquad(playerId, team, gw, updateUI) {
   updateUI();
 }
 
+// Sell every player currently in the squad via the batch-transfer mechanism.
+// This leaves SOLD placeholder cards on the pitch so the user can:
+//   - add 15 replacements via the transfer-in flow
+//   - reinstate individual players by clicking the ↶ button on each placeholder
+//   - cancel the whole operation with the Cancel Transfer button
+export function sellAllPlayers(updateUI) {
+  const gw = state.viewingGW;
+  const team = state.plan[gw];
+  if (!team) return;
+
+  const allPlayers = [...team.starting, ...team.bench];
+  if (allPlayers.length === 0) {
+    showMessage('Squad is already empty.', 'info');
+    return;
+  }
+
+  // Take a snapshot for cancel (only if no batch is already active)
+  if (!batchTransfers.isActive) {
+    batchTransfers.snapshot = snapshotForCancel();
+    batchTransfers.isActive = true;
+  }
+
+  // Sell every player through the batch mechanism
+  for (const entry of [...team.starting]) {
+    const sell = entry.sellingPrice ?? displayPrice(entry);
+    batchTransfers.removedPlayers.push({ id: entry.id, side: 'starting', sellingPrice: sell });
+    state.bank = Number((state.bank + sell).toFixed(1));
+  }
+  for (const entry of [...team.bench]) {
+    const sell = entry.sellingPrice ?? displayPrice(entry);
+    batchTransfers.removedPlayers.push({ id: entry.id, side: 'bench', sellingPrice: sell });
+    state.bank = Number((state.bank + sell).toFixed(1));
+  }
+
+  // Remove all sold players from this GW and every future GW
+  const soldIds = new Set(batchTransfers.removedPlayers.map(r => r.id));
+  for (let g = gw; g <= 38; g++) {
+    const t = state.plan[g];
+    if (!t) continue;
+    t.starting = t.starting.filter(e => !soldIds.has(e.id));
+    t.bench = t.bench.filter(e => !soldIds.has(e.id));
+    if (soldIds.has(t.captain)) t.captain = null;
+    if (soldIds.has(t.viceCaptain)) t.viceCaptain = null;
+  }
+
+  recomputeFreeTransfersFromGW(gw);
+  showMessage('All players sold. Click ↶ on any card to reinstate, or use Cancel Transfer to undo all.', 'success');
+  updateUI();
+}
+
 export function isPendingTransfer() {
   return batchTransfers.isActive;
 }
