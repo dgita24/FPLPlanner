@@ -392,6 +392,7 @@ export function renderPitch() {
         <option value="current" ${state.priceMode === 'current' ? 'selected' : ''}>Current</option>
       </select>
       <div class="pitch-bank-badge pitch-bank-editable" id="pitchBankBadge" onclick="editPitchBank()" title="Edit bank balance">£${Number(state.bank).toFixed(1)}m</div>
+      <button class="pitch-clear-btn" onclick="clearSquad()">🗑️ Clear</button>
     </div>
     <div class="formation-line" data-player-count="${gk.length}">${gk.map(renderCard).join('')}</div>
     <div class="formation-line" data-player-count="${def.length}">${def.map(renderCard).join('')}</div>

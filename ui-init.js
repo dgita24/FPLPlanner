@@ -1022,6 +1022,51 @@ function resetToImportedTeam() {
   showMessage('Team reset to imported state.', 'success');
 }
 
+function clearSquad() {
+  const gw = state.viewingGW;
+  const team = state.plan[gw];
+  if (!team) return;
+
+  // Nothing to clear
+  if (team.starting.length === 0 && team.bench.length === 0) {
+    showMessage('Squad is already empty.', 'info');
+    return;
+  }
+
+  // Save undo state so user can recover
+  history.undoStack.push(JSON.parse(JSON.stringify(state)));
+  if (history.undoStack.length > 50) history.undoStack.shift();
+
+  // Cancel any pending batch transfers first
+  resetTransferState();
+
+  // Sum up all selling prices and add to bank
+  const allPlayers = [...team.starting, ...team.bench];
+  let totalSellValue = 0;
+  for (const entry of allPlayers) {
+    totalSellValue += entry.sellingPrice ?? (entry.purchasePrice ?? 0);
+  }
+  state.bank = Number((state.bank + totalSellValue).toFixed(1));
+
+  // Clear starting, bench, and captain/VC for current GW and all future GWs
+  for (let g = gw; g <= 38; g++) {
+    const t = state.plan[g];
+    if (!t) continue;
+    t.starting = [];
+    t.bench = [];
+    t.captain = null;
+    t.viceCaptain = null;
+  }
+
+  // Recompute FTs from current GW onward.
+  // After clearing, countTransfersInGW returns 0 (no new players vs previous GW),
+  // so the displayed FT value automatically resets to the stored start-of-week total.
+  recomputeFreeTransfersFromGW(gw);
+
+  updateUI();
+  showMessage('Squad cleared. All players sold.', 'success');
+}
+
 // Captain/Vice-Captain functions
 // Logic: When setting a captain/VC on a player who already has the other role,
 // swap the roles between the two players (if both roles are currently assigned).
@@ -1327,6 +1372,7 @@ export function initUI() {
   window.onSaveNameInput = onSaveNameInput;
   window.undoLastAction = undoLastAction;
   window.resetToImportedTeam = resetToImportedTeam;
+  window.clearSquad = clearSquad;
   window.setCaptain = setCaptain;
   window.setViceCaptain = setViceCaptain;
   window.donatePlaceholder = () => showMessage('Donate feature coming soon! This is a placeholder for now.', 'info');
