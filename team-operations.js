@@ -257,11 +257,12 @@ export function removePlayer(playerId, source, updateUI) {
   const actualSource = team.starting.some((e) => e.id === playerId) ? 'starting' : 'bench';
   const sell = entry.sellingPrice ?? displayPrice(entry);
   
-  // Track this removal
+  // Track this removal (include elementType so transfer-in can match position)
   batchTransfers.removedPlayers.push({
     id: playerId,
     side: actualSource,
-    sellingPrice: sell
+    sellingPrice: sell,
+    elementType: getElementType(playerId)
   });
 
   state.bank = Number((state.bank + sell).toFixed(1));
@@ -452,46 +453,73 @@ function addSinglePlayerToSquad(playerId, team, gw, updateUI) {
   }
 
   // Determine which slots are available based on removed players
+  // Use position-aware counts so the original formation is preserved during rebuild.
+  const playerElementType = getElementType(playerId);
+  const isGKPlayer = playerElementType === 1;
+
   const startingSlotsNeeded = batchTransfers.removedPlayers.filter(p => p.side === 'starting').length;
   const benchSlotsNeeded = batchTransfers.removedPlayers.filter(p => p.side === 'bench').length;
   
+  // Position-matched remaining slots
+  const startingSlotsForPos = batchTransfers.removedPlayers.filter(
+    p => p.side === 'starting' && p.elementType === playerElementType
+  ).length;
+  const benchSlotsForPos = batchTransfers.removedPlayers.filter(
+    p => p.side === 'bench' && p.elementType === playerElementType
+  ).length;
+
   const currentStartingCount = team.starting.length;
   const currentBenchCount = team.bench.length;
   
-  // Determine which side to add to based on available slots
+  // Determine which side to add to, preferring a position-matched slot so the
+  // original formation structure is preserved after clear-squad.
   let targetSide = null;
   
-  // Check if we can add to starting XI (has room and needs filling)
-  const canAddToStarting = currentStartingCount < 11 && startingSlotsNeeded > 0;
-  // Check if we can add to bench (has room and needs filling)
-  const canAddToBench = currentBenchCount < 4 && benchSlotsNeeded > 0;
-  
-  if (!canAddToStarting && !canAddToBench) {
-    if (startingSlotsNeeded > 0 || benchSlotsNeeded > 0) {
-      return { success: false, reason: 'All available slots are full' };
-    } else {
-      return { success: false, reason: 'No slots to fill' };
-    }
-    return;
-  }
-  
-  // Intelligently choose target side based on player type and available slots
-  const isGKPlayer = getElementType(playerId) === 1;
-  
-  if (canAddToStarting && canAddToBench) {
-    // Both available - check if GK should go to bench
+  // Try position-matched slot first
+  const posMatchStarting = startingSlotsForPos > 0 && currentStartingCount < 11;
+  const posMatchBench = benchSlotsForPos > 0 && currentBenchCount < 4;
+
+  if (posMatchStarting && posMatchBench) {
     if (isGKPlayer) {
-      // If adding a GK and starting XI already has a GK, prefer bench
       const startingHasGK = team.starting.some(e => getElementType(e.id) === 1);
       targetSide = startingHasGK ? 'bench' : 'starting';
     } else {
-      // Default to starting XI for outfield players
       targetSide = 'starting';
     }
-  } else if (canAddToStarting) {
-    targetSide = 'starting';
-  } else {
+  } else if (posMatchStarting) {
+    if (isGKPlayer) {
+      const startingHasGK = team.starting.some(e => getElementType(e.id) === 1);
+      targetSide = startingHasGK && posMatchBench ? 'bench' : 'starting';
+    } else {
+      targetSide = 'starting';
+    }
+  } else if (posMatchBench) {
     targetSide = 'bench';
+  } else {
+    // Fallback: no position-matched slot — use any available slot on either side
+    const canAddToStarting = currentStartingCount < 11 && startingSlotsNeeded > 0;
+    const canAddToBench = currentBenchCount < 4 && benchSlotsNeeded > 0;
+
+    if (!canAddToStarting && !canAddToBench) {
+      if (startingSlotsNeeded > 0 || benchSlotsNeeded > 0) {
+        return { success: false, reason: 'All available slots are full' };
+      } else {
+        return { success: false, reason: 'No slots to fill' };
+      }
+    }
+
+    if (canAddToStarting && canAddToBench) {
+      if (isGKPlayer) {
+        const startingHasGK = team.starting.some(e => getElementType(e.id) === 1);
+        targetSide = startingHasGK ? 'bench' : 'starting';
+      } else {
+        targetSide = 'starting';
+      }
+    } else if (canAddToStarting) {
+      targetSide = 'starting';
+    } else {
+      targetSide = 'bench';
+    }
   }
 
   const purchasePrice = buy;
@@ -578,8 +606,16 @@ function addSinglePlayerToSquad(playerId, team, gw, updateUI) {
     }
   }
 
-  // Remove the filled slot from the batch (find matching side, not FIFO)
-  const slotIndex = batchTransfers.removedPlayers.findIndex(p => p.side === targetSide);
+  // Remove the filled slot from the batch.
+  // Prefer a slot matching both side AND position type so the correct
+  // placeholder disappears from the pitch (preserves visual formation).
+  let slotIndex = batchTransfers.removedPlayers.findIndex(
+    p => p.side === targetSide && p.elementType === playerElementType
+  );
+  if (slotIndex === -1) {
+    // Fallback: match just the side (handles formation-change scenarios)
+    slotIndex = batchTransfers.removedPlayers.findIndex(p => p.side === targetSide);
+  }
   if (slotIndex !== -1) {
     batchTransfers.removedPlayers.splice(slotIndex, 1);
   }
@@ -634,15 +670,15 @@ export function sellAllPlayers(updateUI) {
     batchTransfers.isActive = true;
   }
 
-  // Sell every player through the batch mechanism
+  // Sell every player through the batch mechanism (include elementType for position-aware rebuild)
   for (const entry of [...team.starting]) {
     const sell = entry.sellingPrice ?? displayPrice(entry);
-    batchTransfers.removedPlayers.push({ id: entry.id, side: 'starting', sellingPrice: sell });
+    batchTransfers.removedPlayers.push({ id: entry.id, side: 'starting', sellingPrice: sell, elementType: getElementType(entry.id) });
     state.bank = Number((state.bank + sell).toFixed(1));
   }
   for (const entry of [...team.bench]) {
     const sell = entry.sellingPrice ?? displayPrice(entry);
-    batchTransfers.removedPlayers.push({ id: entry.id, side: 'bench', sellingPrice: sell });
+    batchTransfers.removedPlayers.push({ id: entry.id, side: 'bench', sellingPrice: sell, elementType: getElementType(entry.id) });
     state.bank = Number((state.bank + sell).toFixed(1));
   }
 
