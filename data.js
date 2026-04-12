@@ -208,7 +208,7 @@ export function resetChipUsageState() {
 
 export async function loadBootstrap() {
   try {
-    const res = await fetch(`${FPL_BASE}/bootstrap-static/`);
+    const res = await fetch(`${FPL_BASE}/bootstrap-static/`, { cache: 'no-store' });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
     state.bootstrap = await parseJsonOrThrow(res);
@@ -273,7 +273,7 @@ export async function loadFixtures(gw) {
 async function loadTransfersPurchaseMap(managerId) {
   // Same approach as your older single-file: build purchase map from /transfers/ [file:71]
   try {
-    const res = await fetch(`${FPL_BASE}/entry/${managerId}/transfers/`);
+    const res = await fetch(`${FPL_BASE}/entry/${managerId}/transfers/`, { cache: 'no-store' });
     if (!res.ok) return {};
 
     const transfers = await parseJsonOrThrow(res);
@@ -384,7 +384,7 @@ export async function loadTeamEntry(managerId, gwRequested) {
   // Fetch entry summary for current bank balance
   let entrySummary = null;
   try {
-    const entryRes = await fetch(`${FPL_BASE}/entry/${managerId}/`);
+    const entryRes = await fetch(`${FPL_BASE}/entry/${managerId}/`, { cache: 'no-store' });
     if (entryRes.ok) {
       entrySummary = await parseJsonOrThrow(entryRes);
     }
@@ -395,7 +395,8 @@ export async function loadTeamEntry(managerId, gwRequested) {
   for (const gw of unique) {
     try {
       const res = await fetch(
-        `${FPL_BASE}/entry/${managerId}/event/${gw}/picks/`
+        `${FPL_BASE}/entry/${managerId}/event/${gw}/picks/`,
+        { cache: 'no-store' }
       );
       if (!res.ok) continue;
 
@@ -471,7 +472,7 @@ export async function loadTeamEntry(managerId, gwRequested) {
       // Falls back to default (1 FT) if the fetch fails.
       let ftResult = null;
       try {
-        const histRes = await fetch(`${FPL_BASE}/entry/${managerId}/history/`);
+        const histRes = await fetch(`${FPL_BASE}/entry/${managerId}/history/`, { cache: 'no-store' });
         if (histRes.ok) {
           const histData = await parseJsonOrThrow(histRes);
           ftResult = computeFreeTransfersFromHistory(histData);
@@ -489,12 +490,12 @@ export async function loadTeamEntry(managerId, gwRequested) {
         state.freeTransfersByGW[planningGW] =
           normalizeFreeTransfersValue(ftResult.nextGWft);
 
-        // Also mark historically used chips from the API response
-        for (const c of (ftResult.chips || [])) {
-          if (CHIP_TYPES.includes(c.name)) {
-            state.historicallyUsedChips[c.name] = true;
-          }
-        }
+        // Note: we intentionally do NOT auto-mark historically used chips
+        // from the API response here.  Fresh imports should present a clean
+        // slate (all chips unticked).  Only saved-draft re-imports restore
+        // previously ticked chip state.  The chip history from the API is
+        // already consumed by computeFreeTransfersFromHistory() for
+        // accurate FT calculation, which is separate from the planning UI.
       }
 
       recomputeFreeTransfersFromGW(state.viewingGW);
