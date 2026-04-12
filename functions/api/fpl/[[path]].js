@@ -32,6 +32,7 @@ export async function onRequest(context) {
   newRes.headers.set('Access-Control-Allow-Origin', '*');
   newRes.headers.set('Access-Control-Allow-Methods', 'GET, OPTIONS');
   newRes.headers.set('Access-Control-Allow-Headers', 'Content-Type');
+  newRes.headers.set('Cache-Control', 'no-store');
 
   const ct = res.headers.get('Content-Type');
   if (ct) newRes.headers.set('Content-Type', ct);

@@ -5,6 +5,7 @@ export async function onRequest() {
   });
   const newRes = new Response(res.body, res);
   newRes.headers.set('Access-Control-Allow-Origin', '*');
+  newRes.headers.set('Cache-Control', 'no-store');
   return newRes;
 }
 
