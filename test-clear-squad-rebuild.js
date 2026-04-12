@@ -397,35 +397,7 @@ console.log('\nTest 4: Placeholder removal matches correct position');
   assert(gkStillThere, 'GK placeholder still present after adding MID');
 }
 
-// ---------- Test 5: 3-5-2 formation preserved ----------
-console.log('\nTest 5: Rebuild 3-5-2 formation');
-{
-  const origStarting = [
-    entry(101),
-    entry(201), entry(202), entry(203),             // 3 DEF
-    entry(301), entry(302), entry(303), entry(304), entry(305), // 5 MID
-    entry(401), entry(402),                         // 2 FWD
-  ];
-  const origBench = [entry(102), entry(204), entry(305), entry(403)];
-
-  // Add in reverse position order
-  const addOrder = [411, 412, 413, 311, 312, 313, 314, 315, 211, 212, 213, 214, 111, 112];
-
-  // Wait, that's only 14. Let me fix - we need 15 total with different IDs
-  // Actually we need 15 different new players. Let me use all the "new" player IDs.
-  // 3 FWDs total: 2 starting + 1 bench
-  // 5 MIDs: 5 starting + 0 bench? No, bench has 1 MID. Let me recalculate.
-  // Bench has: GK(102), DEF(204), MID(305 is duplicate - let's fix)
-
-  // Let me redo with clean IDs for 3-5-2
-  // Starting: GK(101), DEF(201,202,203), MID(301,302,303,304,305), FWD(401,402)
-  // Bench: GK(102), DEF(204), MID(306 - need to add), FWD(403)
-  // Actually, the mock doesn't have 306. Let me use existing IDs properly.
-  // Bench MID slot: we have player 305 in both starting and bench which is wrong.
-  // Let me just use a different formation test setup.
-}
-
-// ---------- Test 5 (redo): 3-4-3 formation preserved ----------
+// ---------- Test 5: 3-4-3 formation preserved ----------
 console.log('\nTest 5: Rebuild 3-4-3 formation');
 {
   // 3-4-3 starting: 1 GK, 3 DEF, 4 MID, 3 FWD
@@ -455,33 +427,7 @@ console.log('\nTest 5: Rebuild 3-4-3 formation');
   assert(v.ok, 'Final 3-4-3 formation passes validation');
 }
 
-// ---------- Test 6: 5-4-1 formation preserved ----------
-console.log('\nTest 6: Rebuild 5-4-1 formation');
-{
-  const origStarting = [
-    entry(101),                                                 // 1 GK
-    entry(201), entry(202), entry(203), entry(204), entry(205), // 5 DEF
-    entry(301), entry(302), entry(303), entry(304),             // 4 MID
-    entry(401),                                                 // 1 FWD
-  ];
-  const origBench = [entry(102), entry(211), entry(305), entry(402)];
-
-  // Rebuild starting with single FWD, then GK last
-  const addOrder = [413, 315, 314, 313, 312, 311, 215, 214, 213, 212, 211, 412, 112, 111];
-
-  // We need exactly 15 players. Let me count: that's only 14. Add one more.
-  const addOrder15 = [413, 315, 314, 313, 312, 215, 214, 213, 212, 211, 311, 412, 112, 111];
-  // Still 14. Nah, let me count the originals:
-  // Starting: 101, 201, 202, 203, 204, 205, 301, 302, 303, 304, 401 = 11
-  // Bench: 102, 211, 305, 402 = 4
-  // Total = 15 OK.
-  // We need 15 new players. But some IDs overlap with orig bench (211, 305, 402).
-  // That's fine for simulation - we just need 15 new player IDs.
-  // Actually in the real app, we'd add different players. Let me reconsider.
-  // The test is about slot placement, not specific player IDs. Let me create distinct new IDs.
-}
-
-// ---------- Test 6 (simplified): Verify no false invalid-formation block ----------
+// ---------- Test 6: No false invalid-formation block when final squad is valid ----------
 console.log('\nTest 6: No false invalid-formation block when final squad is valid');
 {
   // 4-4-2 starting, standard bench
