@@ -74,6 +74,30 @@ export function validateSquadComposition(team) {
   return { ok: true, message: '' };
 }
 
+// Validate position maximums even for incomplete squads (2 GK, 5 DEF, 5 MID, 3 FWD)
+export function validatePositionLimits(team) {
+  if (!team) return { ok: false, message: 'Internal error: missing team.' };
+
+  const all = [...(team.starting || []), ...(team.bench || [])];
+
+  let gk = 0, def = 0, mid = 0, fwd = 0;
+
+  for (const e of all) {
+    const et = getElementType(e.id);
+    if (et === 1) gk++;
+    else if (et === 2) def++;
+    else if (et === 3) mid++;
+    else if (et === 4) fwd++;
+  }
+
+  if (gk > 2) return { ok: false, message: 'Invalid squad: max 2 goalkeepers allowed.' };
+  if (def > 5) return { ok: false, message: 'Invalid squad: max 5 defenders allowed.' };
+  if (mid > 5) return { ok: false, message: 'Invalid squad: max 5 midfielders allowed.' };
+  if (fwd > 3) return { ok: false, message: 'Invalid squad: max 3 forwards allowed.' };
+
+  return { ok: true, message: '' };
+}
+
 export function getClubCounts(team) {
   const counts = new Map();
   if (!team) return counts;
