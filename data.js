@@ -351,7 +351,7 @@ export async function loadTeamEntry(managerId, gwRequested) {
 
   if (Number.isFinite(+gwRequested)) candidates.push(+gwRequested);
 
-  const available = events
+  const completedOrCurrentGWs = events
     .filter(
       e =>
         e &&
@@ -362,7 +362,7 @@ export async function loadTeamEntry(managerId, gwRequested) {
     .sort((a, b) => b.id - a.id)
     .map(e => e.id);
 
-  for (const id of available) candidates.push(id);
+  for (const id of completedOrCurrentGWs) candidates.push(id);
 
   // final safety
   for (let g = gwRequested - 1; g >= Math.max(1, gwRequested - 6); g--) {
