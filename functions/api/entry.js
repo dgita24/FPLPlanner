@@ -9,5 +9,6 @@ export async function onRequest(context) {
   const newRes = new Response(res.body, res);
   newRes.headers.set('Access-Control-Allow-Origin', '*');
   newRes.headers.set('Content-Type', 'application/json');
+  newRes.headers.set('Cache-Control', 'no-store');
   return newRes;
 }
