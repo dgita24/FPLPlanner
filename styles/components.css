@@ -2065,6 +2065,92 @@ td.fixtures-cell {
   font-size: 16px;
 }
 
+/* ---- Squad player card modal (compact redesign) ---- */
+
+.squad-modal-content {
+  max-width: 480px;
+  padding: 16px;
+}
+
+/* Prominent info button next to player name */
+.squad-modal-info-btn {
+  background: var(--accent);
+  color: var(--bg-light);
+  border: none;
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  min-width: 28px;
+  font-size: 15px;
+  font-weight: bold;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+
+.squad-modal-info-btn:hover {
+  background: var(--accent-hover);
+  transform: scale(1.12);
+}
+
+/* Fixture strip row beneath the header */
+.squad-modal-fixtures {
+  margin-bottom: 10px;
+}
+
+.squad-modal-fixtures .pim-fix-chip {
+  background: rgba(255, 255, 255, 0.10);
+  border-color: rgba(255, 255, 255, 0.18);
+}
+
+.squad-modal-fixtures .pim-fix-chip--dgw {
+  background: rgba(255, 215, 0, 0.14);
+}
+
+/* Compact button row used for captain + actions */
+.squad-modal-btn-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.squad-modal-btn {
+  flex: 1 1 0;
+  min-width: 0;
+  padding: 6px 10px;
+  border: none;
+  border-radius: 5px;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s;
+  background: var(--primary);
+  color: var(--bg);
+  text-align: center;
+  white-space: nowrap;
+}
+
+.squad-modal-btn:hover {
+  filter: brightness(1.15);
+  transform: translateY(-1px);
+}
+
+.squad-modal-btn--active {
+  background: var(--accent);
+}
+
+.squad-modal-btn--danger {
+  background: var(--error);
+}
+
+.squad-modal-btn--accent {
+  background: var(--accent);
+}
+
 /* ---- Player name row with ℹ status icon ---- */
 .pim-title-row {
   display: flex;

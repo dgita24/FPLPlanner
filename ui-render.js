@@ -755,170 +755,71 @@ window.showSquadPlayerInfo = function (playerId, source) {
     `;
   }
   
-  // Build stats grid including DEFCON points
-  const statsHtml = `
-    <div class="player-info-stats">
-      <div class="player-stat-item">
-        <div class="player-stat-label">Total Points</div>
-        <div class="player-stat-value">${player.total_points || 0}</div>
-      </div>
-      <div class="player-stat-item">
-        <div class="player-stat-label">Price</div>
-        <div class="player-stat-value">£${(player.now_cost / 10).toFixed(1)}m</div>
-      </div>
-      <div class="player-stat-item">
-        <div class="player-stat-label">Form</div>
-        <div class="player-stat-value">${player.form || '0'}</div>
-      </div>
-      <div class="player-stat-item">
-        <div class="player-stat-label">Goals Scored</div>
-        <div class="player-stat-value">${player.goals_scored || 0}</div>
-      </div>
-      <div class="player-stat-item">
-        <div class="player-stat-label">Assists</div>
-        <div class="player-stat-value">${player.assists || 0}</div>
-      </div>
-      <div class="player-stat-item">
-        <div class="player-stat-label">Clean Sheets</div>
-        <div class="player-stat-value">${player.clean_sheets || 0}</div>
-      </div>
-      <div class="player-stat-item">
-        <div class="player-stat-label">Bonus Points</div>
-        <div class="player-stat-value">${player.bonus || 0}</div>
-      </div>
-      <div class="player-stat-item">
-        <div class="player-stat-label">Minutes Played</div>
-        <div class="player-stat-value">${player.minutes || 0}</div>
-      </div>
-      <div class="player-stat-item">
-        <div class="player-stat-label">Goals Conceded</div>
-        <div class="player-stat-value">${player.goals_conceded || 0}</div>
-      </div>
-      <div class="player-stat-item">
-        <div class="player-stat-label">Yellow Cards</div>
-        <div class="player-stat-value">${player.yellow_cards || 0}</div>
-      </div>
-      <div class="player-stat-item">
-        <div class="player-stat-label">Red Cards</div>
-        <div class="player-stat-value">${player.red_cards || 0}</div>
-      </div>
-      <div class="player-stat-item">
-        <div class="player-stat-label">Saves</div>
-        <div class="player-stat-value">${player.saves || 0}</div>
-      </div>
-      <div class="player-stat-item">
-        <div class="player-stat-label">Penalties Saved</div>
-        <div class="player-stat-value">${player.penalties_saved || 0}</div>
-      </div>
-      <div class="player-stat-item">
-        <div class="player-stat-label">Penalties Missed</div>
-        <div class="player-stat-value">${player.penalties_missed || 0}</div>
-      </div>
-      <div class="player-stat-item">
-        <div class="player-stat-label">Owned By</div>
-        <div class="player-stat-value">${parseFloat(player.selected_by_percent || 0).toFixed(1)}%</div>
-      </div>
-      <div class="player-stat-item">
-        <div class="player-stat-label">Transfers In (GW)</div>
-        <div class="player-stat-value">${player.transfers_in_event || 0}</div>
-      </div>
-      <div class="player-stat-item">
-        <div class="player-stat-label">Transfers Out (GW)</div>
-        <div class="player-stat-value">${player.transfers_out_event || 0}</div>
-      </div>
-      <div class="player-stat-item">
-        <div class="player-stat-label">ICT Index</div>
-        <div class="player-stat-value">${parseFloat(player.ict_index || 0).toFixed(1)}</div>
-      </div>
-      <div class="player-stat-item">
-        <div class="player-stat-label">DEFCON Points</div>
-        <div class="player-stat-value">${player.defensive_contribution || 0}</div>
-      </div>
-    </div>
-  `;
-  
   // Captain/Vice-Captain selector (starting XI only)
-  // Note: defensive_contribution field stores DEFCON season total (2pts per game with sufficient defensive actions)
   let captainSelectorHtml = '';
   if (isStartingXI) {
     captainSelectorHtml = `
-      <div class="player-info-section">
-        <h3>Captain Selection</h3>
-        <div style="display: flex; gap: 8px; margin-top: 6px;">
-          <button 
-            class="modal-action-btn ${isCaptain ? 'active' : ''}" 
-            onclick="setCaptain(${playerId}); closeSquadPlayerInfo();"
-            style="flex: 1;">
-            ${isCaptain ? '✓ Captain' : 'Set as Captain'}
-          </button>
-          <button 
-            class="modal-action-btn ${isViceCaptain ? 'active' : ''}" 
-            onclick="setViceCaptain(${playerId}); closeSquadPlayerInfo();"
-            style="flex: 1;">
-            ${isViceCaptain ? '✓ Vice-Captain' : 'Set as Vice-Captain'}
-          </button>
-        </div>
+      <div class="squad-modal-btn-row">
+        <button 
+          class="squad-modal-btn ${isCaptain ? 'squad-modal-btn--active' : ''}" 
+          onclick="setCaptain(${playerId}); closeSquadPlayerInfo();">
+          ${isCaptain ? '✓ Captain' : 'Set as Captain'}
+        </button>
+        <button 
+          class="squad-modal-btn ${isViceCaptain ? 'squad-modal-btn--active' : ''}" 
+          onclick="setViceCaptain(${playerId}); closeSquadPlayerInfo();">
+          ${isViceCaptain ? '✓ Vice-Captain' : 'Set as Vice-Captain'}
+        </button>
       </div>
     `;
   }
   
   // Action buttons (transfer/substitute)
   const actionButtonsHtml = `
-    <div class="player-info-section">
-      <h3>Actions</h3>
-      <div style="display: flex; gap: 8px; margin-top: 6px;">
-        <button 
-          class="modal-action-btn" 
-          onclick="removePlayer(${playerId}, '${source}'); closeSquadPlayerInfo();"
-          style="flex: 1; background: var(--error);">
-          Transfer Out
-        </button>
-        <button 
-          class="modal-action-btn" 
-          onclick="substitutePlayer(${playerId}); closeSquadPlayerInfo();"
-          style="flex: 1; background: var(--accent);">
-          Swap/Substitute
-        </button>
-      </div>
-      <div style="margin-top: 8px;">
-        <button 
-          class="modal-action-btn ${isMarked ? 'active' : ''}" 
-          onclick="togglePlayerMark(${playerId}); closeSquadPlayerInfo();"
-          style="width: 100%; background: ${isMarked ? 'var(--error)' : 'var(--primary)'};">
-          ${isMarked ? '✓ Marked (click to unmark)' : 'Mark / Target'}
-        </button>
-      </div>
+    <div class="squad-modal-btn-row">
+      <button 
+        class="squad-modal-btn squad-modal-btn--danger" 
+        onclick="removePlayer(${playerId}, '${source}'); closeSquadPlayerInfo();">
+        Transfer Out
+      </button>
+      <button 
+        class="squad-modal-btn squad-modal-btn--accent" 
+        onclick="substitutePlayer(${playerId}); closeSquadPlayerInfo();">
+        Swap/Sub
+      </button>
+      <button 
+        class="squad-modal-btn ${isMarked ? 'squad-modal-btn--active' : ''}" 
+        onclick="togglePlayerMark(${playerId}); closeSquadPlayerInfo();">
+        ${isMarked ? '✓ Marked' : 'Mark / Target'}
+      </button>
     </div>
   `;
   
   const fixtureChipsHtml = buildSquadFixtureChipsHtml(player.team, state.viewingGW, 6);
 
   modal.innerHTML = `
-    <div class="player-info-content" style="max-width: 700px;">
+    <div class="player-info-content squad-modal-content">
       <button class="player-info-close" onclick="closeSquadPlayerInfo()">×</button>
       
       <div class="player-info-header">
         <img src="${getTeamBadgeUrl(teamCode)}" 
              class="player-info-badge" alt="${teamNameEscaped}">
-        <div class="pim-header-main">
-          <div class="player-info-title">
+        <div class="player-info-title">
+          <div class="pim-title-row">
             <h2>${playerNameEscaped}</h2>
-            <p>${teamNameEscaped} • ${posNames[player.element_type]}</p>
+            <button class="squad-modal-info-btn" onclick="event.stopPropagation(); showPlayerInfo(null, ${playerId});" title="View full player stats">i</button>
           </div>
-          <div class="pim-header-fixtures">${fixtureChipsHtml}</div>
+          <p>${teamNameEscaped} • ${posNames[player.element_type]} • £${(player.now_cost / 10).toFixed(1)}m</p>
         </div>
       </div>
+
+      <div class="squad-modal-fixtures">${fixtureChipsHtml}</div>
       
       ${availabilityFlagHtml}
       
       ${captainSelectorHtml}
       
       ${actionButtonsHtml}
-      
-      <div class="player-info-section">
-        <h3>Season Statistics</h3>
-        ${statsHtml}
-      </div>
     </div>
   `;
   
