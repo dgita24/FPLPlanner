@@ -17,7 +17,11 @@ export async function onRequest(context) {
 
   // Remove "/api/fpl" prefix
   const fplPath = url.pathname.replace(/^\/api\/fpl/, '');
-  const target = `https://fantasy.premierleague.com/api${fplPath}${url.search}`;
+  // Strip the cache-busting _cb param before forwarding to upstream
+  const upstreamParams = new URLSearchParams(url.search);
+  upstreamParams.delete('_cb');
+  const qs = upstreamParams.toString();
+  const target = `https://fantasy.premierleague.com/api${fplPath}${qs ? '?' + qs : ''}`;
 
   const res = await fetch(target, {
     method: 'GET',
