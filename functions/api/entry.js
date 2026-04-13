@@ -9,6 +9,10 @@ export async function onRequest(context) {
   const newRes = new Response(res.body, res);
   newRes.headers.set('Access-Control-Allow-Origin', '*');
   newRes.headers.set('Content-Type', 'application/json');
-  newRes.headers.set('Cache-Control', 'no-store');
+  newRes.headers.set('Cache-Control', 'no-store, max-age=0, must-revalidate');
+  newRes.headers.set('Pragma', 'no-cache');
+  newRes.headers.set('Expires', '0');
+  newRes.headers.delete('ETag');
+  newRes.headers.delete('Last-Modified');
   return newRes;
 }

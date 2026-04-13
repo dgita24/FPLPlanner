@@ -37,6 +37,10 @@ async function init() {
           ensureHistoricallyUsedChips();
           recomputeFreeTransfersFromGW(state.viewingGW);
 
+          // Mark that current plan came from localStorage, not a fresh import.
+          // importTeam() will clear this flag after a successful import.
+          state._restoredFromLocalStorage = true;
+
           // Show persistent banner prompting user to import their team,
           // since managerId is not saved to localStorage
           if (!state.managerId) {

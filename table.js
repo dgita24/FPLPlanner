@@ -1,6 +1,6 @@
 // table.js - Player table render/filter - adding this to force a new deploy
 
-import { state, loadFixtures } from './data.js';
+import { state, loadFixtures, freshFetch } from './data.js';
 import { shouldShowPlayerFlag } from './player-status-utils.js';
 import { getResolvedFixturesForGW, isResolverReady, applyOverrides } from './fixture-resolver.js';
 
@@ -599,7 +599,7 @@ async function fetchPlayerSummary(playerId) {
   if (playerSummaryCache.has(playerId)) {
     return playerSummaryCache.get(playerId);
   }
-  const res = await fetch(`/api/fpl/element-summary/${playerId}/`);
+  const res = await freshFetch(`/api/fpl/element-summary/${playerId}/`);
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
   const data = await res.json();
   playerSummaryCache.set(playerId, data);

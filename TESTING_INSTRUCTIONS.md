@@ -236,6 +236,48 @@ Verify nothing broke:
 4. **Edge cases:** Try boundary values (£0.0 bank, 15 players, etc.)
 5. **Network:** Test with and without fixtures loaded (may see "--" initially)
 
+## Cache-Busting / Stale Import Tests
+
+### Test 21: No stale import in a normal (non-incognito) tab
+- [ ] Open the app in a **normal browser tab** (not incognito).
+- [ ] Import a team (enter your FPL Team ID, click "Import from FPL").
+- [ ] Note the imported GW shown in the success toast (e.g. "Team imported for GW33").
+- [ ] **Do not clear cache.** Close the tab or navigate away.
+- [ ] Re-open the app in the **same browser** (normal tab, no incognito).
+- [ ] Import the same team again.
+- [ ] **Expected:** The toast shows the same (correct/current) GW — never a stale older GW.
+- [ ] Repeat on a second browser or device to verify cross-device consistency.
+
+### Test 22: Response headers are no-store
+- [ ] Open DevTools → Network tab.
+- [ ] Import a team.
+- [ ] Click the `/api/fpl/entry/.../picks/` request in the network log.
+- [ ] **Expected response headers:**
+  - `Cache-Control: no-store, max-age=0, must-revalidate`
+  - `Pragma: no-cache`
+  - `Expires: 0`
+- [ ] Check the same headers on `/api/fpl/bootstrap-static/` and any `/api/fpl/entry/...` requests.
+- [ ] Confirm there is no `cf-cache-status: HIT` or `age > 0`.
+
+### Test 23: Cache-busting query params
+- [ ] Open DevTools → Network tab.
+- [ ] Import a team.
+- [ ] **Expected:** Every `/api/fpl/*` request URL includes a `_cb=<timestamp>` query parameter.
+- [ ] Refresh the page and import again — `_cb` values should differ between the two imports.
+
+### Test 24: Debug mode (`?debugCache=1`)
+- [ ] Open the app with `?debugCache=1` in the URL (e.g., `https://yoursite.com/?debugCache=1`).
+- [ ] Open DevTools → Console.
+- [ ] Import a team.
+- [ ] **Expected:** Console shows grouped `[debugCache]` entries for each `/api/fpl/*` request, with status code and key response headers (cache-control, pragma, age, cf-cache-status, etc.).
+
+### Test 25: localStorage restore does not override fresh import
+- [ ] Import a team (e.g., for GW33). Make a transfer so the plan is modified.
+- [ ] Close and re-open the app (no cache clear).
+- [ ] The app should restore the locally saved plan (banner says "Import a team…").
+- [ ] Import the same team again.
+- [ ] **Expected:** The fresh import fully overwrites the restored plan — the transfer you made previously is gone, and the plan matches the live FPL data.
+
 ## Known Limitations
 
 - Fixtures may show "--" until API responds (this is expected)

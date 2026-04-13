@@ -48,6 +48,44 @@ export let state = {
 const FPL_BASE = '/api/fpl';
 export const CHIP_TYPES = ['wildcard', 'freehit', 'bboost', '3xc'];
 
+/**
+ * Append a cache-busting query parameter to defeat misbehaving CDN/browser caches.
+ * @param {string} url - The URL to bust
+ * @returns {string} URL with `_cb=<timestamp>` appended
+ */
+export function cacheBust(url) {
+  const sep = url.includes('?') ? '&' : '?';
+  return `${url}${sep}_cb=${Date.now()}`;
+}
+
+/** Debug-cache mode: enabled by adding ?debugCache=1 to the page URL. */
+export const DEBUG_CACHE = (() => {
+  try { return new URLSearchParams(window.location.search).get('debugCache') === '1'; }
+  catch { return false; }
+})();
+
+/**
+ * Wrapper around fetch that:
+ *  - always adds cache: 'no-store'
+ *  - appends a cache-busting query param
+ *  - logs request URL + key response headers when debugCache=1
+ */
+export async function freshFetch(url, opts = {}) {
+  const bustedUrl = cacheBust(url);
+  const res = await fetch(bustedUrl, { ...opts, cache: 'no-store' });
+
+  if (DEBUG_CACHE) {
+    console.groupCollapsed(`[debugCache] ${bustedUrl}`);
+    console.log('status', res.status);
+    for (const h of ['cache-control', 'pragma', 'expires', 'age', 'cf-cache-status', 'etag', 'last-modified']) {
+      const v = res.headers.get(h);
+      if (v !== null) console.log(h, v);
+    }
+    console.groupEnd();
+  }
+  return res;
+}
+
 function deepCopy(obj) {
   return JSON.parse(JSON.stringify(obj));
 }
@@ -208,7 +246,7 @@ export function resetChipUsageState() {
 
 export async function loadBootstrap() {
   try {
-    const res = await fetch(`${FPL_BASE}/bootstrap-static/`, { cache: 'no-store' });
+    const res = await freshFetch(`${FPL_BASE}/bootstrap-static/`);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
     state.bootstrap = await parseJsonOrThrow(res);
@@ -264,7 +302,7 @@ export async function loadDefconData() {
 
 
 export async function loadFixtures(gw) {
-  const res = await fetch(`${FPL_BASE}/fixtures/?event=${gw}`);
+  const res = await freshFetch(`${FPL_BASE}/fixtures/?event=${gw}`);
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
   state.fixtures = await parseJsonOrThrow(res);
   return state.fixtures;
@@ -273,7 +311,7 @@ export async function loadFixtures(gw) {
 async function loadTransfersPurchaseMap(managerId) {
   // Same approach as your older single-file: build purchase map from /transfers/ [file:71]
   try {
-    const res = await fetch(`${FPL_BASE}/entry/${managerId}/transfers/`, { cache: 'no-store' });
+    const res = await freshFetch(`${FPL_BASE}/entry/${managerId}/transfers/`);
     if (!res.ok) return {};
 
     const transfers = await parseJsonOrThrow(res);
@@ -384,7 +422,7 @@ export async function loadTeamEntry(managerId, gwRequested) {
   // Fetch entry summary for current bank balance
   let entrySummary = null;
   try {
-    const entryRes = await fetch(`${FPL_BASE}/entry/${managerId}/`, { cache: 'no-store' });
+    const entryRes = await freshFetch(`${FPL_BASE}/entry/${managerId}/`);
     if (entryRes.ok) {
       entrySummary = await parseJsonOrThrow(entryRes);
     }
@@ -394,9 +432,8 @@ export async function loadTeamEntry(managerId, gwRequested) {
 
   for (const gw of unique) {
     try {
-      const res = await fetch(
-        `${FPL_BASE}/entry/${managerId}/event/${gw}/picks/`,
-        { cache: 'no-store' }
+      const res = await freshFetch(
+        `${FPL_BASE}/entry/${managerId}/event/${gw}/picks/`
       );
       if (!res.ok) continue;
 
@@ -472,7 +509,7 @@ export async function loadTeamEntry(managerId, gwRequested) {
       // Falls back to default (1 FT) if the fetch fails.
       let ftResult = null;
       try {
-        const histRes = await fetch(`${FPL_BASE}/entry/${managerId}/history/`, { cache: 'no-store' });
+        const histRes = await freshFetch(`${FPL_BASE}/entry/${managerId}/history/`);
         if (histRes.ok) {
           const histData = await parseJsonOrThrow(histRes);
           ftResult = computeFreeTransfersFromHistory(histData);

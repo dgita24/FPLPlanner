@@ -1,6 +1,6 @@
 // ui-init.js - Initializes all UI-related event listeners and dependencies
 
-import { state, history, loadTeamEntry, normalizePlanPrices, ensureFreeTransfersByGW, getFreeTransfersForGW, setFreeTransfersForGW, recomputeFreeTransfersFromGW, ensureHistoricallyUsedChips, countTransfersInGW } from './data.js';
+import { state, history, loadTeamEntry, normalizePlanPrices, ensureFreeTransfersByGW, getFreeTransfersForGW, setFreeTransfersForGW, recomputeFreeTransfersFromGW, ensureHistoricallyUsedChips, countTransfersInGW, DEBUG_CACHE } from './data.js';
 import { setupSidebarHandlers, closeSidebar, toggleSidebarMenu } from './ui-sidebar.js';
 import { showMessage, renderPitch, renderBench, ensureFixturesForView } from './ui-render.js';
 import { renderFixtures, setFixturesGW, isFixturesSyncEnabled } from './fixtures.js';
@@ -505,11 +505,25 @@ async function importTeam() {
     return;
   }
 
+  // Clear any stale localStorage-restored state so the fresh import is
+  // unambiguous.  loadTeamEntry() will re-populate state.plan fully.
+  state._restoredFromLocalStorage = false;
+  state.importedGW = null;
+
   // Use viewingGW (what the user sees on the banner) as the target.
   // loadTeamEntry will try this GW first, then fall back to the latest
   // available GW if picks aren't ready yet (e.g. next-GW deadline not passed).
   const planningGW = state.viewingGW;
   showMessage(`Loading team (planning GW${planningGW})...`, 'info');
+
+  if (DEBUG_CACHE) {
+    console.log('[debugCache] importTeam start', {
+      planningGW,
+      viewingGW: state.viewingGW,
+      currentGW: state.currentGW,
+      managerId: teamId,
+    });
+  }
 
   const data = await loadTeamEntry(teamId, planningGW);
 
@@ -537,6 +551,15 @@ async function importTeam() {
   // Compare imported GW against the planning GW the user sees (viewingGW),
   // not currentGW, so the toast message matches the banner.
   const importedGW = data._imported_gw || state.importedGW;
+
+  if (DEBUG_CACHE) {
+    console.log('[debugCache] importTeam result', {
+      importedGW,
+      planningGW,
+      _imported_gw: data._imported_gw,
+    });
+  }
+
   if (importedGW && importedGW !== planningGW) {
     showMessage(
       `⚠️ Imported GW${importedGW} squad (GW${planningGW} picks not yet available). Your current squad may differ if you made transfers since GW${importedGW}.`,

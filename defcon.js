@@ -1,6 +1,8 @@
 // defcon.js - Defensive Contributions (DEFCON) data module
 // Fetches and aggregates defensive_contribution stats from FPL live gameweek data
 
+import { freshFetch } from './data.js';
+
 const FPL_BASE = '/api/fpl';
 
 // In-memory cache for DEFCON data (per session)
@@ -18,7 +20,7 @@ let defconCache = {
  */
 async function getLatestStartedGameweek() {
   try {
-    const res = await fetch(`${FPL_BASE}/fixtures/`);
+    const res = await freshFetch(`${FPL_BASE}/fixtures/`);
     if (!res.ok) {
       console.warn('Failed to fetch fixtures for DEFCON');
       return 0;
@@ -69,7 +71,7 @@ async function getLatestStartedGameweek() {
  */
 async function fetchLiveGameweek(gw) {
   try {
-    const res = await fetch(`${FPL_BASE}/event/${gw}/live/`);
+    const res = await freshFetch(`${FPL_BASE}/event/${gw}/live/`);
     if (!res.ok) {
       console.warn(`Failed to fetch live data for GW${gw}`);
       return null;
