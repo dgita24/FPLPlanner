@@ -242,6 +242,32 @@ Verify nothing broke:
 - Import may fall back to previous GW if current GW not yet public
 - Cloud save/load requires valid API endpoints
 
+## Stale localStorage / Gameweek Override Test
+
+This verifies the fix for the "old GW import" bug where persisted localStorage
+caused the app to open on a past gameweek instead of the current one.
+
+### Manual Steps
+
+1. Open the app normally during GW **N** and import a team — confirm it shows GW **N**.
+2. In DevTools Console, simulate stale saved state:
+   ```js
+   const stale = JSON.parse(localStorage.getItem('fplplanner-state'));
+   stale.viewingGW = stale.viewingGW - 1; // e.g. GW N-1
+   stale.minNavigableGW = stale.viewingGW;
+   localStorage.setItem('fplplanner-state', JSON.stringify(stale));
+   ```
+3. Refresh the page (do **not** clear cache or use incognito).
+4. **Expected**: The header shows GW **N** (not N-1). Console logs
+   `Clamping stale viewingGW …`.
+5. Click Import — the network request should target `/event/N/picks/`
+   (or the correct fallback), **not** the stale GW.
+6. Verify FT count matches what bootstrap says for GW **N**.
+
+### Automated Test
+
+Run `node test-gw-clamp.js` — it exercises the clamping logic in isolation.
+
 ## Success Criteria
 
 ✅ All tests pass

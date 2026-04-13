@@ -1,6 +1,6 @@
 // ui-init.js - Initializes all UI-related event listeners and dependencies
 
-import { state, history, loadTeamEntry, normalizePlanPrices, ensureFreeTransfersByGW, getFreeTransfersForGW, setFreeTransfersForGW, recomputeFreeTransfersFromGW, ensureHistoricallyUsedChips, countTransfersInGW } from './data.js';
+import { state, history, loadTeamEntry, normalizePlanPrices, ensureFreeTransfersByGW, getFreeTransfersForGW, setFreeTransfersForGW, recomputeFreeTransfersFromGW, ensureHistoricallyUsedChips, countTransfersInGW, getBootstrapPlanningGW } from './data.js';
 import { setupSidebarHandlers, closeSidebar, toggleSidebarMenu } from './ui-sidebar.js';
 import { showMessage, renderPitch, renderBench, ensureFixturesForView } from './ui-render.js';
 import { renderFixtures, setFixturesGW, isFixturesSyncEnabled } from './fixtures.js';
@@ -505,9 +505,15 @@ async function importTeam() {
     return;
   }
 
-  // Use viewingGW (what the user sees on the banner) as the target.
-  // loadTeamEntry will try this GW first, then fall back to the latest
-  // available GW if picks aren't ready yet (e.g. next-GW deadline not passed).
+  // Derive planning GW from fresh bootstrap events so a stale
+  // state.viewingGW (e.g. from localStorage) can never target the wrong GW.
+  const freshPlanningGW = getBootstrapPlanningGW();
+
+  // If viewingGW is behind the bootstrap-derived GW, bring it forward.
+  if (state.viewingGW < freshPlanningGW) {
+    state.viewingGW = freshPlanningGW;
+  }
+
   const planningGW = state.viewingGW;
   showMessage(`Loading team (planning GW${planningGW})...`, 'info');
 

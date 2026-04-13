@@ -1,5 +1,5 @@
 // main.js - App initialization
-import { loadBootstrap, state, normalizePlanPrices, ensureFreeTransfersByGW, ensureHistoricallyUsedChips, recomputeFreeTransfersFromGW } from './data.js';
+import { loadBootstrap, state, normalizePlanPrices, ensureFreeTransfersByGW, ensureHistoricallyUsedChips, recomputeFreeTransfersFromGW, getBootstrapPlanningGW } from './data.js';
 import { renderTable, populateFilters } from './table.js';
 import { initUI } from './ui.js';
 import { loadFixturesData, renderFixtures } from './fixtures.js';
@@ -33,6 +33,20 @@ async function init() {
           state.priceMode = data.priceMode;
           state.freeTransfersByGW = data.freeTransfersByGW || {};
           state.historicallyUsedChips = data.historicallyUsedChips || {};
+
+          // Clamp restored viewingGW forward so stale localStorage can never
+          // drag the app back to an older gameweek than bootstrap indicates.
+          const bootstrapPlanningGW = getBootstrapPlanningGW();
+
+          if (state.viewingGW < bootstrapPlanningGW) {
+            console.log(`Clamping stale viewingGW ${state.viewingGW} → ${bootstrapPlanningGW}`);
+            state.viewingGW = bootstrapPlanningGW;
+          }
+          // Ensure minNavigableGW is never behind bootstrap planning GW.
+          // Use a safe fallback in case the saved value was missing/undefined.
+          const restoredMin = state.minNavigableGW ?? state.viewingGW;
+          state.minNavigableGW = Math.max(restoredMin, bootstrapPlanningGW);
+
           ensureFreeTransfersByGW();
           ensureHistoricallyUsedChips();
           recomputeFreeTransfersFromGW(state.viewingGW);

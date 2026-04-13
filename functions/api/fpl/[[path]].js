@@ -27,17 +27,25 @@ export async function onRequest(context) {
     },
   });
 
-  const newRes = new Response(res.body, res);
+  // Build a fresh response – do NOT clone upstream headers (e.g. edge-control)
+  // which can cause intermediate caches to serve stale data.
+  const body = await res.arrayBuffer();
+  const ct = res.headers.get('Content-Type') || 'application/json';
 
-  newRes.headers.set('Access-Control-Allow-Origin', '*');
-  newRes.headers.set('Access-Control-Allow-Methods', 'GET, OPTIONS');
-  newRes.headers.set('Access-Control-Allow-Headers', 'Content-Type');
-  newRes.headers.set('Cache-Control', 'no-store');
-
-  const ct = res.headers.get('Content-Type');
-  if (ct) newRes.headers.set('Content-Type', ct);
-
-  return newRes;
+  return new Response(body, {
+    status: res.status,
+    headers: {
+      'Content-Type': ct,
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type',
+      'Cache-Control': 'no-store, no-cache, max-age=0, must-revalidate',
+      'Pragma': 'no-cache',
+      'Expires': '0',
+      'Surrogate-Control': 'no-store',
+      'CDN-Cache-Control': 'no-store',
+    },
+  });
 }
 
 
