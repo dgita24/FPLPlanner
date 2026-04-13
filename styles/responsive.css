@@ -896,9 +896,16 @@
     margin-bottom: 6px;
   }
 
-  #squadPlayerInfoModal .modal-action-btn {
-    padding: 8px 12px;
-    font-size: 12px;
+  .squad-modal-btn {
+    padding: 5px 8px;
+    font-size: 10px;
+  }
+
+  .squad-modal-info-btn {
+    width: 24px;
+    height: 24px;
+    min-width: 24px;
+    font-size: 13px;
   }
 
   .player-info-header {
