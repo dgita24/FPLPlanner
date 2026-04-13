@@ -505,9 +505,19 @@ async function importTeam() {
     return;
   }
 
-  // Use viewingGW (what the user sees on the banner) as the target.
-  // loadTeamEntry will try this GW first, then fall back to the latest
-  // available GW if picks aren't ready yet (e.g. next-GW deadline not passed).
+  // Derive planning GW from fresh bootstrap events so a stale
+  // state.viewingGW (e.g. from localStorage) can never target the wrong GW.
+  const events = state.bootstrap?.events || [];
+  const freshPlanningGW = events.find(e => e.is_next)?.id
+    || events.find(e => e.is_current)?.id
+    || state.currentGW
+    || 1;
+
+  // If viewingGW is behind the bootstrap-derived GW, bring it forward.
+  if (state.viewingGW < freshPlanningGW) {
+    state.viewingGW = freshPlanningGW;
+  }
+
   const planningGW = state.viewingGW;
   showMessage(`Loading team (planning GW${planningGW})...`, 'info');
 

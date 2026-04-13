@@ -3,9 +3,21 @@ export async function onRequest() {
   const res = await fetch(target, {
     headers: { 'User-Agent': 'Mozilla/5.0' }
   });
-  const newRes = new Response(res.body, res);
-  newRes.headers.set('Access-Control-Allow-Origin', '*');
-  newRes.headers.set('Cache-Control', 'no-store');
-  return newRes;
+
+  // Build a fresh response – do NOT clone upstream headers (e.g. edge-control)
+  // which can cause intermediate caches to serve stale data.
+  const body = await res.arrayBuffer();
+  return new Response(body, {
+    status: res.status,
+    headers: {
+      'Content-Type': 'application/json',
+      'Access-Control-Allow-Origin': '*',
+      'Cache-Control': 'no-store, no-cache, max-age=0, must-revalidate',
+      'Pragma': 'no-cache',
+      'Expires': '0',
+      'Surrogate-Control': 'no-store',
+      'CDN-Cache-Control': 'no-store',
+    },
+  });
 }
 

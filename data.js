@@ -48,6 +48,10 @@ export let state = {
 const FPL_BASE = '/api/fpl';
 export const CHIP_TYPES = ['wildcard', 'freehit', 'bboost', '3xc'];
 
+// Per-page-load nonce appended to import-critical URLs to bust any URL-keyed
+// caches (browser disk cache, intermediate CDN/proxy layers).
+const CACHE_NONCE = Date.now();
+
 function deepCopy(obj) {
   return JSON.parse(JSON.stringify(obj));
 }
@@ -208,7 +212,7 @@ export function resetChipUsageState() {
 
 export async function loadBootstrap() {
   try {
-    const res = await fetch(`${FPL_BASE}/bootstrap-static/`, { cache: 'no-store' });
+    const res = await fetch(`${FPL_BASE}/bootstrap-static/?cb=${CACHE_NONCE}`, { cache: 'no-store' });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
     state.bootstrap = await parseJsonOrThrow(res);
@@ -273,7 +277,7 @@ export async function loadFixtures(gw) {
 async function loadTransfersPurchaseMap(managerId) {
   // Same approach as your older single-file: build purchase map from /transfers/ [file:71]
   try {
-    const res = await fetch(`${FPL_BASE}/entry/${managerId}/transfers/`, { cache: 'no-store' });
+    const res = await fetch(`${FPL_BASE}/entry/${managerId}/transfers/?cb=${CACHE_NONCE}`, { cache: 'no-store' });
     if (!res.ok) return {};
 
     const transfers = await parseJsonOrThrow(res);
@@ -384,7 +388,7 @@ export async function loadTeamEntry(managerId, gwRequested) {
   // Fetch entry summary for current bank balance
   let entrySummary = null;
   try {
-    const entryRes = await fetch(`${FPL_BASE}/entry/${managerId}/`, { cache: 'no-store' });
+    const entryRes = await fetch(`${FPL_BASE}/entry/${managerId}/?cb=${CACHE_NONCE}`, { cache: 'no-store' });
     if (entryRes.ok) {
       entrySummary = await parseJsonOrThrow(entryRes);
     }
@@ -395,7 +399,7 @@ export async function loadTeamEntry(managerId, gwRequested) {
   for (const gw of unique) {
     try {
       const res = await fetch(
-        `${FPL_BASE}/entry/${managerId}/event/${gw}/picks/`,
+        `${FPL_BASE}/entry/${managerId}/event/${gw}/picks/?cb=${CACHE_NONCE}`,
         { cache: 'no-store' }
       );
       if (!res.ok) continue;
@@ -472,7 +476,7 @@ export async function loadTeamEntry(managerId, gwRequested) {
       // Falls back to default (1 FT) if the fetch fails.
       let ftResult = null;
       try {
-        const histRes = await fetch(`${FPL_BASE}/entry/${managerId}/history/`, { cache: 'no-store' });
+        const histRes = await fetch(`${FPL_BASE}/entry/${managerId}/history/?cb=${CACHE_NONCE}`, { cache: 'no-store' });
         if (histRes.ok) {
           const histData = await parseJsonOrThrow(histRes);
           ftResult = computeFreeTransfersFromHistory(histData);

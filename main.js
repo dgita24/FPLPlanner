@@ -33,6 +33,23 @@ async function init() {
           state.priceMode = data.priceMode;
           state.freeTransfersByGW = data.freeTransfersByGW || {};
           state.historicallyUsedChips = data.historicallyUsedChips || {};
+
+          // Clamp restored viewingGW forward so stale localStorage can never
+          // drag the app back to an older gameweek than bootstrap indicates.
+          const events = state.bootstrap?.events || [];
+          const bootstrapPlanningGW = events.find(e => e.is_next)?.id
+            || events.find(e => e.is_current)?.id
+            || state.currentGW
+            || 1;
+
+          if (state.viewingGW < bootstrapPlanningGW) {
+            console.log(`Clamping stale viewingGW ${state.viewingGW} → ${bootstrapPlanningGW}`);
+            state.viewingGW = bootstrapPlanningGW;
+          }
+          if (state.minNavigableGW < bootstrapPlanningGW) {
+            state.minNavigableGW = bootstrapPlanningGW;
+          }
+
           ensureFreeTransfersByGW();
           ensureHistoricallyUsedChips();
           recomputeFreeTransfersFromGW(state.viewingGW);
