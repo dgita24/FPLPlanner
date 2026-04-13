@@ -210,6 +210,19 @@ export function resetChipUsageState() {
 
 // data.js - only this function needs updating
 
+/**
+ * Derives the bootstrap-based planning GW from the events list.
+ * Prefers is_next (upcoming GW during inter-GW gap), falls back to is_current
+ * (live GW), then state.currentGW, then 1.
+ */
+export function getBootstrapPlanningGW() {
+  const events = state.bootstrap?.events || [];
+  return events.find(e => e.is_next)?.id
+    || events.find(e => e.is_current)?.id
+    || state.currentGW
+    || 1;
+}
+
 export async function loadBootstrap() {
   try {
     const res = await fetch(`${FPL_BASE}/bootstrap-static/?cb=${CACHE_NONCE}`, { cache: 'no-store' });
