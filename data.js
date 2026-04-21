@@ -318,7 +318,7 @@ async function loadTransfersPurchaseMap(managerId) {
  * FPL rules:
  *  - Each GW you get +1 FT, max 5 stored
  *  - Wildcard resets FT to 1 for the next GW
- *  - Free Hit preserves FTs (transfers don't count), +1 for next GW
+ *  - Free Hit preserves FTs (chip counts as a "used transfer", so no +1 rollover bonus)
  *  - Bench Boost / Triple Captain don't affect FT calculation
  */
 function computeFreeTransfersFromHistory(historyData) {
@@ -341,7 +341,7 @@ function computeFreeTransfersFromHistory(historyData) {
     if (chip === 'wildcard') {
       ft = 1; // WC resets to 1
     } else if (chip === 'freehit') {
-      ft = Math.min(5, ft + 1); // FH: FTs preserved, +1 for next GW
+      ft = ft; // FH preserves FTs; no +1 rollover since the chip was "used"
     } else {
       ft = Math.min(5, Math.max(0, ft - transfers) + 1);
     }
@@ -419,6 +419,9 @@ export async function loadTeamEntry(managerId, gwRequested) {
 
       const json = await parseJsonOrThrow(res);
       if (!json || !json.picks) continue;
+
+      // Free Hit produces a temporary squad; skip it and use the real squad from a prior GW
+      if (json.active_chip === 'freehit') continue;
 
       // Mark imported gw
       state.importedGW = gw;
