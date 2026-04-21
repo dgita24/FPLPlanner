@@ -40,7 +40,7 @@ function computeFreeTransfersFromHistory(historyData) {
     if (chip === 'wildcard') {
       ft = 1;
     } else if (chip === 'freehit') {
-      ft = Math.min(5, ft + 1);
+      ft = ft; // FH preserves FTs; no +1 rollover since the chip was "used"
     } else {
       ft = Math.min(5, Math.max(0, ft - transfers) + 1);
     }
@@ -237,6 +237,46 @@ console.log('\nTest 7: planningGW matches last history GW (perGW available, used
   // Even when "no fallback" in picks, if GW33 is in history, we use perGW.
   const seedFT = computeSeedFT(ftResult, planningGW);
   assert(seedFT === 2, `FT seeded as 2 from perGW[33], even though nextGWft=3`);
+}
+
+// ── Test 8: Free Hit in GW33 – FTs preserved, no +1 rollover ────────────────
+console.log('\nTest 8: Free Hit in GW33 – FTs preserved, no +1 rollover');
+{
+  // Manager had 3 FTs going into GW33, played FH → should still have 3 FTs for GW34.
+  const historyData = {
+    current: [
+      { event: 31, event_transfers: 0 },
+      { event: 32, event_transfers: 0 },
+      { event: 33, event_transfers: 15 }, // FH: unlimited transfers, ignored
+    ],
+    chips: [{ name: 'freehit', event: 33 }],
+  };
+  const ftResult = computeFreeTransfersFromHistory(historyData);
+
+  // GW31: ft=1, 0 transfers → ft=2
+  // GW32: ft=2, 0 transfers → ft=3
+  // GW33: ft=3, freehit → ft=3 (preserved, no +1)
+  // nextGWft = 3 (for GW34)
+  assert(ftResult.nextGWft === 3, `FH preserves 3 FTs → nextGWft=3 for GW34`);
+}
+
+// ── Test 9: Free Hit with only 1 FT – still preserved (not +1) ──────────────
+console.log('\nTest 9: Free Hit with 1 FT – FT count stays at 1, not bumped to 2');
+{
+  // Manager had 1 FT going into GW33 (used 2 transfers in GW32), played FH.
+  const historyData = {
+    current: [
+      { event: 32, event_transfers: 2 }, // 2 transfers → FT goes to 0, then +1 = 1? No: max(0, 1-2)+1=1
+      { event: 33, event_transfers: 15 },
+    ],
+    chips: [{ name: 'freehit', event: 33 }],
+  };
+  const ftResult = computeFreeTransfersFromHistory(historyData);
+
+  // GW32: ft=1, 2 transfers → ft=min(5, max(0,1-2)+1)=min(5,0+1)=1
+  // GW33: ft=1, freehit → ft=1 (preserved)
+  // nextGWft = 1
+  assert(ftResult.nextGWft === 1, `FH with 1 FT → nextGWft=1 (not bumped to 2)`);
 }
 
 // ── Summary ─────────────────────────────────────────────────────────────────
