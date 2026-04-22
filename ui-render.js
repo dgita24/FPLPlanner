@@ -552,6 +552,7 @@ function placeholderCard(removedPlayer, source) {
 
   const price = removedPlayer.sellingPrice.toFixed(1);
   const reinstateFn = `reinstatePlayer(${removedPlayer.id})`;
+  const posLabel = posNames[p.element_type] || '';
 
   return `
     <div class="player-card placeholder-card">
@@ -559,6 +560,7 @@ function placeholderCard(removedPlayer, source) {
       <div class="placeholder-overlay">
         <button class="reinstate-btn" onclick="${reinstateFn}" title="Undo removal">↶</button>
         <span class="placeholder-text">SOLD</span>
+        <span class="placeholder-position">${posLabel}</span>
         <span class="placeholder-price">+£${price}m</span>
       </div>
 

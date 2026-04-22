@@ -1272,6 +1272,17 @@ export function initUI() {
         letter-spacing: 1px;
       }
 
+      .placeholder-position {
+        font-size: 11px;
+        font-weight: 800;
+        color: rgba(255, 255, 255, 0.9);
+        background: rgba(0, 0, 0, 0.4);
+        padding: 1px 5px;
+        border-radius: 3px;
+        letter-spacing: 0.5px;
+        margin-top: 2px;
+      }
+
       .placeholder-price {
         font-size: 13px;
         font-weight: 700;
