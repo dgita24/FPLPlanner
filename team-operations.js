@@ -437,13 +437,25 @@ function addSinglePlayerToSquad(playerId, team, gw, updateUI) {
     return { success: false, reason: 'Player data not found' };
   }
 
-  // Prevent duplicates
+  // Prevent duplicates in the current GW
   const already =
     team.starting.some((e) => e.id === playerId) ||
     team.bench.some((e) => e.id === playerId);
 
   if (already) {
     return { success: false, reason: 'Already in your squad' };
+  }
+
+  // Prevent buying a player who already exists in any future planned GW
+  for (let g = gw + 1; g <= 38; g++) {
+    const ft = state.plan[g];
+    if (!ft) continue;
+    const inFuture =
+      ft.starting.some((e) => e.id === playerId) ||
+      ft.bench.some((e) => e.id === playerId);
+    if (inFuture) {
+      return { success: false, reason: `Already in your planned squad for GW${g}` };
+    }
   }
 
   // Budget check
@@ -537,14 +549,31 @@ function addSinglePlayerToSquad(playerId, team, gw, updateUI) {
     };
 
     if (targetSide === 'starting') {
-      temp.starting.push({ ...entry });
+      if (temp.starting.length < 11) {
+        temp.starting.push({ ...entry });
+      } else if (temp.bench.length < 4) {
+        // Fallback: target starting side is full in this future GW (player may have been
+        // substituted to bench in this GW after the original transfer), so fill bench instead.
+        if (isGKPlayer) {
+          temp.bench.unshift({ ...entry });
+        } else {
+          const gkIndex = temp.bench.findIndex((e) => getElementType(e.id) === 1);
+          if (gkIndex === -1) temp.bench.push({ ...entry });
+          else temp.bench.splice(gkIndex + 1, 0, { ...entry });
+        }
+      }
     } else {
-      if (isGKPlayer) {
-        temp.bench.unshift({ ...entry });
-      } else {
-        const gkIndex = temp.bench.findIndex((e) => getElementType(e.id) === 1);
-        if (gkIndex === -1) temp.bench.push({ ...entry });
-        else temp.bench.splice(gkIndex + 1, 0, { ...entry });
+      if (temp.bench.length < 4) {
+        if (isGKPlayer) {
+          temp.bench.unshift({ ...entry });
+        } else {
+          const gkIndex = temp.bench.findIndex((e) => getElementType(e.id) === 1);
+          if (gkIndex === -1) temp.bench.push({ ...entry });
+          else temp.bench.splice(gkIndex + 1, 0, { ...entry });
+        }
+      } else if (temp.starting.length < 11) {
+        // Fallback: bench is full in this future GW, add to starting instead.
+        temp.starting.push({ ...entry });
       }
     }
 
@@ -592,6 +621,16 @@ function addSinglePlayerToSquad(playerId, team, gw, updateUI) {
     if (targetSide === 'starting') {
       if (t.starting.length < 11) {
         t.starting.push({ ...entry });
+      } else if (t.bench.length < 4) {
+        // Fallback: starting is full in this future GW (player may have been substituted to
+        // bench after the original transfer), so fill the available bench slot instead.
+        if (isGKPlayer) {
+          t.bench.unshift({ ...entry });
+        } else {
+          const gkIndex = t.bench.findIndex((e) => getElementType(e.id) === 1);
+          if (gkIndex === -1) t.bench.push({ ...entry });
+          else t.bench.splice(gkIndex + 1, 0, { ...entry });
+        }
       }
     } else {
       if (t.bench.length < 4) {
@@ -602,6 +641,9 @@ function addSinglePlayerToSquad(playerId, team, gw, updateUI) {
           if (gkIndex === -1) t.bench.push({ ...entry });
           else t.bench.splice(gkIndex + 1, 0, { ...entry });
         }
+      } else if (t.starting.length < 11) {
+        // Fallback: bench is full in this future GW, add to starting instead.
+        t.starting.push({ ...entry });
       }
     }
   }
