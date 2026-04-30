@@ -1316,6 +1316,20 @@ export function initUI() {
     });
   }
 
+  // Pressing Enter/Return on the FT inputs should commit the value (important on mobile
+  // where the on-screen keyboard "Done" key does not always trigger blur/change).
+  ['freeTransfersInput', 'freeTransfersInputMobile'].forEach((id) => {
+    const ftInput = document.getElementById(id);
+    if (ftInput) {
+      ftInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          ftInput.blur();
+        }
+      });
+    }
+  });
+
   // Expose nav + actions used by inline onclicks in index.html
   window.changeGW = changeGW;
   window.syncPitchGWFromFixtures = syncPitchGWFromFixtures;

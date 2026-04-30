@@ -207,18 +207,40 @@ export function substitutePlayer(playerId, updateUI) {
     if (!t) continue;
     swapWithinTeam(t, a, b);
     
-    // Clear captain/vice-captain if they are being moved to the bench
-    const aInBench = t.bench.some(e => e.id === a);
-    const bInBench = t.bench.some(e => e.id === b);
-    
-    if (aInBench && t.captain === a) t.captain = null;
-    if (aInBench && t.viceCaptain === a) t.viceCaptain = null;
-    if (bInBench && t.captain === b) t.captain = null;
-    if (bInBench && t.viceCaptain === b) t.viceCaptain = null;
+    // Reassign captain/VC if either player was moved to the bench
+    reassignCaptainVC(t);
   }
 
   setPendingSwap(null);
   updateUI();
+}
+
+/* -------------------------
+   CAPTAIN / VC AUTO-REASSIGN
+-------------------------- */
+
+/**
+ * After any change that may have invalidated the captain or vice-captain
+ * (player removed, moved to bench, etc.), ensure both roles are still held by
+ * players in the starting XI.  If a role is vacant (null or player no longer
+ * in starting), the function picks the first available starter that does not
+ * already hold the other role.
+ */
+function reassignCaptainVC(team) {
+  if (!team || !Array.isArray(team.starting)) return;
+
+  const captainOk = team.captain !== null && team.starting.some(e => e.id === team.captain);
+  const vcOk = team.viceCaptain !== null && team.starting.some(e => e.id === team.viceCaptain);
+
+  if (!captainOk) {
+    const pick = team.starting.find(e => e.id !== team.viceCaptain);
+    team.captain = pick ? pick.id : null;
+  }
+
+  if (!vcOk) {
+    const pick = team.starting.find(e => e.id !== team.captain);
+    team.viceCaptain = pick ? pick.id : null;
+  }
 }
 
 /* -------------------------
@@ -274,9 +296,8 @@ export function removePlayer(playerId, source, updateUI) {
     t.starting = t.starting.filter((e) => e.id !== playerId);
     t.bench = t.bench.filter((e) => e.id !== playerId);
     
-    // Clear captain/vice-captain if this player was assigned
-    if (t.captain === playerId) t.captain = null;
-    if (t.viceCaptain === playerId) t.viceCaptain = null;
+    // Reassign captain/VC to another starting player if the sold player held the role
+    reassignCaptainVC(t);
   }
 
   const removedCount = batchTransfers.removedPlayers.length;
@@ -437,13 +458,25 @@ function addSinglePlayerToSquad(playerId, team, gw, updateUI) {
     return { success: false, reason: 'Player data not found' };
   }
 
-  // Prevent duplicates
+  // Prevent duplicates in the current GW
   const already =
     team.starting.some((e) => e.id === playerId) ||
     team.bench.some((e) => e.id === playerId);
 
   if (already) {
     return { success: false, reason: 'Already in your squad' };
+  }
+
+  // Prevent buying a player who already exists in any future planned GW
+  for (let g = gw + 1; g <= 38; g++) {
+    const ft = state.plan[g];
+    if (!ft) continue;
+    const inFuture =
+      ft.starting.some((e) => e.id === playerId) ||
+      ft.bench.some((e) => e.id === playerId);
+    if (inFuture) {
+      return { success: false, reason: `Already in your planned squad for GW${g}` };
+    }
   }
 
   // Budget check
@@ -537,14 +570,31 @@ function addSinglePlayerToSquad(playerId, team, gw, updateUI) {
     };
 
     if (targetSide === 'starting') {
-      temp.starting.push({ ...entry });
+      if (temp.starting.length < 11) {
+        temp.starting.push({ ...entry });
+      } else if (temp.bench.length < 4) {
+        // Fallback: target starting side is full in this future GW (player may have been
+        // substituted to bench in this GW after the original transfer), so fill bench instead.
+        if (isGKPlayer) {
+          temp.bench.unshift({ ...entry });
+        } else {
+          const gkIndex = temp.bench.findIndex((e) => getElementType(e.id) === 1);
+          if (gkIndex === -1) temp.bench.push({ ...entry });
+          else temp.bench.splice(gkIndex + 1, 0, { ...entry });
+        }
+      }
     } else {
-      if (isGKPlayer) {
-        temp.bench.unshift({ ...entry });
-      } else {
-        const gkIndex = temp.bench.findIndex((e) => getElementType(e.id) === 1);
-        if (gkIndex === -1) temp.bench.push({ ...entry });
-        else temp.bench.splice(gkIndex + 1, 0, { ...entry });
+      if (temp.bench.length < 4) {
+        if (isGKPlayer) {
+          temp.bench.unshift({ ...entry });
+        } else {
+          const gkIndex = temp.bench.findIndex((e) => getElementType(e.id) === 1);
+          if (gkIndex === -1) temp.bench.push({ ...entry });
+          else temp.bench.splice(gkIndex + 1, 0, { ...entry });
+        }
+      } else if (temp.starting.length < 11) {
+        // Fallback: bench is full in this future GW, add to starting instead.
+        temp.starting.push({ ...entry });
       }
     }
 
@@ -592,6 +642,16 @@ function addSinglePlayerToSquad(playerId, team, gw, updateUI) {
     if (targetSide === 'starting') {
       if (t.starting.length < 11) {
         t.starting.push({ ...entry });
+      } else if (t.bench.length < 4) {
+        // Fallback: starting is full in this future GW (player may have been substituted to
+        // bench after the original transfer), so fill the available bench slot instead.
+        if (isGKPlayer) {
+          t.bench.unshift({ ...entry });
+        } else {
+          const gkIndex = t.bench.findIndex((e) => getElementType(e.id) === 1);
+          if (gkIndex === -1) t.bench.push({ ...entry });
+          else t.bench.splice(gkIndex + 1, 0, { ...entry });
+        }
       }
     } else {
       if (t.bench.length < 4) {
@@ -602,6 +662,9 @@ function addSinglePlayerToSquad(playerId, team, gw, updateUI) {
           if (gkIndex === -1) t.bench.push({ ...entry });
           else t.bench.splice(gkIndex + 1, 0, { ...entry });
         }
+      } else if (t.starting.length < 11) {
+        // Fallback: bench is full in this future GW, add to starting instead.
+        t.starting.push({ ...entry });
       }
     }
   }
@@ -642,6 +705,9 @@ function addSinglePlayerToSquad(playerId, team, gw, updateUI) {
       removedPlayers: [],
       isActive: false
     };
+
+    // Auto-assign captain/VC to the first two starting XI players if still vacant
+    reassignCaptainVC(finalTeam);
   }
 
   return { success: true };
