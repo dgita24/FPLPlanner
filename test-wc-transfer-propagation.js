@@ -26,6 +26,8 @@ function getPlayerTeamId(playerId) {
 
 function validateStartingXI(team) {
   if (!team || !Array.isArray(team.starting)) return { ok: false, message: 'missing starting XI' };
+  // Only validate formation when starting XI is complete; skip for in-progress squads
+  // (mirrors production validateStartingXI in validation.js)
   if (team.starting.length !== 11) return { ok: true, message: '' };
   let gk = 0, def = 0, mid = 0, fwd = 0;
   for (const e of team.starting) {
@@ -63,6 +65,8 @@ function validatePositionLimits(team) {
 function validateSquadComposition(team) {
   if (!team) return { ok: false, message: 'missing team' };
   const all = [...(team.starting || []), ...(team.bench || [])];
+  // Only validate composition when squad is complete (15); skip during partial build
+  // (mirrors production validateSquadComposition in validation.js)
   if (all.length !== 15) return { ok: true, message: '' };
   let gk = 0, def = 0, mid = 0, fwd = 0;
   for (const e of all) {
