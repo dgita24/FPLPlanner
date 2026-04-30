@@ -207,18 +207,40 @@ export function substitutePlayer(playerId, updateUI) {
     if (!t) continue;
     swapWithinTeam(t, a, b);
     
-    // Clear captain/vice-captain if they are being moved to the bench
-    const aInBench = t.bench.some(e => e.id === a);
-    const bInBench = t.bench.some(e => e.id === b);
-    
-    if (aInBench && t.captain === a) t.captain = null;
-    if (aInBench && t.viceCaptain === a) t.viceCaptain = null;
-    if (bInBench && t.captain === b) t.captain = null;
-    if (bInBench && t.viceCaptain === b) t.viceCaptain = null;
+    // Reassign captain/VC if either player was moved to the bench
+    reassignCaptainVC(t);
   }
 
   setPendingSwap(null);
   updateUI();
+}
+
+/* -------------------------
+   CAPTAIN / VC AUTO-REASSIGN
+-------------------------- */
+
+/**
+ * After any change that may have invalidated the captain or vice-captain
+ * (player removed, moved to bench, etc.), ensure both roles are still held by
+ * players in the starting XI.  If a role is vacant (null or player no longer
+ * in starting), the function picks the first available starter that does not
+ * already hold the other role.
+ */
+function reassignCaptainVC(team) {
+  if (!team || !Array.isArray(team.starting)) return;
+
+  const captainOk = team.captain !== null && team.starting.some(e => e.id === team.captain);
+  const vcOk = team.viceCaptain !== null && team.starting.some(e => e.id === team.viceCaptain);
+
+  if (!captainOk) {
+    const pick = team.starting.find(e => e.id !== team.viceCaptain);
+    team.captain = pick ? pick.id : null;
+  }
+
+  if (!vcOk) {
+    const pick = team.starting.find(e => e.id !== team.captain);
+    team.viceCaptain = pick ? pick.id : null;
+  }
 }
 
 /* -------------------------
@@ -274,9 +296,8 @@ export function removePlayer(playerId, source, updateUI) {
     t.starting = t.starting.filter((e) => e.id !== playerId);
     t.bench = t.bench.filter((e) => e.id !== playerId);
     
-    // Clear captain/vice-captain if this player was assigned
-    if (t.captain === playerId) t.captain = null;
-    if (t.viceCaptain === playerId) t.viceCaptain = null;
+    // Reassign captain/VC to another starting player if the sold player held the role
+    reassignCaptainVC(t);
   }
 
   const removedCount = batchTransfers.removedPlayers.length;
@@ -684,6 +705,9 @@ function addSinglePlayerToSquad(playerId, team, gw, updateUI) {
       removedPlayers: [],
       isActive: false
     };
+
+    // Auto-assign captain/VC to the first two starting XI players if still vacant
+    reassignCaptainVC(finalTeam);
   }
 
   return { success: true };
