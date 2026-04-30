@@ -527,6 +527,10 @@ async function importTeam() {
   // Store manager ID for syncing saved drafts
   state.managerId = teamId;
 
+  // history.baseline is captured inside loadTeamEntry() before managerId is set,
+  // so patch it here to ensure resetToImportedTeam() preserves draft accessibility.
+  if (history.baseline) history.baseline.managerId = teamId;
+
   // Persist this team ID to the recent list for future quick-fill.
   addRecentTeamId(teamId);
 
