@@ -522,18 +522,48 @@ export async function loadTeamEntry(managerId, gwRequested) {
         // Seed the planning GW (viewingGW) with the API-derived FT so the
         // user sees their real FT balance immediately after import.
         //
-        // When import falls back to an older GW (importedGW < planningGW),
-        // history may extend beyond the imported picks (e.g. history includes
-        // GW33 events but picks fell back to GW32).  In that case nextGWft
-        // is for a GW *after* planningGW, which would over/under-count FTs.
-        // Use perGW[planningGW] when available (exact match); fall back to
-        // nextGWft only when planningGW is the genuine next unplayed GW.
+        // Two distinct cases:
+        //
+        // A) is_current+1 (no explicit is_next in bootstrap):
+        //    After a GW deadline passes the FPL API sets is_current but may
+        //    not yet set is_next, so viewingGW = currentGW + 1.  In this
+        //    window historyData may not yet include currentGW, making
+        //    nextGWft the FT *for* currentGW rather than planningGW.
+        //    Seeding planningGW directly with nextGWft gives the wrong (too
+        //    low) FT count.  Instead we seed currentGW and let
+        //    recomputeFreeTransfersFromGW propagate the rollover to planningGW
+        //    using plan-level transfer counts (zero on a fresh import).
+        //
+        // B) Normal / is_next case (currentGW == planningGW, or is_next set):
+        //    When import falls back to an older GW (importedGW < planningGW),
+        //    history may extend beyond the imported picks (e.g. history
+        //    includes GW33 but picks fell back to GW32).  In that case
+        //    nextGWft is for a GW *after* planningGW.  Use perGW[planningGW]
+        //    when available (exact match); fall back to nextGWft only when
+        //    planningGW is the genuine next unplayed GW.
         const planningGW = state.viewingGW;
-        const seedFT = (ftResult.perGW[planningGW] !== undefined)
-          ? ftResult.perGW[planningGW]
-          : ftResult.nextGWft;
-        state.freeTransfersByGW[planningGW] =
-          normalizeFreeTransfersValue(seedFT);
+        const baseGW = state.currentGW;
+
+        const bootstrapEvents = state.bootstrap?.events || [];
+        const isCurrentPlusOneCase =
+          baseGW < planningGW && !bootstrapEvents.some(e => e.is_next);
+
+        if (isCurrentPlusOneCase) {
+          // Seed at currentGW so recompute can roll the FT forward correctly.
+          const baseSeedFT = (ftResult.perGW[baseGW] !== undefined)
+            ? ftResult.perGW[baseGW]
+            : ftResult.nextGWft;
+          state.freeTransfersByGW[baseGW] =
+            normalizeFreeTransfersValue(baseSeedFT);
+          recomputeFreeTransfersFromGW(baseGW);
+        } else {
+          const seedFT = (ftResult.perGW[planningGW] !== undefined)
+            ? ftResult.perGW[planningGW]
+            : ftResult.nextGWft;
+          state.freeTransfersByGW[planningGW] =
+            normalizeFreeTransfersValue(seedFT);
+          recomputeFreeTransfersFromGW(planningGW);
+        }
 
         // Note: we intentionally do NOT auto-mark historically used chips
         // from the API response here.  Fresh imports should present a clean
@@ -541,9 +571,9 @@ export async function loadTeamEntry(managerId, gwRequested) {
         // previously ticked chip state.  The chip history from the API is
         // already consumed by computeFreeTransfersFromHistory() for
         // accurate FT calculation, which is separate from the planning UI.
+      } else {
+        recomputeFreeTransfersFromGW(state.viewingGW);
       }
-
-      recomputeFreeTransfersFromGW(state.viewingGW);
 
       // Save baseline state for Reset
       history.baseline = JSON.parse(JSON.stringify(state));
