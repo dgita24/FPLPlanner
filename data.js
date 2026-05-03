@@ -1,6 +1,7 @@
 // data.js - FPL data via Cloudflare Pages Functions proxy (/api/fpl/*)
 
 import { fetchDefconData, mergeDefconIntoElements } from './defcon.js';
+import { MAX_GAMEWEEK } from './constants.js';
 
 export let history = {
   baseline: null,
@@ -212,15 +213,22 @@ export function resetChipUsageState() {
 
 /**
  * Derives the bootstrap-based planning GW from the events list.
- * Prefers is_next (upcoming GW during inter-GW gap), falls back to is_current
- * (live GW), then state.currentGW, then 1.
+ *
+ * Priority:
+ *  1. is_next  – the FPL API explicitly marks the upcoming transfer-window GW.
+ *  2. is_current + 1 – deadline has passed for is_current so the transfer
+ *     window is already open for the *next* GW.  Cap at MAX_GAMEWEEK so we
+ *     don't overshoot the final gameweek (GW38 has no GW39).
+ *  3. state.currentGW – last-known GW before bootstrap data arrived.
+ *  4. 1 – absolute fallback.
  */
 export function getBootstrapPlanningGW() {
   const events = state.bootstrap?.events || [];
-  return events.find(e => e.is_next)?.id
-    || events.find(e => e.is_current)?.id
-    || state.currentGW
-    || 1;
+  const next = events.find(e => e.is_next)?.id;
+  const current = events.find(e => e.is_current)?.id;
+  if (next) return next;
+  if (current) return Math.min(current + 1, MAX_GAMEWEEK);
+  return state.currentGW || 1;
 }
 
 export async function loadBootstrap() {
@@ -236,13 +244,20 @@ export async function loadBootstrap() {
     const current = events.find(e => e.is_current)?.id;
     const next = events.find(e => e.is_next)?.id;
 
-    // Use the current GW when available (GW is live) for importing data
-    // Only use next GW during the gap between gameweeks
+    // Use the current GW when available (GW is live) for importing data.
+    // Only use next GW during the gap between gameweeks.
     state.currentGW = current || next || 1;
     
-    // For planning purposes, default to viewing the next GW
-    // This allows users to plan for the upcoming gameweek
-    state.viewingGW = next || current || 1;
+    // Planning/viewing GW = the transfer-window GW the user should be looking at.
+    //   • If is_next is set, that IS the transfer-window GW.
+    //   • If only is_current is set, the deadline for is_current has already
+    //     passed so the transfer window is open for is_current + 1.
+    //     Cap at MAX_GAMEWEEK so GW38 never overflows to a non-existent GW39.
+    //   • Fallback: currentGW (already set above) or 1.
+    state.viewingGW = next
+      || (current ? Math.min(current + 1, MAX_GAMEWEEK) : null)
+      || state.currentGW
+      || 1;
     
     // Set initial minimum navigable GW at bootstrap (before any team import)
     state.minNavigableGW = state.viewingGW;
@@ -487,48 +502,42 @@ export async function loadTeamEntry(managerId, gwRequested) {
       }
       resetChipUsageState();
 
-      // --- Free-transfer initialization from FPL history (best-effort) ---
-      // Fetch the manager's season history to derive accurate FT counts.
-      // Falls back to default (1 FT) if the fetch fails.
-      let ftResult = null;
-      try {
-        const histRes = await fetch(`${FPL_BASE}/entry/${managerId}/history/?cb=${CACHE_NONCE}`, { cache: 'no-store' });
-        if (histRes.ok) {
-          const histData = await parseJsonOrThrow(histRes);
-          ftResult = computeFreeTransfersFromHistory(histData);
-        }
-      } catch (e) {
-        // non-fatal – FTs will default to 1
-      }
+      // --- Free-transfer seeding from picks response ---
+      // entry_history.extra_free_transfers is the direct API value: the number
+      // of FTs available for the imported GW (before any transfers were made).
+      // No separate history fetch needed.
+      const planningGW = state.viewingGW;
+      const importedGW = gw;
+      const extraFT = json.entry_history?.extra_free_transfers;
 
       ensureFreeTransfersByGW();
 
-      if (ftResult) {
-        // Seed the planning GW (viewingGW) with the API-derived FT so the
-        // user sees their real FT balance immediately after import.
-        //
-        // When import falls back to an older GW (importedGW < planningGW),
-        // history may extend beyond the imported picks (e.g. history includes
-        // GW33 events but picks fell back to GW32).  In that case nextGWft
-        // is for a GW *after* planningGW, which would over/under-count FTs.
-        // Use perGW[planningGW] when available (exact match); fall back to
-        // nextGWft only when planningGW is the genuine next unplayed GW.
-        const planningGW = state.viewingGW;
-        const seedFT = (ftResult.perGW[planningGW] !== undefined)
-          ? ftResult.perGW[planningGW]
-          : ftResult.nextGWft;
-        state.freeTransfersByGW[planningGW] =
-          normalizeFreeTransfersValue(seedFT);
+      if (typeof extraFT === 'number') {
+        let seedFT = extraFT;
 
-        // Note: we intentionally do NOT auto-mark historically used chips
-        // from the API response here.  Fresh imports should present a clean
-        // slate (all chips unticked).  Only saved-draft re-imports restore
-        // previously ticked chip state.  The chip history from the API is
-        // already consumed by computeFreeTransfersFromHistory() for
-        // accurate FT calculation, which is separate from the planning UI.
+        if (importedGW < planningGW) {
+          // Roll forward from importedGW to planningGW.
+          // First step uses the real event_transfers and active chip from the
+          // imported GW; subsequent steps assume 0 plan-transfers (fresh import).
+          const eventTransfers = json.entry_history?.event_transfers || 0;
+          const importedChip = json.active_chip || null;
+          if (importedChip === 'wildcard') {
+            seedFT = 1; // WC resets FT to 1 for the following GW
+          } else {
+            // Normal or free-hit (FH preserves FTs with no +1; use seedFT as-is
+            // since extra_free_transfers already reflects the pre-FH FT count).
+            seedFT = Math.min(5, Math.max(0, seedFT - eventTransfers) + 1);
+          }
+          // +1 rollover for each additional gap-GW (0 plan-transfers on fresh import).
+          for (let g = importedGW + 1; g < planningGW; g++) {
+            seedFT = Math.min(5, seedFT + 1);
+          }
+        }
+
+        state.freeTransfersByGW[planningGW] = normalizeFreeTransfersValue(seedFT);
       }
 
-      recomputeFreeTransfersFromGW(state.viewingGW);
+      recomputeFreeTransfersFromGW(planningGW);
 
       // Save baseline state for Reset
       history.baseline = JSON.parse(JSON.stringify(state));

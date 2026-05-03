@@ -279,6 +279,113 @@ console.log('\nTest 9: Free Hit with 1 FT – FT count stays at 1, not bumped to
   assert(ftResult.nextGWft === 1, `FH with 1 FT → nextGWft=1 (not bumped to 2)`);
 }
 
+// ── Helper that mirrors the new direct FT seeding in loadTeamEntry ───────────
+
+/**
+ * Mirrors the new FT seeding logic that uses entry_history.extra_free_transfers
+ * directly from the picks response.
+ */
+function seedFTFromPicks(extraFT, eventTransfers, importedChip, importedGW, planningGW) {
+  function norm(v) { return normalizeFreeTransfersValue(v); }
+  if (typeof extraFT !== 'number') return null; // no seeding
+  let seedFT = extraFT;
+  if (importedGW < planningGW) {
+    if (importedChip === 'wildcard') {
+      seedFT = 1; // WC resets FT to 1 for the following GW
+    } else {
+      seedFT = Math.min(5, Math.max(0, seedFT - (eventTransfers || 0)) + 1);
+    }
+    for (let g = importedGW + 1; g < planningGW; g++) {
+      seedFT = Math.min(5, seedFT + 1);
+    }
+  }
+  return norm(seedFT);
+}
+
+// ── Tests: direct extra_free_transfers seeding ───────────────────────────────
+
+console.log('\nTest 10: importedGW == planningGW — extra_free_transfers used directly');
+{
+  // importedGW=36 IS the planningGW (e.g. is_next=36): FTs for GW36 = 2 directly.
+  const seed = seedFTFromPicks(2, 0, null, 36, 36);
+  assert(seed === 2, `extraFT=2, importedGW==planningGW=36 → seed=2 directly ✓`);
+}
+
+console.log('\nTest 11: importedGW < planningGW, 0 real transfers → rollover +1');
+{
+  // importedGW=35 (is_current), planningGW=36.
+  // extraFT=2 (had 2 FTs for GW35), 0 event_transfers.
+  // FT for GW36 = min(5, max(0, 2-0)+1) = 3.
+  const seed = seedFTFromPicks(2, 0, null, 35, 36);
+  assert(seed === 3, `extraFT=2, 0 event_transfers, importedGW=35→36: seed=3 ✓`);
+}
+
+console.log('\nTest 12: importedGW < planningGW, 1 real transfer → rollover');
+{
+  // importedGW=35, planningGW=36.
+  // extraFT=2 (had 2 FTs for GW35), 1 event_transfer made.
+  // FT for GW36 = min(5, max(0, 2-1)+1) = 2.
+  const seed = seedFTFromPicks(2, 1, null, 35, 36);
+  assert(seed === 2, `extraFT=2, 1 event_transfer, importedGW=35→36: seed=2 ✓`);
+}
+
+console.log('\nTest 13: importedGW < planningGW, 1 FT, 1 transfer → rollover gives 1');
+{
+  // importedGW=35, planningGW=36.
+  // extraFT=1 (had 1 FT for GW35), 1 event_transfer made.
+  // FT for GW36 = min(5, max(0, 1-1)+1) = 1.
+  const seed = seedFTFromPicks(1, 1, null, 35, 36);
+  assert(seed === 1, `extraFT=1, 1 event_transfer, importedGW=35→36: seed=1 ✓`);
+}
+
+console.log('\nTest 14: WC in importedGW → FT resets to 1 for planningGW');
+{
+  // importedGW=35 used WC, planningGW=36.
+  // Regardless of extraFT, WC resets next GW FT to 1.
+  const seed = seedFTFromPicks(3, 8, 'wildcard', 35, 36);
+  assert(seed === 1, `WC in importedGW=35, planningGW=36: seed=1 (WC reset) ✓`);
+}
+
+console.log('\nTest 15: API lag — importedGW=34, planningGW=36, 2 gap GWs');
+{
+  // Picks fell back to GW34 (2 GWs behind planningGW=36).
+  // extraFT=1 for GW34, 1 event_transfer in GW34.
+  // Step GW34→GW35: min(5, max(0,1-1)+1) = 1
+  // Step GW35→GW36: min(5, 1+1) = 2
+  const seed = seedFTFromPicks(1, 1, null, 34, 36);
+  assert(seed === 2, `extraFT=1 at GW34, importedGW=34→planningGW=36: seed=2 ✓`);
+}
+
+console.log('\nTest 16: FT cap at 5');
+{
+  // extraFT=4, 0 transfers, importedGW=35, planningGW=36 → would be 5.
+  const seed = seedFTFromPicks(4, 0, null, 35, 36);
+  assert(seed === 5, `extraFT=4, 0 transfers, rollover → capped at 5 ✓`);
+}
+
+console.log('\nTest 17: extraFT missing → no seeding (null returned)');
+{
+  // If API doesn't return extra_free_transfers, seeding is skipped (defaults to 1).
+  const seed = seedFTFromPicks(undefined, 0, null, 35, 36);
+  assert(seed === null, `extraFT=undefined → null (no seeding, default 1 FT applies) ✓`);
+}
+
+console.log('\nTest 18: user-reported scenario — had 1 FT for GW36, should see 1');
+{
+  // importedGW=36 == planningGW=36.
+  // API returns extra_free_transfers=1 for GW36.  Should seed 1 directly.
+  const seed = seedFTFromPicks(1, 0, null, 36, 36);
+  assert(seed === 1, `extraFT=1 for planningGW=36 → seed=1 directly ✓`);
+}
+
+console.log('\nTest 19: user-reported scenario — had 2 FTs for GW36, should see 2');
+{
+  // importedGW=36 == planningGW=36.
+  // API returns extra_free_transfers=2 for GW36.  Should seed 2 directly.
+  const seed = seedFTFromPicks(2, 0, null, 36, 36);
+  assert(seed === 2, `extraFT=2 for planningGW=36 → seed=2 directly ✓`);
+}
+
 // ── Summary ─────────────────────────────────────────────────────────────────
 
 console.log(`\n${'='.repeat(50)}`);
