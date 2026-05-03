@@ -279,125 +279,71 @@ console.log('\nTest 9: Free Hit with 1 FT – FT count stays at 1, not bumped to
   assert(ftResult.nextGWft === 1, `FH with 1 FT → nextGWft=1 (not bumped to 2)`);
 }
 
-// ── Helpers for is_current+1 rollover ────────────────────────────────────────
+// ── Helper that mirrors the new simplified seeding in loadTeamEntry ──────────
 
 /**
- * Mirrors the is_current+1 path in loadTeamEntry:
- * seeds freeTransfersByGW[baseGW] and derives planningGW FT by rollover
- * (0 plan transfers, i.e. fresh import).
+ * Mirrors the new simplified FT seeding logic:
+ * use nextGWft, rolling it forward +1 per gap-GW if history is behind planningGW.
  */
-function computeIsCurrentPlusOneFT(ftResult, baseGW, planTransfersAtBase = 0) {
+function computeSimpleSeedFT(ftResult, planningGW) {
   if (!ftResult) return 1;
-  const baseSeedFT = (ftResult.perGW[baseGW] !== undefined)
-    ? ftResult.perGW[baseGW]
-    : ftResult.nextGWft;
-  // Replicate recomputeFreeTransfersFromGW logic for one step (baseGW → planningGW)
-  const normalised = Math.max(0, Math.min(5, Math.round(baseSeedFT)));
-  return Math.min(5, Math.max(0, normalised - planTransfersAtBase) + 1);
+  if (ftResult.perGW[planningGW] !== undefined) {
+    return normalizeFreeTransfersValue(ftResult.perGW[planningGW]);
+  }
+  const lastHistoryGW = Object.keys(ftResult.perGW)
+    .reduce((max, k) => Math.max(max, +k), 0);
+  let seedFT = ftResult.nextGWft;
+  for (let g = lastHistoryGW + 1; g < planningGW; g++) {
+    seedFT = Math.min(5, seedFT + 1);
+  }
+  return normalizeFreeTransfersValue(seedFT);
 }
 
-// ── Tests: is_current+1 transfer-window case (no is_next) ───────────────────
+// ── Tests: is_current+1 transfer-window (no is_next) ────────────────────────
 
-console.log('\nTest 10: is_current+1 — GW35 NOT in history (API not yet updated)');
+console.log('\nTest 10: is_current+1 — GW35 in history, 0 real transfers → GW36=2');
 {
-  // GW35 deadline just passed; FPL history still only contains GW34 data.
-  // nextGWft = FT for GW35 (the next unplayed GW after GW34), NOT for GW36.
-  // planningGW = 36 (viewingGW = currentGW + 1 after the header fix).
-  //
-  // Old (broken): seeds GW36 directly with nextGWft = FT_for_GW35 (off by one).
-  // New (correct): seeds GW35 with nextGWft, then rolls forward →
-  //   GW36 = min(5, GW35_FT - 0_plan_transfers + 1).
-  const historyData = {
-    current: [
-      { event: 33, event_transfers: 1 },  // used free transfer in GW33 → GW34 gets 1 FT
-      { event: 34, event_transfers: 0 },  // 0 transfers in GW34 → GW35 gets 2 FTs
-      // GW35 not yet in history
-    ],
-    chips: [],
-  };
-  const ftResult = computeFreeTransfersFromHistory(historyData);
-  // GW33: ft=1, 1 transfer → ft=min(5,max(0,1-1)+1)=1
-  // GW34: ft=1, 0 transfers → ft=min(5,max(0,1-0)+1)=2
-  // nextGWft=2 (for GW35)
-  assert(ftResult.nextGWft === 2, `nextGWft=2 (FT for GW35, not GW36)`);
-
-  const baseGW = 35;  // currentGW
-
-  // Old (broken): seed GW36 with nextGWft=2 (GW35's FT) → GW36 shows 2 instead of 3
-  const oldGW36 = normalizeFreeTransfersValue(ftResult.nextGWft);
-  assert(oldGW36 === 2, `Old approach: GW36 seeded as 2 (actually FT for GW35 — off by one)`);
-
-  // New (correct): seed GW35=2, rollover 0 plan transfers → GW36=3
-  const newGW36 = computeIsCurrentPlusOneFT(ftResult, baseGW, 0);
-  assert(newGW36 === 3, `New approach: seed GW35=2, rollover → GW36=3 ✓`);
-
-  assert(oldGW36 !== newGW36, `Bug confirmed: old=2 (wrong), new=3 (correct)`);
-}
-
-console.log('\nTest 11: is_current+1 — GW35 in history, user made 0 real transfers');
-{
-  // Most common scenario: history includes GW35 (is_current), user made 0 transfers.
-  // FT at start of GW35 = 1 → nextGWft = 2 (FT for GW36).
+  // Most common case: GW35 deadline passed, history updated, user made 0 transfers.
+  // planningGW=36, nextGWft = FT for GW36.
   const historyData = {
     current: [
       { event: 34, event_transfers: 0 },
-      { event: 35, event_transfers: 0 },  // GW35 in history, 0 transfers
+      { event: 35, event_transfers: 0 },
     ],
     chips: [],
   };
   const ftResult = computeFreeTransfersFromHistory(historyData);
   // GW34: ft=1, 0 transfers → ft=2
-  // GW35: ft=2, 0 transfers → ft=3
-  // nextGWft = 3 (for GW36)
-  // perGW[35] = 2
-
-  const baseGW = 35;
-  // New approach: seed GW35 = perGW[35] = 2, rollover 0 plan transfers → GW36=3
-  const newGW36FT = computeIsCurrentPlusOneFT(ftResult, baseGW, 0);
-  assert(newGW36FT === 3, `GW35 in history (perGW=2, 0 real transfers) → GW36=3 via rollover`);
-
-  // Note: old approach (seed GW36 with nextGWft=3) gives same result here.
-  const oldSeed = normalizeFreeTransfersValue(ftResult.nextGWft);
-  assert(oldSeed === 3, `Old approach also gives 3 (consistent when 0 real transfers)`);
+  // GW35: ft=2, 0 transfers → ft=3; nextGWft=3 (for GW36); perGW[35]=2
+  assert(ftResult.nextGWft === 3, `nextGWft=3 (FT for GW36 directly)`);
+  const seed = computeSimpleSeedFT(ftResult, 36);
+  assert(seed === 3, `planningGW=36, seed=nextGWft=3 ✓`);
 }
 
-console.log('\nTest 12: is_current+1 — GW35 in history, user made 1 real transfer (plan has 0)');
+console.log('\nTest 11: is_current+1 — GW35 in history, 1 real transfer → GW36=2');
 {
-  // User made 1 real transfer for GW35 before the deadline.
-  // Real-world: FT for GW36 = 1 (spent the free transfer).
-  // Plan-world (fresh import, 0 plan transfers at GW35): FT for GW36 = 2.
-  // The planner should show plan-world FTs (2), not real-world (1).
+  // User made 1 real transfer in GW35 (used free transfer).
+  // nextGWft already reflects this → directly gives correct GW36 FT.
   const historyData = {
     current: [
       { event: 34, event_transfers: 0 },
-      { event: 35, event_transfers: 1 },  // GW35: 1 real transfer
+      { event: 35, event_transfers: 1 },
     ],
     chips: [],
   };
   const ftResult = computeFreeTransfersFromHistory(historyData);
   // GW34: ft=1, 0 transfers → ft=2
-  // GW35: ft=2, 1 transfer → ft=min(5, max(0,2-1)+1) = 2
-  // nextGWft = 2 (real-world FT for GW36)
-  // perGW[35] = 2 (FT at start of GW35)
-
-  const baseGW = 35;
-
-  // Old (broken) approach: seed GW36 with nextGWft=2 — gives 2 (coincidental match)
-  const oldSeed = normalizeFreeTransfersValue(ftResult.nextGWft);
-  assert(oldSeed === 2, `Old approach seeds GW36 with nextGWft=2`);
-
-  // New approach: seed GW35 = perGW[35] = 2, rollover 0 plan transfers → GW36=3
-  const newGW36FT = computeIsCurrentPlusOneFT(ftResult, baseGW, 0);
-  assert(newGW36FT === 3, `New approach: plan has 0 GW35 transfers → GW36=3 from perGW[35]=2`);
+  // GW35: ft=2, 1 transfer → ft=min(5,max(0,2-1)+1)=2; nextGWft=2; perGW[35]=2
+  assert(ftResult.nextGWft === 2, `nextGWft=2 (GW36 FT after 1 real GW35 transfer)`);
+  const seed = computeSimpleSeedFT(ftResult, 36);
+  assert(seed === 2, `planningGW=36, seed=nextGWft=2 ✓`);
 }
 
-console.log('\nTest 13: is_current+1 — the user-reported scenario (1 FT, showed 1 not 2)');
+console.log('\nTest 12: is_current+1 — GW35 NOT in history (API lag), GW35 should have 1 FT → GW36=2');
 {
-  // The reported bug: user should have 2 FTs for GW36 but sees 1.
-  // History ends at GW34 (GW35 not in history yet); user had 1 FT for GW35.
-  // nextGWft = 1 (FT FOR GW35, not GW36).
-  // Old broken code: seed GW36 with nextGWft=1 → shows 1. ✗
-  // New correct code: seed GW35=1 (nextGWft), rollover 0 plan transfers → GW36=2. ✓
+  // The user-reported regression: GW35 deadline passed but history still
+  // ends at GW34.  nextGWft=1 is the FT *for GW35* (not GW36).
+  // The new code rolls it forward +1 → GW36=2.
   const historyData = {
     current: [
       { event: 34, event_transfers: 1 },  // used 1 FT in GW34 → GW35 gets 1 FT
@@ -405,21 +351,54 @@ console.log('\nTest 13: is_current+1 — the user-reported scenario (1 FT, showe
     chips: [],
   };
   const ftResult = computeFreeTransfersFromHistory(historyData);
-  // GW34: ft=1, 1 transfer → ft=min(5, max(0,1-1)+1) = 1
-  // nextGWft = 1 (for GW35)
+  // GW34: ft=1, 1 transfer → ft=min(5,max(0,1-1)+1)=1; nextGWft=1 (for GW35)
+  assert(ftResult.nextGWft === 1, `nextGWft=1 (FT for GW35, not GW36 — API lag)`);
+  // lastHistoryGW=34; loop g=35, g<36 runs once: seedFT = min(5, 1+1) = 2
+  const seed = computeSimpleSeedFT(ftResult, 36);
+  assert(seed === 2, `planningGW=36 with API lag: rolled forward → seed=2 ✓`);
+}
 
-  const baseGW = 35;
-  const planningGW = 36;
+console.log('\nTest 13: is_current+1 — API lag, had 2 FTs for GW35 → GW36=3');
+{
+  // History ends at GW34, user banked 2 FTs for GW35.
+  // nextGWft=2 (FT for GW35).  Roll → GW36=3.
+  const historyData = {
+    current: [
+      { event: 33, event_transfers: 0 },
+      { event: 34, event_transfers: 0 },
+    ],
+    chips: [],
+  };
+  const ftResult = computeFreeTransfersFromHistory(historyData);
+  // GW33: ft=1, 0 transfers → ft=2
+  // GW34: ft=2, 0 transfers → ft=3; nextGWft=3 (for GW35)
+  assert(ftResult.nextGWft === 3, `nextGWft=3 (FT for GW35 — API lag)`);
+  const seed = computeSimpleSeedFT(ftResult, 36);
+  // lastHistoryGW=34; loop g=35, g<36: seedFT=min(5,3+1)=4
+  assert(seed === 4, `planningGW=36 with API lag: rolled forward → seed=4 ✓`);
+}
 
-  // Old broken approach: seed planningGW(36) directly with nextGWft=1
-  const oldSeed = normalizeFreeTransfersValue(ftResult.nextGWft);
-  assert(oldSeed === 1, `Old broken approach: GW36 seeded as 1 (nextGWft=1 is actually for GW35)`);
-
-  // New correct approach: seed baseGW(35) with nextGWft=1, rollover → GW36=2
-  const newGW36FT = computeIsCurrentPlusOneFT(ftResult, baseGW, 0);
-  assert(newGW36FT === 2, `New correct approach: seed GW35=1, rollover 0 plan transfers → GW36=2 ✓`);
-
-  assert(oldSeed !== newGW36FT, `Bug was real: old=1, new=2 (old code showed 1 instead of 2)`);
+console.log('\nTest 14: normal is_next case — perGW[planningGW] used when available');
+{
+  // Picks fell back to an older GW; history extends beyond importedGW.
+  // perGW[planningGW] should be used exactly (same as original main logic).
+  const historyData = {
+    current: [
+      { event: 31, event_transfers: 0 },
+      { event: 32, event_transfers: 1 },
+      { event: 33, event_transfers: 2 },
+    ],
+    chips: [],
+  };
+  const ftResult = computeFreeTransfersFromHistory(historyData);
+  // GW31: ft=1, 0 transfers → ft=2
+  // GW32: ft=2, 1 transfer  → ft=2
+  // GW33: ft=2, 2 transfers → ft=1; nextGWft=1 (for GW34)
+  // perGW[33]=2
+  assert(ftResult.perGW[33] === 2, `perGW[33]=2`);
+  assert(ftResult.nextGWft === 1, `nextGWft=1`);
+  const seed = computeSimpleSeedFT(ftResult, 33);
+  assert(seed === 2, `planningGW=33 present in perGW → seed=2 ✓ (not nextGWft=1)`);
 }
 
 // ── Summary ─────────────────────────────────────────────────────────────────
