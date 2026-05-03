@@ -400,13 +400,85 @@ console.log('\nTest 20: exact reported bug — GW35 live, GW36 open, 0 transfers
   assert(seed === 2, `Bug scenario: extraFT=0 (API, 1 total), 0 transfers, importedGW=35→planningGW=36: seed=2 ✓`);
 }
 
-// ── Tests: history-based primary path (loadTeamEntry) ────────────────────────
-// These verify the new primary path: /entry/{id}/history/ is fetched and
-// computeFreeTransfersFromHistory is used instead of extra_free_transfers.
-// The bug: extra_free_transfers is absent in picks responses for live/future GWs,
-// so every manager silently defaulted to 1 FT regardless of their actual count.
+// ── Tests: entry-summary primary path ────────────────────────────────────────
+// Mirrors the new SOURCE 1 logic in loadTeamEntry:
+//   state.freeTransfersByGW[planningGW] = normalizeFreeTransfersValue(
+//     entrySummary.extra_free_transfers + 1
+//   )
+// This is the most direct and reliable source: /entry/{id}/ is already fetched,
+// extra_free_transfers always reflects the active transfer window (= planningGW),
+// and no rollover calculation is needed.
 
-console.log('\nTest 21 (PRIMARY PATH): GW35 live, GW36 open — history gives correct FTs for 1-FT manager');
+function seedFTFromEntrySummary(extraFreeTransfers) {
+  function normalizeFreeTransfersValue(value) {
+    const n = Number(value);
+    if (!Number.isInteger(n)) return 1;
+    return Math.max(0, Math.min(5, n));
+  }
+  if (typeof extraFreeTransfers !== 'number') return null; // source 1 unavailable
+  return normalizeFreeTransfersValue(extraFreeTransfers + 1);
+}
+
+console.log('\nTest 25 (ENTRY SUMMARY PATH): manager with 1 FT → extra_free_transfers=0');
+{
+  // Standard case: 1 FT (no banked), extra_free_transfers=0
+  const seed = seedFTFromEntrySummary(0);
+  assert(seed === 1, `Entry summary: extra=0 → total=1 ✓`);
+}
+
+console.log('\nTest 26 (ENTRY SUMMARY PATH): manager with 2 FTs → extra_free_transfers=1');
+{
+  const seed = seedFTFromEntrySummary(1);
+  assert(seed === 2, `Entry summary: extra=1 → total=2 ✓`);
+}
+
+console.log('\nTest 27 (ENTRY SUMMARY PATH): manager with 5 FTs (max) → extra_free_transfers=4');
+{
+  const seed = seedFTFromEntrySummary(4);
+  assert(seed === 5, `Entry summary: extra=4 → total=5 ✓`);
+}
+
+console.log('\nTest 28 (ENTRY SUMMARY PATH): entry summary absent → falls through to history path');
+{
+  // When entrySummary is null or extra_free_transfers is not a number,
+  // source 1 is skipped and source 2 (history) is used.
+  const noEntrySummary = seedFTFromEntrySummary(null);
+  assert(noEntrySummary === null, `Entry summary: null extra → null (fall through) ✓`);
+
+  const undefinedExtra = seedFTFromEntrySummary(undefined);
+  assert(undefinedExtra === null, `Entry summary: undefined extra → null (fall through) ✓`);
+}
+
+console.log('\nTest 29 (ENTRY SUMMARY PATH): extra=0 regardless of importedGW — no rollover needed');
+{
+  // KEY TEST: entry summary extra_free_transfers directly reflects planningGW FTs.
+  // No rollover from importedGW to planningGW needed (unlike the picks-based fallback).
+  // A manager who imported from GW35 (importedGW=35) with planningGW=36 and
+  // 2 FTs for GW36 gets extra_free_transfers=1 from the entry endpoint.
+  // seedFT should be 2, not the picks-based rollover calculation.
+  const seed = seedFTFromEntrySummary(1); // extra=1 → 2 total for GW36
+  assert(seed === 2, `Entry summary: importedGW irrelevant, extra=1 → 2 FTs for planningGW ✓`);
+}
+
+console.log('\nTest 30 (REAL-WORLD): previously broken — every manager showed 1 FT');
+{
+  // The bug: extra_free_transfers was sought in json.entry_history (picks endpoint)
+  // but that field does NOT exist there — it only exists in the entry summary.
+  // With entry summary as SOURCE 1, managers now get their correct FT count.
+  const scenarios = [
+    [0, 1, '1-FT manager: extra=0 → 1'],
+    [1, 2, '2-FT manager: extra=1 → 2'],
+    [2, 3, '3-FT manager: extra=2 → 3'],
+    [3, 4, '4-FT manager: extra=3 → 4'],
+    [4, 5, '5-FT manager: extra=4 → 5'],
+  ];
+  for (const [extra, expected, desc] of scenarios) {
+    const seed = seedFTFromEntrySummary(extra);
+    assert(seed === expected, desc);
+  }
+}
+
+console.log('\nTest 21 (SOURCE 2 - HISTORY PATH): GW35 live, GW36 open — history gives correct FTs for 1-FT manager');
 {
   // Manager had 1 FT for all recent GWs (1 transfer per GW).
   const historyData = {
@@ -427,7 +499,7 @@ console.log('\nTest 21 (PRIMARY PATH): GW35 live, GW36 open — history gives co
   assert(seed === 2, `History path: 1-FT manager in GW35 → seed=2 for GW36 ✓`);
 }
 
-console.log('\nTest 22 (PRIMARY PATH): GW35 live, GW36 open — history gives correct FTs for 3-FT manager');
+console.log('\nTest 22 (SOURCE 2 - HISTORY PATH): GW35 live, GW36 open — history gives correct FTs for 3-FT manager');
 {
   // Manager had 3 FTs going into GW35 (banked from previous 0-transfer GWs).
   const historyData = {
@@ -449,7 +521,7 @@ console.log('\nTest 22 (PRIMARY PATH): GW35 live, GW36 open — history gives co
   assert(seed === 5, `History path: 4-FT manager in GW35 with 0 transfers → seed=5 for GW36 ✓`);
 }
 
-console.log('\nTest 23 (PRIMARY PATH): picks for GW36 available — history still gives correct FTs');
+console.log('\nTest 23 (SOURCE 2 - HISTORY PATH): picks for GW36 available — history still gives correct FTs');
 {
   // importedGW==planningGW==36 (picks for GW36 directly available).
   // Without history, extra_free_transfers might be null/absent for an unplayed GW.
@@ -470,7 +542,7 @@ console.log('\nTest 23 (PRIMARY PATH): picks for GW36 available — history stil
   assert(seed === 1, `History path: GW36 picks available, 1 FT expected → seed=1 ✓`);
 }
 
-console.log('\nTest 24 (PRIMARY PATH): every manager shows correct FTs — not always 1');
+console.log('\nTest 24 (SOURCE 2 - HISTORY PATH): every manager shows correct FTs — not always 1');
 {
   // This test directly verifies the user-reported bug is fixed by the primary path.
   // Old broken path: extra_free_transfers absent → all managers get 1 FT.

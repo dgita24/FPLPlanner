@@ -525,19 +525,32 @@ export async function loadTeamEntry(managerId, gwRequested) {
 
       ensureFreeTransfersByGW();
 
-      // Primary path: history-based FT calculation.
-      // computeFreeTransfersFromHistory replays every chip and transfer from
-      // the season start, giving a definitive FT count for any GW.
-      // perGW[planningGW] is set when planningGW has already been played;
-      // nextGWft is the computed FT for the first unplayed GW after history.
-      if (ftResult) {
+      // SOURCE 1 (most reliable): /entry/{id}/ summary already fetched above.
+      // extra_free_transfers = banked FTs beyond the standard 1 each GW gets.
+      // Total = extra_free_transfers + 1.
+      // This field always reflects the ACTIVE transfer window (= planningGW),
+      // so no rollover calculation is needed regardless of which GW was imported.
+      // NOTE: extra_free_transfers is NOT present in json.entry_history from the
+      // picks endpoint at all — it is only available on the entry summary endpoint.
+      // The fallback paths below handle the case where the entry summary is
+      // unavailable or missing this field.
+      if (entrySummary && typeof entrySummary.extra_free_transfers === 'number') {
+        state.freeTransfersByGW[planningGW] = normalizeFreeTransfersValue(
+          entrySummary.extra_free_transfers + 1
+        );
+      } else if (ftResult) {
+        // SOURCE 2: history-based FT calculation.
+        // Replays every chip and transfer from the season start.
+        // perGW[planningGW] is used when planningGW is already in history;
+        // nextGWft is the FT count for the first unplayed GW after history.
         const seedFT = (ftResult.perGW[planningGW] !== undefined)
           ? ftResult.perGW[planningGW]
           : ftResult.nextGWft;
         state.freeTransfersByGW[planningGW] = normalizeFreeTransfersValue(seedFT);
       } else {
-        // Fallback: use extra_free_transfers from the picks response.
-        // FPL stores "extra" FTs beyond the standard 1, so total = extra + 1.
+        // SOURCE 3: extra_free_transfers from the picks response entry_history.
+        // This field may not exist in all FPL API versions, but included as a
+        // last-resort fallback.
         const extraFT = json.entry_history?.extra_free_transfers;
         if (typeof extraFT === 'number') {
           let seedFT = extraFT + 1; // convert extra → total
