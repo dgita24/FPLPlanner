@@ -502,65 +502,42 @@ export async function loadTeamEntry(managerId, gwRequested) {
       }
       resetChipUsageState();
 
-      // --- Free-transfer initialization from FPL history (best-effort) ---
-      // Fetch the manager's season history to derive accurate FT counts.
-      // Falls back to default (1 FT) if the fetch fails.
-      let ftResult = null;
-      try {
-        const histRes = await fetch(`${FPL_BASE}/entry/${managerId}/history/?cb=${CACHE_NONCE}`, { cache: 'no-store' });
-        if (histRes.ok) {
-          const histData = await parseJsonOrThrow(histRes);
-          ftResult = computeFreeTransfersFromHistory(histData);
-        }
-      } catch (e) {
-        // non-fatal – FTs will default to 1
-      }
+      // --- Free-transfer seeding from picks response ---
+      // entry_history.extra_free_transfers is the direct API value: the number
+      // of FTs available for the imported GW (before any transfers were made).
+      // No separate history fetch needed.
+      const planningGW = state.viewingGW;
+      const importedGW = gw;
+      const extraFT = json.entry_history?.extra_free_transfers;
 
       ensureFreeTransfersByGW();
 
-      if (ftResult) {
-        // Seed the planning GW (viewingGW) with the API-derived FT so the
-        // user sees their real FT balance immediately after import.
-        //
-        // nextGWft is the FT for (lastHistoryGW + 1), where lastHistoryGW is
-        // the highest GW present in the history response.  In the common case
-        // lastHistoryGW + 1 == planningGW, so nextGWft is used directly.
-        //
-        // When the history API hasn't yet updated to include currentGW (a
-        // brief window right after the deadline), nextGWft is one GW behind
-        // planningGW.  Roll it forward by +1 per missing GW, assuming zero
-        // plan-transfers for those gap GWs.
-        //
-        // If planningGW itself is in history (e.g. picks fell back to an
-        // older GW), use perGW[planningGW] directly for an exact match.
-        const planningGW = state.viewingGW;
-        let seedFT;
-        if (ftResult.perGW[planningGW] !== undefined) {
-          seedFT = ftResult.perGW[planningGW];
-        } else {
-          // perGW always has ≥1 entry here (computeFreeTransfersFromHistory
-          // returns null when history is empty, so we never reach this branch
-          // with an empty perGW).  The initial value of 0 is a safe fallback.
-          const lastHistoryGW = Object.keys(ftResult.perGW)
-            .reduce((max, k) => Math.max(max, +k), 0);
-          seedFT = ftResult.nextGWft;
-          // Roll forward one +1 per GW for any gap between history and planningGW.
-          for (let g = lastHistoryGW + 1; g < planningGW; g++) {
+      if (typeof extraFT === 'number') {
+        let seedFT = extraFT;
+
+        if (importedGW < planningGW) {
+          // Roll forward from importedGW to planningGW.
+          // First step uses the real event_transfers and active chip from the
+          // imported GW; subsequent steps assume 0 plan-transfers (fresh import).
+          const eventTransfers = json.entry_history?.event_transfers || 0;
+          const importedChip = json.active_chip || null;
+          if (importedChip === 'wildcard') {
+            seedFT = 1; // WC resets FT to 1 for the following GW
+          } else {
+            // Normal or free-hit (FH preserves FTs with no +1; use seedFT as-is
+            // since extra_free_transfers already reflects the pre-FH FT count).
+            seedFT = Math.min(5, Math.max(0, seedFT - eventTransfers) + 1);
+          }
+          // +1 rollover for each additional gap-GW (0 plan-transfers on fresh import).
+          for (let g = importedGW + 1; g < planningGW; g++) {
             seedFT = Math.min(5, seedFT + 1);
           }
         }
-        state.freeTransfersByGW[planningGW] =
-          normalizeFreeTransfersValue(seedFT);
 
-        // Note: we intentionally do NOT auto-mark historically used chips
-        // from the API response here.  Fresh imports should present a clean
-        // slate (all chips unticked).  Only saved-draft re-imports restore
-        // previously ticked chip state.  The chip history from the API is
-        // already consumed by computeFreeTransfersFromHistory() for
-        // accurate FT calculation, which is separate from the planning UI.
+        state.freeTransfersByGW[planningGW] = normalizeFreeTransfersValue(seedFT);
       }
 
-      recomputeFreeTransfersFromGW(state.viewingGW);
+      recomputeFreeTransfersFromGW(planningGW);
 
       // Save baseline state for Reset
       history.baseline = JSON.parse(JSON.stringify(state));
