@@ -1,6 +1,7 @@
 // data.js - FPL data via Cloudflare Pages Functions proxy (/api/fpl/*)
 
 import { fetchDefconData, mergeDefconIntoElements } from './defcon.js';
+import { MAX_GAMEWEEK } from './constants.js';
 
 export let history = {
   baseline: null,
@@ -212,15 +213,22 @@ export function resetChipUsageState() {
 
 /**
  * Derives the bootstrap-based planning GW from the events list.
- * Prefers is_next (upcoming GW during inter-GW gap), falls back to is_current
- * (live GW), then state.currentGW, then 1.
+ *
+ * Priority:
+ *  1. is_next  – the FPL API explicitly marks the upcoming transfer-window GW.
+ *  2. is_current + 1 – deadline has passed for is_current so the transfer
+ *     window is already open for the *next* GW.  Cap at MAX_GAMEWEEK so we
+ *     don't overshoot the final gameweek (GW38 has no GW39).
+ *  3. state.currentGW – last-known GW before bootstrap data arrived.
+ *  4. 1 – absolute fallback.
  */
 export function getBootstrapPlanningGW() {
   const events = state.bootstrap?.events || [];
-  return events.find(e => e.is_next)?.id
-    || events.find(e => e.is_current)?.id
-    || state.currentGW
-    || 1;
+  const next = events.find(e => e.is_next)?.id;
+  const current = events.find(e => e.is_current)?.id;
+  if (next) return next;
+  if (current) return Math.min(current + 1, MAX_GAMEWEEK);
+  return state.currentGW || 1;
 }
 
 export async function loadBootstrap() {
@@ -236,13 +244,20 @@ export async function loadBootstrap() {
     const current = events.find(e => e.is_current)?.id;
     const next = events.find(e => e.is_next)?.id;
 
-    // Use the current GW when available (GW is live) for importing data
-    // Only use next GW during the gap between gameweeks
+    // Use the current GW when available (GW is live) for importing data.
+    // Only use next GW during the gap between gameweeks.
     state.currentGW = current || next || 1;
     
-    // For planning purposes, default to viewing the next GW
-    // This allows users to plan for the upcoming gameweek
-    state.viewingGW = next || current || 1;
+    // Planning/viewing GW = the transfer-window GW the user should be looking at.
+    //   • If is_next is set, that IS the transfer-window GW.
+    //   • If only is_current is set, the deadline for is_current has already
+    //     passed so the transfer window is open for is_current + 1.
+    //     Cap at MAX_GAMEWEEK so GW38 never overflows to a non-existent GW39.
+    //   • Fallback: currentGW (already set above) or 1.
+    state.viewingGW = next
+      || (current ? Math.min(current + 1, MAX_GAMEWEEK) : null)
+      || state.currentGW
+      || 1;
     
     // Set initial minimum navigable GW at bootstrap (before any team import)
     state.minNavigableGW = state.viewingGW;

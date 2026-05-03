@@ -11,12 +11,22 @@
 // ── Helpers (mirror production clamping logic) ──────────────────────────────
 
 /**
- * Derives the planning GW from bootstrap events (mirrors main.js + ui-init.js).
+ * Derives the planning GW from bootstrap events (mirrors data.js getBootstrapPlanningGW).
+ *
+ * Priority:
+ *  1. is_next  – FPL API explicitly marks the upcoming transfer-window GW.
+ *  2. is_current + 1 – deadline has passed; the transfer window is for the
+ *     next GW.  Cap at MAX_GAMEWEEK (38) to avoid overflowing past GW38.
+ *  3. currentGW fallback, then 1.
  */
+const MAX_GAMEWEEK = 38;
+
 function getBootstrapPlanningGW(events, currentGW) {
   const next = events.find(e => e.is_next)?.id;
   const current = events.find(e => e.is_current)?.id;
-  return next || current || currentGW || 1;
+  if (next) return next;
+  if (current) return Math.min(current + 1, MAX_GAMEWEEK);
+  return currentGW || 1;
 }
 
 /**
@@ -107,15 +117,17 @@ console.log('\n== GW Clamping: future viewingGW is preserved ==');
 console.log('\n== GW Clamping: only is_current, no is_next ==');
 
 {
-  // During a live gameweek, is_current is set but is_next is not
+  // After a GW's deadline passes the FPL API sets is_current for the live GW
+  // but may not yet have is_next for the following GW.  The planning/viewing
+  // GW must advance to is_current + 1 (the open transfer-window GW).
   const events = [
     { id: 32, is_current: true, is_next: false, finished: false },
   ];
   const planningGW = getBootstrapPlanningGW(events, 32);
-  assert(planningGW === 32, 'Bootstrap planning GW = 32 (is_current fallback)');
+  assert(planningGW === 33, 'Bootstrap planning GW = 33 (is_current + 1, transfer window is open for next GW)');
 
   const result = clampRestoredState(31, 31, planningGW);
-  assert(result.viewingGW === 32, 'viewingGW clamped from 31 to 32');
+  assert(result.viewingGW === 33, 'viewingGW clamped from 31 to 33');
 }
 
 console.log('\n== GW Clamping: no events (empty bootstrap) ==');
@@ -175,6 +187,43 @@ console.log('\n== Import: viewingGW ahead of bootstrap is preserved ==');
 }
 
 // ── Results ─────────────────────────────────────────────────────────────────
+
+console.log('\n== GW38 edge case: is_current=38, no is_next (final GW) ==');
+
+{
+  // GW38 is the last gameweek – there is no GW39.  The cap at MAX_GAMEWEEK
+  // must prevent the planning GW from advancing past 38.
+  const events = [
+    { id: 38, is_current: true, is_next: false, finished: false },
+  ];
+  const planningGW = getBootstrapPlanningGW(events, 38);
+  assert(planningGW === 38, 'GW38 planning GW stays at 38 (no GW39 exists)');
+}
+
+console.log('\n== Real-world: GW35 deadline passed, GW35 games ongoing, is_next not yet set ==');
+
+{
+  // GW35 deadline passed Friday evening; FPL API shows is_current=35 but
+  // is_next=36 has not been set yet.  Header must show GW36 (transfer window).
+  const events = [
+    { id: 35, is_current: true, is_next: false, finished: false },
+  ];
+  const planningGW = getBootstrapPlanningGW(events, 35);
+  assert(planningGW === 36, 'GW35 live with no is_next → planning GW = 36 (transfer window)');
+}
+
+console.log('\n== Real-world: GW35 deadline passed, is_next=36 set by FPL API ==');
+
+{
+  // Normal mid-season case: FPL API sets both is_current and is_next.
+  const events = [
+    { id: 35, is_current: true, is_next: false, finished: false },
+    { id: 36, is_current: false, is_next: true, finished: false },
+  ];
+  const planningGW = getBootstrapPlanningGW(events, 35);
+  assert(planningGW === 36, 'is_next=36 takes priority → planning GW = 36');
+}
+
 
 console.log('\n==================================================');
 console.log(`Results: ${passed} passed, ${failed} failed`);
