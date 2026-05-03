@@ -503,9 +503,10 @@ export async function loadTeamEntry(managerId, gwRequested) {
       resetChipUsageState();
 
       // --- Free-transfer seeding from picks response ---
-      // entry_history.extra_free_transfers is the direct API value: the number
-      // of FTs available for the imported GW (before any transfers were made).
-      // No separate history fetch needed.
+      // entry_history.extra_free_transfers is the FPL API field for *extra*
+      // transfers beyond the standard 1 every manager receives each GW.
+      // Total FTs available = extra_free_transfers + 1.
+      // (e.g. API returns 0 when manager has exactly 1 FT, 1 when they have 2, etc.)
       const planningGW = state.viewingGW;
       const importedGW = gw;
       const extraFT = json.entry_history?.extra_free_transfers;
@@ -513,7 +514,7 @@ export async function loadTeamEntry(managerId, gwRequested) {
       ensureFreeTransfersByGW();
 
       if (typeof extraFT === 'number') {
-        let seedFT = extraFT;
+        let seedFT = extraFT + 1; // convert extra→total
 
         if (importedGW < planningGW) {
           // Roll forward from importedGW to planningGW.
