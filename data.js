@@ -424,6 +424,23 @@ export async function loadTeamEntry(managerId, gwRequested) {
     // non-fatal
   }
 
+  // Fetch full entry history for free-transfer calculation.
+  // /entry/{id}/history/ returns { current: [{event, event_transfers, ...}], chips: [...] }
+  // computeFreeTransfersFromHistory derives the correct FT count for any GW by
+  // replaying every historical transfer and chip — far more reliable than the
+  // extra_free_transfers field in the picks response, which is absent for
+  // live/future GWs and causes everyone to silently default to 1 FT.
+  let ftResult = null;
+  try {
+    const histRes = await fetch(`${FPL_BASE}/entry/${managerId}/history/?cb=${CACHE_NONCE}`, { cache: 'no-store' });
+    if (histRes.ok) {
+      const histData = await parseJsonOrThrow(histRes);
+      ftResult = computeFreeTransfersFromHistory(histData);
+    }
+  } catch (e) {
+    // non-fatal – fall back to extra_free_transfers below
+  }
+
   for (const gw of unique) {
     try {
       const res = await fetch(
@@ -502,40 +519,42 @@ export async function loadTeamEntry(managerId, gwRequested) {
       }
       resetChipUsageState();
 
-      // --- Free-transfer seeding from picks response ---
-      // entry_history.extra_free_transfers is the FPL API field for *extra*
-      // transfers beyond the standard 1 every manager receives each GW.
-      // Total FTs available = extra_free_transfers + 1.
-      // (e.g. API returns 0 when manager has exactly 1 FT, 1 when they have 2, etc.)
+      // --- Free-transfer seeding ---
       const planningGW = state.viewingGW;
       const importedGW = gw;
-      const extraFT = json.entry_history?.extra_free_transfers;
 
       ensureFreeTransfersByGW();
 
-      if (typeof extraFT === 'number') {
-        let seedFT = extraFT + 1; // convert extra→total
-
-        if (importedGW < planningGW) {
-          // Roll forward from importedGW to planningGW.
-          // First step uses the real event_transfers and active chip from the
-          // imported GW; subsequent steps assume 0 plan-transfers (fresh import).
-          const eventTransfers = json.entry_history?.event_transfers || 0;
-          const importedChip = json.active_chip || null;
-          if (importedChip === 'wildcard') {
-            seedFT = 1; // WC resets FT to 1 for the following GW
-          } else {
-            // Normal or free-hit (FH preserves FTs with no +1; use seedFT as-is
-            // since extra_free_transfers already reflects the pre-FH FT count).
-            seedFT = Math.min(5, Math.max(0, seedFT - eventTransfers) + 1);
-          }
-          // +1 rollover for each additional gap-GW (0 plan-transfers on fresh import).
-          for (let g = importedGW + 1; g < planningGW; g++) {
-            seedFT = Math.min(5, seedFT + 1);
-          }
-        }
-
+      // Primary path: history-based FT calculation.
+      // computeFreeTransfersFromHistory replays every chip and transfer from
+      // the season start, giving a definitive FT count for any GW.
+      // perGW[planningGW] is set when planningGW has already been played;
+      // nextGWft is the computed FT for the first unplayed GW after history.
+      if (ftResult) {
+        const seedFT = (ftResult.perGW[planningGW] !== undefined)
+          ? ftResult.perGW[planningGW]
+          : ftResult.nextGWft;
         state.freeTransfersByGW[planningGW] = normalizeFreeTransfersValue(seedFT);
+      } else {
+        // Fallback: use extra_free_transfers from the picks response.
+        // FPL stores "extra" FTs beyond the standard 1, so total = extra + 1.
+        const extraFT = json.entry_history?.extra_free_transfers;
+        if (typeof extraFT === 'number') {
+          let seedFT = extraFT + 1; // convert extra → total
+          if (importedGW < planningGW) {
+            const eventTransfers = json.entry_history?.event_transfers || 0;
+            const importedChip = json.active_chip || null;
+            if (importedChip === 'wildcard') {
+              seedFT = 1;
+            } else {
+              seedFT = Math.min(5, Math.max(0, seedFT - eventTransfers) + 1);
+            }
+            for (let g = importedGW + 1; g < planningGW; g++) {
+              seedFT = Math.min(5, seedFT + 1);
+            }
+          }
+          state.freeTransfersByGW[planningGW] = normalizeFreeTransfersValue(seedFT);
+        }
       }
 
       recomputeFreeTransfersFromGW(planningGW);

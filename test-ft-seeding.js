@@ -400,6 +400,105 @@ console.log('\nTest 20: exact reported bug — GW35 live, GW36 open, 0 transfers
   assert(seed === 2, `Bug scenario: extraFT=0 (API, 1 total), 0 transfers, importedGW=35→planningGW=36: seed=2 ✓`);
 }
 
+// ── Tests: history-based primary path (loadTeamEntry) ────────────────────────
+// These verify the new primary path: /entry/{id}/history/ is fetched and
+// computeFreeTransfersFromHistory is used instead of extra_free_transfers.
+// The bug: extra_free_transfers is absent in picks responses for live/future GWs,
+// so every manager silently defaulted to 1 FT regardless of their actual count.
+
+console.log('\nTest 21 (PRIMARY PATH): GW35 live, GW36 open — history gives correct FTs for 1-FT manager');
+{
+  // Manager had 1 FT for all recent GWs (1 transfer per GW).
+  const historyData = {
+    current: [
+      { event: 33, event_transfers: 1 },
+      { event: 34, event_transfers: 1 },
+      { event: 35, event_transfers: 0 }, // GW35 live, 0 transfers made so far
+    ],
+    chips: [],
+  };
+  const ftResult = computeFreeTransfersFromHistory(historyData);
+  // GW33: ft=1, 1 transfer → ft=min(5,max(0,1-1)+1)=1
+  // GW34: ft=1, 1 transfer → ft=1
+  // GW35: ft=1, 0 transfers → ft=min(5,max(0,1-0)+1)=2
+  // nextGWft=2 (FTs available for GW36)
+  // perGW[36] is undefined → use nextGWft=2
+  const seed = computeSeedFT(ftResult, 36);
+  assert(seed === 2, `History path: 1-FT manager in GW35 → seed=2 for GW36 ✓`);
+}
+
+console.log('\nTest 22 (PRIMARY PATH): GW35 live, GW36 open — history gives correct FTs for 3-FT manager');
+{
+  // Manager had 3 FTs going into GW35 (banked from previous 0-transfer GWs).
+  const historyData = {
+    current: [
+      { event: 32, event_transfers: 0 },
+      { event: 33, event_transfers: 0 },
+      { event: 34, event_transfers: 0 },
+      { event: 35, event_transfers: 0 }, // GW35 live, 0 transfers so far
+    ],
+    chips: [],
+  };
+  const ftResult = computeFreeTransfersFromHistory(historyData);
+  // GW32: ft=1, 0 transfers → ft=2
+  // GW33: ft=2, 0 transfers → ft=3
+  // GW34: ft=3, 0 transfers → ft=4 (would be 4, but min(5,...))
+  // GW35: ft=4, 0 transfers → ft=5
+  // nextGWft=5 (FTs for GW36)
+  const seed = computeSeedFT(ftResult, 36);
+  assert(seed === 5, `History path: 4-FT manager in GW35 with 0 transfers → seed=5 for GW36 ✓`);
+}
+
+console.log('\nTest 23 (PRIMARY PATH): picks for GW36 available — history still gives correct FTs');
+{
+  // importedGW==planningGW==36 (picks for GW36 directly available).
+  // Without history, extra_free_transfers might be null/absent for an unplayed GW.
+  // History gives correct FTs regardless.
+  const historyData = {
+    current: [
+      { event: 34, event_transfers: 1 },
+      { event: 35, event_transfers: 1 },
+      // GW36 not yet in history (hasn't been played) → use nextGWft
+    ],
+    chips: [],
+  };
+  const ftResult = computeFreeTransfersFromHistory(historyData);
+  // GW34: ft=1, 1 transfer → ft=1
+  // GW35: ft=1, 1 transfer → ft=1
+  // nextGWft=1 (correct FT for GW36 after 1 transfer in GW35)
+  const seed = computeSeedFT(ftResult, 36);
+  assert(seed === 1, `History path: GW36 picks available, 1 FT expected → seed=1 ✓`);
+}
+
+console.log('\nTest 24 (PRIMARY PATH): every manager shows correct FTs — not always 1');
+{
+  // This test directly verifies the user-reported bug is fixed by the primary path.
+  // Old broken path: extra_free_transfers absent → all managers get 1 FT.
+  // New fixed path: history always present → correct FT for every manager.
+
+  const scenarios = [
+    // [history_current, chips, planningGW, expected_FT, description]
+    [
+      [{ event: 34, event_transfers: 0 }, { event: 35, event_transfers: 0 }],
+      [], 36, 3, '2 banked FTs (0 transfers each GW) → 3 for GW36'
+    ],
+    [
+      [{ event: 34, event_transfers: 1 }, { event: 35, event_transfers: 2 }],
+      [], 36, 1, '2 transfers in GW35 (had 1 FT) → 1 for GW36'
+    ],
+    [
+      [{ event: 34, event_transfers: 0 }, { event: 35, event_transfers: 0 }],
+      [{ name: 'wildcard', event: 34 }], 36, 2, 'WC in GW34 → resets to 1, then +1 rollover = 2 for GW36'
+    ],
+  ];
+
+  for (const [current, chips, planningGW, expected, desc] of scenarios) {
+    const ftResult = computeFreeTransfersFromHistory({ current, chips });
+    const seed = computeSeedFT(ftResult, planningGW);
+    assert(seed === expected, desc);
+  }
+}
+
 // ── Summary ─────────────────────────────────────────────────────────────────
 
 console.log(`\n${'='.repeat(50)}`);
