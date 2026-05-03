@@ -401,7 +401,7 @@ console.log('\nTest 28 (WC edge case): WC with 2 transfers and 4 FTs → 2 FTs a
     chips: [{ name: 'wildcard', event: 33 }],
   });
 
-  // GW30: Q=1, GW31: Q=2, GW32: Q=3, GW33: prevFT=3,prevTransfers=0 → Q=min(max(1,4),5)=4
+  // GW30: Q=1, GW31: Q=2, GW32: Q=3, GW33: prevFT=3, prevTransfers=0 → Q=min(max(1,3-0+1),5)=4
   // nextGWft: lastFTStart=4, lastTransfers=2, lastChip='WC', inc=0 → max(1, 4-2)=2
   assert(ftResult.nextGWft === 2, `WC with 2 transfers, 4 FTs → nextGWft=2`);
 }

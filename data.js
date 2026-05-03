@@ -590,7 +590,10 @@ export async function loadTeamEntry(managerId, gwRequested) {
             const eventTransfers = json.entry_history?.event_transfers || 0;
             const importedChip = json.active_chip || null;
             if (importedChip === 'wildcard' || importedChip === 'freehit') {
-              seedFT = 1;
+              // WC/FH: no +1 rollover. Formula: max(1, seedFT - eventTransfers).
+              // For WC (many transfers): typically gives 1.
+              // For FH (event_transfers ≈ 0): preserves prevFTs.
+              seedFT = Math.max(1, seedFT - eventTransfers);
             } else {
               seedFT = Math.min(5, Math.max(1, seedFT - eventTransfers) + 1);
             }
