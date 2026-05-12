@@ -33,47 +33,20 @@ export async function onRequestPost({ request, env, context }) {
     const hashArray = Array.from(new Uint8Array(hashBuffer));
     const passwordhash = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
 
-    // Save to Supabase
-    const supabaseUrl = env.SUPABASE_URL;
-    const supabaseKey = env.SUPABASE_ANON_KEY;
-    
-    const getHeaders = {
-      'apikey': supabaseKey,
-      'Authorization': `Bearer ${supabaseKey}`,
-      'Content-Type': 'application/json',
-      'Prefer': 'return=representation'
-    };
-
-    // Build query string to check for existing draft with composite key (teamid, managerid)
-    // Use URL encoding to safely include parameters
-    const encodedTeamId = encodeURIComponent(teamid);
-    let queryString = `teamid=eq.${encodedTeamId}`;
+    let existing;
     if (managerid) {
-      const encodedManagerId = encodeURIComponent(managerid);
-      queryString += `&managerid=eq.${encodedManagerId}`;
+      existing = await env.DB.prepare(
+        'SELECT id, passwordhash FROM team_saves WHERE teamid = ? AND managerid = ?'
+      ).bind(teamid, managerid).first();
     } else {
-      queryString += `&managerid=is.null`;
+      existing = await env.DB.prepare(
+        'SELECT id, passwordhash FROM team_saves WHERE teamid = ? AND managerid IS NULL'
+      ).bind(teamid).first();
     }
 
-    // Check existing with better response
-    const getResponse = await fetch(`${supabaseUrl}/rest/v1/team_saves?${queryString}`, {
-      method: 'GET',
-      headers: getHeaders
-    });
-    const existing = await getResponse.json();
-
-    const saveData = {
-      teamid,
-      label: label || teamid,
-      passwordhash,
-      payload,
-      managerid: managerid || null
-    };
-
-    let saveResponse;
-    if (existing.length > 0) {
+    if (existing) {
       // Overwrite requires the same password used when the draft was created
-      const storedHash = existing[0].passwordhash || '';
+      const storedHash = existing.passwordhash || '';
       if (!timingSafeEqual(storedHash, passwordhash)) {
         return new Response(JSON.stringify({ error: 'Invalid password' }), {
           status: 403,
@@ -82,53 +55,35 @@ export async function onRequestPost({ request, env, context }) {
       }
 
       // Update existing - use composite key (teamid, managerid) to identify the correct record
-      saveResponse = await fetch(`${supabaseUrl}/rest/v1/team_saves?${queryString}`, {
-        method: 'PATCH',
-        headers: getHeaders,
-        body: JSON.stringify(saveData)
-      });
+      if (managerid) {
+        await env.DB.prepare(
+          'UPDATE team_saves SET label=?, passwordhash=?, payload=?, updated_at=datetime(\'now\') WHERE teamid=? AND managerid=?'
+        ).bind(label || teamid, passwordhash, JSON.stringify(payload), teamid, managerid).run();
+      } else {
+        await env.DB.prepare(
+          'UPDATE team_saves SET label=?, passwordhash=?, payload=?, updated_at=datetime(\'now\') WHERE teamid=? AND managerid IS NULL'
+        ).bind(label || teamid, passwordhash, JSON.stringify(payload), teamid).run();
+      }
     } else {
       // This is a new insert - check if manager has reached limit
       if (managerid) {
-        // Count existing drafts for this manager
-        const encodedManagerId = encodeURIComponent(managerid);
-        const countResponse = await fetch(
-          `${supabaseUrl}/rest/v1/team_saves?managerid=eq.${encodedManagerId}&select=id`,
-          {
-            method: 'GET',
-            headers: getHeaders
-          }
-        );
-        
-        if (countResponse.ok) {
-          const existingDrafts = await countResponse.json();
-          
-          if (existingDrafts.length >= MAX_DRAFTS_PER_MANAGER) {
-            return new Response(JSON.stringify({ 
-              error: `Maximum draft limit reached. You can save up to ${MAX_DRAFTS_PER_MANAGER} drafts per manager. Please delete an old draft or update an existing one.` 
-            }), {
-              status: 400,
-              headers: { 'Content-Type': 'application/json' }
-            });
-          }
-        } else {
-          // Log failure but allow save to proceed (fail-safe approach)
-          console.warn('Failed to check draft count, allowing save to proceed');
+        const countResult = await env.DB.prepare(
+          'SELECT COUNT(*) as cnt FROM team_saves WHERE managerid = ?'
+        ).bind(managerid).first();
+
+        if ((countResult?.cnt || 0) >= MAX_DRAFTS_PER_MANAGER) {
+          return new Response(JSON.stringify({
+            error: `Maximum draft limit reached. You can save up to ${MAX_DRAFTS_PER_MANAGER} drafts per manager. Please delete an old draft or update an existing one.`
+          }), {
+            status: 400,
+            headers: { 'Content-Type': 'application/json' }
+          });
         }
       }
-      
-      // Insert new
-      saveResponse = await fetch(`${supabaseUrl}/rest/v1/team_saves`, {
-        method: 'POST',
-        headers: getHeaders,
-        body: JSON.stringify(saveData)
-      });
-    }
 
-    if (!saveResponse.ok) {
-      const errorData = await saveResponse.json();
-      console.error('Supabase Error:', errorData);  // Log for debugging
-      throw new Error(`Supabase save failed: ${JSON.stringify(errorData)}`);
+      await env.DB.prepare(
+        'INSERT INTO team_saves (teamid, managerid, label, passwordhash, payload) VALUES (?,?,?,?,?)'
+      ).bind(teamid, managerid || null, label || teamid, passwordhash, JSON.stringify(payload)).run();
     }
 
     return new Response(JSON.stringify({ success: true, message: 'Team saved successfully' }), {
@@ -143,6 +98,5 @@ export async function onRequestPost({ request, env, context }) {
     });
   }
 }
-
 
 

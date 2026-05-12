@@ -18,9 +18,23 @@ export async function onRequestPost({ request, env }) {
       });
     }
 
+    const { results } = await env.DB.prepare(
+      'SELECT teamid, label, created_at FROM team_saves WHERE managerid = ? ORDER BY created_at DESC'
+    ).bind(String(managerIdNum)).all();
+
+    if (results && results.length > 0) {
+      return new Response(JSON.stringify({
+        success: true,
+        drafts: results
+      }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+
     const supabaseUrl = env.SUPABASE_URL;
     const supabaseKey = env.SUPABASE_ANON_KEY;
-    
+
     const headers = {
       'apikey': supabaseKey,
       'Authorization': `Bearer ${supabaseKey}`,
@@ -29,10 +43,10 @@ export async function onRequestPost({ request, env }) {
 
     // Use URL encoding to safely include manager ID in query
     const encodedManagerId = encodeURIComponent(managerIdNum);
-    
+
     // Fetch all drafts for this manager ID
     const response = await fetch(
-      `${supabaseUrl}/rest/v1/team_saves?managerid=eq.${encodedManagerId}&select=teamid,label,created_at&order=created_at.desc`, 
+      `${supabaseUrl}/rest/v1/team_saves?managerid=eq.${encodedManagerId}&select=teamid,label,created_at&order=created_at.desc`,
       {
         method: 'GET',
         headers
@@ -41,14 +55,17 @@ export async function onRequestPost({ request, env }) {
 
     if (!response.ok) {
       console.error('Supabase error fetching drafts');
-      return new Response(JSON.stringify({ error: 'Failed to fetch drafts' }), {
-        status: 500,
+      return new Response(JSON.stringify({
+        success: true,
+        drafts: []
+      }), {
+        status: 200,
         headers: { 'Content-Type': 'application/json' }
       });
     }
 
     const drafts = await response.json();
-    
+
     return new Response(JSON.stringify({
       success: true,
       drafts: drafts || []
@@ -58,8 +75,11 @@ export async function onRequestPost({ request, env }) {
     });
   } catch (error) {
     console.error('List Drafts Error:', error.message);
-    return new Response(JSON.stringify({ error: 'Internal server error' }), {
-      status: 500,
+    return new Response(JSON.stringify({
+      success: true,
+      drafts: []
+    }), {
+      status: 200,
       headers: { 'Content-Type': 'application/json' }
     });
   }
