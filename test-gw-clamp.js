@@ -51,7 +51,7 @@ function clampRestoredState(savedViewingGW, savedMinNavigableGW, bootstrapPlanni
  */
 function getImportPlanningGW(stateViewingGW, events, currentGW) {
   const freshPlanningGW = getBootstrapPlanningGW(events, currentGW);
-  return Math.max(stateViewingGW, freshPlanningGW);
+  return freshPlanningGW;
 }
 
 // ── Test runner ─────────────────────────────────────────────────────────────
@@ -176,14 +176,34 @@ console.log('\n== Import: viewingGW already correct ==');
   assert(importGW === 33, 'Import targets GW33 when viewingGW is already 33');
 }
 
-console.log('\n== Import: viewingGW ahead of bootstrap is preserved ==');
+console.log('\n== Import: viewingGW ahead of bootstrap is reset to fresh planning GW ==');
 
 {
   const events = [
     { id: 33, is_next: true, is_current: false, finished: false },
   ];
   const importGW = getImportPlanningGW(35, events, 32);
-  assert(importGW === 35, 'Import targets GW35 when viewingGW is ahead of bootstrap');
+  assert(importGW === 33, 'Import targets GW33 even when viewingGW is ahead');
+}
+
+console.log('\n== Import: repeated imports while user is on future GW stay on fresh planning GW ==');
+
+{
+  const events = [
+    { id: 37, is_next: true, is_current: false, finished: false },
+  ];
+
+  // First import at the correct GW
+  const firstImportGW = getImportPlanningGW(37, events, 36);
+  assert(firstImportGW === 37, 'First import targets GW37');
+
+  // User navigates to GW38, then imports again
+  const secondImportGW = getImportPlanningGW(38, events, 36);
+  assert(secondImportGW === 37, 'Second import resets back to GW37');
+
+  // Repeated imports continue targeting the authoritative GW
+  const thirdImportGW = getImportPlanningGW(38, events, 36);
+  assert(thirdImportGW === 37, 'Repeated imports continue targeting GW37');
 }
 
 // ── Results ─────────────────────────────────────────────────────────────────
