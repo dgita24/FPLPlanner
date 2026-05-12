@@ -505,16 +505,11 @@ async function importTeam() {
     return;
   }
 
-  // Derive planning GW from fresh bootstrap events so a stale
-  // state.viewingGW (e.g. from localStorage) can never target the wrong GW.
+  // Always derive planning GW from fresh bootstrap events so import never
+  // inherits a manually navigated future/past viewingGW.
   const freshPlanningGW = getBootstrapPlanningGW();
-
-  // If viewingGW is behind the bootstrap-derived GW, bring it forward.
-  if (state.viewingGW < freshPlanningGW) {
-    state.viewingGW = freshPlanningGW;
-  }
-
-  const planningGW = state.viewingGW;
+  const planningGW = freshPlanningGW;
+  state.viewingGW = planningGW;
   showMessage(`Loading team (planning GW${planningGW})...`, 'info');
 
   const data = await loadTeamEntry(teamId, planningGW);
