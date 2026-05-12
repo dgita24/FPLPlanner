@@ -33,22 +33,48 @@ export async function onRequestPost({ request, env }) {
       });
     }
 
-    const supabaseUrl = env.SUPABASE_URL;
-    const supabaseKey = env.SUPABASE_ANON_KEY;
-    
-    const headers = {
-      'apikey': supabaseKey,
-      'Authorization': `Bearer ${supabaseKey}`,
-      'Content-Type': 'application/json',
-      'Prefer': 'return=representation'
-    };
-
     // Hash the provided password using SHA-256 (same method as save.js and load.js)
     const encoder = new TextEncoder();
     const pwdData = encoder.encode(password);
     const hashBuffer = await crypto.subtle.digest('SHA-256', pwdData);
     const hashArray = Array.from(new Uint8Array(hashBuffer));
     const inputHash = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+
+    const row = await env.DB.prepare(
+      'SELECT id, passwordhash FROM team_saves WHERE teamid = ? AND managerid = ?'
+    ).bind(teamid, managerid).first();
+
+    if (row) {
+      const storedHash = row.passwordhash || '';
+      if (!timingSafeEqual(storedHash, inputHash)) {
+        return new Response(JSON.stringify({ error: 'Invalid password' }), {
+          status: 403,
+          headers: { 'Content-Type': 'application/json' }
+        });
+      }
+
+      await env.DB.prepare(
+        'DELETE FROM team_saves WHERE teamid = ? AND managerid = ?'
+      ).bind(teamid, managerid).run();
+
+      return new Response(JSON.stringify({
+        success: true,
+        message: 'Draft deleted successfully'
+      }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+
+    const supabaseUrl = env.SUPABASE_URL;
+    const supabaseKey = env.SUPABASE_ANON_KEY;
+
+    const headers = {
+      'apikey': supabaseKey,
+      'Authorization': `Bearer ${supabaseKey}`,
+      'Content-Type': 'application/json',
+      'Prefer': 'return=representation'
+    };
 
     // Fetch the draft record to verify the password before deleting
     const encodedTeamId = encodeURIComponent(teamid);
@@ -79,7 +105,7 @@ export async function onRequestPost({ request, env }) {
 
     // Verify password hash using constant-time comparison to prevent timing attacks
     const storedHash = records[0].passwordhash || '';
-    if (storedHash.length !== inputHash.length || !timingSafeEqual(storedHash, inputHash)) {
+    if (!timingSafeEqual(storedHash, inputHash)) {
       return new Response(JSON.stringify({ error: 'Invalid password' }), {
         status: 403,
         headers: { 'Content-Type': 'application/json' }
