@@ -361,9 +361,8 @@ export function renderPitch() {
   if (batchInfo.isActive) {
     const removedStarters = batchInfo.removedPlayers.filter(rp => rp.side === 'starting');
     for (const removed of removedStarters) {
-      const p = getPlayer(removed.id);
-      if (!p) continue;
-      const et = getElementType(removed.id);
+      const et = removed.id === null ? removed.elementType : getElementType(removed.id);
+      if (!et) continue;
       const placeholder = { ...removed, isPlaceholder: true };
       if (et === 1) gk.push(placeholder);
       else if (et === 2) def.push(placeholder);
@@ -383,6 +382,7 @@ export function renderPitch() {
       <button class="pitch-save-btn" onclick="openCloudSave()" title="Cloud Save">💾 Save</button>
       <button class="pitch-import-btn" onclick="openImportMenu()" title="Import Team">📥 Import</button>
       <button class="pitch-drafts-btn" onclick="openDraftsMenu()">📂 Drafts</button>
+      <button class="pitch-build-btn" onclick="startFreshSquad()" title="Build squad from scratch">✏️ Build</button>
     </div>
     <div class="pitch-right-controls">
       <button class="pitch-reset-btn" onclick="resetToImportedTeam()">⏮️ Reset</button>
@@ -543,6 +543,26 @@ function playerCard(entry, source) {
 
 // Placeholder card for removed players during batch transfers
 function placeholderCard(removedPlayer, source) {
+  // Empty slot — no real player (e.g. fresh squad builder)
+  if (removedPlayer.id === null) {
+    const posLabel = posNames[removedPlayer.elementType] || '';
+    return `
+      <div class="player-card placeholder-card">
+        <div class="placeholder-overlay">
+          <span class="placeholder-text">ADD</span>
+          <span class="placeholder-position">${posLabel}</span>
+        </div>
+        <div class="name">—</div>
+        <div class="card-fixture-next">--</div>
+        <div class="future-fixtures">
+          <div class="fdr-segment fdr-none">--</div>
+          <div class="fdr-segment fdr-none">--</div>
+          <div class="fdr-segment fdr-none">--</div>
+        </div>
+      </div>
+    `;
+  }
+
   const p = getPlayer(removedPlayer.id);
   if (!p) return '';
 

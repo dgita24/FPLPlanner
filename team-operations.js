@@ -764,6 +764,55 @@ export function sellAllPlayers(updateUI) {
   updateUI();
 }
 
+export function startFreshSquad(updateUI) {
+  const gw = state.viewingGW;
+  const team = state.plan[gw];
+  if (!team) return;
+
+  const allPlayers = [...team.starting, ...team.bench];
+  if (allPlayers.length > 0) {
+    showMessage('Squad already has players. Use Sell All or remove players first.', 'info');
+    return;
+  }
+  if (batchTransfers.isActive) {
+    showMessage('A transfer session is already active.', 'info');
+    return;
+  }
+
+  // Snapshot for cancel (bank is 0 for an empty squad)
+  batchTransfers.snapshot = snapshotForCancel();
+  batchTransfers.isActive = true;
+
+  // Set standard FPL budget
+  state.bank = 100.0;
+
+  // Pre-populate 15 position-aware null-id slots (4-3-3 default formation)
+  // Starting XI: 1 GK, 4 DEF, 3 MID, 3 FWD
+  const startingSlots = [
+    { elementType: 1 },
+    { elementType: 2 }, { elementType: 2 }, { elementType: 2 }, { elementType: 2 },
+    { elementType: 3 }, { elementType: 3 }, { elementType: 3 },
+    { elementType: 4 }, { elementType: 4 }, { elementType: 4 },
+  ];
+  // Bench: 1 GK, 1 DEF, 1 MID, 1 FWD
+  const benchSlots = [
+    { elementType: 1 },
+    { elementType: 2 },
+    { elementType: 3 },
+    { elementType: 4 },
+  ];
+
+  for (const slot of startingSlots) {
+    batchTransfers.removedPlayers.push({ id: null, side: 'starting', sellingPrice: 0, elementType: slot.elementType });
+  }
+  for (const slot of benchSlots) {
+    batchTransfers.removedPlayers.push({ id: null, side: 'bench', sellingPrice: 0, elementType: slot.elementType });
+  }
+
+  showMessage('Squad builder active. Pick 15 players from the table. £100m budget.', 'success');
+  updateUI();
+}
+
 export function isPendingTransfer() {
   return batchTransfers.isActive;
 }
