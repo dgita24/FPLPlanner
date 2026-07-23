@@ -70,6 +70,8 @@ function getImportErrorMessage(error) {
   switch (error.category) {
     case 'invalid_team_id':
       return 'Team ID not found. Please check the ID and try again.';
+    case 'private_pre_deadline':
+      return 'Your team ID is valid, but FPL keeps GW1 picks private until the deadline. Import will work after the GW1 deadline; until then, use a draft team.';
     case 'network':
       return 'Network error while loading team data. Check your connection and retry.';
     case 'proxy':
@@ -81,6 +83,13 @@ function getImportErrorMessage(error) {
     default:
       return error.message || 'Failed to load team. Please try again.';
   }
+}
+
+function isPreDeadlineGW1Import(events, gwRequested, entrySummary) {
+  if (!entrySummary || Number(gwRequested) !== 1) return false;
+  return !(events || []).some(
+    e => e && typeof e.id === 'number' && e.id <= 1 && (e.finished || e.is_previous || e.is_current)
+  );
 }
 
 let passed = 0;
@@ -146,9 +155,20 @@ console.log('\n== Valid import after rollover targets fresh season GW1 ==');
 console.log('\n== Import error mapping is actionable ==');
 {
   assert(getImportErrorMessage({ category: 'invalid_team_id' }).includes('Team ID not found'), 'invalid team ID message is specific');
+  assert(getImportErrorMessage({ category: 'private_pre_deadline' }).includes('GW1 picks private until the deadline'), 'pre-deadline private picks message is specific');
   assert(getImportErrorMessage({ category: 'network' }).includes('Network error'), 'network message is specific');
   assert(getImportErrorMessage({ category: 'proxy' }).includes('proxy/API'), 'proxy message is specific');
   assert(getImportErrorMessage({ category: 'schema' }).includes('unexpected team data format'), 'schema message is specific');
+}
+
+console.log('\n== Pre-deadline GW1 import is classified separately ==');
+{
+  const events = [
+    { id: 1, is_next: true, is_current: false, is_previous: false, finished: false },
+  ];
+  assert(isPreDeadlineGW1Import(events, 1, { id: 18225 }), 'valid team at season start is treated as pre-deadline private picks');
+  assert(!isPreDeadlineGW1Import([{ id: 1, is_current: true, finished: false }], 1, { id: 18225 }), 'live GW1 is not treated as pre-deadline private picks');
+  assert(!isPreDeadlineGW1Import(events, 2, { id: 18225 }), 'only GW1 is classified as pre-deadline private picks');
 }
 
 console.log('\n==================================================');

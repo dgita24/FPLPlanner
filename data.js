@@ -259,6 +259,8 @@ export function getImportErrorMessage(error = state.lastImportError) {
   switch (error.category) {
     case 'invalid_team_id':
       return 'Team ID not found. Please check the ID and try again.';
+    case 'private_pre_deadline':
+      return 'Your team ID is valid, but FPL keeps GW1 picks private until the deadline. Import will work after the GW1 deadline; until then, use a draft team.';
     case 'network':
       return 'Network error while loading team data. Check your connection and retry.';
     case 'proxy':
@@ -270,6 +272,18 @@ export function getImportErrorMessage(error = state.lastImportError) {
     default:
       return error.message || 'Failed to load team. Please try again.';
   }
+}
+
+function isPreDeadlineGW1Import(events, gwRequested, entrySummary) {
+  if (!entrySummary || Number(gwRequested) !== 1) return false;
+
+  return !(events || []).some(
+    e =>
+      e &&
+      typeof e.id === 'number' &&
+      e.id <= 1 &&
+      (e.finished || e.is_previous || e.is_current)
+  );
 }
 
 function initEmptyPlan() {
@@ -813,6 +827,8 @@ export async function loadTeamEntry(managerId, gwRequested) {
     setImportError('proxy', 'FPL picks endpoint returned server errors.');
   } else if (state.lastImportError) {
     // Preserve an earlier classified error (for example from /entry/{id}/).
+  } else if (triedPicks > 0 && missingPicksCount === triedPicks && isPreDeadlineGW1Import(events, gwRequested, entrySummary)) {
+    setImportError('private_pre_deadline', 'GW1 picks are private before the deadline.');
   } else if (triedPicks > 0 && missingPicksCount === triedPicks) {
     setImportError('no_picks', 'No picks available in candidate gameweeks.');
   } else {
