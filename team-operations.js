@@ -786,13 +786,13 @@ export function startFreshSquad(updateUI) {
   // Set standard FPL budget
   state.bank = 100.0;
 
-  // Pre-populate 15 position-aware null-id slots (4-3-3 default formation)
-  // Starting XI: 1 GK, 4 DEF, 3 MID, 3 FWD
+  // Pre-populate 15 position-aware null-id slots (4-4-2 default formation)
+  // Starting XI: 1 GK, 4 DEF, 4 MID, 2 FWD → total 2GK, 5DEF, 5MID, 3FWD across squad
   const startingSlots = [
     { elementType: 1 },
     { elementType: 2 }, { elementType: 2 }, { elementType: 2 }, { elementType: 2 },
-    { elementType: 3 }, { elementType: 3 }, { elementType: 3 },
-    { elementType: 4 }, { elementType: 4 }, { elementType: 4 },
+    { elementType: 3 }, { elementType: 3 }, { elementType: 3 }, { elementType: 3 },
+    { elementType: 4 }, { elementType: 4 },
   ];
   // Bench: 1 GK, 1 DEF, 1 MID, 1 FWD
   const benchSlots = [

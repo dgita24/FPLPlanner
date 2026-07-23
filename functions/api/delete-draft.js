@@ -33,6 +33,13 @@ export async function onRequestPost({ request, env }) {
       });
     }
 
+    if (!env?.DB) {
+      return new Response(JSON.stringify({ error: 'Cloud database not configured.' }), {
+        status: 503,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+
     // Hash the provided password using SHA-256 (same method as save.js and load.js)
     const encoder = new TextEncoder();
     const pwdData = encoder.encode(password);

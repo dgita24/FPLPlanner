@@ -25,6 +25,13 @@ export async function onRequestPost({ request, env }) {
       });
     }
 
+    if (!env?.DB) {
+      return new Response(JSON.stringify({ error: 'Cloud database not configured.' }), {
+        status: 503,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+
     // Hash input password
     const encoder = new TextEncoder();
     const pwdData = encoder.encode(password);
