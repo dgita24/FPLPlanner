@@ -18,6 +18,13 @@ export async function onRequestPost({ request, env }) {
       });
     }
 
+    if (!env?.DB) {
+      return new Response(JSON.stringify({ success: true, drafts: [] }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+
     const { results } = await env.DB.prepare(
       'SELECT teamid, label, created_at FROM team_saves WHERE managerid = ? ORDER BY created_at DESC'
     ).bind(String(managerIdNum)).all();

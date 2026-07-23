@@ -1,10 +1,10 @@
 // ui-init.js - Initializes all UI-related event listeners and dependencies
 
-import { state, history, loadTeamEntry, normalizePlanPrices, ensureFreeTransfersByGW, getFreeTransfersForGW, setFreeTransfersForGW, recomputeFreeTransfersFromGW, ensureHistoricallyUsedChips, countTransfersInGW, getBootstrapPlanningGW } from './data.js';
+import { state, history, loadTeamEntry, normalizePlanPrices, ensureFreeTransfersByGW, getFreeTransfersForGW, setFreeTransfersForGW, recomputeFreeTransfersFromGW, ensureHistoricallyUsedChips, countTransfersInGW, getBootstrapPlanningGW, getImportErrorMessage } from './data.js';
 import { setupSidebarHandlers, closeSidebar, toggleSidebarMenu } from './ui-sidebar.js';
 import { showMessage, renderPitch, renderBench, ensureFixturesForView } from './ui-render.js';
 import { renderFixtures, setFixturesGW, isFixturesSyncEnabled } from './fixtures.js';
-import { cancelTransfer, substitutePlayer, addSelectedToSquad, removePlayer, resetTransferState, isPendingTransfer, getBatchTransferInfo, reinstatePlayer, selectChip, togglePlayerMark, setHistoricalChipUsedForPlanning, sellAllPlayers } from './team-operations.js';
+import { cancelTransfer, substitutePlayer, addSelectedToSquad, removePlayer, resetTransferState, isPendingTransfer, getBatchTransferInfo, reinstatePlayer, selectChip, togglePlayerMark, setHistoricalChipUsedForPlanning, sellAllPlayers, startFreshSquad } from './team-operations.js';
 import { setPendingSwap, getPendingSwap } from './ui-render.js';
 import { setDefaultSort } from './table.js';
 import { MAX_GAMEWEEK, MAX_DRAFTS_PER_MANAGER } from './constants.js';
@@ -515,7 +515,7 @@ async function importTeam() {
   const data = await loadTeamEntry(teamId, planningGW);
 
   if (!data || !data.picks) {
-    showMessage('Failed to load team.', 'error');
+    showMessage(getImportErrorMessage(), 'error');
     return;
   }
 
@@ -1361,6 +1361,7 @@ export function initUI() {
   window.undoLastAction = undoLastAction;
   window.resetToImportedTeam = resetToImportedTeam;
   window.clearSquad = clearSquad;
+  window.startFreshSquad = () => startFreshSquad(updateUI);
   window.setCaptain = setCaptain;
   window.setViceCaptain = setViceCaptain;
   window.donatePlaceholder = () => showMessage('Donate feature coming soon! This is a placeholder for now.', 'info');

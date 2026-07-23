@@ -44,10 +44,26 @@ export let state = {
 
   // Chips marked as already used historically (for mid-season planners)
   historicallyUsedChips: {},
+
+  // Season tracking for safe rollover handling
+  seasonMarker: null,
+  seasonRolloverDetected: false,
+  seasonRolloverMessage: '',
+
+  // Last import diagnostic for user-facing error mapping
+  lastImportError: null,
 };
 
 const FPL_BASE = '/api/fpl';
 export const CHIP_TYPES = ['wildcard', 'freehit', 'bboost', '3xc'];
+const SEASON_MARKER_STORAGE_KEY = 'fplplanner-season-marker';
+const RESETTABLE_STORAGE_KEYS = [
+  'fplplanner-state',
+  'fplplanner-recent-team-ids',
+  'fplplanner-fixtures-sync',
+  'fplplanner-fixtures-view-mode',
+  'fplplanner-fixtures-selected-team',
+];
 
 // Per-page-load nonce appended to import-critical URLs to bust any URL-keyed
 // caches (browser disk cache, intermediate CDN/proxy layers).
@@ -55,6 +71,118 @@ const CACHE_NONCE = Date.now();
 
 function deepCopy(obj) {
   return JSON.parse(JSON.stringify(obj));
+}
+
+function delay(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+async function fetchWithRetry(url, options = {}, retries = 2) {
+  let lastError = null;
+
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    try {
+      const res = await fetch(url, options);
+      if (res.status >= 500 && attempt < retries) {
+        await delay(150 * (attempt + 1));
+        continue;
+      }
+      return res;
+    } catch (error) {
+      lastError = error;
+      if (attempt < retries) {
+        await delay(150 * (attempt + 1));
+        continue;
+      }
+      throw error;
+    }
+  }
+
+  if (lastError) throw lastError;
+  throw new Error('Request failed');
+}
+
+function getSeasonMarkerFromBootstrap(bootstrap) {
+  const events = Array.isArray(bootstrap?.events) ? [...bootstrap.events] : [];
+  if (!events.length) return null;
+
+  const sorted = events
+    .filter(e => e && typeof e.id === 'number')
+    .sort((a, b) => a.id - b.id);
+
+  const first = sorted[0];
+  const last = sorted[sorted.length - 1];
+
+  return JSON.stringify({
+    firstEventId: first?.id ?? null,
+    firstEventDeadline: first?.deadline_time ?? null,
+    lastEventId: last?.id ?? null,
+    lastEventDeadline: last?.deadline_time ?? null,
+    totalEvents: sorted.length,
+  });
+}
+
+function safeStorageGet(storage, key) {
+  try {
+    if (!storage) return null;
+    return storage.getItem(key);
+  } catch (e) {
+    return null;
+  }
+}
+
+function safeStorageSet(storage, key, value) {
+  try {
+    if (!storage) return;
+    storage.setItem(key, value);
+  } catch (e) {
+    // ignore storage errors
+  }
+}
+
+function safeStorageRemove(storage, key) {
+  try {
+    if (!storage) return;
+    storage.removeItem(key);
+  } catch (e) {
+    // ignore storage errors
+  }
+}
+
+async function clearBrowserCaches() {
+  try {
+    if (typeof caches === 'undefined' || !caches?.keys) return;
+    const names = await caches.keys();
+    await Promise.all(names.map(name => caches.delete(name)));
+  } catch (e) {
+    // ignore cache API failures
+  }
+}
+
+async function handleSeasonRolloverIfNeeded() {
+  const marker = getSeasonMarkerFromBootstrap(state.bootstrap);
+  state.seasonMarker = marker;
+  state.seasonRolloverDetected = false;
+  state.seasonRolloverMessage = '';
+
+  if (!marker) return;
+
+  const ls = typeof localStorage !== 'undefined' ? localStorage : null;
+  const ss = typeof sessionStorage !== 'undefined' ? sessionStorage : null;
+  const previousMarker = safeStorageGet(ls, SEASON_MARKER_STORAGE_KEY);
+
+  if (previousMarker && previousMarker !== marker) {
+    state.seasonRolloverDetected = true;
+    state.seasonRolloverMessage = 'New FPL season detected. Local planner cache was reset. Please import your team to continue.';
+
+    for (const key of RESETTABLE_STORAGE_KEYS) {
+      safeStorageRemove(ls, key);
+      safeStorageRemove(ss, key);
+    }
+    await clearBrowserCaches();
+  }
+
+  safeStorageSet(ls, SEASON_MARKER_STORAGE_KEY, marker);
 }
 
 export function calculateSellingPrice(purchasePrice, currentPrice) {
@@ -119,6 +247,43 @@ async function parseJsonOrThrow(res) {
     throw new Error(`Expected JSON but got "${ct || 'unknown'}" (HTTP ${res.status}). Body: ${text.slice(0, 120)}`);
   }
   return await res.json();
+}
+
+function setImportError(category, message, meta = {}) {
+  state.lastImportError = { category, message, ...meta };
+}
+
+export function getImportErrorMessage(error = state.lastImportError) {
+  if (!error) return 'Failed to load team. Please try again.';
+
+  switch (error.category) {
+    case 'invalid_team_id':
+      return 'Team ID not found. Please check the ID and try again.';
+    case 'private_pre_deadline':
+      return 'Your team ID is valid, but FPL keeps GW1 picks private until the deadline. Import will work after the GW1 deadline; until then, use a draft team.';
+    case 'network':
+      return 'Network error while loading team data. Check your connection and retry.';
+    case 'proxy':
+      return 'FPL proxy/API request failed. Please retry shortly.';
+    case 'schema':
+      return 'Received unexpected team data format. Please retry shortly.';
+    case 'no_picks':
+      return 'No team picks available yet for current gameweeks. Please retry shortly.';
+    default:
+      return error.message || 'Failed to load team. Please try again.';
+  }
+}
+
+function isPreDeadlineGW1Import(events, gwRequested, entrySummary) {
+  if (!entrySummary || Number(gwRequested) !== 1) return false;
+
+  return !(events || []).some(
+    e =>
+      e &&
+      typeof e.id === 'number' &&
+      e.id <= 1 &&
+      (e.finished || e.is_previous || e.is_current)
+  );
 }
 
 function initEmptyPlan() {
@@ -233,12 +398,13 @@ export function getBootstrapPlanningGW() {
 
 export async function loadBootstrap() {
   try {
-    const res = await fetch(`${FPL_BASE}/bootstrap-static/?cb=${CACHE_NONCE}`, { cache: 'no-store' });
+    const res = await fetchWithRetry(`${FPL_BASE}/bootstrap-static/?cb=${CACHE_NONCE}`, { cache: 'no-store' });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
     state.bootstrap = await parseJsonOrThrow(res);
     state.elements = state.bootstrap.elements || [];
     state.teams = state.bootstrap.teams || [];
+    await handleSeasonRolloverIfNeeded();
 
     const events = state.bootstrap.events || [];
     const current = events.find(e => e.is_current)?.id;
@@ -415,6 +581,13 @@ function computeFreeTransfersFromHistory(historyData) {
  * When we import from an older GW, we still populate the plan starting at *currentGW*.
  */
 export async function loadTeamEntry(managerId, gwRequested) {
+  state.lastImportError = null;
+
+  if (!/^\d+$/.test(String(managerId || ''))) {
+    setImportError('invalid_team_id', 'Invalid team ID format.');
+    return null;
+  }
+
   const events = state.bootstrap?.events || [];
 
   // Candidates to try (in order):
@@ -459,12 +632,18 @@ export async function loadTeamEntry(managerId, gwRequested) {
   // Fetch entry summary for current bank balance
   let entrySummary = null;
   try {
-    const entryRes = await fetch(`${FPL_BASE}/entry/${managerId}/?cb=${CACHE_NONCE}`, { cache: 'no-store' });
+    const entryRes = await fetchWithRetry(`${FPL_BASE}/entry/${managerId}/?cb=${CACHE_NONCE}`, { cache: 'no-store' });
+    if (entryRes.status === 404) {
+      setImportError('invalid_team_id', `Team ID ${managerId} was not found.`);
+      return null;
+    }
     if (entryRes.ok) {
       entrySummary = await parseJsonOrThrow(entryRes);
+    } else if (entryRes.status >= 500) {
+      setImportError('proxy', `Entry endpoint failed with HTTP ${entryRes.status}.`, { status: entryRes.status });
     }
   } catch (e) {
-    // non-fatal
+    setImportError('network', 'Failed to fetch entry summary.', { details: e?.message || String(e) });
   }
 
   // Fetch full entry history for free-transfer calculation.
@@ -475,7 +654,7 @@ export async function loadTeamEntry(managerId, gwRequested) {
   // live/future GWs and causes everyone to silently default to 1 FT.
   let ftResult = null;
   try {
-    const histRes = await fetch(`${FPL_BASE}/entry/${managerId}/history/?cb=${CACHE_NONCE}`, { cache: 'no-store' });
+    const histRes = await fetchWithRetry(`${FPL_BASE}/entry/${managerId}/history/?cb=${CACHE_NONCE}`, { cache: 'no-store' });
     if (histRes.ok) {
       const histData = await parseJsonOrThrow(histRes);
       ftResult = computeFreeTransfersFromHistory(histData);
@@ -484,16 +663,33 @@ export async function loadTeamEntry(managerId, gwRequested) {
     // non-fatal – fall back to extra_free_transfers below
   }
 
+  let hadNetworkError = false;
+  let hadProxyError = false;
+  let hadSchemaError = false;
+  let triedPicks = 0;
+  let missingPicksCount = 0;
+
   for (const gw of unique) {
+    triedPicks++;
     try {
-      const res = await fetch(
+      const res = await fetchWithRetry(
         `${FPL_BASE}/entry/${managerId}/event/${gw}/picks/?cb=${CACHE_NONCE}`,
         { cache: 'no-store' }
       );
-      if (!res.ok) continue;
+      if (res.status === 404) {
+        missingPicksCount++;
+        continue;
+      }
+      if (!res.ok) {
+        if (res.status >= 500) hadProxyError = true;
+        continue;
+      }
 
       const json = await parseJsonOrThrow(res);
-      if (!json || !json.picks) continue;
+      if (!json || !Array.isArray(json.picks)) {
+        hadSchemaError = true;
+        continue;
+      }
 
       // Free Hit produces a temporary squad; skip it and use the real squad from a prior GW
       if (json.active_chip === 'freehit') continue;
@@ -610,11 +806,33 @@ export async function loadTeamEntry(managerId, gwRequested) {
       // Save baseline state for Reset
       history.baseline = JSON.parse(JSON.stringify(state));
       history.undoStack = [];
+      state.lastImportError = null;
 
       return json;
     } catch (e) {
-      // try next gw
+      if ((e?.message || '').includes('Expected JSON')) {
+        hadSchemaError = true;
+      } else {
+        hadNetworkError = true;
+      }
     }
+  }
+
+  if (state.lastImportError?.category === 'invalid_team_id') return null;
+  if (hadNetworkError) {
+    setImportError('network', 'Failed to reach FPL API while loading picks.');
+  } else if (hadSchemaError) {
+    setImportError('schema', 'Unexpected picks payload while loading team.');
+  } else if (hadProxyError) {
+    setImportError('proxy', 'FPL picks endpoint returned server errors.');
+  } else if (state.lastImportError) {
+    // Preserve an earlier classified error (for example from /entry/{id}/).
+  } else if (triedPicks > 0 && missingPicksCount === triedPicks && isPreDeadlineGW1Import(events, gwRequested, entrySummary)) {
+    setImportError('private_pre_deadline', 'GW1 picks are private before the deadline.');
+  } else if (triedPicks > 0 && missingPicksCount === triedPicks) {
+    setImportError('no_picks', 'No picks available in candidate gameweeks.');
+  } else {
+    setImportError('unknown', 'Failed to load team.');
   }
 
   return null;

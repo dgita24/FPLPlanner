@@ -22,6 +22,16 @@
 
 **Expected Result:** All basic UI interactions work as before
 
+### 3. Season Rollover Verification
+**What to test:** Verify automatic reset only when a new season is detected
+**Steps:**
+1. Ensure browser has an older `fplplanner-season-marker` and `fplplanner-state` value.
+2. Reload app with fresh bootstrap data for the new season.
+3. Confirm stale local planner state is cleared and an import prompt is shown.
+4. Import a valid new-season team ID (e.g., `18225`).
+
+**Expected Result:** User sees rollover message once, stale state is cleared, and team import succeeds.
+
 ## Comprehensive Testing (30 minutes)
 
 ### Module: ui-sidebar.js
