@@ -1,6 +1,6 @@
 // ui-init.js - Initializes all UI-related event listeners and dependencies
 
-import { state, history, loadTeamEntry, normalizePlanPrices, ensureFreeTransfersByGW, getFreeTransfersForGW, setFreeTransfersForGW, recomputeFreeTransfersFromGW, ensureHistoricallyUsedChips, countTransfersInGW, getBootstrapPlanningGW } from './data.js';
+import { state, history, loadTeamEntry, normalizePlanPrices, ensureFreeTransfersByGW, getFreeTransfersForGW, setFreeTransfersForGW, recomputeFreeTransfersFromGW, ensureHistoricallyUsedChips, countTransfersInGW, getBootstrapPlanningGW, getImportErrorMessage } from './data.js';
 import { setupSidebarHandlers, closeSidebar, toggleSidebarMenu } from './ui-sidebar.js';
 import { showMessage, renderPitch, renderBench, ensureFixturesForView } from './ui-render.js';
 import { renderFixtures, setFixturesGW, isFixturesSyncEnabled } from './fixtures.js';
@@ -515,7 +515,7 @@ async function importTeam() {
   const data = await loadTeamEntry(teamId, planningGW);
 
   if (!data || !data.picks) {
-    showMessage('Failed to load team.', 'error');
+    showMessage(getImportErrorMessage(), 'error');
     return;
   }
 

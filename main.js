@@ -4,6 +4,7 @@ import { renderTable, populateFilters } from './table.js';
 import { initUI } from './ui.js';
 import { loadFixturesData, renderFixtures } from './fixtures.js';
 import { initFixturePlanner } from './fixture-planner.js';
+import { showMessage } from './ui-render.js';
 
 async function init() {
   console.log('FPLPlanner starting...');
@@ -70,6 +71,16 @@ async function init() {
 
     // Re-render pitch with the (potentially restored) state after all data is ready
     if (window.updateUI) window.updateUI();
+
+    if (state.seasonRolloverDetected) {
+      const banner = document.getElementById('import-banner');
+      if (banner) {
+        const text = banner.querySelector('span');
+        if (text) text.textContent = state.seasonRolloverMessage;
+        banner.style.display = 'block';
+      }
+      showMessage('New season detected. Local cache reset — import your team to continue.', 'info');
+    }
   } else {
     console.error('Failed to load FPL data');
   }
