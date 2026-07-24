@@ -436,7 +436,8 @@ export function updateUI() {
         minNavigableGW: state.minNavigableGW,
         priceMode: state.priceMode,
         freeTransfersByGW: state.freeTransfersByGW,
-        historicallyUsedChips: state.historicallyUsedChips
+        historicallyUsedChips: state.historicallyUsedChips,
+        seasonMarker: state.seasonMarker
       };
       localStorage.setItem('fplplanner-state', JSON.stringify(data));
     } catch (e) {
@@ -626,7 +627,8 @@ function localSave() {
       minNavigableGW: state.minNavigableGW,
       priceMode: state.priceMode,
       freeTransfersByGW: state.freeTransfersByGW,
-      historicallyUsedChips: state.historicallyUsedChips
+      historicallyUsedChips: state.historicallyUsedChips,
+      seasonMarker: state.seasonMarker
     };
     localStorage.setItem('fplplanner-state', JSON.stringify(data));
     showMessage('Team saved locally', 'success');

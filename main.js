@@ -25,7 +25,42 @@ async function init() {
       const saved = localStorage.getItem('fplplanner-state');
       if (saved) {
         const data = JSON.parse(saved);
-        if (data.plan && Object.values(data.plan).some(gw => gw?.starting?.length > 0)) {
+
+        // ── Season compatibility guard ────────────────────────────────────────
+        // Saved state from a previous season must not be restored — it would
+        // show stale players and lock the app to the old season's GW.
+        //
+        // Two detection paths:
+        //  1. Explicit marker mismatch: the saved state carries a seasonMarker
+        //     that differs from the current bootstrap marker.  This is the
+        //     reliable path once the app has written at least one save with the
+        //     new format (ui-init.js now includes seasonMarker in every write).
+        //  2. Legacy heuristic: saved state has no seasonMarker (written before
+        //     this fix), the bootstrap is at GW1/GW2 (very start of new season),
+        //     and the saved viewingGW is well above GW1 — strong signal that the
+        //     save belongs to the prior season (e.g. the user left the app on
+        //     GW38 of last season, the season marker feature was deployed, and
+        //     they now revisit at the start of the new season).
+        const bootstrapPlanningGW = getBootstrapPlanningGW();
+        const savedSeasonMarker = data.seasonMarker;
+        const currentSeasonMarker = state.seasonMarker;
+
+        const explicitSeasonMismatch =
+          savedSeasonMarker && currentSeasonMarker &&
+          savedSeasonMarker !== currentSeasonMarker;
+
+        const likelyStaleNoMarker =
+          !savedSeasonMarker &&
+          bootstrapPlanningGW <= 2 &&
+          (data.viewingGW ?? 1) > 5;
+
+        if (explicitSeasonMismatch || likelyStaleNoMarker) {
+          console.log('Stale cross-season state detected in localStorage — discarding.');
+          state.seasonRolloverDetected = true;
+          state.seasonRolloverMessage = state.seasonRolloverMessage ||
+            'New FPL season detected. Local planner cache was reset. Please import your team to continue.';
+          try { localStorage.removeItem('fplplanner-state'); } catch (_) {}
+        } else if (data.plan && Object.values(data.plan).some(gw => gw?.starting?.length > 0)) {
           state.plan = data.plan;
           normalizePlanPrices(state.plan);
           state.bank = data.bank;
@@ -37,8 +72,6 @@ async function init() {
 
           // Clamp restored viewingGW forward so stale localStorage can never
           // drag the app back to an older gameweek than bootstrap indicates.
-          const bootstrapPlanningGW = getBootstrapPlanningGW();
-
           if (state.viewingGW < bootstrapPlanningGW) {
             console.log(`Clamping stale viewingGW ${state.viewingGW} → ${bootstrapPlanningGW}`);
             state.viewingGW = bootstrapPlanningGW;
