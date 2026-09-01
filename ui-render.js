@@ -382,7 +382,7 @@ export function renderPitch() {
       <button class="pitch-save-btn" onclick="openCloudSave()" title="Cloud Save">💾 Save</button>
       <button class="pitch-import-btn" onclick="openImportMenu()" title="Import Team">📥 Import</button>
       <button class="pitch-drafts-btn" onclick="openDraftsMenu()" title="Drafts">📂 Drafts</button>
-      <button class="pitch-build-btn" onclick="startFreshSquad()" title="Build squad from scratch">✏️ Pre Season Build</button>
+      <button class="pitch-build-btn" onclick="startFreshSquad()" title="Build squad from scratch">✏️ Pre Season</button>
     </div>
     <div class="pitch-right-controls">
       <button class="pitch-reset-btn" onclick="resetToImportedTeam()">⏮️ Reset</button>
