@@ -1,0 +1,18 @@
+-- Cloudflare D1
+-- Storage & Databases -> D1 SQLite Database -> Console
+
+-- List all saved drafts
+SELECT teamid, managerid, label, created_at
+FROM team_saves
+ORDER BY created_at DESC;
+
+-- List saved drafts for a specific manager
+SELECT teamid, label, created_at
+FROM team_saves
+WHERE managerid = '18225'
+ORDER BY created_at DESC;
+
+-- Delete a saved draft
+DELETE FROM team_saves
+WHERE teamid = 'YOUR_DRAFT_NAME'
+  AND managerid = 'YOUR_MANAGER_ID';
