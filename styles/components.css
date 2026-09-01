@@ -46,21 +46,8 @@
   align-items: flex-end;
 }
 
-.pitch-left-controls button,
-.pitch-right-controls button,
-.pitch-right-controls select,
-.pitch-bank-badge {
-  min-width: 78px;
-}
-
-.pitch-save-btn,
-.pitch-import-btn,
-.pitch-drafts-btn {
-  width: 78px;
-}
-
 .pitch-build-btn {
-  width: 108px;
+  padding: 4px 10px;
 }
 
 .pitch-reset-btn,
@@ -80,7 +67,7 @@
   transition: all 0.2s;
   line-height: 1;
   white-space: nowrap;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
   text-align: center;
