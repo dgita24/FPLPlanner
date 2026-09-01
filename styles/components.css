@@ -31,7 +31,7 @@
   flex-direction: column;
   gap: 4px;
   z-index: 20;
-  align-items: stretch;
+  align-items: flex-start;
 }
 
 /* Right controls: Reset, Price dropdown, Bank badge stacked */
@@ -43,7 +43,11 @@
   flex-direction: column;
   gap: 4px;
   z-index: 20;
-  align-items: stretch;
+  align-items: flex-end;
+}
+
+.pitch-build-btn {
+  padding: 4px 10px;
 }
 
 .pitch-reset-btn,
@@ -63,6 +67,10 @@
   transition: all 0.2s;
   line-height: 1;
   white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
 }
 
 .pitch-reset-btn:hover,
@@ -90,6 +98,10 @@
   -webkit-appearance: none;
   appearance: none;
   box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
 }
 
 /* Editable bank badge inside pitch (under price dropdown) */
@@ -104,6 +116,9 @@
   text-align: center;
   line-height: 1;
   white-space: nowrap;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .pitch-bank-editable {
