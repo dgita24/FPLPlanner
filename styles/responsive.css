@@ -1353,32 +1353,66 @@
 
 /* Pitch controls: smaller on mobile */
 @media (max-width: 768px) {
+  .pitch {
+    padding: 2px 8px 14px;
+    overflow-x: hidden;
+  }
+
+  .pitch-left-controls {
+    left: 4px;
+    gap: 3px;
+    align-items: flex-start;
+  }
+
+  .pitch-right-controls {
+    right: 4px;
+    gap: 3px;
+    align-items: flex-end;
+  }
+
+  .pitch-left-controls button,
+  .pitch-right-controls button,
+  .pitch-right-controls select,
+  .pitch-bank-badge {
+    width: 74px;
+    min-width: 74px;
+    font-size: 11px;
+    padding: 3px 6px;
+    line-height: 1.1;
+  }
+
+  .pitch-build-btn {
+    width: 108px;
+    min-width: 108px;
+    white-space: normal;
+    text-align: center;
+  }
+
   .pitch-reset-btn,
   .pitch-save-btn,
   .pitch-import-btn,
   .pitch-drafts-btn,
-  .pitch-clear-btn {
-    font-size: 11px;
-    padding: 3px 6px;
+  .pitch-clear-btn,
+  .pitch-price-btn,
+  .pitch-bank-badge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
   }
 
   .pitch-price-btn {
-    font-size: 11px;
-    padding: 3px 6px;
+    appearance: none;
+    -webkit-appearance: none;
   }
 
   .pitch-bank-badge {
-    font-size: 11px;
-    padding: 3px 6px;
+    color: #b8ddf7;
   }
 
-  .pitch-left-controls,
-  .pitch-right-controls {
-    gap: 3px;
-  }
-
-  .pitch-save-import-row {
-    gap: 3px;
+  .pitch-price-btn option[value="selling"] {
+    /* This won't reliably style the emoji inside option text,
+       but keeps the dropdown consistent */
   }
 }
 
