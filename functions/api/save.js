@@ -93,7 +93,7 @@ export async function onRequestPost({ request, env, context }) {
 
       await env.DB.prepare(
         'INSERT INTO team_saves (teamid, managerid, label, passwordhash, payload) VALUES (?,?,?,?,?)'
-      ).bind(teamid, managerid || null, label || teamid, passwordhash, JSON.stringify(payload)).run();
+      ).bind(teamid, managerid, label || teamid, passwordhash, JSON.stringify(payload)).run();
     }
 
     return new Response(JSON.stringify({ success: true, message: 'Team saved successfully' }), {
