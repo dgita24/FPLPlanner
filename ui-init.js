@@ -954,7 +954,7 @@ async function saveTeam() {
         label, 
         password, 
         payload,
-        managerid: state.managerId || null
+        managerid: state.managerId
       })
     });
 

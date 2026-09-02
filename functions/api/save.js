@@ -30,7 +30,10 @@ export async function onRequestPost({ request, env, context }) {
 
     // Warn if managerid is missing - draft won't appear in dropdown
     if (!managerid) {
-      console.warn(`Warning: Saving draft without managerid for teamid ${teamid} - draft will not appear in dropdown`);
+      return new Response(JSON.stringify({ error: 'Missing managerid' }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' }
+      });
     }
 
     // Hash password
@@ -90,7 +93,7 @@ export async function onRequestPost({ request, env, context }) {
 
       await env.DB.prepare(
         'INSERT INTO team_saves (teamid, managerid, label, passwordhash, payload) VALUES (?,?,?,?,?)'
-      ).bind(teamid, managerid || null, label || teamid, passwordhash, JSON.stringify(payload)).run();
+      ).bind(teamid, managerid, label || teamid, passwordhash, JSON.stringify(payload)).run();
     }
 
     return new Response(JSON.stringify({ success: true, message: 'Team saved successfully' }), {
