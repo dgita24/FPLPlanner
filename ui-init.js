@@ -927,8 +927,10 @@ async function saveTeam() {
   const password = document.getElementById('savePassword')?.value?.trim();
   const label = document.getElementById('saveLabel')?.value?.trim();
 
-  if (!teamId || !password) {
-    showMessage('Draft team name and/or password missing or incorrect.', 'error');
+  const managerId = document.getElementById('saveManagerId')?.value?.trim();
+
+  if (!teamId || !managerId || !password) {
+    showMessage('Draft name, manager ID, and password are required.', 'error');
     return;
   }
 
@@ -946,6 +948,8 @@ async function saveTeam() {
       historicallyUsedChips: state.historicallyUsedChips
     };
 
+    const managerId = document.getElementById('saveManagerId')?.value?.trim();
+
     const response = await fetch('/api/save', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -954,7 +958,7 @@ async function saveTeam() {
         label, 
         password, 
         payload,
-        managerid: state.managerId
+        managerid: managerId
       })
     });
 
@@ -1403,6 +1407,9 @@ export function initUI() {
       selectedOverwriteDraft = null;
       const saveTeamId = document.getElementById('saveTeamId');
       if (saveTeamId) saveTeamId.value = '';
+      const saveManagerId = document.getElementById('saveManagerId');
+      if (saveManagerId) saveManagerId.value = state.managerId || '';
+
       const savePassword = document.getElementById('savePassword');
       if (savePassword) savePassword.value = '';
       const indicator = document.getElementById('overwriteIndicator');

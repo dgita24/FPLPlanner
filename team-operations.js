@@ -783,17 +783,8 @@ export function startFreshSquad(updateUI) {
   batchTransfers.snapshot = snapshotForCancel();
   batchTransfers.isActive = true;
 
-  // Preserve or initialize a stable managerId so preseason drafts can be saved
-  if (!state.managerId) {
-    state.managerId = `preseason-${gw}`;
-  }
   if (history?.baseline) {
     history.baseline.managerId = state.managerId;
-  }
-
-  // Ensure preseason drafts still have an owner key
-  if (!state.managerId) {
-    state.managerId = '';
   }
 
   // Set standard FPL budget
