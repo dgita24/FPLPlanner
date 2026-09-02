@@ -791,6 +791,11 @@ export function startFreshSquad(updateUI) {
     history.baseline.managerId = state.managerId;
   }
 
+  // Ensure preseason drafts still have an owner key
+  if (!state.managerId) {
+    state.managerId = '';
+  }
+
   // Set standard FPL budget
   state.bank = 100.0;
 
