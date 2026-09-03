@@ -81,8 +81,13 @@ export function validatePositionLimits(team) {
   const all = [...(team.starting || []), ...(team.bench || [])];
 
   let gk = 0, def = 0, mid = 0, fwd = 0;
+  const seen = new Set();
 
   for (const e of all) {
+    if (!e || e.id == null) continue;
+    if (seen.has(e.id)) continue; // prevent ghost/duplicate double-counting
+    seen.add(e.id);
+
     const et = getElementType(e.id);
     if (et === 1) gk++;
     else if (et === 2) def++;
