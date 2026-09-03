@@ -24,6 +24,18 @@ function getPlayer(id) {
   return state.elements.find((p) => p.id === id);
 }
 
+function dedupeTeamById(team) {
+  const seen = new Set();
+  const clean = (arr) => (arr || []).filter((e) => {
+    if (!e || e.id == null) return false;
+    if (seen.has(e.id)) return false;
+    seen.add(e.id);
+    return true;
+  });
+  team.starting = clean(team.starting);
+  team.bench = clean(team.bench);
+}
+
 function pushUndoState() {
   history.undoStack.push(JSON.parse(JSON.stringify(state)));
 
@@ -50,6 +62,11 @@ function snapshotForCancel() {
 }
 
 function restorePlanInPlace(snapshotPlan) {
+for (let g = state.viewingGW; g <= 38; g++) {
+  const t = state.plan[g];
+  if (!t) continue;
+  dedupeTeamById(t);
+}
   // Keep the same object reference for state.plan; replace its contents.
   for (const k of Object.keys(state.plan)) delete state.plan[k];
   for (const [k, v] of Object.entries(snapshotPlan)) state.plan[k] = v;
@@ -278,6 +295,7 @@ export function removePlayer(playerId, source, updateUI) {
   // Record where the sale came from and add selling price to bank
   const actualSource = team.starting.some((e) => e.id === playerId) ? 'starting' : 'bench';
   const sell = entry.sellingPrice ?? displayPrice(entry);
+  dedupeTeamById(t);
   
   // Track this removal (include elementType so transfer-in can match position)
   batchTransfers.removedPlayers.push({
@@ -346,7 +364,10 @@ export function reinstatePlayer(playerId, updateUI) {
 
     // Check if player already exists
     const exists = t.starting.some(e => e.id === playerId) || t.bench.some(e => e.id === playerId);
-    if (exists) continue;
+    if (exists) {
+      dedupeTeamById(t);
+      continue;
+    }
 
     // Add back to the correct side
     if (removed.side === 'starting') {
@@ -365,6 +386,8 @@ export function reinstatePlayer(playerId, updateUI) {
         }
       }
     }
+
+    dedupeTeamById(t);
   }
 
   // Deduct the selling price from bank
@@ -458,12 +481,18 @@ function addSinglePlayerToSquad(playerId, team, gw, updateUI) {
     return { success: false, reason: 'Player data not found' };
   }
 
-  // Prevent duplicates in the current GW
-  const already =
-    team.starting.some((e) => e.id === playerId) ||
-    team.bench.some((e) => e.id === playerId);
+  // Prevent duplicates in current or future GWs
+  let alreadyInPlan = false;
+  for (let g = gw; g <= 38; g++) {
+    const t = state.plan[g];
+    if (!t) continue;
+    if (t.starting.some((e) => e.id === playerId) || t.bench.some((e) => e.id === playerId)) {
+      alreadyInPlan = true;
+      break;
+    }
+  }
 
-  if (already) {
+  if (alreadyInPlan) {
     return { success: false, reason: 'Already in your squad' };
   }
 
@@ -598,6 +627,7 @@ function addSinglePlayerToSquad(playerId, team, gw, updateUI) {
       }
     }
 
+    dedupeTeamById(temp);
     const clubOk = validateClubLimit(temp);
     if (!clubOk.ok) {
       return { success: false, reason: 'Max 3 players per club' };
@@ -652,6 +682,7 @@ function addSinglePlayerToSquad(playerId, team, gw, updateUI) {
           if (gkIndex === -1) t.bench.push({ ...entry });
           else t.bench.splice(gkIndex + 1, 0, { ...entry });
         }
+        dedupeTeamById(t);
       }
     } else {
       if (t.bench.length < 4) {
