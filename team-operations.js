@@ -496,18 +496,6 @@ function addSinglePlayerToSquad(playerId, team, gw, updateUI) {
     return { success: false, reason: 'Already in your squad' };
   }
 
-  // Prevent buying a player who already exists in any future planned GW
-  for (let g = gw + 1; g <= 38; g++) {
-    const ft = state.plan[g];
-    if (!ft) continue;
-    const inFuture =
-      ft.starting.some((e) => e.id === playerId) ||
-      ft.bench.some((e) => e.id === playerId);
-    if (inFuture) {
-      return { success: false, reason: `Already in your planned squad for GW${g}` };
-    }
-  }
-
   // Budget check
   const buy = p.now_cost / 10;
   if (state.bank < buy) {
@@ -699,6 +687,7 @@ function addSinglePlayerToSquad(playerId, team, gw, updateUI) {
         t.starting.push({ ...entry });
       }
     }
+    dedupeTeamById(t);
   }
 
   // Remove the filled slot from the batch.
@@ -743,7 +732,6 @@ function addSinglePlayerToSquad(playerId, team, gw, updateUI) {
   }
 
   return { success: true };
-  updateUI();
 }
 
 // Sell every player currently in the squad via the batch-transfer mechanism.
