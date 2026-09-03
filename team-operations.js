@@ -24,6 +24,18 @@ function getPlayer(id) {
   return state.elements.find((p) => p.id === id);
 }
 
+function dedupeTeamById(team) {
+  const seen = new Set();
+  const clean = (arr) => (arr || []).filter((e) => {
+    if (!e || e.id == null) return false;
+    if (seen.has(e.id)) return false;
+    seen.add(e.id);
+    return true;
+  });
+  team.starting = clean(team.starting);
+  team.bench = clean(team.bench);
+}
+
 function pushUndoState() {
   history.undoStack.push(JSON.parse(JSON.stringify(state)));
 
@@ -62,6 +74,11 @@ export function cancelTransfer(updateUI) {
   }
 
   restorePlanInPlace(batchTransfers.snapshot.plan);
+  for (let g = state.viewingGW; g <= 38; g++) {
+  const t = state.plan[g];
+  if (!t) continue;
+  dedupeTeamById(t);
+}
   state.bank = batchTransfers.snapshot.bank;
 
   batchTransfers = {
@@ -295,6 +312,7 @@ export function removePlayer(playerId, source, updateUI) {
     if (!t) continue;
     t.starting = t.starting.filter((e) => e.id !== playerId);
     t.bench = t.bench.filter((e) => e.id !== playerId);
+    dedupeTeamById(t);
     
     // Reassign captain/VC to another starting player if the sold player held the role
     reassignCaptainVC(t);
@@ -346,7 +364,10 @@ export function reinstatePlayer(playerId, updateUI) {
 
     // Check if player already exists
     const exists = t.starting.some(e => e.id === playerId) || t.bench.some(e => e.id === playerId);
-    if (exists) continue;
+    if (exists) {
+      dedupeTeamById(t);
+      continue;
+    }
 
     // Add back to the correct side
     if (removed.side === 'starting') {
@@ -365,6 +386,8 @@ export function reinstatePlayer(playerId, updateUI) {
         }
       }
     }
+
+    dedupeTeamById(t);
   }
 
   // Deduct the selling price from bank
@@ -458,25 +481,19 @@ function addSinglePlayerToSquad(playerId, team, gw, updateUI) {
     return { success: false, reason: 'Player data not found' };
   }
 
-  // Prevent duplicates in the current GW
-  const already =
-    team.starting.some((e) => e.id === playerId) ||
-    team.bench.some((e) => e.id === playerId);
-
-  if (already) {
-    return { success: false, reason: 'Already in your squad' };
+  // Prevent duplicates in current or future GWs
+  let alreadyInPlan = false;
+  for (let g = gw; g <= 38; g++) {
+    const t = state.plan[g];
+    if (!t) continue;
+    if (t.starting.some((e) => e.id === playerId) || t.bench.some((e) => e.id === playerId)) {
+      alreadyInPlan = true;
+      break;
+    }
   }
 
-  // Prevent buying a player who already exists in any future planned GW
-  for (let g = gw + 1; g <= 38; g++) {
-    const ft = state.plan[g];
-    if (!ft) continue;
-    const inFuture =
-      ft.starting.some((e) => e.id === playerId) ||
-      ft.bench.some((e) => e.id === playerId);
-    if (inFuture) {
-      return { success: false, reason: `Already in your planned squad for GW${g}` };
-    }
+  if (alreadyInPlan) {
+    return { success: false, reason: 'Already in your squad' };
   }
 
   // Budget check
@@ -598,6 +615,7 @@ function addSinglePlayerToSquad(playerId, team, gw, updateUI) {
       }
     }
 
+    dedupeTeamById(temp);
     const clubOk = validateClubLimit(temp);
     if (!clubOk.ok) {
       return { success: false, reason: 'Max 3 players per club' };
@@ -636,7 +654,8 @@ function addSinglePlayerToSquad(playerId, team, gw, updateUI) {
     const exists =
       t.starting.some((e) => e.id === playerId) ||
       t.bench.some((e) => e.id === playerId);
-
+    
+    dedupeTeamById(t);
     if (exists) continue;
 
     if (targetSide === 'starting') {
@@ -652,6 +671,7 @@ function addSinglePlayerToSquad(playerId, team, gw, updateUI) {
           if (gkIndex === -1) t.bench.push({ ...entry });
           else t.bench.splice(gkIndex + 1, 0, { ...entry });
         }
+        dedupeTeamById(t);
       }
     } else {
       if (t.bench.length < 4) {
@@ -667,6 +687,7 @@ function addSinglePlayerToSquad(playerId, team, gw, updateUI) {
         t.starting.push({ ...entry });
       }
     }
+    dedupeTeamById(t);
   }
 
   // Remove the filled slot from the batch.
@@ -711,7 +732,6 @@ function addSinglePlayerToSquad(playerId, team, gw, updateUI) {
   }
 
   return { success: true };
-  updateUI();
 }
 
 // Sell every player currently in the squad via the batch-transfer mechanism.
@@ -757,6 +777,7 @@ export function sellAllPlayers(updateUI) {
     t.bench = t.bench.filter(e => !soldIds.has(e.id));
     if (soldIds.has(t.captain)) t.captain = null;
     if (soldIds.has(t.viceCaptain)) t.viceCaptain = null;
+    dedupeTeamById(t);
   }
 
   recomputeFreeTransfersFromGW(gw);
