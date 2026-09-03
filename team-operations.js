@@ -62,11 +62,6 @@ function snapshotForCancel() {
 }
 
 function restorePlanInPlace(snapshotPlan) {
-for (let g = state.viewingGW; g <= 38; g++) {
-  const t = state.plan[g];
-  if (!t) continue;
-  dedupeTeamById(t);
-}
   // Keep the same object reference for state.plan; replace its contents.
   for (const k of Object.keys(state.plan)) delete state.plan[k];
   for (const [k, v] of Object.entries(snapshotPlan)) state.plan[k] = v;
@@ -79,6 +74,11 @@ export function cancelTransfer(updateUI) {
   }
 
   restorePlanInPlace(batchTransfers.snapshot.plan);
+  for (let g = state.viewingGW; g <= 38; g++) {
+  const t = state.plan[g];
+  if (!t) continue;
+  dedupeTeamById(t);
+}
   state.bank = batchTransfers.snapshot.bank;
 
   batchTransfers = {
@@ -295,7 +295,6 @@ export function removePlayer(playerId, source, updateUI) {
   // Record where the sale came from and add selling price to bank
   const actualSource = team.starting.some((e) => e.id === playerId) ? 'starting' : 'bench';
   const sell = entry.sellingPrice ?? displayPrice(entry);
-  dedupeTeamById(t);
   
   // Track this removal (include elementType so transfer-in can match position)
   batchTransfers.removedPlayers.push({
@@ -313,6 +312,7 @@ export function removePlayer(playerId, source, updateUI) {
     if (!t) continue;
     t.starting = t.starting.filter((e) => e.id !== playerId);
     t.bench = t.bench.filter((e) => e.id !== playerId);
+    dedupeTeamById(t);
     
     // Reassign captain/VC to another starting player if the sold player held the role
     reassignCaptainVC(t);
@@ -666,7 +666,8 @@ function addSinglePlayerToSquad(playerId, team, gw, updateUI) {
     const exists =
       t.starting.some((e) => e.id === playerId) ||
       t.bench.some((e) => e.id === playerId);
-
+    
+    dedupeTeamById(t);
     if (exists) continue;
 
     if (targetSide === 'starting') {
@@ -788,6 +789,7 @@ export function sellAllPlayers(updateUI) {
     t.bench = t.bench.filter(e => !soldIds.has(e.id));
     if (soldIds.has(t.captain)) t.captain = null;
     if (soldIds.has(t.viceCaptain)) t.viceCaptain = null;
+    dedupeTeamById(t);
   }
 
   recomputeFreeTransfersFromGW(gw);
