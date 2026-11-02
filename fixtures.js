@@ -364,7 +364,11 @@ function renderFixtureRow(f) {
 
   let centreDisplay;
 
-  if (f.finished && f.team_h_score !== null && f.team_a_score !== null) {
+  const hasResult = (f.finished || f.finished_provisional || f.started) &&
+    f.team_h_score !== null && f.team_h_score !== undefined &&
+    f.team_a_score !== null && f.team_a_score !== undefined;
+
+  if (hasResult) {
     centreDisplay = `${f.team_h_score}–${f.team_a_score}`;
   } else {
     centreDisplay = f.kickoff_time
