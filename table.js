@@ -611,15 +611,23 @@ let pimFilter = 'all'; // 'all' | 'home' | 'away'
 let pimHistoryRows = [];
 let pimElementType = 0;
 
-// Compute DEFCON points for a single match row (mirrors fplmanagerdata logic)
-function computeMatchDC(row, elementType) {
+// Compute raw defensive contributions and DEFCON points for a single match row
+function computeMatchRawDC(row, elementType) {
   if (elementType === 1) return 0;
+
   const cbi = row.clearances_blocks_interceptions ?? 0;
   const tackles = row.tackles ?? 0;
   const recoveries = row.recoveries ?? 0;
   const cbit = cbi + tackles;
-  if (elementType === 2) return cbit >= 10 ? 2 : 0;
-  return (cbit + recoveries) >= 12 ? 2 : 0;
+
+  // DEF use CBI + tackles; MID/FWD also count recoveries.
+  return elementType === 2 ? cbit : cbit + recoveries;
+}
+
+function computeMatchDC(row, elementType) {
+  const rawDc = computeMatchRawDC(row, elementType);
+  const threshold = elementType === 2 ? 10 : 12;
+  return rawDc >= threshold ? 2 : 0;
 }
 
 // Format score from the player's perspective
@@ -777,6 +785,7 @@ function buildMatchHistoryTableRows(rows, elementType) {
     const score = formatScore(h.was_home, h.team_h_score, h.team_a_score);
     const pts = h.total_points ?? 0;
     const ptsCls = pts >= 9 ? 'pim-pts--high' : (pts <= 1 ? 'pim-pts--low' : '');
+    const rawDc = computeMatchRawDC(h, elementType);
     const dc = computeMatchDC(h, elementType);
     const gcVal = h.goals_conceded ?? 0;
     const xgcVal = fmtDec(h.expected_goals_conceded);
@@ -803,6 +812,7 @@ function buildMatchHistoryTableRows(rows, elementType) {
          <td>${gBadge}</td>
          <td>${aBadge}</td>
          <td>${dc > 0 ? `<span class="pim-dc-badge">${dc}</span>` : '0'}</td>
+         <td>${rawDc}</td>
          <td>${h.bonus ?? 0}</td>
          ${hasXg ? `<td>${fmtDec(h.expected_goals)}</td><td>${fmtDec(h.expected_assists)}</td>` : ''}
          <td>${gcVal}</td>
@@ -845,7 +855,8 @@ function buildMatchHistoryTableRows(rows, elementType) {
         <th title="Total Points">Pts</th>
         <th title="Goals">G</th>
         <th title="Assists">A</th>
-        <th title="DEFCON Points">DC</th>
+        <th title="DEFCON Points Awarded">DC</th>
+        <th title="Raw defensive contributions used for DEFCON scoring (CBI + tackles; recoveries also count for MID/FWD)">CBITr</th>
         <th title="Bonus">Bon</th>
         ${hasXg ? '<th title="Expected Goals">xG</th><th title="Expected Assists">xA</th>' : ''}
         <th title="Goals Conceded">GC</th>
