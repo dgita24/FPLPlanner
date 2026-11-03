@@ -1601,6 +1601,11 @@ td.fixtures-cell {
   color: var(--text-light);
 }
 
+.team-fixture-venue.result {
+  font-size: 13px;
+  text-transform: none;
+}
+
 /* ===== Transfer Panel (Right Side) ===== */
 
 .transfer-panel {
