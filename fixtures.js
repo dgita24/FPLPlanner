@@ -330,9 +330,12 @@ function scrollToCurrentGameweek() {
     
     // Find the current or next gameweek
     const events = state.bootstrap?.events || [];
-    const current = events.find(e => e.is_current)?.id;
-    const next = events.find(e => e.is_next)?.id;
-    const targetGW = current || next || state.currentGW;
+    const currentEvent = events.find(e => e.is_current);
+    const nextEvent = events.find(e => e.is_next);
+    // If the "current" GW is already finished, this week's GW is the next one
+    const targetGW = (currentEvent && !currentEvent.finished)
+      ? currentEvent.id
+      : (nextEvent?.id || currentEvent?.id || state.currentGW);
     
     // Find the first fixture row for the target gameweek
     const targetRow = scrollContainer.querySelector(`[data-gw="${targetGW}"]`);
@@ -411,6 +414,23 @@ function renderTeamFixtureRow(f, teamId) {
   const opponent = getTeam(opponentId);
   const venue = isHome ? 'Home' : 'Away';
 
+  const played =
+    f.team_h_score !== null && f.team_h_score !== undefined &&
+    f.team_a_score !== null && f.team_a_score !== undefined;
+
+  let venueText = venue;
+  let venueClass = isHome ? 'home' : 'away';
+  let venueStyle = '';
+  if (played) {
+    const myScore = isHome ? f.team_h_score : f.team_a_score;
+    const oppScore = isHome ? f.team_a_score : f.team_h_score;
+    const outcome = myScore > oppScore ? 'W' : myScore < oppScore ? 'L' : 'D';
+    const colour = outcome === 'W' ? '#00c853' : outcome === 'L' ? '#e53935' : '#ffb300';
+    venueText = `${f.team_h_score}–${f.team_a_score} (${outcome})`;
+    venueClass = '';
+    venueStyle = `style="color:${colour}; font-weight:700;"`;
+  }
+
   const overrideBadge = f._override
     ? `<span class="fixture-override-badge"
           title="Official override: GW${f._override.original_event} → GW${f.event}${f._override.notes ? ' — ' + f._override.notes : ''}"
@@ -423,7 +443,7 @@ function renderTeamFixtureRow(f, teamId) {
       <div class="team-fixture-gw">GW${f.event || '?'}${overrideBadge}</div>
       <img class="team-fixture-badge" src="${opponent.badge}" alt="${opponent.name}" />
       <div class="team-fixture-opponent">${opponent.name}</div>
-      <div class="team-fixture-venue ${isHome ? 'home' : 'away'}">${venue}</div>
+      <div class="team-fixture-venue ${venueClass}" ${venueStyle}>${venueText}</div>
     </div>
   `;
 }
