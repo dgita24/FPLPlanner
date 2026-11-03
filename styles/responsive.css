@@ -1045,6 +1045,10 @@
     font-size: 10px;
   }
 
+  .team-fixture-venue.result {
+    font-size: 11px;
+  }
+
   .pitch-left-controls {
     left: 2px;
     gap: 2px;
