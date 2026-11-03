@@ -427,8 +427,8 @@ function renderTeamFixtureRow(f, teamId) {
     const outcome = myScore > oppScore ? 'W' : myScore < oppScore ? 'L' : 'D';
     const colour = outcome === 'W' ? '#00c853' : outcome === 'L' ? '#e53935' : '#ffb300';
     venueText = `${f.team_h_score}–${f.team_a_score} (${outcome})`;
-    venueClass = '';
-    venueStyle = `style="color:${colour}; font-weight:700;"`;
+    venueClass = 'result';
+    venueStyle = `style="color:${colour};"`;
   }
 
   const overrideBadge = f._override
