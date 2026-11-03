@@ -442,7 +442,7 @@ function renderTeamFixtureRow(f, teamId) {
     <div class="team-fixture-row" data-gw="${f.event || ''}">
       <div class="team-fixture-gw">GW${f.event || '?'}${overrideBadge}</div>
       <img class="team-fixture-badge" src="${opponent.badge}" alt="${opponent.name}" />
-      <div class="team-fixture-opponent">${opponent.name}</div>
+      <div class="team-fixture-opponent">${opponent.name}${played ? ` <span class="team-fixture-ha">(${isHome ? 'H' : 'A'})</span>` : ''}</div>
       <div class="team-fixture-venue ${venueClass}" ${venueStyle}>${venueText}</div>
     </div>
   `;
