@@ -856,7 +856,7 @@ function buildMatchHistoryTableRows(rows, elementType) {
         <th title="Goals">G</th>
         <th title="Assists">A</th>
         <th title="DEFCON Points Awarded">DC</th>
-        <th title="Raw defensive contributions used for DEFCON scoring (CBI + tackles; recoveries also count for MID/FWD)">Raw DC</th>
+        <th title="Raw defensive contributions used for DEFCON scoring (CBI + tackles; recoveries also count for MID/FWD)">CBITr</th>
         <th title="Bonus">Bon</th>
         ${hasXg ? '<th title="Expected Goals">xG</th><th title="Expected Assists">xA</th>' : ''}
         <th title="Goals Conceded">GC</th>
